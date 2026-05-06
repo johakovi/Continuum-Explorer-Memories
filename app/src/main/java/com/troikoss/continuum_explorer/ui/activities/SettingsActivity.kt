@@ -130,6 +130,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     val text = when (language) {
                         "tr" -> stringResource(R.string.settings_language_turkish)
                         "en" -> stringResource(R.string.settings_language_english)
+                        "fi" -> stringResource(R.string.settings_language_finnish)
                         "fr" -> stringResource(R.string.settings_language_french)
                         "pt" -> stringResource(R.string.settings_language_portuguese)
                         "es" -> stringResource(R.string.settings_language_spanish)
@@ -400,6 +401,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 selected = language == "en",
                                 onClick = {
                                     SettingsManager.setLanguage(context, "en")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_finnish),
+                                selected = language == "fi",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "fi")
                                     showLanguageDialog = false
                                 }
                             )

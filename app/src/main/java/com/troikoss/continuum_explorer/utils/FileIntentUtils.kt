@@ -26,6 +26,7 @@ fun shareFiles(context: Context, scope: CoroutineScope, files: List<UniversalFil
         scope.launch {
             try {
                 FileOperationsManager.start()
+                NotificationHelper.start(context)
                 withContext(Dispatchers.Main) {
                     FileOperationsManager.update(0, files.size, operationType = OperationType.COPY)
                 }
@@ -98,6 +99,7 @@ fun openWith(context: Context, scope: CoroutineScope, file: UniversalFile) {
         scope.launch {
             try {
                 FileOperationsManager.start()
+                NotificationHelper.start(context)
                 withContext(Dispatchers.Main) {
                     FileOperationsManager.update(0, 1, operationType = OperationType.COPY)
                     FileOperationsManager.currentFileName.value = file.name
@@ -151,6 +153,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile)
     scope.launch {
         try {
             FileOperationsManager.start()
+            NotificationHelper.start(context)
             withContext(Dispatchers.Main) {
                 FileOperationsManager.update(0, 1, operationType = OperationType.COPY)
                 FileOperationsManager.currentFileName.value = file.name

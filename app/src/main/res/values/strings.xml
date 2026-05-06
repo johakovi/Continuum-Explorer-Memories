@@ -210,10 +210,11 @@
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
     <string name="settings_language_english">English</string>
-    <string name="settings_language_turkish">Turkish</string>
+    <string name="settings_language_finnish">Finnish</string>
     <string name="settings_language_french">French</string>
     <string name="settings_language_portuguese">Portuguese</string>
     <string name="settings_language_spanish">Spanish</string>
+    <string name="settings_language_turkish">Turkish</string>
     <string name="settings_choose_language">Choose Language</string>
 
     <!-- Context Menus/Command Bar -->

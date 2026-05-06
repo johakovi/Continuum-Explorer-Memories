@@ -1,13 +1,16 @@
 package com.troikoss.continuum_explorer.utils
 
 import android.Manifest
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.text.format.Formatter
 import androidx.core.app.ActivityCompat
@@ -22,23 +25,39 @@ object NotificationHelper {
     private const val NOTIFICATION_ID = 1001
     private var isRegistered = false
     private var appContext: Context? = null
+    private var currentService: Service? = null
 
-    // Store the listener so we can remove it later
     private val updateListener: () -> Unit = {
         appContext?.let { context ->
-            showProgressNotification(context)
+            updateNotification(context)
         }
     }
 
     fun start(context: Context) {
-        appContext = context.applicationContext
-        createNotificationChannel(context)
+        val intent = Intent(context, FileOperationService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent)
+        } else {
+            context.startService(intent)
+        }
+    }
+
+    fun startForeground(service: Service) {
+        currentService = service
+        appContext = service.applicationContext
+        createNotificationChannel(service)
         
         if (!isRegistered) {
             FileOperationsManager.addListener(updateListener)
             isRegistered = true
         }
-        showProgressNotification(context)
+
+        val notification = createNotification(service)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            service.startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            service.startForeground(NOTIFICATION_ID, notification)
+        }
     }
 
     fun stop() {
@@ -48,8 +67,11 @@ object NotificationHelper {
         }
         appContext?.let {
             NotificationManagerCompat.from(it).cancel(NOTIFICATION_ID)
+            val intent = Intent(it, FileOperationService::class.java)
+            it.stopService(intent)
         }
         appContext = null
+        currentService = null
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -66,42 +88,21 @@ object NotificationHelper {
         }
     }
 
-    private fun showProgressNotification(context: Context) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+    private fun updateNotification(context: Context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return
         }
 
         val isRunning = FileOperationsManager.isOperating.value
-        val isCancelled = FileOperationsManager.isCancelled.value
-        val progress = FileOperationsManager.progress.floatValue
-        val fileName = FileOperationsManager.currentFileName.value
-        
-        // Detailed Stats
-        val speedBytesPerSec = FileOperationsManager.currentSpeed.longValue
-        val timeRemainingMillis = FileOperationsManager.timeRemaining.longValue
-
-        // Create Intent to open PopUpActivity
-        val intent = Intent(context, PopUpActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Handle Finished State
         if (!isRunning) {
-            if (isCancelled) {
-                // If cancelled, remove the notification immediately
-                NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID)
-            } else {
-                // If finished successfully, show success message
+            // Success or Cancelled - show final notification then stop service
+            val isCancelled = FileOperationsManager.isCancelled.value
+            if (!isCancelled) {
+                val intent = Intent(context, PopUpActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)
                     .setContentTitle(context.getString(R.string.op_finished))
@@ -112,28 +113,31 @@ object NotificationHelper {
 
                 NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
             }
-
-            // Unregister listener
-            if (isRegistered) {
-                FileOperationsManager.removeListener(updateListener)
-                isRegistered = false
-            }
+            stop()
             return
         }
 
-        // Handle Ongoing State
-        // Create Intent for Cancel Action
+        val notification = createNotification(context)
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
+    }
+
+    private fun createNotification(context: Context): Notification {
+        val isCancelled = FileOperationsManager.isCancelled.value
+        val progress = FileOperationsManager.progress.floatValue
+        val fileName = FileOperationsManager.currentFileName.value
+        val speedBytesPerSec = FileOperationsManager.currentSpeed.longValue
+        val timeRemainingMillis = FileOperationsManager.timeRemaining.longValue
+
+        val intent = Intent(context, PopUpActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
         val cancelIntent = Intent(context, NotificationCancelReceiver::class.java).apply {
             action = NotificationCancelReceiver.ACTION_CANCEL
         }
-        val cancelPendingIntent = PendingIntent.getBroadcast(
-            context,
-            1,
-            cancelIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val cancelPendingIntent = PendingIntent.getBroadcast(context, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-        // Format stats
         val speedString = "${Formatter.formatFileSize(context, speedBytesPerSec)}/s"
         val timeString = when {
             timeRemainingMillis <= 0 -> context.getString(R.string.calculating)
@@ -148,21 +152,19 @@ object NotificationHelper {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(title)
-            .setSubText(contentText) // Shows speed in header as well
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText("$contentText\n$fileName")) // Detailed view
+            .setSubText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("$contentText\n$fileName"))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .setProgress(100, progressInt, false)
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             
-        // Only add cancel button if not already cancelling
         if (!isCancelled) {
             builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel), cancelPendingIntent)
         }
 
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+        return builder.build()
     }
 }
 

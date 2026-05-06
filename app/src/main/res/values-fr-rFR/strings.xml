@@ -204,11 +204,12 @@
     <string name="settings_choose_details_mode">Choisir le mode de détails</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_system">Par défaut du système</string>
-    <string name="settings_language_english">Anglais</string>
-    <string name="settings_language_turkish">Turc</string>
-    <string name="settings_language_french">Français</string>
-    <string name="settings_language_portuguese">Portugais</string>
-    <string name="settings_language_spanish">Espagnol</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_finnish">Finnish</string>
+    <string name="settings_language_french">French</string>
+    <string name="settings_language_portuguese">Portuguese</string>
+    <string name="settings_language_spanish">Spanish</string>
+    <string name="settings_language_turkish">Turkish</string>
     <string name="settings_choose_language">Choisir la langue</string>
 
     <!-- Context Menus/Command Bar -->

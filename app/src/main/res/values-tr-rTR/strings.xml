@@ -188,11 +188,12 @@
     <string name="settings_choose_details_mode">Ayrıntılar Modunu Seç</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem varsayılanı</string>
-    <string name="settings_language_english">İngilizce</string>
-    <string name="settings_language_turkish">Türkçe</string>
-    <string name="settings_language_french">Fransızca</string>
-    <string name="settings_language_portuguese">Portekizce</string>
-    <string name="settings_language_spanish">İspanyolca</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_finnish">Finnish</string>
+    <string name="settings_language_french">French</string>
+    <string name="settings_language_portuguese">Portuguese</string>
+    <string name="settings_language_spanish">Spanish</string>
+    <string name="settings_language_turkish">Turkish</string>
     <string name="settings_choose_language">Dil Seç</string>
     <string name="menu_restore">Geri Yükle</string>
     <string name="menu_delete_permanently">Kalıcı Sil</string>

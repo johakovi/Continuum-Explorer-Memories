@@ -9,11 +9,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.troikoss.continuum_explorer"
+        applicationId = "com.troikoss.continuum_explorer_memories"
         minSdk = 26
         targetSdk = 36
         versionCode = 40
-        versionName = "0.4.0-beta"
+        versionName = "0.4.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
