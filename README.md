@@ -30,9 +30,10 @@ Icon packs
 Text editor
 
 ## Bugs to fix
-Example PDF or Word file that are opened from Continuum Explorer, it opens only read-only
-
 "Square" sidebar and "Rounded" window theme elements overlaps
+
+## Known issues
+The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
 
 ## More languages?
 If you want contribute to adding more languages to my fork or original troikoss app,
