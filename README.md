@@ -1,9 +1,11 @@
+<img width="192" height="192" alt="1000287944" src="https://github.com/user-attachments/assets/9363592b-b9ec-4abd-8fce-548c74da7b41" /> Continuum Explorer (Memories)
 
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
 Note: This project is forked from troikoss / Continuum Explorer
 
-<img width="2160" height="1681" alt="1000287941" src="https://github.com/user-attachments/assets/163a9d7e-e60b-428c-83b7-d00c075d5498" />
+<img width="2160" height="1686" alt="1000287941" src="https://github.com/user-attachments/assets/163a9d7e-e60b-428c-83b7-d00c075d5498" />
+
 <img width="2160" height="1686" alt="1000287942" src="https://github.com/user-attachments/assets/0334dde4-b7d7-47e4-b003-9c8344706547" />
 
 ## Key Features:
