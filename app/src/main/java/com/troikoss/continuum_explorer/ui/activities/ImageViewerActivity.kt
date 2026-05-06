@@ -464,7 +464,8 @@ fun ImageViewerScreen(
                                     // 2. Do the action
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         setDataAndType(contentUri, "image/*")
-                                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                                     }
                                     context.startActivity(Intent.createChooser(intent, resources.getString(R.string.menu_open_with)))
                                 } catch (e: Exception) {

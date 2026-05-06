@@ -108,7 +108,7 @@ fun openWith(context: Context, scope: CoroutineScope, file: UniversalFile) {
                 withContext(Dispatchers.Main) {
                     FileOperationsManager.finish()
                     val cachedUri = FileProvider.getUriForFile(context, context.packageName + ".provider", cached)
-                    launchOpenWithIntent(context, cachedUri)
+                    launchOpenWithIntent(context, cachedUri, file.name)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -121,24 +121,48 @@ fun openWith(context: Context, scope: CoroutineScope, file: UniversalFile) {
     }
 
     val uri = getUriForUniversalFile(context, file) ?: return
-    launchOpenWithIntent(context, uri)
+    launchOpenWithIntent(context, uri, file.name)
 }
 
-private fun launchOpenWithIntent(context: Context, uri: Uri) {
-    val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-    val mimeType = if (extension != null) {
-        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase())
+private fun launchOpenWithIntent(context: Context, uri: Uri, fileName: String? = null) {
+    val extension = fileName?.substringAfterLast('.', "")?.lowercase() ?: ""
+    val mimeType = if (fileName != null) {
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: context.contentResolver.getType(uri)
     } else {
-        context.contentResolver.getType(uri)
+        val ext = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+        if (ext != null) {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext.lowercase())
+        } else {
+            context.contentResolver.getType(uri)
+        }
     } ?: "*/*"
-    val intent = Intent(Intent.ACTION_VIEW).apply {
+
+    val isOfficeDoc = when (extension) {
+        "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "txt" -> true
+        else -> false
+    }
+
+    val intent = Intent(if (isOfficeDoc) Intent.ACTION_EDIT else Intent.ACTION_VIEW).apply {
         setDataAndType(uri, mimeType)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     try {
-        context.startActivity(Intent.createChooser(intent, context.getString(R.string.menu_open_with_no_dots)))
+        val chooser = Intent.createChooser(intent, context.getString(R.string.menu_open_with_no_dots))
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
     } catch (_: Exception) {
+        if (isOfficeDoc) {
+            intent.action = Intent.ACTION_VIEW
+            try {
+                val chooser = Intent.createChooser(intent, context.getString(R.string.menu_open_with_no_dots))
+                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(chooser)
+                return
+            } catch (_: Exception) {}
+        }
         Toast.makeText(context, context.getString(R.string.msg_no_app_open), Toast.LENGTH_SHORT).show()
     }
 }
@@ -174,6 +198,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile)
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(cachedUri, mime ?: "*/*")
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 try {
@@ -214,22 +239,36 @@ fun openFile(context: Context, file: UniversalFile) {
         }
     }
 
-    val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-    val mimeType = if (extension != null) {
-        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase())
-    } else {
-        context.contentResolver.getType(uri)
-    } ?: "*/*"
+    val extension = file.name.substringAfterLast('.', "").lowercase()
+    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        ?: context.contentResolver.getType(uri)
+        ?: "*/*"
 
-    val intent = Intent(Intent.ACTION_VIEW).apply {
+    // For Office documents, ACTION_EDIT can sometimes bypass the read-only mode in apps like Word/Excel
+    val isOfficeDoc = when (extension) {
+        "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "txt" -> true
+        else -> false
+    }
+
+    val intent = Intent(if (isOfficeDoc) Intent.ACTION_EDIT else Intent.ACTION_VIEW).apply {
         setDataAndType(uri, mimeType)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
     try {
         context.startActivity(intent)
     } catch (_: Exception) {
-        launchOpenWithIntent(context, uri)
+        // Fallback to ACTION_VIEW if ACTION_EDIT is not supported
+        if (isOfficeDoc) {
+            intent.action = Intent.ACTION_VIEW
+            try {
+                context.startActivity(intent)
+                return
+            } catch (_: Exception) {}
+        }
+        launchOpenWithIntent(context, uri, file.name)
     }
 }

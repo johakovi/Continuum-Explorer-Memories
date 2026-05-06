@@ -8,4 +8,7 @@
 
     <!-- This covers app-specific files -->
     <files-path name="my_files" path="." />
+    <cache-path name="my_cache" path="." />
+    <external-files-path name="external_app_files" path="." />
+    <external-cache-path name="external_app_cache" path="." />
 </paths>

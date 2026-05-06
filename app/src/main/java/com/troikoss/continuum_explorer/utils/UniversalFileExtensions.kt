@@ -13,6 +13,8 @@ import com.troikoss.continuum_explorer.providers.SafProvider
 import java.io.File
 
 fun File.toUniversal(): UniversalFile {
+    val extension = this.extension.lowercase()
+    val mimeType = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     return UniversalFile(
         name = this.name,
         isDirectory = this.isDirectory,
@@ -21,6 +23,7 @@ fun File.toUniversal(): UniversalFile {
         provider = LocalProvider,
         providerId = this.absolutePath,
         parentId = this.parentFile?.absolutePath,
+        mimeType = mimeType
     )
 }
 

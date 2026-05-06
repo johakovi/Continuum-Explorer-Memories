@@ -43,7 +43,7 @@
         <string name="prop_deleted_from">Poistettu paikasta:</string>
         <string name="prop_resolution">Resoluutio:</string>
         <string name="prop_duration">Aika:</string>
-        <string name="prop_items">Kappaleet:</string>
+        <string name="prop_items">Kohteita:</string>
         <string name="prop_contains">Sisältää:</string>
         <string name="prop_folders_count">%1$d kansiot</string>
         <string name="prop_files_count">%1$d tiedostot</string>
@@ -265,7 +265,7 @@
         <string name="menu_audio_track">Ääniraita</string>
         <string name="menu_speed">Nopeus</string>
         <string name="menu_aspect_ratio">Kuvasuhde</string>
-        <string name="menu_open_with_no_dots">Avaa seuraavalla</string>
+        <string name="menu_open_with_no_dots">Avaa sovelluksella</string>
         <string name="menu_select">Valitse</string>
         <string name="menu_clear_selection">Tyhjennä valinta</string>
         <string name="menu_select_inverse">Käänteinen valinta</string>
@@ -280,7 +280,7 @@
         <string name="menu_redo">Kumoa</string>
 
         <!-- Navigation -->
-        <string name="nav_library_items">tiedosto kirjasto</string>
+        <string name="nav_library_items">Tiedosto kirjasto</string>
         <string name="nav_recent">Viimeisimmät</string>
         <string name="nav_gallery">Galleria</string>
         <string name="menu_gallery_albums">Albumit</string>
