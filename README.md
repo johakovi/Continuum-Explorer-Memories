@@ -1,10 +1,9 @@
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
-Note: This project is semi-vibecoded. While AI assisted in the creation, I have personally restructured the codebase and manually implemented several core features.
+Note: This project is forked from troikoss / Continuum-Explorer
 
 https://github.com/user-attachments/assets/68dd7068-a8ad-49f6-82b1-7c930df842ba
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/troikoss)
 
 ## Key Features:
 Tabs & Multi-Window: Support for advanced multitasking.
