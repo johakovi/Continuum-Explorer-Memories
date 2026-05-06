@@ -180,6 +180,15 @@
         <string name="settings">Asetukset</string>
         <string name="settings_appearance">Ulkonäkö</string>
         <string name="settings_theme">Teema</string>
+        <string name="settings_themebar">Sivupalkki</string>
+        <string name="settings_themebar_rounded">Pyöreä</string>
+        <string name="settings_themebar_square">Kulmikas</string>
+        <string name="settings_themecontent">Ikkuna</string>
+        <string name="settings_themecontent_rounded">Pyöreä</string>
+        <string name="settings_themecontent_square">Kulmikas</string>
+        <string name="settings_themetop">Välilehti</string>
+        <string name="settings_themetop_attached">Kiinnitetty</string>
+        <string name="settings_themetop_float">Irtonainen</string>
         <string name="settings_theme_system">Järjestelmän oma</string>
         <string name="settings_theme_light">Vaalea tyyli</string>
         <string name="settings_theme_dark">Tumma tyyli</string>

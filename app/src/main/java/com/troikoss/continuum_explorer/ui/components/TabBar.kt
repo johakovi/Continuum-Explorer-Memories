@@ -36,6 +36,7 @@ import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.R
 import kotlinx.coroutines.launch
 
@@ -56,32 +57,39 @@ fun TabBar(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val borderColor = MaterialTheme.colorScheme.outlineVariant
+    val themeTop = SettingsManager.themeTop.value
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(40.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .drawBehind {
-                val strokeWidth = 1.dp.toPx()
-                drawLine(
-                    color = borderColor,
-                    start = Offset(0f, size.height - strokeWidth / 2),
-                    end = Offset(size.width, size.height - strokeWidth / 2),
-                    strokeWidth = strokeWidth
-                )
+            .height(if (themeTop == ThemeTopMode.FLOAT) 48.dp else 40.dp)
+            .background(if (themeTop == ThemeTopMode.FLOAT) Color.Transparent else MaterialTheme.colorScheme.surfaceContainer)
+            .let {
+                if (themeTop == ThemeTopMode.ATTACHED) {
+                    it.drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, size.height - strokeWidth / 2),
+                            end = Offset(size.width, size.height - strokeWidth / 2),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+                } else it
             },
-        contentAlignment = Alignment.BottomStart
+        contentAlignment = if (themeTop == ThemeTopMode.FLOAT) Alignment.CenterStart else Alignment.BottomStart
     ) {
         // Shrink tabs proportionally as more are added, scroll when they hit minimum.
+        val horizontalPadding = if (themeTop == ThemeTopMode.FLOAT) 16.dp else 0.dp
         val slotWidth: Dp = if (tabs.isEmpty()) TAB_SLOT_MAX else {
-            val available = maxWidth - ADD_BUTTON_WIDTH
+            val available = maxWidth - ADD_BUTTON_WIDTH - (horizontalPadding * 2)
             (available / tabs.size).coerceIn(TAB_SLOT_MIN, TAB_SLOT_MAX)
         }
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = horizontalPadding)
                 .horizontalScroll(scrollState)
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
@@ -96,7 +104,7 @@ fun TabBar(
                         }
                     }
                 },
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = if (themeTop == ThemeTopMode.FLOAT) Alignment.CenterVertically else Alignment.Bottom
         ) {
             tabs.forEachIndexed { index, title ->
                 val universalFile: UniversalFile? = when {
@@ -163,6 +171,7 @@ fun TabBar(
 }
 
 private val TabShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+private val TabShapeFloat = RoundedCornerShape(22.dp)
 
 @Composable
 private fun TabItem(
@@ -174,25 +183,28 @@ private fun TabItem(
     onClose: () -> Unit
 ) {
     val isColorful = SettingsManager.isColorfulBarsEnabled.value
+    val themeTop = SettingsManager.themeTop.value
 
     val backgroundColor = when {
         selected && isColorful -> MaterialTheme.colorScheme.primaryContainer
-        selected -> MaterialTheme.colorScheme.surface
-        else -> Color.Transparent
+        selected -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface
+        else -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else Color.Transparent
     }
     val textColor = when {
         selected && isColorful -> MaterialTheme.colorScheme.onPrimaryContainer
-        selected -> MaterialTheme.colorScheme.onSurface
+        selected -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
+
+    val shape = if (themeTop == ThemeTopMode.FLOAT) TabShapeFloat else TabShape
 
     // slotWidth = visual tab width + 4dp side padding (2dp each side)
     Box(
         modifier = Modifier
             .width(slotWidth)
-            .padding(start = 2.dp, end = 2.dp, top = 8.dp)
-            .clip(TabShape)
-            .height(32.dp)
+            .padding(start = 2.dp, end = 2.dp, top = if (themeTop == ThemeTopMode.FLOAT) 0.dp else 8.dp)
+            .clip(shape)
+            .height(if (themeTop == ThemeTopMode.FLOAT) 36.dp else 32.dp)
             .background(backgroundColor)
             .pointerInput(Unit) {
                 awaitEachGesture {

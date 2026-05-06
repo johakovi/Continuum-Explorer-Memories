@@ -179,6 +179,15 @@
     <string name="settings_theme_system">Predeterminado del sistema</string>
     <string name="settings_theme_light">Modo claro</string>
     <string name="settings_theme_dark">Modo oscuro</string>
+    <string name="settings_themebar">Sidebar</string>
+    <string name="settings_themebar_rounded">Rounded</string>
+    <string name="settings_themebar_square">Square</string>
+    <string name="settings_themecontent">Window</string>
+    <string name="settings_themecontent_rounded">Rounded</string>
+    <string name="settings_themecontent_square">Square</string>
+    <string name="settings_themetop_attached">Attached</string>
+    <string name="settings_themetop">Tab</string>
+    <string name="settings_themetop_float">Float</string>
     <string name="settings_details_large">Detalles (Solo pantallas grandes)</string>
     <string name="settings_details_hidden">Oculto</string>
     <string name="settings_details_pane">Panel lateral</string>

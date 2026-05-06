@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.utils.FileExplorerState
-import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
 import com.troikoss.continuum_explorer.utils.getFileType

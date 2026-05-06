@@ -32,6 +32,16 @@ enum class ThemeMode {
     DARK
 }
 
+enum class ThemeShape {
+    ROUNDED,
+    SQUARE
+}
+
+enum class ThemeTopMode {
+    ATTACHED,
+    FLOAT
+}
+
 object SettingsManager {
     private const val PREFS_NAME = "explorer_settings"
     private const val KEY_DELETE_BEHAVIOR = "delete_behavior"
@@ -39,6 +49,9 @@ object SettingsManager {
     private const val KEY_TOUCH_DRAG_BEHAVIOR = "touch_drag_behavior"
     private const val KEY_DEFAULT_ARCHIVE_VIEWER = "default_archive_viewer"
     private const val KEY_THEME_MODE = "theme_mode"
+    private const val KEY_THEME_BAR = "theme_bar"
+    private const val KEY_THEME_CONTENT = "theme_content"
+    private const val KEY_THEME_TOP = "theme_top"
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
@@ -57,6 +70,15 @@ object SettingsManager {
 
     private val _themeMode = mutableStateOf(ThemeMode.SYSTEM)
     val themeMode: State<ThemeMode> = _themeMode
+
+    private val _themeBar = mutableStateOf(ThemeShape.ROUNDED)
+    val themeBar: State<ThemeShape> = _themeBar
+
+    private val _themeContent = mutableStateOf(ThemeShape.ROUNDED)
+    val themeContent: State<ThemeShape> = _themeContent
+
+    private val _themeTop = mutableStateOf(ThemeTopMode.ATTACHED)
+    val themeTop: State<ThemeTopMode> = _themeTop
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
@@ -92,7 +114,7 @@ object SettingsManager {
         val savedBehavior = prefs.getString(KEY_DELETE_BEHAVIOR, DeleteBehavior.ASK.name)
         val behavior = try {
             DeleteBehavior.valueOf(savedBehavior ?: DeleteBehavior.ASK.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DeleteBehavior.ASK
         }
         
@@ -101,17 +123,37 @@ object SettingsManager {
         val savedTouchDrag = prefs.getString(KEY_TOUCH_DRAG_BEHAVIOR, TouchDragBehavior.ASK.name)
         _touchDragBehavior.value = try {
             TouchDragBehavior.valueOf(savedTouchDrag ?: TouchDragBehavior.ASK.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             TouchDragBehavior.ASK
         }
 
         val savedTheme = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
-        val theme = try {
+        _themeMode.value = try {
             ThemeMode.valueOf(savedTheme ?: ThemeMode.SYSTEM.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ThemeMode.SYSTEM
         }
-        _themeMode.value = theme
+
+        val savedThemeBar = prefs.getString(KEY_THEME_BAR, ThemeShape.ROUNDED.name)
+        _themeBar.value = try {
+            ThemeShape.valueOf(savedThemeBar ?: ThemeShape.ROUNDED.name)
+        } catch (_: Exception) {
+            ThemeShape.ROUNDED
+        }
+
+        val savedThemeContent = prefs.getString(KEY_THEME_CONTENT, ThemeShape.ROUNDED.name)
+        _themeContent.value = try {
+            ThemeShape.valueOf(savedThemeContent ?: ThemeShape.ROUNDED.name)
+        } catch (_: Exception) {
+            ThemeShape.ROUNDED
+        }
+
+        val savedThemeTop = prefs.getString(KEY_THEME_TOP, ThemeTopMode.ATTACHED.name)
+        _themeTop.value = try {
+            ThemeTopMode.valueOf(savedThemeTop ?: ThemeTopMode.ATTACHED.name)
+        } catch (_: Exception) {
+            ThemeTopMode.ATTACHED
+        }
 
         val savedLanguage = prefs.getString(KEY_LANGUAGE, "system") ?: "system"
         _language.value = savedLanguage
@@ -120,7 +162,7 @@ object SettingsManager {
         val savedDetails = prefs.getString(KEY_DETAILS_MODE, DetailsMode.OFF.name)
         _detailsMode.value = try {
             DetailsMode.valueOf(savedDetails ?: DetailsMode.OFF.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DetailsMode.OFF
         }
 
@@ -161,8 +203,6 @@ object SettingsManager {
         _detailsMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_DETAILS_MODE, mode.name).apply()
-
-        // ADD THIS LINE: It tells the rest of the app "Hey! Settings changed!"
         GlobalEvents.triggerConfigUpdate()
     }
 
@@ -210,6 +250,27 @@ object SettingsManager {
         _themeMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_THEME_MODE, mode.name).apply()
+    }
+
+    fun setThemeBar(context: Context, mode: ThemeShape) {
+        _themeBar.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_THEME_BAR, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setThemeContent(context: Context, mode: ThemeShape) {
+        _themeContent.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_THEME_CONTENT, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setThemeTop(context: Context, mode: ThemeTopMode) {
+        _themeTop.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_THEME_TOP, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
     }
 
     private fun updateBehaviorInternal(behavior: DeleteBehavior) {

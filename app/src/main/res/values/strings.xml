@@ -182,6 +182,15 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light mode</string>
     <string name="settings_theme_dark">Dark mode</string>
+    <string name="settings_themebar">Sidebar</string>
+    <string name="settings_themebar_rounded">Rounded</string>
+    <string name="settings_themebar_square">Square</string>
+    <string name="settings_themecontent">Window</string>
+    <string name="settings_themecontent_rounded">Rounded</string>
+    <string name="settings_themecontent_square">Square</string>
+    <string name="settings_themetop">Tab</string>
+    <string name="settings_themetop_attached">Attached</string>
+    <string name="settings_themetop_float">Float</string>
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colors for the top bar and tab bar.</string>
     <string name="settings_details_large">Details (Large screens only)</string>

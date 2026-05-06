@@ -225,13 +225,11 @@ private fun FileGalleryView(
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            onTextLayout = { textLayoutResult ->
-                                isOverflowing = textLayoutResult.hasVisualOverflow
-                            }
+
                         )
                     }
                 }
-            } else isOverflowing = true
+            }
 
             Box(
                 modifier = Modifier

@@ -46,8 +46,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.SdCard
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.CloudCircle
-import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Lan
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Tab

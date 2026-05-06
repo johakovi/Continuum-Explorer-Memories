@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,6 +33,8 @@ import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
+import com.troikoss.continuum_explorer.managers.ThemeShape
+import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.TouchDragBehavior
 import com.troikoss.continuum_explorer.model.ViewMode
 
@@ -52,11 +53,13 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
     val deleteBehavior = SettingsManager.deleteBehavior.value
     val touchDragBehavior = SettingsManager.touchDragBehavior.value
     val isDefaultArchiveViewerEnabled = SettingsManager.isDefaultArchiveViewerEnabled.value
     val themeMode = SettingsManager.themeMode.value
+    val themeBar = SettingsManager.themeBar.value
+    val themeContent = SettingsManager.themeContent.value
+    val themeTop = SettingsManager.themeTop.value
     val language = SettingsManager.language.value
     val detailsMode = SettingsManager.detailsMode.value
     val isCommandBarVisible = SettingsManager.isCommandBarVisible.value
@@ -68,6 +71,9 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTouchDragDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showThemeBarDialog by remember { mutableStateOf(false) }
+    var showThemeContentDialog by remember { mutableStateOf(false) }
+    var showThemeTopDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
@@ -110,6 +116,42 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Text(text)
                 },
                 modifier = Modifier.clickable { showThemeDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_themetop)) },
+                supportingContent = {
+                    val text = when (themeTop) {
+                        ThemeTopMode.ATTACHED -> stringResource(R.string.settings_themetop_attached)
+                        ThemeTopMode.FLOAT -> stringResource(R.string.settings_themetop_float)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showThemeTopDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_themebar)) },
+                supportingContent = {
+                    val text = when (themeBar) {
+                        ThemeShape.SQUARE -> stringResource(R.string.settings_themebar_square)
+                        ThemeShape.ROUNDED -> stringResource(R.string.settings_themebar_rounded)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showThemeBarDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_themecontent)) },
+                supportingContent = {
+                    val text = when (themeContent) {
+                        ThemeShape.SQUARE -> stringResource(R.string.settings_themecontent_square)
+                        ThemeShape.ROUNDED -> stringResource(R.string.settings_themecontent_rounded)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showThemeContentDialog = true }
             )
 
             ListItem(
@@ -382,6 +424,102 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
+            if (showThemeTopDialog) {
+                AlertDialog(
+                    onDismissRequest = { showThemeTopDialog = false },
+                    title = { Text(stringResource(R.string.settings_themetop)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_themetop_attached),
+                                selected = themeTop == ThemeTopMode.ATTACHED,
+                                onClick = {
+                                    SettingsManager.setThemeTop(context, ThemeTopMode.ATTACHED)
+                                    showThemeTopDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_themetop_float),
+                                selected = themeTop == ThemeTopMode.FLOAT,
+                                onClick = {
+                                    SettingsManager.setThemeTop(context, ThemeTopMode.FLOAT)
+                                    showThemeTopDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showThemeTopDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showThemeBarDialog) {
+                AlertDialog(
+                    onDismissRequest = { showThemeBarDialog = false },
+                    title = { Text(stringResource(R.string.settings_themebar)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_themebar_rounded),
+                                selected = themeBar == ThemeShape.ROUNDED,
+                                onClick = {
+                                    SettingsManager.setThemeBar(context, ThemeShape.ROUNDED)
+                                    showThemeBarDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_themebar_square),
+                                selected = themeBar == ThemeShape.SQUARE,
+                                onClick = {
+                                    SettingsManager.setThemeBar(context, ThemeShape.SQUARE)
+                                    showThemeBarDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showThemeBarDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showThemeContentDialog) {
+                AlertDialog(
+                    onDismissRequest = { showThemeContentDialog = false },
+                    title = { Text(stringResource(R.string.settings_themecontent)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_themecontent_rounded),
+                                selected = themeContent == ThemeShape.ROUNDED,
+                                onClick = {
+                                    SettingsManager.setThemeContent(context, ThemeShape.ROUNDED)
+                                    showThemeContentDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_themecontent_square),
+                                selected = themeContent == ThemeShape.SQUARE,
+                                onClick = {
+                                    SettingsManager.setThemeContent(context, ThemeShape.SQUARE)
+                                    showThemeContentDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showThemeContentDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
             if (showLanguageDialog) {
                 AlertDialog(
                     onDismissRequest = { showLanguageDialog = false },
@@ -555,7 +693,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
 
             if (showAboutDialog) {
-                val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+                val uriHandler = LocalUriHandler.current
 
                 // This part safely loads your app icon so it doesn't crash
                 val context = LocalContext.current
@@ -565,7 +703,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
                 val version = try {
                     context.packageManager.getPackageInfo(context.packageName, 0).versionName
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     "1.0"
                 }
 
@@ -584,10 +722,10 @@ fun SettingsScreen(onBack: () -> Unit) {
 
                             // App Name and Version
                             Column {
-                                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleMedium)
+                                Text("Continuum Explorer (Memories)", style = MaterialTheme.typography.titleMedium)
                                 Text("$version", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                                 Text(
-                                    text = "GitHub",
+                                    text = "GitHub troikoss",
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline // Adds the underline
@@ -598,6 +736,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                                         }
                                         .padding(top = 4.dp)
                                 )
+                                Text(
+                                    text = "GitHub johakovi",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline // Adds the underline
+                                    ),
+                                    modifier = Modifier
+                                        .clickable {
+                                            uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories")
+                                        }
+                                        .padding(top = 4.dp))
                             }
                         }
                     },
