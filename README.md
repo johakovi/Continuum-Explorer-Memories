@@ -20,8 +20,23 @@ Responsive Design: A UI that dynamically adapts to any screen or window dimensio
 
 Archive Support: Integrated .zip viewer (Support for .7z is planned; .rar support is currently excluded due to licensing).
 
-## Planned Features:
-Media Suite: In-app video and image viewer optimized for desktop inputs.
+Network storage managment
 
-Advanced Rename
+## Planned Features:
+New colours for themes
+
+Icon packs
+
+Text editor
+
+## Bugs to fix
+Example PDF or Word file that are opened from Continuum Explorer, it opens only read-only
+
+"Square" sidebar and "Rounded" window theme elements overlaps
+
+## More languages?
+If you want contribute to adding more languages to my fork or original troikoss app,
+then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml) or this [link (troikoss)](https://github.com/troikoss/Continuum-Explorer/blob/master/app/src/main/res/values/strings.xml) and send file to us! c:
+
+
 
