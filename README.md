@@ -1,4 +1,4 @@
-<img width="192" height="192" alt="1000287944" src="https://github.com/user-attachments/assets/9363592b-b9ec-4abd-8fce-548c74da7b41" /> Continuum Explorer (Memories)
+ ![alt text](https://github.com/user-attachments/assets/9363592b-b9ec-4abd-8fce-548c74da7b41) Continuum Explorer (Memories)
 
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
