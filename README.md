@@ -36,6 +36,8 @@ Text editor
 ## Bugs to fix
 "Square" sidebar and "Rounded" window theme elements overlaps
 
+Operation window should go to background, when touching/clicking other window
+
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
 
