@@ -1,5 +1,4 @@
 package com.troikoss.continuum_explorer.managers
-
 import android.content.ContentResolver
 import android.content.Context
 import android.os.Bundle

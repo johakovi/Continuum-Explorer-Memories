@@ -182,6 +182,8 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light mode</string>
     <string name="settings_theme_dark">Dark mode</string>
+    <string name="settings_theme_very_dark">Very dark mode</string>
+    <string name="settings_theme_very_light">Very light mode</string>
     <string name="settings_themebar">Sidebar</string>
     <string name="settings_themebar_rounded">Rounded</string>
     <string name="settings_themebar_square">Square</string>
@@ -193,6 +195,10 @@
     <string name="settings_themetop_float">Float</string>
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colors for the top bar and tab bar.</string>
+    <string name="settings_icon_theme">Icon Theme</string>
+    <string name="settings_icon_theme_colourful">Colourful</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Choose Icon Theme</string>
     <string name="settings_details_large">Details (Large screens only)</string>
     <string name="settings_details_hidden">Hidden</string>
     <string name="settings_details_pane">Side Pane</string>
@@ -282,6 +288,7 @@
     <string name="nav_library_items">Library items</string>
     <string name="nav_recent">Recent</string>
     <string name="nav_gallery">Gallery</string>
+    <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documents</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="nav_add_storage">Add Storage</string>

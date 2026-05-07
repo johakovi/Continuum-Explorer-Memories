@@ -29,7 +29,9 @@ enum class TouchDragBehavior {
 enum class ThemeMode {
     SYSTEM,
     LIGHT,
-    DARK
+    DARK,
+    VERY_DARK,
+    VERY_LIGHT
 }
 
 enum class ThemeShape {
@@ -42,6 +44,11 @@ enum class ThemeTopMode {
     FLOAT
 }
 
+enum class IconTheme {
+    COLOURFUL,
+    MATERIAL
+}
+
 object SettingsManager {
     private const val PREFS_NAME = "explorer_settings"
     private const val KEY_DELETE_BEHAVIOR = "delete_behavior"
@@ -52,6 +59,7 @@ object SettingsManager {
     private const val KEY_THEME_BAR = "theme_bar"
     private const val KEY_THEME_CONTENT = "theme_content"
     private const val KEY_THEME_TOP = "theme_top"
+    private const val KEY_ICON_THEME = "icon_theme"
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
@@ -79,6 +87,9 @@ object SettingsManager {
 
     private val _themeTop = mutableStateOf(ThemeTopMode.ATTACHED)
     val themeTop: State<ThemeTopMode> = _themeTop
+
+    private val _iconTheme = mutableStateOf(IconTheme.COLOURFUL)
+    val iconTheme: State<IconTheme> = _iconTheme
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
@@ -153,6 +164,13 @@ object SettingsManager {
             ThemeTopMode.valueOf(savedThemeTop ?: ThemeTopMode.ATTACHED.name)
         } catch (_: Exception) {
             ThemeTopMode.ATTACHED
+        }
+
+        val savedIconTheme = prefs.getString(KEY_ICON_THEME, IconTheme.COLOURFUL.name)
+        _iconTheme.value = try {
+            IconTheme.valueOf(savedIconTheme ?: IconTheme.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconTheme.COLOURFUL
         }
 
         val savedLanguage = prefs.getString(KEY_LANGUAGE, "system") ?: "system"
@@ -270,6 +288,13 @@ object SettingsManager {
         _themeTop.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_THEME_TOP, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setIconTheme(context: Context, mode: IconTheme) {
+        _iconTheme.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_ICON_THEME, mode.name).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

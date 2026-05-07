@@ -81,7 +81,9 @@
     <string name="shortcuts_ctrl_cvx_desc">Copiar / Recortar / Colar</string>
     <string name="shortcuts_delete">Delete</string>
     <string name="shortcuts_delete_desc">Excluir (Shift + Delete para permanente)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">Renomear</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">Atualizar</string>
     <string name="shortcuts_app_actions">Ações do App</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -179,15 +181,17 @@
     <string name="settings_theme_system">Padrão do sistema</string>
     <string name="settings_theme_light">Modo claro</string>
     <string name="settings_theme_dark">Modo escuro</string>
-    <string name="settings_themebar">Sidebar</string>
-    <string name="settings_themebar_rounded">Rounded</string>
-    <string name="settings_themebar_square">Square</string>
-    <string name="settings_themecontent">Window</string>
-    <string name="settings_themecontent_rounded">Rounded</string>
-    <string name="settings_themecontent_square">Square</string>
-    <string name="settings_themetop">Tab</string>
-    <string name="settings_themetop_attached">Attached</string>
-    <string name="settings_themetop_float">Float</string>
+    <string name="settings_theme_very_dark">Modo muito escuro</string>
+    <string name="settings_theme_very_light">Modo muito claro</string>
+    <string name="settings_themebar">Barra lateral</string>
+    <string name="settings_themebar_rounded">Arredondada</string>
+    <string name="settings_themebar_square">Quadrada</string>
+    <string name="settings_themecontent">Janela</string>
+    <string name="settings_themecontent_rounded">Arredondada</string>
+    <string name="settings_themecontent_square">Quadrada</string>
+    <string name="settings_themetop">Guia</string>
+    <string name="settings_themetop_attached">Anexada</string>
+    <string name="settings_themetop_float">Flutuante</string>
     <string name="settings_details_large">Detalhes (Apenas telas grandes)</string>
     <string name="settings_details_hidden">Oculto</string>
     <string name="settings_details_pane">Painel Lateral</string>
@@ -278,8 +282,11 @@
     <!-- Navigation -->
     <string name="nav_library_items">Itens da biblioteca</string>
     <string name="nav_recent">Recentes</string>
+    <string name="nav_gallery">Galeria</string>
+    <string name="nav_downloads">Downloads</string>
+    <string name="nav_documents">Documentos</string>
+    <string name="menu_gallery_albums">Álbuns</string>
     <string name="nav_add_storage">Adicionar Armazenamento</string>
-    <string name="nav_documents">Documents</string>
     <string name="nav_internal_storage">Armazenamento Interno</string>
     <string name="nav_trash">Lixeira</string>
     <string name="nav_external_drive">Unidade Externa</string>
@@ -328,6 +335,7 @@
     <string name="msg_no_app_share">Nenhum aplicativo encontrado para compartilhar este arquivo</string>
     <string name="msg_no_app_open">Nenhum aplicativo encontrado para abrir este arquivo</string>
     <string name="msg_apk_install_permission">Por favor, conceda a permissão e clique no APK novamente para instalar.</string>
+    <string name="msg_search_results" translatable="false">search_results</string>
     <string name="msg_search_failed">Falha na pesquisa</string>
     <string name="msg_invalid_path">Caminho inválido</string>
     <string name="msg_file_not_found">Arquivo ou diretório não encontrado</string>
@@ -354,6 +362,9 @@
     <!-- Search -->
     <string name="search_subfolders">Pesquisar em todas as subpastas</string>
     <string name="search_kind">tipo: (Tipo de arquivo)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
     <string name="search_ext">*.ext (Extensão)</string>
 
     <!-- Image Viewer/ Video Player -->
@@ -398,8 +409,6 @@
     <string name="settings_touch_drag_move">Sempre mover</string>
     <string name="msg_cancelled_deletion">Exclusão cancelada</string>
     <string name="msg_deletion">Excluídos %1$d arquivos</string>
-    <string name="nav_gallery">Galeria</string>
-    <string name="menu_gallery_albums">Álbuns</string>
     <string name="details_header_type">Tipo</string>
     <string name="menu_by_type">Por tipo</string>
     <string name="nav_network">Rede</string>
@@ -421,6 +430,10 @@
     <string name="nav_network_test">Testar conexão</string>
     <string name="settings_colorful_bars">Barras superior e de abas coloridas</string>
     <string name="settings_colorful_bars_desc">Ativar cores de destaque para a barra superior e a barra de abas.</string>
+    <string name="settings_icon_theme">Tema de Ícones</string>
+    <string name="settings_icon_theme_colourful">Colorido</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Escolher Tema de Ícones</string>
     <string name="msg_remote_permanent_warning">Os arquivos de rede serão excluídos permanentemente (não podem ser movidos para a lixeira).</string>
     <string name="msg_archive_remote_unsupported">O arquivamento ainda não é suportado para locais de rede.</string>
     <string name="msg_remote_trash_skipped">Não é possível mover arquivos de rede para a lixeira. Eles serão excluídos permanentemente.</string>

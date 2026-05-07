@@ -31,6 +31,7 @@ import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.managers.DeleteBehavior
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
+import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
 import com.troikoss.continuum_explorer.managers.ThemeShape
@@ -67,6 +68,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val iconTouchSelection = SettingsManager.iconTouchSelection.value
     val defaultViewMode = SettingsManager.defaultViewMode.value
     val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
+    val iconTheme = SettingsManager.iconTheme.value
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTouchDragDialog by remember { mutableStateOf(false) }
@@ -74,6 +76,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showThemeBarDialog by remember { mutableStateOf(false) }
     var showThemeContentDialog by remember { mutableStateOf(false) }
     var showThemeTopDialog by remember { mutableStateOf(false) }
+    var showIconThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
@@ -112,6 +115,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
                         ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
                         ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                        ThemeMode.VERY_DARK -> stringResource(R.string.settings_theme_very_dark)
+                        ThemeMode.VERY_LIGHT -> stringResource(R.string.settings_theme_very_light)
                     }
                     Text(text)
                 },
@@ -163,6 +168,18 @@ fun SettingsScreen(onBack: () -> Unit) {
                         onCheckedChange = { SettingsManager.setColorfulBarsEnabled(context, it) }
                     )
                 }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_icon_theme)) },
+                supportingContent = {
+                    val text = when (iconTheme) {
+                        IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                        IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showIconThemeDialog = true }
             )
 
 
@@ -414,6 +431,22 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     showThemeDialog = false
                                 }
                             )
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_very_dark),
+                                selected = themeMode == ThemeMode.VERY_DARK,
+                                onClick = {
+                                    SettingsManager.setThemeMode(context, ThemeMode.VERY_DARK)
+                                    showThemeDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_very_light),
+                                selected = themeMode == ThemeMode.VERY_LIGHT,
+                                onClick = {
+                                    SettingsManager.setThemeMode(context, ThemeMode.VERY_LIGHT)
+                                    showThemeDialog = false
+                                }
+                            )
                         }
                     },
                     confirmButton = {
@@ -450,6 +483,38 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showThemeTopDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showIconThemeDialog) {
+                AlertDialog(
+                    onDismissRequest = { showIconThemeDialog = false },
+                    title = { Text(stringResource(R.string.settings_choose_icon_theme)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful),
+                                selected = iconTheme == IconTheme.COLOURFUL,
+                                onClick = {
+                                    SettingsManager.setIconTheme(context, IconTheme.COLOURFUL)
+                                    showIconThemeDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_material),
+                                selected = iconTheme == IconTheme.MATERIAL,
+                                onClick = {
+                                    SettingsManager.setIconTheme(context, IconTheme.MATERIAL)
+                                    showIconThemeDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showIconThemeDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }

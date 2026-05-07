@@ -54,6 +54,7 @@ import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.providers.StorageProviders
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.ui.components.*
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.CoroutineScope
@@ -92,9 +93,11 @@ fun FileExplorerRO(
                         networkProvider = item.provider, networkId = item.providerId,
                         networkConnectionId = item.provider.connectionId.ifEmpty { null }
                     )
-                    item.absolutePath == "recent://" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Recent)
-                    item.absolutePath == "gallery://" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
-                    item.absolutePath == "trash://" -> {
+                    item.absolutePath == "virtual://recent" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Recent)
+                    item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
+                    item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
+                    item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
+                    item.absolutePath == "virtual://recycle_bin" -> {
                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                         if (!trashDir.exists()) trashDir.mkdirs()
                         newState.navigateTo(trashDir, null, addToHistory = false, libraryItem = LibraryItem.RecycleBin)
@@ -211,7 +214,9 @@ fun FileExplorerRO(
             drawerState = drawerState,
             gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
             drawerContent = {
-                ModalDrawerSheet {
+                ModalDrawerSheet(
+                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground
+                ) {
                     NavigationContent(
                         appState = appState,
                         onCloseDrawer = { scope.launch { drawerState.close() } },
@@ -296,16 +301,15 @@ private fun ExplorerTopBar(
     val themeTop = SettingsManager.themeTop.value
     Column(
         modifier = Modifier
-            .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else MaterialTheme.colorScheme.surface)
+            .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground)
             .statusBarsPadding()
     ) {
         TabBar(
-            tabs = tabs.map { it.currentName },
+            tabStates = tabs,
             selectedTabIndex = selectedTabIndex,
             onTabSelected = onTabSelected,
             onAddTab = onAddTab,
-            onCloseTab = onCloseTab,
-            appState = appState
+            onCloseTab = onCloseTab
         )
 
         TopBar(
@@ -341,7 +345,7 @@ private fun ExplorerBody(
                         modifier = Modifier.width(navPaneWidth).fillMaxHeight(),
                         windowInsets = WindowInsets(0, 0, 0, 0),
                         drawerShape = RoundedCornerShape(16.dp),
-                        drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        drawerContainerColor = LocalExtendedColors.current.sidebarBackground
                     ) {
                         NavigationPane(
                             appState = appState,
@@ -409,6 +413,7 @@ private fun navigateToSection(appState: FileExplorerState, context: Context, sec
         }
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
+        is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
         is NavSection.Documents -> appState.navigateTo(null, null, libraryItem = LibraryItem.Documents)
         is NavSection.NetworkStorage -> {
             val conn = appState.appConfigs.networkConnections.find { it.id == section.connectionId } ?: return

@@ -179,15 +179,17 @@
     <string name="settings_theme_system">Predeterminado del sistema</string>
     <string name="settings_theme_light">Modo claro</string>
     <string name="settings_theme_dark">Modo oscuro</string>
-    <string name="settings_themebar">Sidebar</string>
-    <string name="settings_themebar_rounded">Rounded</string>
-    <string name="settings_themebar_square">Square</string>
-    <string name="settings_themecontent">Window</string>
-    <string name="settings_themecontent_rounded">Rounded</string>
-    <string name="settings_themecontent_square">Square</string>
-    <string name="settings_themetop_attached">Attached</string>
-    <string name="settings_themetop">Tab</string>
-    <string name="settings_themetop_float">Float</string>
+    <string name="settings_theme_very_dark">Modo muy oscuro</string>
+    <string name="settings_theme_very_light">Modo muy claro</string>
+    <string name="settings_themebar">Barra lateral</string>
+    <string name="settings_themebar_rounded">Redondeada</string>
+    <string name="settings_themebar_square">Cuadrada</string>
+    <string name="settings_themecontent">Ventana</string>
+    <string name="settings_themecontent_rounded">Redondeada</string>
+    <string name="settings_themecontent_square">Cuadrada</string>
+    <string name="settings_themetop">Pestaña</string>
+    <string name="settings_themetop_attached">Acoplada</string>
+    <string name="settings_themetop_float">Flotante</string>
     <string name="settings_details_large">Detalles (Solo pantallas grandes)</string>
     <string name="settings_details_hidden">Oculto</string>
     <string name="settings_details_pane">Panel lateral</string>
@@ -279,8 +281,10 @@
     <!-- Navigation -->
     <string name="nav_library_items">Elementos de biblioteca</string>
     <string name="nav_recent">Reciente</string>
+    <string name="nav_gallery">Galería</string>
+    <string name="nav_downloads">Descargas</string>
+    <string name="nav_documents">Documentos</string>
     <string name="nav_add_storage">Añadir almacenamiento</string>
-    <string name="nav_documents">Documents</string>
     <string name="nav_internal_storage">Almacenamiento interno</string>
     <string name="nav_trash">Papelera</string>
     <string name="nav_external_drive">Unidad externa</string>
@@ -397,7 +401,6 @@
     <string name="settings_touch_drag_move">Siempre mover</string>
     <string name="msg_cancelled_deletion">Eliminación cancelada</string>
     <string name="msg_deletion">Se han eliminado %1$d archivos</string>
-    <string name="nav_gallery">Galería</string>
     <string name="menu_gallery_albums">Álbumes</string>
     <string name="details_header_type">Tipo</string>
     <string name="menu_by_type">Por tipo</string>
@@ -420,6 +423,10 @@
     <string name="nav_network_test">Probar conexión</string>
     <string name="settings_colorful_bars">Barras superior y de pestañas coloridas</string>
     <string name="settings_colorful_bars_desc">Activar colores de acento para la barra superior y la barra de pestañas.</string>
+    <string name="settings_icon_theme">Tema de iconos</string>
+    <string name="settings_icon_theme_colourful">Colorido</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Elegir tema de iconos</string>
     <string name="msg_remote_permanent_warning">Los archivos de red se eliminarán permanentemente (no se pueden mover a la papelera).</string>
     <string name="msg_archive_remote_unsupported">El archivado aún no es compatible con ubicaciones de red.</string>
     <string name="msg_remote_trash_skipped">No se pueden mover los archivos de red a la papelera. Se eliminarán permanentemente.</string>

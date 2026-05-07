@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.documentfile.provider.DocumentFile
@@ -193,7 +194,7 @@ fun TopBar(
                     strokeWidth = strokeWidth
                 )
             },
-        color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+        color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.topBarBackground
     ) {
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
             if (appState.getScreenSize() == ScreenSize.SMALL) {

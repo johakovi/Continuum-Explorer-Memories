@@ -179,15 +179,17 @@
     <string name="settings_theme_system">Par défaut du système</string>
     <string name="settings_theme_light">Mode clair</string>
     <string name="settings_theme_dark">Mode sombre</string>
-    <string name="settings_themebar">Sidebar</string>
-    <string name="settings_themebar_rounded">Rounded</string>
-    <string name="settings_themebar_square">Square</string>
-    <string name="settings_themecontent">Window</string>
-    <string name="settings_themecontent_rounded">Rounded</string>
-    <string name="settings_themecontent_square">Square</string>
-    <string name="settings_themetop">Tab</string>
-    <string name="settings_themetop_attached">Attached</string>
-    <string name="settings_themetop_float">Float</string>
+    <string name="settings_theme_very_dark">Mode très sombre</string>
+    <string name="settings_theme_very_light">Mode très clair</string>
+    <string name="settings_themebar">Barre latérale</string>
+    <string name="settings_themebar_rounded">Arrondie</string>
+    <string name="settings_themebar_square">Carrée</string>
+    <string name="settings_themecontent">Fenêtre</string>
+    <string name="settings_themecontent_rounded">Arrondie</string>
+    <string name="settings_themecontent_square">Carrée</string>
+    <string name="settings_themetop">Onglet</string>
+    <string name="settings_themetop_attached">Attaché</string>
+    <string name="settings_themetop_float">Flottant</string>
     <string name="settings_details_large">Détails (Grands écrans uniquement)</string>
     <string name="settings_details_hidden">Masqué</string>
     <string name="settings_details_pane">Panneau latéral</string>
@@ -276,8 +278,10 @@
     <!-- Navigation -->
     <string name="nav_library_items">Éléments de la bibliothèque</string>
     <string name="nav_recent">Récents</string>
-    <string name="nav_add_storage">Ajouter un stockage</string>
+    <string name="nav_gallery">Galerie</string>
+    <string name="nav_downloads">Téléchargements</string>
     <string name="nav_documents">Documents</string>
+    <string name="nav_add_storage">Ajouter un stockage</string>
     <string name="nav_internal_storage">Stockage interne</string>
     <string name="nav_trash">Corbeille</string>
     <string name="nav_external_drive">Lecteur externe</string>
@@ -399,7 +403,6 @@
     <string name="settings_touch_drag_move">Toujours déplacer</string>
     <string name="msg_cancelled_deletion">Suppression annulée</string>
     <string name="msg_deletion">%1$d fichiers supprimés</string>
-    <string name="nav_gallery">Galerie</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="details_header_type">Type</string>
     <string name="menu_by_type">Par type</string>
@@ -422,6 +425,10 @@
     <string name="nav_network_test">Tester la connexion</string>
     <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
     <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
+    <string name="settings_icon_theme">Thème d\'icônes</string>
+    <string name="settings_icon_theme_colourful">Coloré</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Choisir le thème d\'icônes</string>
     <string name="msg_remote_permanent_warning">Les fichiers réseau seront supprimés définitivement (impossible de les déplacer vers la corbeille).</string>
     <string name="msg_archive_remote_unsupported">L\'archivage n\'est pas encore pris en charge pour les emplacements réseau.</string>
     <string name="msg_remote_trash_skipped">Impossible de déplacer les fichiers réseau vers la corbeille. Ils seront supprimés définitivement.</string>

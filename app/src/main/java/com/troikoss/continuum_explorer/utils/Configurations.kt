@@ -237,10 +237,11 @@ class FolderConfigurations(private val context: Context) {
 class AppConfigurations(private val context: Context) {
     val addedSafUris = mutableStateListOf<Uri>()
     val favoritePaths = mutableStateListOf<String>()
-    val libraryOrder = mutableStateListOf("gallery", "recent", "documents", "trash")
+    val libraryOrder = mutableStateListOf("gallery", "recent", "downloads", "documents", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
+    var isDownloadsVisible by mutableStateOf(true)
     var isDocumentsVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
 
@@ -259,11 +260,14 @@ class AppConfigurations(private val context: Context) {
         loadNetworkConnections()
 
         // Ensure all library items are present in the order list
-        val required = listOf("gallery", "recent", "documents", "trash")
+        val required = listOf("gallery", "recent", "downloads", "documents", "trash")
         required.forEach { id ->
             if (!libraryOrder.contains(id)) {
-                if (id == "documents") {
+                if (id == "downloads") {
                     val idx = libraryOrder.indexOf("recent")
+                    libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
+                } else if (id == "documents") {
+                    val idx = libraryOrder.indexOf("downloads")
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else {
                     libraryOrder.add(id)
@@ -349,11 +353,17 @@ class AppConfigurations(private val context: Context) {
         }
         // Migrate: add documents if not present in saved order
         if (!libraryOrder.contains("documents")) {
-            val insertIndex = libraryOrder.indexOf("recent").let { if (it != -1) it + 1 else 0 }
+            val insertIndex = libraryOrder.indexOf("downloads").let { if (it != -1) it + 1 else 0 }
             libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "documents")
+        }
+        // Migrate: add downloads if not present in saved order
+        if (!libraryOrder.contains("downloads")) {
+            val insertIndex = libraryOrder.indexOf("recent").let { if (it != -1) it + 1 else 0 }
+            libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "downloads")
         }
         isRecentVisible = prefs.getBoolean("is_recent_visible", true)
         isGalleryVisible = prefs.getBoolean("is_gallery_visible", true)
+        isDownloadsVisible = prefs.getBoolean("is_downloads_visible", true)
         isDocumentsVisible = prefs.getBoolean("is_documents_visible", true)
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
     }
@@ -364,6 +374,7 @@ class AppConfigurations(private val context: Context) {
             putString("order", libraryOrder.joinToString("|"))
             putBoolean("is_recent_visible", isRecentVisible)
             putBoolean("is_gallery_visible", isGalleryVisible)
+            putBoolean("is_downloads_visible", isDownloadsVisible)
             putBoolean("is_documents_visible", isDocumentsVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
         }.apply()
@@ -377,6 +388,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGalleryVisibility() {
         isGalleryVisible = !isGalleryVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleDownloadsVisibility() {
+        isDownloadsVisible = !isDownloadsVisible
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

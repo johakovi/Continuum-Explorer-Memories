@@ -73,7 +73,9 @@
     <string name="shortcuts_ctrl_cvx_desc">Kopyala / Kes / Yapıştır</string>
     <string name="shortcuts_delete">Delete</string>
     <string name="shortcuts_delete_desc">Sil (Kalıcı silmek için Shift + Delete)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">Yeniden adlandır</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">Yenile</string>
     <string name="shortcuts_app_actions">Uygulama eylemleri</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -163,15 +165,17 @@
     <string name="settings_theme_system">Sistem varsayılanı</string>
     <string name="settings_theme_light">Açık tema</string>
     <string name="settings_theme_dark">Koyu tema</string>
-    <string name="settings_themebar">Sidebar</string>
-    <string name="settings_themebar_rounded">Rounded</string>
-    <string name="settings_themebar_square">Square</string>
-    <string name="settings_themecontent">Window</string>
-    <string name="settings_themecontent_rounded">Rounded</string>
-    <string name="settings_themecontent_square">Square</string>
-    <string name="settings_themetop">Tab</string>
-    <string name="settings_themetop_attached">Attached</string>
-    <string name="settings_themetop_float">Float</string>
+    <string name="settings_theme_very_dark">Çok koyu tema</string>
+    <string name="settings_theme_very_light">Çok açık tema</string>
+    <string name="settings_themebar">Kenar Çubuğu</string>
+    <string name="settings_themebar_rounded">Yuvarlak</string>
+    <string name="settings_themebar_square">Kare</string>
+    <string name="settings_themecontent">Pencere</string>
+    <string name="settings_themecontent_rounded">Yuvarlak</string>
+    <string name="settings_themecontent_square">Kare</string>
+    <string name="settings_themetop">Sekme</string>
+    <string name="settings_themetop_attached">Bitişik</string>
+    <string name="settings_themetop_float">Yüzen</string>
     <string name="settings_details_large">Ayrıntılar (Sadece büyük ekranlar için geçerli)</string>
     <string name="settings_details_hidden">Gizli</string>
     <string name="settings_details_pane">Yan Panel</string>
@@ -257,9 +261,12 @@
     <string name="menu_redo">Yinele</string>
     <string name="nav_library_items">Kütüphane öğeleri</string>
     <string name="nav_recent">Son Kullanılanlar</string>
+    <string name="nav_gallery">Galeri</string>
+    <string name="nav_downloads">İndirilenler</string>
+    <string name="nav_documents">Belgeler</string>
+    <string name="menu_gallery_albums">Albümler</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
-    <string name="nav_documents">Documents</string>
     <string name="nav_trash">Geri Dönüşüm Kutusu</string>
     <string name="nav_external_drive">Harici Sürücü</string>
     <string name="nav_favorites">Favoriler</string>
@@ -322,6 +329,9 @@
     <string name="dialog_search_options">Arama Seçenekleri</string>
     <string name="search_subfolders">Bütün alt klasörleri ara</string>
     <string name="search_kind">kind: (Dosya türü)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
     <string name="search_ext">*.ext (Uzantı)</string>
     <string name="unknown_resolution">Bilinmeyen çözünürlük</string>
     <string name="media_playing">Oynatılıyor</string>
@@ -366,8 +376,6 @@
     <string name="settings_touch_drag_move">Her zaman taşı</string>
     <string name="msg_cancelled_deletion">Silme İptal Edildi</string>
     <string name="msg_deletion">%1$d dosya silindi</string>
-    <string name="nav_gallery">Galeri</string>
-    <string name="menu_gallery_albums">Albümler</string>
     <string name="details_header_type">Tür</string>
     <string name="menu_by_type">Türe Göre</string>
     <string name="nav_network">Ağ</string>
@@ -389,6 +397,10 @@
     <string name="nav_network_test">Bağlantıyı Test Et</string>
     <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
     <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
+    <string name="settings_icon_theme">Simge Teması</string>
+    <string name="settings_icon_theme_colourful">Renkli</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Simge Teması Seç</string>
     <string name="msg_remote_permanent_warning">Ağ dosyaları kalıcı olarak silinecek (çöp kutusuna taşınamaz).</string>
     <string name="msg_archive_remote_unsupported">Arşivleme henüz ağ konumları için desteklenmiyor.</string>
     <string name="msg_remote_trash_skipped">Ağ dosyaları çöp kutusuna taşınamaz. Kalıcı olarak silinecekler.</string>

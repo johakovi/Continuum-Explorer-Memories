@@ -30,12 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.troikoss.continuum_explorer.model.UniversalFile
-import com.troikoss.continuum_explorer.providers.LocalProvider
-import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.R
 import kotlinx.coroutines.launch
@@ -46,13 +44,12 @@ private val ADD_BUTTON_WIDTH = 40.dp
 
 @Composable
 fun TabBar(
-    tabs: List<String>,
+    tabStates: List<FileExplorerState>,
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
     onAddTab: () -> Unit,
     onCloseTab: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    appState: FileExplorerState
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -63,7 +60,7 @@ fun TabBar(
         modifier = modifier
             .fillMaxWidth()
             .height(if (themeTop == ThemeTopMode.FLOAT) 48.dp else 40.dp)
-            .background(if (themeTop == ThemeTopMode.FLOAT) Color.Transparent else MaterialTheme.colorScheme.surfaceContainer)
+            .background(if (themeTop == ThemeTopMode.FLOAT) Color.Transparent else LocalExtendedColors.current.topBarBackground)
             .let {
                 if (themeTop == ThemeTopMode.ATTACHED) {
                     it.drawBehind {
@@ -81,9 +78,9 @@ fun TabBar(
     ) {
         // Shrink tabs proportionally as more are added, scroll when they hit minimum.
         val horizontalPadding = if (themeTop == ThemeTopMode.FLOAT) 16.dp else 0.dp
-        val slotWidth: Dp = if (tabs.isEmpty()) TAB_SLOT_MAX else {
+        val slotWidth: Dp = if (tabStates.isEmpty()) TAB_SLOT_MAX else {
             val available = maxWidth - ADD_BUTTON_WIDTH - (horizontalPadding * 2)
-            (available / tabs.size).coerceIn(TAB_SLOT_MIN, TAB_SLOT_MAX)
+            (available / tabStates.size).coerceIn(TAB_SLOT_MIN, TAB_SLOT_MAX)
         }
 
         Row(
@@ -106,37 +103,8 @@ fun TabBar(
                 },
             verticalAlignment = if (themeTop == ThemeTopMode.FLOAT) Alignment.CenterVertically else Alignment.Bottom
         ) {
-            tabs.forEachIndexed { index, title ->
-                val universalFile: UniversalFile? = when {
-                    appState.currentArchiveFile != null -> {
-                        appState.currentArchiveFile?.let { file ->
-                            val archiveProvider = StorageProviders.archive(appState.context, file)
-                            UniversalFile(
-                                name = file.name,
-                                isDirectory = false,
-                                lastModified = file.lastModified(),
-                                length = file.length(),
-                                provider = archiveProvider,
-                                providerId = archiveProvider.makeId(""),
-                            )
-                        }
-                    }
-                    appState.currentPath != null -> {
-                        appState.currentPath?.let { file ->
-                            UniversalFile(
-                                name = file.name,
-                                isDirectory = file.isDirectory,
-                                lastModified = file.lastModified(),
-                                length = file.length(),
-                                provider = LocalProvider,
-                                providerId = file.absolutePath,
-                                parentId = file.parentFile?.absolutePath,
-                            )
-                        }
-                    }
-                    else -> null
-                }
-
+            tabStates.forEachIndexed { index, state ->
+                val universalFile = state.currentUniversalPath
                 val tabIcon = if (universalFile != null) {
                     IconHelper.getIconForItem(universalFile)
                 } else {
@@ -144,7 +112,7 @@ fun TabBar(
                 }
 
                 TabItem(
-                    text = title,
+                    text = state.currentName,
                     icon = tabIcon,
                     slotWidth = slotWidth,
                     selected = (selectedTabIndex == index),
@@ -187,7 +155,7 @@ private fun TabItem(
 
     val backgroundColor = when {
         selected && isColorful -> MaterialTheme.colorScheme.primaryContainer
-        selected -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface
+        selected -> LocalExtendedColors.current.tabActiveBackground
         else -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else Color.Transparent
     }
     val textColor = when {

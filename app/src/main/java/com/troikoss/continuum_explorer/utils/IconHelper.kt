@@ -17,9 +17,12 @@ import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.AudioFile
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FolderZip
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Slideshow
@@ -36,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathParser
@@ -56,6 +60,8 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.model.UniversalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -78,13 +84,46 @@ object IconHelper {
         isDetailView: Boolean = false,
         contentScale: ContentScale = ContentScale.Fit
     ) {
+        val extendedColors = LocalExtendedColors.current
+        val isSelected = tint == MaterialTheme.colorScheme.primary
+        val finalTint = if (file.isDirectory && !isSelected) {
+            when {
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
+                file.providerId == "virtual://recent" -> extendedColors.recentIcon
+                file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
+                file.providerId == "virtual://documents" -> extendedColors.documentsIcon
+                file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
+                else -> extendedColors.folderIcon
+            }
+        } else {
+            tint
+        }
+
         if (file.isDirectory) {
-            Icon(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder),
-                contentDescription = null,
-                modifier = modifier.size(iconSize),
-                tint = tint
-            )
+            val iconTheme = SettingsManager.iconTheme.value
+            if (iconTheme == IconTheme.COLOURFUL) {
+                val painter = when {
+                    file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_gallery)
+                    file.providerId == "virtual://recent" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_recent)
+                    file.providerId == "virtual://downloads" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_downloads)
+                    file.providerId == "virtual://documents" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_documents)
+                    file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_trash)
+                    else -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder)
+                }
+                Icon(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize),
+                    tint = finalTint
+                )
+            } else {
+                Icon(
+                    imageVector = getIconForItem(file),
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize),
+                    tint = finalTint
+                )
+            }
             return
         }
         val fallbackIcon = getIconForItem(file)
@@ -92,9 +131,9 @@ object IconHelper {
         if (!file.isDirectory && isMimeTypePreviewable(file)) {
             val name = file.name.lowercase()
             when {
-                name.endsWith(".pdf") -> PdfThumbnail(file, fallbackIcon, modifier, iconSize, tint)
-                name.endsWith(".apk") -> ApkThumbnail(file, fallbackIcon, modifier, iconSize, tint)
-                name.endsWith(".txt") -> TextFilePreview(file, fallbackIcon, modifier, iconSize, tint, isDetailView)
+                name.endsWith(".pdf") -> PdfThumbnail(file, fallbackIcon, modifier, iconSize, finalTint)
+                name.endsWith(".apk") -> ApkThumbnail(file, fallbackIcon, modifier, iconSize, finalTint)
+                name.endsWith(".txt") -> TextFilePreview(file, fallbackIcon, modifier, iconSize, finalTint, isDetailView)
                 else -> {
                     SubcomposeAsyncImage(
                         model = if (file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath),
@@ -105,7 +144,7 @@ object IconHelper {
                         if (painter.state is AsyncImagePainter.State.Success) {
                             SubcomposeAsyncImageContent()
                         } else {
-                            Icon(imageVector = fallbackIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+                            Icon(imageVector = fallbackIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
                         }
                     }
                 }
@@ -115,7 +154,7 @@ object IconHelper {
                 imageVector = fallbackIcon,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
-                tint = tint
+                tint = finalTint
             )
         }
     }
@@ -126,7 +165,15 @@ object IconHelper {
      * Returns the appropriate icon for a given UniversalFile.
      */
     fun getIconForItem(file: UniversalFile): ImageVector {
-        if (file.isDirectory) return Icons.Default.Folder
+        if (file.isDirectory) {
+            return when {
+                file.providerId == "virtual://recent" -> Icons.Default.History
+                file.providerId == "virtual://documents" -> Icons.Default.Description
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> Icons.Default.Collections
+                file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> Icons.Default.Delete
+                else -> Icons.Default.Folder
+            }
+        }
         return getIconByFileName(file.name)
     }
 

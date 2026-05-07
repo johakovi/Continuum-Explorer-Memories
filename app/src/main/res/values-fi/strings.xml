@@ -192,8 +192,14 @@
         <string name="settings_theme_system">Järjestelmän oma</string>
         <string name="settings_theme_light">Vaalea tyyli</string>
         <string name="settings_theme_dark">Tumma tyyli</string>
+        <string name="settings_theme_very_dark">Erittäin tumma tyyli</string>
+        <string name="settings_theme_very_light">Erittäin vaalea tyyli</string>
         <string name="settings_colorful_bars">Värikäs ylä ja ala palkit</string>
         <string name="settings_colorful_bars_desc">Aktivoi aksentti värit välilehdelle ja ylä ja ala palkeille.</string>
+        <string name="settings_icon_theme">Kuvakkeiden tyyli</string>
+        <string name="settings_icon_theme_colourful">Värikäs</string>
+        <string name="settings_icon_theme_material">Material</string>
+        <string name="settings_choose_icon_theme">Valitse kuvakkeiden tyyli</string>
         <string name="settings_details_large">Yksityiskohdat (Isoille ruuduille)</string>
         <string name="settings_details_hidden">Piilotettu</string>
         <string name="settings_details_pane">Sivu paneeli</string>
@@ -283,7 +289,8 @@
         <string name="nav_library_items">Tiedosto kirjasto</string>
         <string name="nav_recent">Viimeisimmät</string>
         <string name="nav_gallery">Galleria</string>
-        <string name="nav_documents">Tiedostot</string>
+        <string name="nav_downloads">Lataukset</string>
+        <string name="nav_documents">Asiakirjat</string>
         <string name="menu_gallery_albums">Albumit</string>
         <string name="nav_add_storage">Lisää tallennustila</string>
         <string name="nav_internal_storage">Sisäinen tallennustila</string>
@@ -432,6 +439,6 @@
         <string name="msg_remote_permanent_warning">Verkkotiedostot poistetaan pysyvästi (ei voi siirtää roskakoriin).</string>
         <string name="msg_archive_remote_unsupported">Arkistointia ei vielä tueta verkkosijainneissa.</string>
         <string name="msg_remote_trash_skipped">Verkkotiedostoja ei voi siirtää roskakoriin. Ne poistetaan pysyvästi.</string>
-        <string name="settings_about">About</string>
+        <string name="settings_about">Tietoja</string>
 
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.DocumentsManager
+import com.troikoss.continuum_explorer.managers.DownloadsManager
 import com.troikoss.continuum_explorer.managers.GalleryManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
@@ -196,6 +197,10 @@ class FileExplorerState(
                 context.getString(R.string.nav_recycle_bin)
             } else if (libraryItem == LibraryItem.Recent) {
                 context.getString(R.string.nav_recent)
+            } else if (libraryItem == LibraryItem.Downloads) {
+                context.getString(R.string.nav_downloads)
+            } else if (libraryItem == LibraryItem.Documents) {
+                context.getString(R.string.nav_documents)
             } else if (libraryItem == LibraryItem.Gallery) {
                 if (currentPath != null) currentPath!!.name
                 else context.getString(R.string.nav_gallery)
@@ -257,6 +262,24 @@ class FileExplorerState(
                 length = 0L,
                 provider = LocalProvider,
                 providerId = "virtual://recent"
+            )
+
+            libraryItem == LibraryItem.Downloads -> UniversalFile(
+                name = context.getString(R.string.nav_downloads),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://downloads"
+            )
+
+            libraryItem == LibraryItem.Documents -> UniversalFile(
+                name = context.getString(R.string.nav_documents),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://documents"
             )
 
             else -> null
@@ -422,6 +445,7 @@ class FileExplorerState(
             val (sortedList, newMeta) = withContext(Dispatchers.IO) {
                 val universalList = when (libraryItem) {
                     LibraryItem.Recent -> RecentFilesManager.getRecentFiles(context)
+                    LibraryItem.Downloads -> DownloadsManager.getDownloadsFiles(context)
                     LibraryItem.Documents -> DocumentsManager.getDocumentsFiles(context)
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
@@ -513,6 +537,7 @@ class FileExplorerState(
                 loadedPathKey = key ?: when (libraryItem) {
                     LibraryItem.Recent -> "recent"
                     LibraryItem.Gallery -> "gallery"
+                    LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
                     LibraryItem.None -> "root"
                     LibraryItem.RecycleBin -> "trash"
@@ -574,6 +599,10 @@ class FileExplorerState(
             else "virtual://gallery"
         } else if (libraryItem == LibraryItem.Recent) {
             "virtual://recent"
+        } else if (libraryItem == LibraryItem.Downloads) {
+            "virtual://downloads"
+        } else if (libraryItem == LibraryItem.Documents) {
+            "virtual://documents"
         } else if (libraryItem == LibraryItem.RecycleBin) {
             "virtual://recycle_bin"
         } else if (currentPath != null) {
