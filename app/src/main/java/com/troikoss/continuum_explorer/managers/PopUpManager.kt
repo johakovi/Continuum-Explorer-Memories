@@ -14,6 +14,7 @@ import com.troikoss.continuum_explorer.providers.SftpProvider
 import com.troikoss.continuum_explorer.providers.SmbProvider
 import com.troikoss.continuum_explorer.providers.WebDavProvider
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.utils.NotificationHelper
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -227,6 +228,13 @@ object FileOperationsManager {
         extractDeferred = null
         archiveDeferred = null
         
+        try {
+            val context = SafProvider.appContext()
+            NotificationHelper.start(context)
+        } catch (_: Exception) {
+            // Context not available yet or other issue
+        }
+
         notifyListeners()
     }
 

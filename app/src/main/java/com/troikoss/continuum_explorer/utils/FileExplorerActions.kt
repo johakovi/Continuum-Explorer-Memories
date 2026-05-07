@@ -123,7 +123,6 @@ fun FileExplorerState.paste() {
     val clipData = clipboard.primaryClip
 
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -145,7 +144,6 @@ fun FileExplorerState.paste() {
 
 fun FileExplorerState.deleteSelection(forcePermanent: Boolean = false) {
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -161,7 +159,6 @@ fun FileExplorerState.deleteSelection(forcePermanent: Boolean = false) {
 
 fun FileExplorerState.restoreSelection() {
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -177,7 +174,6 @@ fun FileExplorerState.restoreSelection() {
 
 fun FileExplorerState.undo() {
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -193,7 +189,6 @@ fun FileExplorerState.undo() {
 
 fun FileExplorerState.redo() {
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -217,7 +212,6 @@ fun FileExplorerState.extractSelection() {
 
     scope.launch {
         FileOperationsManager.start()
-        NotificationHelper.start(context)
         val intent = Intent(context, PopUpActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -253,7 +247,6 @@ fun FileExplorerState.compressSelection() {
 
     scope.launch {
         FileOperationsManager.start()
-        NotificationHelper.start(context)
         val intent = Intent(context, PopUpActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -294,7 +287,6 @@ fun FileExplorerState.renameSelection() {
 
 fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
     FileOperationsManager.start()
-    NotificationHelper.start(context)
     FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
     FileOperationsManager.currentFileName.value = target.name
     // Don't start a new PopUpActivity here — the existing one (showing INPUT_TEXT) stays alive
@@ -378,7 +370,6 @@ fun FileExplorerState.emptyRecycleBin() {
         val filesToDelete = trashDir.listFiles()?.filter { it.name != ".metadata" }?.map { it.toUniversal() } ?: emptyList()
         if (filesToDelete.isNotEmpty()) {
             FileOperationsManager.start()
-            NotificationHelper.start(context)
             val intent = Intent(context, PopUpActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }

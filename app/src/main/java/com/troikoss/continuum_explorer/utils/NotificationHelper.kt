@@ -60,13 +60,15 @@ object NotificationHelper {
         }
     }
 
-    fun stop() {
+    fun stop(cancelNotification: Boolean = true) {
         if (isRegistered) {
             FileOperationsManager.removeListener(updateListener)
             isRegistered = false
         }
         appContext?.let {
-            NotificationManagerCompat.from(it).cancel(NOTIFICATION_ID)
+            if (cancelNotification) {
+                NotificationManagerCompat.from(it).cancel(NOTIFICATION_ID)
+            }
             val intent = Intent(it, FileOperationService::class.java)
             it.stopService(intent)
         }
@@ -78,9 +80,10 @@ object NotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = context.getString(R.string.settings_file_ops)
             val descriptionText = context.getString(R.string.notif_description)
-            val importance = NotificationManager.IMPORTANCE_LOW
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
+                setShowBadge(false)
             }
             val notificationManager: NotificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -107,13 +110,15 @@ object NotificationHelper {
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)
                     .setContentTitle(context.getString(R.string.op_finished))
                     .setContentText(context.getString(R.string.msg_op_completed))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true)
 
                 NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+                stop(cancelNotification = false)
+            } else {
+                stop(cancelNotification = true)
             }
-            stop()
             return
         }
 
@@ -154,7 +159,7 @@ object NotificationHelper {
             .setContentTitle(title)
             .setSubText(contentText)
             .setStyle(NotificationCompat.BigTextStyle().bigText("$contentText\n$fileName"))
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
             .setProgress(100, progressInt, false)
             .setOnlyAlertOnce(true)

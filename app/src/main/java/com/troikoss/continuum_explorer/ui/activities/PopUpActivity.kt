@@ -146,7 +146,7 @@ class PopUpActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
-        NotificationHelper.stop()
+        // We no longer stop the notification here, so it can run simultaneously.
     }
 }
 
@@ -1135,7 +1135,7 @@ fun ProgressContent (onClose: () -> Unit) {
                     modifier = Modifier.focusRequester(focusRequester)
                 ) { Text(stringResource(R.string.close)) }
             } else {
-                TextButton(onClick = { NotificationHelper.start(context); onClose() }) { Text(stringResource(R.string.op_background)) }
+                TextButton(onClick = { onClose() }) { Text(stringResource(R.string.op_background)) }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = { FileOperationsManager.cancel() }) { Text(stringResource(R.string.cancel)) }
             }
