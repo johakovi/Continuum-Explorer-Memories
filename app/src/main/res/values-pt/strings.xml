@@ -279,6 +279,7 @@
     <string name="nav_library_items">Itens da biblioteca</string>
     <string name="nav_recent">Recentes</string>
     <string name="nav_add_storage">Adicionar Armazenamento</string>
+    <string name="nav_documents">Documents</string>
     <string name="nav_internal_storage">Armazenamento Interno</string>
     <string name="nav_trash">Lixeira</string>
     <string name="nav_external_drive">Unidade Externa</string>

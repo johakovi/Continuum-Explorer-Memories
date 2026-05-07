@@ -168,7 +168,10 @@ fun FileExplorerState.getLocationName(location: NavLocation): String {
     } else if (location.libraryItem == LibraryItem.Gallery) {
         if (location.path != null) location.path.name
         else context.getString(R.string.nav_gallery)
-    } else if (location.networkConnectionId != null && location.networkPath != null) {
+    } else if (location.libraryItem == LibraryItem.Documents) {
+        context.getString(R.string.nav_documents)
+    }
+    else if (location.networkConnectionId != null && location.networkPath != null) {
         val conn = appConfigs.networkConnections.find { it.id == location.networkConnectionId }
         if (conn != null) {
             com.troikoss.continuum_explorer.providers.StorageProviders.network(conn).displayName(location.networkPath)

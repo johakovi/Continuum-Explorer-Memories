@@ -259,6 +259,7 @@
     <string name="nav_recent">Son Kullanılanlar</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
+    <string name="nav_documents">Documents</string>
     <string name="nav_trash">Geri Dönüşüm Kutusu</string>
     <string name="nav_external_drive">Harici Sürücü</string>
     <string name="nav_favorites">Favoriler</string>

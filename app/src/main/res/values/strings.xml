@@ -282,6 +282,7 @@
     <string name="nav_library_items">Library items</string>
     <string name="nav_recent">Recent</string>
     <string name="nav_gallery">Gallery</string>
+    <string name="nav_documents">Documents</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="nav_add_storage">Add Storage</string>
     <string name="nav_internal_storage">Internal Storage</string>

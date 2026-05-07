@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         val initialLibraryItem = when {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
             intent.getBooleanExtra("isGallery", false) -> LibraryItem.Gallery
+            intent.getBooleanExtra("isDocuments", false) -> LibraryItem.Documents
             intent.getBooleanExtra("isRecycleBin", false) -> LibraryItem.RecycleBin
             else -> LibraryItem.None
         }

@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FolderSpecial
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
@@ -205,6 +204,7 @@ fun NavigationPane(
             "trash" -> isRecycleBinEnabled
             "recent" -> appState.appConfigs.isRecentVisible
             "gallery" -> appState.appConfigs.isGalleryVisible
+            "documents" -> appState.appConfigs.isDocumentsVisible
             else -> true
         }
     }
@@ -423,6 +423,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_gallery),
                                 icon = Icons.Default.Image,
+                                customIcon = R.drawable.ic_nav_gallery,
                                 onClick = { onItemSelected(NavSection.Gallery) },
                                 appState = appState,
                                 section = NavSection.Gallery
@@ -431,6 +432,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_recent),
                                 icon = Icons.Default.History,
+                                customIcon = R.drawable.ic_nav_recent,
                                 onClick = { onItemSelected(NavSection.Recent) },
                                 appState = appState,
                                 section = NavSection.Recent
@@ -440,10 +442,20 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_trash),
                                 icon = Icons.Default.Delete,
+                                customIcon = R.drawable.ic_nav_trash,
                                 onClick = { onItemSelected(NavSection.RecycleBin) },
                                 modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
                                 appState = appState,
                                 section = NavSection.RecycleBin
+                            )
+                        } else if (id == "documents") {
+                            NavItem(
+                                label = stringResource(R.string.nav_documents),
+                                icon = Icons.AutoMirrored.Filled.List,
+                                customIcon = R.drawable.ic_nav_documents,
+                                onClick = { onItemSelected(NavSection.Documents) },
+                                appState = appState,
+                                section = NavSection.Documents
                             )
                         }
                     }
@@ -680,7 +692,7 @@ private fun NavBackgroundContextMenu(
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.nav_add_local_storage)) },
-                    leadingIcon = { Icon(Icons.Default.Folder, null) },
+                    leadingIcon = { Icon(painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder), null, modifier = Modifier.size(24.dp)) },
                     onClick = {
                         onDismissRequest()
                         onAddStorageClick()
@@ -721,6 +733,17 @@ private fun NavBackgroundContextMenu(
                     trailingIcon = { if (appState.appConfigs.isRecentVisible) Icon(Icons.Default.Check, null) },
                     onClick = {
                         appState.appConfigs.toggleRecentVisibility()
+                        onDismissRequest()
+                        currentScreen = "MAIN"
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.nav_documents)) },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                    trailingIcon = { if (appState.appConfigs.isDocumentsVisible) Icon(Icons.Default.Check, null) },
+                    onClick = {
+                        appState.appConfigs.toggleDocumentsVisibility()
                         onDismissRequest()
                         currentScreen = "MAIN"
                     }
@@ -769,6 +792,9 @@ private fun NavContextMenu(
                     is NavSection.Gallery -> appState.onOpenInNewTab?.invoke(
                         UniversalFile(name = "Gallery", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "gallery://")
                     )
+                    is NavSection.Documents -> appState.onOpenInNewTab?.invoke(
+                        UniversalFile(name = "Documents", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "documents://")
+                    )
                     is NavSection.NetworkStorage -> {
                         val conn = appState.appConfigs.networkConnections.find { it.id == section.connectionId }
                         if (conn != null) {
@@ -800,6 +826,7 @@ private fun NavContextMenu(
                             addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
                             if (section is NavSection.Recent) putExtra("isRecent", true)
                             if (section is NavSection.Gallery) putExtra("isGallery", true)
+                            if (section is NavSection.Documents) putExtra("isDocuments", true)
                             if (section is NavSection.RecycleBin) putExtra("isRecycleBin", true)
                         }
                         appState.context.startActivity(intent)
@@ -904,7 +931,8 @@ private fun NavItem(
     onClick: () -> Unit,
     appState: FileExplorerState,
     modifier: Modifier = Modifier,
-    section: NavSection? = null
+    section: NavSection? = null,
+    customIcon: Int? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
@@ -915,7 +943,18 @@ private fun NavItem(
             label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             selected = false,
             onClick = onClick,
-            icon = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+            icon = {
+                if (customIcon != null) {
+                    Icon(
+                        painter = androidx.compose.ui.res.painterResource(id = customIcon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                }
+            },
             modifier = Modifier
                 .height(36.dp)
                 .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
@@ -957,7 +996,7 @@ private fun NavFavoriteItem(
             label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             selected = false,
             onClick = onClick,
-            icon = { Icon(Icons.Default.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+            icon = { Icon(painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder), contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(24.dp)) },
             shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
             modifier = Modifier
                 .height(36.dp)
@@ -1301,7 +1340,7 @@ private fun StorageFolderTreeItem(
                 )
             }
             Icon(
-                imageVector = Icons.Default.Folder,
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(20.dp)

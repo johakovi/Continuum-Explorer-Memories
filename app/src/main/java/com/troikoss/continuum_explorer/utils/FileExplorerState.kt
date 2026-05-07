@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.DocumentsManager
 import com.troikoss.continuum_explorer.managers.GalleryManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
@@ -421,6 +422,7 @@ class FileExplorerState(
             val (sortedList, newMeta) = withContext(Dispatchers.IO) {
                 val universalList = when (libraryItem) {
                     LibraryItem.Recent -> RecentFilesManager.getRecentFiles(context)
+                    LibraryItem.Documents -> DocumentsManager.getDocumentsFiles(context)
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context)
@@ -511,6 +513,7 @@ class FileExplorerState(
                 loadedPathKey = key ?: when (libraryItem) {
                     LibraryItem.Recent -> "recent"
                     LibraryItem.Gallery -> "gallery"
+                    LibraryItem.Documents -> "documents"
                     LibraryItem.None -> "root"
                     LibraryItem.RecycleBin -> "trash"
                 }

@@ -409,6 +409,7 @@ private fun navigateToSection(appState: FileExplorerState, context: Context, sec
         }
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
+        is NavSection.Documents -> appState.navigateTo(null, null, libraryItem = LibraryItem.Documents)
         is NavSection.NetworkStorage -> {
             val conn = appState.appConfigs.networkConnections.find { it.id == section.connectionId } ?: return
             val provider = StorageProviders.network(conn)

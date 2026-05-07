@@ -55,6 +55,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.UniversalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -77,6 +78,15 @@ object IconHelper {
         isDetailView: Boolean = false,
         contentScale: ContentScale = ContentScale.Fit
     ) {
+        if (file.isDirectory) {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder),
+                contentDescription = null,
+                modifier = modifier.size(iconSize),
+                tint = tint
+            )
+            return
+        }
         val fallbackIcon = getIconForItem(file)
 
         if (!file.isDirectory && isMimeTypePreviewable(file)) {

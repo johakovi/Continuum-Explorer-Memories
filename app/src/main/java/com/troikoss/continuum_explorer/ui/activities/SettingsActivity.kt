@@ -739,7 +739,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "App icon: Fluent UI System Color Icons by Microsoft Corporation",
+                                    text = "Icons used:",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Fluent UI System Color Icons by Microsoft Corporation",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Lets Icons by Leonid Tsvetkov",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )

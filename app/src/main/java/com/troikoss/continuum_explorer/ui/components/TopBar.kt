@@ -537,13 +537,27 @@ fun TopBar(
                                 onClick = { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) },
                                 contentPadding = PaddingValues(horizontal = 12.dp)
                             ) {
-                                Text(text = stringResource(R.string.nav_gallery), style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = MaterialTheme.colorScheme.onSurface)
+                                Text(
+                                    text = stringResource(R.string.nav_gallery),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                                    color = MaterialTheme.colorScheme.onSurface)
                             }
                             Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
-                            Text(text = appState.currentPath!!.name, modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp), color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                text = appState.currentPath!!.name,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
+                                color = MaterialTheme.colorScheme.onSurface)
                         } else if (appState.libraryItem == LibraryItem.RecycleBin) {
                             Text(
                                 text = stringResource(R.string.nav_recycle_bin),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                        } else if (appState.libraryItem == LibraryItem.Documents) {
+                            Text(
+                                text = stringResource(R.string.nav_documents),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
@@ -696,6 +710,13 @@ fun TopBar(
                         } else if (appState.libraryItem == LibraryItem.Recent) {
                             Text(
                                 text = stringResource(R.string.nav_recent),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                        } else if (appState.libraryItem == LibraryItem.Documents) {
+                            Text(
+                                text = stringResource(R.string.nav_documents),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
