@@ -722,14 +722,38 @@ fun SettingsScreen(onBack: () -> Unit) {
 
                             // App Name and Version
                             Column {
-                                Text("Continuum Explorer (Memories)", style = MaterialTheme.typography.titleMedium)
-                                Text("$version", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    "Continuum Explorer (Memories)",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    "$version",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "App is made under GPL-3.0 license",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "App icon: Fluent UI System Color Icons by Microsoft Corporation",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Links:",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
                                 Text(
                                     text = "GitHub troikoss",
                                     color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline // Adds the underline
-                                    ),
+                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
                                     modifier = Modifier
                                         .clickable {
                                             uriHandler.openUri("https://github.com/troikoss/Continuum-Explorer")
@@ -747,6 +771,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                                             uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories")
                                         }
                                         .padding(top = 4.dp))
+
+
                             }
                         }
                     },
