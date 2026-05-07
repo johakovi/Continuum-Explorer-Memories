@@ -1,5 +1,4 @@
 package com.troikoss.continuum_explorer.ui.activities
-
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import android.Manifest
+import android.content.Intent.ACTION_MAIN
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
 import java.util.UUID
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
             val freshIntent = Intent(this, MainActivity::class.java).apply {
-                action = Intent.ACTION_MAIN
+                action = ACTION_MAIN
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
                         Intent.FLAG_ACTIVITY_NEW_DOCUMENT
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
             val newWindowIntent = Intent(this, MainActivity::class.java).apply {
-                action = Intent.ACTION_MAIN
+                action = ACTION_MAIN
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
                         Intent.FLAG_ACTIVITY_NEW_DOCUMENT
