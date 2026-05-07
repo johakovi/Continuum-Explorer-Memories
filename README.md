@@ -33,6 +33,8 @@ Icon packs
 
 Text editor
 
+More shortcuts for the library (ex. Downloads)
+
 ## Bugs to fix
 "Square" sidebar and "Rounded" window theme elements overlaps
 
