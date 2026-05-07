@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import android.Manifest
-import android.content.Intent.ACTION_MAIN
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
 import java.util.UUID
@@ -71,11 +70,11 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
             val freshIntent = Intent(this, MainActivity::class.java).apply {
-                action = ACTION_MAIN
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
                         Intent.FLAG_ACTIVITY_NEW_DOCUMENT
                 data = Uri.fromParts("window", UUID.randomUUID().toString(), null)
+                putExtra("path", Environment.getExternalStorageDirectory().absolutePath)
             }
             startActivity(freshIntent)
             finish()
@@ -121,11 +120,11 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
             val newWindowIntent = Intent(this, MainActivity::class.java).apply {
-                action = ACTION_MAIN
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
                         Intent.FLAG_ACTIVITY_NEW_DOCUMENT
                 data = Uri.fromParts("window", UUID.randomUUID().toString(), null)
+                putExtra("path", Environment.getExternalStorageDirectory().absolutePath)
             }
             startActivity(newWindowIntent)
             return

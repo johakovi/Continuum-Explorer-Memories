@@ -9,7 +9,7 @@
         android:shortcutLongLabel="@string/shortcut_new_window_long">
         <intent
             android:action="com.troikoss.continuum_explorer.OPEN_NEW_WINDOW"
-            android:targetPackage="com.troikoss.continuum_explorer"
+            android:targetPackage="com.troikoss.continuum_explorer_memories"
             android:targetClass="com.troikoss.continuum_explorer.ui.activities.MainActivity" />
     </shortcut>
 </shortcuts>
