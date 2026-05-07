@@ -100,8 +100,7 @@ object ShortcutHelper {
             val iconBitmap = withContext(Dispatchers.IO) {
                 IconHelper.getFileBitmap(context, item)
             }
-            val icon = iconBitmap?.let { IconCompat.createWithBitmap(it) }
-                ?: IconCompat.createWithResource(context, R.drawable.ic_folder)
+            val icon = IconCompat.createWithBitmap(iconBitmap)
 
             val shortcutInfo = ShortcutInfoCompat.Builder(context, "pinned_$path")
                 .setShortLabel(name)

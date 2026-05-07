@@ -34,7 +34,7 @@ import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.DropdownMenu
@@ -453,7 +453,7 @@ fun ImageViewerScreen(
                     // --- GROUP 1: Open With ---
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_open_with)) },
-                        leadingIcon = { Icon(Icons.Default.OpenInNew, contentDescription = stringResource(R.string.menu_open_with)) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.menu_open_with)) },
                         onClick = {
                             showMenu = false
                             currentUri?.let { uriString ->

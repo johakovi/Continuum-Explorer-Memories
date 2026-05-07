@@ -8,6 +8,6 @@ import com.troikoss.continuum_explorer.providers.UniversalFileFetcher
 class MainApplication : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
         .components { add(UniversalFileFetcher.Factory()) }
-        .respectCacheHeaders(false)
+        .respectCacheHeaders(enable = false)
         .build()
 }

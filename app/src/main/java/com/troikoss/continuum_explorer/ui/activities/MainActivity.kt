@@ -10,6 +10,7 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import coil.decode.VideoFrameDecoder
@@ -30,7 +31,7 @@ import java.util.UUID
 class MainActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (isGranted) {
             // The user granted the permission. Notifications will work!
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.data = Uri.parse("package:${packageName}")
+                intent.data = "package:$packageName".toUri()
                 startActivity(intent)
             }
         }
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         val initialUri = intent.getStringExtra("uri")
         val initialArchive = run {
             val path = intent.getStringExtra("archivePath")
-            if (path != null) File(path) else null
+            path?.let { File(it) }
         }
         val initialLibraryItem = when {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                     add(UniversalFileFetcher.Factory())
                     add(VideoFrameDecoder.Factory())
                 }
-                .crossfade(true)
+                .crossfade(enable = true)
                 .build()
 
             // Set this as the global loader

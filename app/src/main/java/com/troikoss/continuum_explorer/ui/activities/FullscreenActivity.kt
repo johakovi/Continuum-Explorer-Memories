@@ -1,7 +1,5 @@
 package com.troikoss.continuum_explorer.ui.activities
 
-import android.app.Activity.FULLSCREEN_MODE_REQUEST_ENTER
-import android.app.Activity.FULLSCREEN_MODE_REQUEST_EXIT
 import android.os.Build
 import android.os.OutcomeReceiver
 import androidx.activity.ComponentActivity
@@ -14,28 +12,31 @@ import androidx.core.view.WindowInsetsControllerCompat
 
 open class FullscreenActivity: ComponentActivity() {
 
-    var isFullscreen by mutableStateOf(false)
+    var isFullscreen by mutableStateOf(value = false)
         protected set
 
     fun toggleFullscreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && isInMultiWindowMode) {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) && isInMultiWindowMode) {
             // Freeform window: need to expand the window first, then hide bars
             val request = if (isFullscreen)
                 FULLSCREEN_MODE_REQUEST_EXIT
             else
                 FULLSCREEN_MODE_REQUEST_ENTER
 
-            requestFullscreenMode(request, object : OutcomeReceiver<Void, Throwable> {
-                override fun onResult(result: Void?) {
-                    isFullscreen = !isFullscreen
-                    updateSystemBars()
-                }
-                override fun onError(error: Throwable) {
-                    // Still try to hide bars as fallback
-                    isFullscreen = !isFullscreen
-                    updateSystemBars()
-                }
-            })
+            requestFullscreenMode(
+                request,
+                object : OutcomeReceiver<Void, Throwable> {
+                    override fun onResult(result: Void?) {
+                        isFullscreen = !isFullscreen
+                        updateSystemBars()
+                    }
+                    override fun onError(error: Throwable) {
+                        // Still try to hide bars as fallback
+                        isFullscreen = !isFullscreen
+                        updateSystemBars()
+                    }
+                },
+            )
         } else {
             // Maximized or older API: window already covers screen, just toggle bars
             isFullscreen = !isFullscreen

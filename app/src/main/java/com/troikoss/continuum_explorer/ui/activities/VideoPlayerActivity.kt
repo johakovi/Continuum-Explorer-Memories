@@ -2,9 +2,7 @@ package com.troikoss.continuum_explorer.ui.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -65,6 +63,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -100,6 +100,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
@@ -128,11 +130,11 @@ data class TrackOption(
     val label: String,
     val groupIndex: Int,
     val trackIndex: Int,
-    val isSelected: Boolean
+    val isSelected: Boolean,
 )
 
 /** All supported aspect-ratio resize modes with display names. */
-@androidx.media3.common.util.UnstableApi
+@UnstableApi
 enum class ResizeMode(val labelRes: Int, val value: Int) {
     FIT(R.string.media_fit, AspectRatioFrameLayout.RESIZE_MODE_FIT),
     FILL(R.string.media_fill, AspectRatioFrameLayout.RESIZE_MODE_FILL),
@@ -155,8 +157,9 @@ class VideoPlayerActivity : FullscreenActivity() {
             FileExplorerTheme {
                 VideoPlayerScreen(
                     initialVideoUri = videoUri,
-                    onToggleFullscreen = { toggleFullscreen() }
-                )
+                ) {
+                    toggleFullscreen()
+                }
             }
         }
     }
@@ -170,7 +173,7 @@ class VideoPlayerActivity : FullscreenActivity() {
 @Composable
 fun VideoPlayerScreen(
     initialVideoUri: String?,
-    onToggleFullscreen: () -> Unit
+    onToggleFullscreen: () -> Unit,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -180,22 +183,22 @@ fun VideoPlayerScreen(
     val exoPlayer = remember { ExoPlayer.Builder(context).build() }
 
     // ── Playback state ──────────────────────────────────────────────────────
-    var isPlaying by remember { mutableStateOf(false) }
-    var hasNext  by remember { mutableStateOf(false) }
-    var hasPrev  by remember { mutableStateOf(false) }
-    var currentPosition by remember { mutableStateOf(0L) }
-    var totalDuration   by remember { mutableStateOf(0L) }
+    var isPlaying by remember { mutableStateOf(value = false) }
+    var hasNext  by remember { mutableStateOf(value = false) }
+    var hasPrev  by remember { mutableStateOf(value = false) }
+    var currentPosition by remember { mutableLongStateOf(0L) }
+    var totalDuration   by remember { mutableLongStateOf(0L) }
 
     // ── UI visibility ───────────────────────────────────────────────────────
     var isUiVisible      by remember { mutableStateOf(true) }
-    var hideTimerTrigger by remember { mutableStateOf(0) }
-    var isHoveringControls by remember { mutableStateOf(false) }
+    var hideTimerTrigger by remember { mutableIntStateOf(0) }
+    var isHoveringControls by remember { mutableStateOf(value = false) }
 
     // ── Skip / play / pause indicators ─────────────────────────────────────
-    var showSkipBackIndicator    by remember { mutableStateOf(false) }
-    var showSkipForwardIndicator by remember { mutableStateOf(false) }
-    var showPauseIndicator  by remember { mutableStateOf(false) }
-    var showPlayIndicator   by remember { mutableStateOf(false) }
+    var showSkipBackIndicator    by remember { mutableStateOf(value = false) }
+    var showSkipForwardIndicator by remember { mutableStateOf(value = false) }
+    var showPauseIndicator  by remember { mutableStateOf(value = false) }
+    var showPlayIndicator   by remember { mutableStateOf(value = false) }
 
     // ── Options menu ────────────────────────────────────────────────────────
     var optionsMenuExpanded by remember { mutableStateOf(false) }
@@ -214,7 +217,7 @@ fun VideoPlayerScreen(
     var playerViewRef by remember { mutableStateOf<PlayerView?>(null) }
 
     // ── Loop ────────────────────────────────────────────────────────────────
-    var loopEnabled by remember { mutableStateOf(false) }
+    var loopEnabled by remember { mutableStateOf(value = false) }
 
     // ── Thumbnail preview ────────────────────────────────────────────────────
     val thumbnailCache = remember { mutableStateMapOf<Long, ImageBitmap>() }
@@ -228,14 +231,12 @@ fun VideoPlayerScreen(
 
     // Helper: rebuild track lists from current Tracks object
     fun buildTrackLists(tracks: Tracks) {
-        val selectedAudioGroup    = exoPlayer.trackSelectionParameters
-        val selectedTextGroup     = exoPlayer.trackSelectionParameters
-
         audioTracks = tracks.groups
-            .filter { it.type == C.TRACK_TYPE_AUDIO && it.isSupported }
+            .asSequence()
+            .filter { (it.type == C.TRACK_TYPE_AUDIO) && it.isSupported }
             .mapIndexed { gi, group ->
                 val fmt   = group.getTrackFormat(0)
-                val lang  = fmt.language?.let { Locale(it).displayLanguage } ?: ""
+                val lang  = fmt.language?.let { Locale.forLanguageTag(it).displayLanguage } ?: ""
                 val label = when {
                     fmt.label    != null -> fmt.label!!
                     lang.isNotEmpty()    -> lang
@@ -244,12 +245,14 @@ fun VideoPlayerScreen(
                 // A track group is selected when the player actually rendered it
                 TrackOption(label, gi, 0, group.isSelected)
             }
+            .toList()
 
         subtitleTracks = tracks.groups
-            .filter { it.type == C.TRACK_TYPE_TEXT && it.isSupported }
+            .asSequence()
+            .filter { (it.type == C.TRACK_TYPE_TEXT) && it.isSupported }
             .mapIndexed { gi, group ->
                 val fmt   = group.getTrackFormat(0)
-                val lang  = fmt.language?.let { Locale(it).displayLanguage } ?: ""
+                val lang  = fmt.language?.let { Locale.forLanguageTag(it).displayLanguage } ?: ""
                 val label = when {
                     fmt.label    != null -> fmt.label!!
                     lang.isNotEmpty()    -> lang
@@ -257,6 +260,7 @@ fun VideoPlayerScreen(
                 }
                 TrackOption(label, gi, 0, group.isSelected)
             }
+            .toList()
     }
 
     // ── Player listeners ────────────────────────────────────────────────────
@@ -288,7 +292,7 @@ fun VideoPlayerScreen(
 
     // ── Apply playback speed ────────────────────────────────────────────────
     LaunchedEffect(playbackSpeed) {
-        exoPlayer.setPlaybackParameters(PlaybackParameters(playbackSpeed))
+        exoPlayer.playbackParameters = PlaybackParameters(playbackSpeed)
     }
 
     // ── Apply resize mode ───────────────────────────────────────────────────
@@ -302,9 +306,9 @@ fun VideoPlayerScreen(
             val videoExtensions = setOf("mp4", "mkv", "webm", "avi", "mov")
             val allVideos = getSiblingFiles(context, initialVideoUri, videoExtensions)
             allVideos.forEach { uri -> exoPlayer.addMediaItem(MediaItem.fromUri(uri)) }
-            val targetName = Uri.parse(initialVideoUri).lastPathSegment
+            val targetName = initialVideoUri.toUri().lastPathSegment
             val startIndex = if (targetName != null)
-                allVideos.indexOfFirst { Uri.parse(it).lastPathSegment == targetName }.coerceAtLeast(0)
+                allVideos.indexOfFirst { it.toUri().lastPathSegment == targetName }.coerceAtLeast(0)
             else 0
             exoPlayer.seekTo(startIndex, 0L)
             exoPlayer.prepare()
@@ -358,12 +362,12 @@ fun VideoPlayerScreen(
         val retriever = MediaMetadataRetriever()
         try {
             val (thumbW, thumbH) = withContext(Dispatchers.IO) {
-                retriever.setDataSource(context, Uri.parse(uri))
+                retriever.setDataSource(context, uri.toUri())
                 val w = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 160
                 val h = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 90
                 val rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
                 // Swap dimensions for portrait-rotated videos
-                if (rotation == 90 || rotation == 270) Pair(h, w) else Pair(w, h)
+                if ((rotation == 90) || (rotation == 270)) Pair(h, w) else Pair(w, h)
             }
             val aspect = thumbW.toFloat() / thumbH.toFloat().coerceAtLeast(1f)
             thumbnailAspectRatio = aspect
@@ -376,7 +380,7 @@ fun VideoPlayerScreen(
                 }
                 if (bmp != null) {
                     val scaled = withContext(Dispatchers.IO) {
-                        val s = Bitmap.createScaledBitmap(bmp, scaledW, scaledH, true)
+                        val s = bmp.scale(scaledW, scaledH, true)
                         if (s !== bmp) bmp.recycle()
                         s
                     }
@@ -412,7 +416,7 @@ fun VideoPlayerScreen(
                     onShowPauseIndicator  = { showPauseIndicator  = true },
                     onShowPlayIndicator   = { showPlayIndicator   = true },
                     onShowUi = { isUiVisible = true; hideTimerTrigger++ },
-                    activity = activity
+                    activity = activity,
                 )
         ) {
 
@@ -431,8 +435,10 @@ fun VideoPlayerScreen(
                         onShowPlayIndicator   = { showPlayIndicator   = true },
                         onShowSkipBackIndicator    = { showSkipBackIndicator    = true },
                         onShowSkipForwardIndicator = { showSkipForwardIndicator = true },
-                        onShowUi = { isUiVisible = true; hideTimerTrigger++ }
-                    )
+                    ) {
+                        isUiVisible = true
+                        hideTimerTrigger++
+                    }
             ) {
                 AndroidView(
                     factory = { ctx ->
@@ -451,15 +457,31 @@ fun VideoPlayerScreen(
             }
 
             // ── Indicators ──────────────────────────────────────────────────
-            AnimatedVisibility(visible = showPauseIndicator, enter = fadeIn(), exit = fadeOut(),
-                modifier = Modifier.align(Alignment.Center)) {
-                Icon(Icons.Default.PauseCircle, stringResource(R.string.media_paused),
-                    tint = Color.White, modifier = Modifier.size(96.dp))
+            AnimatedVisibility(
+                visible = showPauseIndicator,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Icon(
+                    Icons.Default.PauseCircle,
+                    stringResource(R.string.media_paused),
+                    tint = Color.White,
+                    modifier = Modifier.size(96.dp),
+                )
             }
-            AnimatedVisibility(visible = showPlayIndicator, enter = fadeIn(), exit = fadeOut(),
-                modifier = Modifier.align(Alignment.Center)) {
-                Icon(Icons.Default.PlayCircle, stringResource(R.string.media_playing),
-                    tint = Color.White, modifier = Modifier.size(96.dp))
+            AnimatedVisibility(
+                visible = showPlayIndicator,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Icon(
+                    Icons.Default.PlayCircle,
+                    stringResource(R.string.media_playing),
+                    tint = Color.White,
+                    modifier = Modifier.size(96.dp),
+                )
             }
             AnimatedVisibility(visible = showSkipBackIndicator, enter = fadeIn(), exit = fadeOut(),
                 modifier = Modifier.fillMaxHeight().fillMaxWidth(0.3f).align(Alignment.CenterStart)) {
@@ -467,8 +489,15 @@ fun VideoPlayerScreen(
                     Icon(Icons.Default.Replay10, null, tint = Color.White, modifier = Modifier.size(64.dp))
                 }
             }
-            AnimatedVisibility(visible = showSkipForwardIndicator, enter = fadeIn(), exit = fadeOut(),
-                modifier = Modifier.fillMaxHeight().fillMaxWidth(0.3f).align(Alignment.CenterEnd)) {
+            AnimatedVisibility(
+                visible = showSkipForwardIndicator,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.3f)
+                    .align(Alignment.CenterEnd),
+            ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(Icons.Default.Forward10, null, tint = Color.White, modifier = Modifier.size(64.dp))
                 }
@@ -499,7 +528,9 @@ fun VideoPlayerScreen(
                                 }
                             }
                         }
-                        .pointerInput(Unit) { detectTapGestures(onTap = { hideTimerTrigger++ }) }
+                        .pointerInput(Unit) {
+                            detectTapGestures { hideTimerTrigger++ }
+                        }
                 ) {
                     // Preview card — zero layout height so it floats above the bar without
                     // pushing the Column upward. The layout modifier reports h=0 to the parent
@@ -522,7 +553,7 @@ fun VideoPlayerScreen(
                             val previewW = (135.dp * thumbnailAspectRatio).coerceIn(80.dp, 240.dp)
                             val previewImageH = previewW / thumbnailAspectRatio
                             val padDp = 8.dp
-                            val thumbXDp = padDp + (maxWidth - padDp * 2) * fraction
+                            val thumbXDp = padDp + ((maxWidth - (padDp * 2)) * fraction)
                             val previewXDp = (thumbXDp - previewW / 2).coerceIn(0.dp, maxWidth - previewW)
                             Column(
                                 modifier = Modifier
@@ -976,8 +1007,12 @@ fun VideoPlayerScreen(
 
                         // Fullscreen button
                         IconButton(onClick = { onToggleFullscreen() }) {
-                            Icon(Icons.Default.Fullscreen, stringResource(R.string.menu_fullscreen),
-                                tint = Color.White, modifier = Modifier.size(64.dp))
+                            Icon(
+                                Icons.Default.Fullscreen,
+                                stringResource(R.string.menu_fullscreen),
+                                tint = Color.White,
+                                modifier = Modifier.size(64.dp),
+                            )
                         }
                     }
                 }
@@ -1020,10 +1055,9 @@ fun Modifier.videoGestures(
 ): Modifier = composed {
     val scope = rememberCoroutineScope()
 
-    var lastClickTime by remember { mutableStateOf(0L) }
+    var lastClickTime by remember { mutableLongStateOf(0L) }
     var pendingClickJob by remember { mutableStateOf<Job?>(null) }
-    var lastTapTime by remember { mutableStateOf(0L) }
-    var lastTapX by remember { mutableStateOf(0f) }
+    var lastTapTime by remember { mutableLongStateOf(0L) }
 
     val currentIsUiVisible         by rememberUpdatedState(isUiVisible)
     val currentIsPlaying           by rememberUpdatedState(isPlaying)
@@ -1040,7 +1074,7 @@ fun Modifier.videoGestures(
                     val isTouch     = event.changes.any { it.type == PointerType.Touch }
                     val isStylus    = event.changes.any { it.type == PointerType.Stylus }
 
-                    if ((isTouch || isStylus) && event.type == PointerEventType.Press) {
+                    if (((isTouch || isStylus)) && (event.type == PointerEventType.Press)) {
                         firstChange.consume()
                         val currentTime = System.currentTimeMillis()
                         val tapX        = firstChange.position.x
@@ -1056,7 +1090,7 @@ fun Modifier.videoGestures(
                                     onShowSkipBackIndicator()
                                     onShowUi()
                                 }
-                                tapX > width * 0.7f -> {
+                                (tapX > (width * 0.7f)) -> {
                                     val newPos = (exoPlayer.currentPosition + 10000).coerceAtMost(exoPlayer.duration)
                                     exoPlayer.seekTo(newPos)
                                     onShowSkipForwardIndicator()
@@ -1077,7 +1111,6 @@ fun Modifier.videoGestures(
                             }
                         }
                         lastTapTime = currentTime
-                        lastTapX    = tapX
                     }
                 }
             }
@@ -1129,7 +1162,7 @@ fun Modifier.videoKeyboardControls(
     onShowPauseIndicator: () -> Unit,
     onShowPlayIndicator: () -> Unit,
     onShowUi: () -> Unit,
-    activity: Activity?
+    activity: Activity?,
 ): Modifier = this.onKeyEvent { keyEvent ->
     if (keyEvent.type != KeyEventType.KeyDown) return@onKeyEvent false
     when (keyEvent.key) {

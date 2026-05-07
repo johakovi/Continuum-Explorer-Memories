@@ -400,7 +400,6 @@ object FileOperationsManager {
                     NetworkProtocol.SFTP -> SftpProvider(connection, SafProvider.appContext())
                     NetworkProtocol.WEBDAV -> WebDavProvider(connection, SafProvider.appContext())
                     NetworkProtocol.SMB -> SmbProvider(connection, SafProvider.appContext())
-                    else -> throw UnsupportedOperationException("Protocol not supported for testing")
                 }
                 try {
                     if (!provider.exists(provider.rootId())) throw IOException("Root not reachable")

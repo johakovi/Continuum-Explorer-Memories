@@ -1,17 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.troikoss.continuum_explorer"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.troikoss.continuum_explorer_memories"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 40
         versionName = "0.4.1.1-beta"
 
@@ -24,16 +23,13 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -48,13 +44,13 @@ android {
 }
 
 dependencies {
-    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
-    implementation("androidx.media3:media3-exoplayer:1.5.1")
-    implementation("androidx.media3:media3-ui:1.5.1")
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation("io.coil-kt:coil-video:2.6.0")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("net.lingala.zip4j:zip4j:2.11.6")
+    implementation(libs.androidx.profileinstaller)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.zip4j)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -77,7 +73,7 @@ dependencies {
         exclude(group = "org.ogce", module = "xpp3")
     }
     implementation(libs.okhttp)
-    implementation("com.hierynomus:smbj:0.13.0")
+    implementation(libs.smbj)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

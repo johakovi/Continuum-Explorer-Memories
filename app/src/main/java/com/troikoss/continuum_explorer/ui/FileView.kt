@@ -1,7 +1,7 @@
 package com.troikoss.continuum_explorer.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -63,7 +63,7 @@ fun FileView(
     val isLead = selectionManager.leadItem == file
 
     // Context Menu
-    var showMenu by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(value = false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
     
     val density = LocalDensity.current
@@ -80,13 +80,13 @@ fun FileView(
                 anchorBounds: IntRect,
                 windowSize: IntSize,
                 layoutDirection: LayoutDirection,
-                popupContentSize: IntSize
+                popupContentSize: IntSize,
             ): IntOffset {
                 val mousePos = mousePosition()
-                if (mousePos == null || containerCoordinates == null || !containerCoordinates.isAttached) {
+                if ((mousePos == null) || (containerCoordinates == null) || !containerCoordinates.isAttached) {
                     return IntOffset(
-                        x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2,
-                        y = anchorBounds.bottom
+                        x = anchorBounds.left + ((anchorBounds.width - popupContentSize.width) / 2),
+                        y = anchorBounds.bottom,
                     )
                 }
 
@@ -117,9 +117,10 @@ fun FileView(
                         onShowContextMenu = { offset ->
                             menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
                             showMenu = true
-                        },
-                        onDismissContextMenu = { showMenu = false }
-                    )
+                        }
+                    ) {
+                        showMenu = false
+                    }
                     .then(
                         if (file.isDirectory) {
                             val isRemote = file.provider.capabilities.isRemote
@@ -128,7 +129,7 @@ fun FileView(
                                 destPath = file.fileRef,
                                 destSafUri = file.documentFileRef?.uri,
                                 destNetworkProvider = if (isRemote) file.provider else null,
-                                destNetworkId = if (isRemote) file.providerId else null
+                                destNetworkId = if (isRemote) file.providerId else null,
                             )
                         } else Modifier
                     )
@@ -141,9 +142,10 @@ fun FileView(
                     )
                     .contextMenuDetector(enableLongPress = false, aggressive = true) { offset ->
                         if (!selectionManager.isSelected(file)) {
-                            selectionManager.handleRowClick(file,
+                            selectionManager.handleRowClick(
+                                file,
                                 isShiftPressed = false,
-                                isCtrlPressed = false
+                                isCtrlPressed = false,
                             )
                         }
                         menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
@@ -159,7 +161,7 @@ fun FileView(
             }
 
         // Context Menu
-        Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+        Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
             ItemContextMenu(
                 expanded = showMenu,
                 onDismiss = { showMenu = false },
@@ -179,11 +181,11 @@ private fun FileGalleryView(
     isHovered: Boolean,
     isLead: Boolean,
     appState: FileExplorerState,
-    toolTipProvider: PopupPositionProvider
+    toolTipProvider: PopupPositionProvider,
 ) {
 
     val tooltipState = rememberTooltipState()
-    var isOverflowing by remember { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(value = false) }
 
     val contentSize = (appState.folderConfigs.gridItemSize * 0.6f).dp
 
@@ -250,11 +252,11 @@ private fun FileGridView(
     isHovered: Boolean,
     isLead: Boolean,
     appState: FileExplorerState,
-    toolTipProvider: PopupPositionProvider
+    toolTipProvider: PopupPositionProvider,
 ) {
 
     val tooltipState = rememberTooltipState()
-    var isOverflowing by remember { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(value = false) }
 
     val shape = RoundedCornerShape(8.dp)
 
@@ -307,7 +309,7 @@ private fun FileContentView(
     isHovered: Boolean,
     isLead: Boolean,
     appState: FileExplorerState,
-    toolTipProvider: PopupPositionProvider
+    toolTipProvider: PopupPositionProvider,
 ) {
     val formattedSize = remember(file) { appState.formatSize(file.length) }
     val formattedDate = remember(file) { appState.formatDate(file.lastModified) }
@@ -315,7 +317,7 @@ private fun FileContentView(
     val iconSelectionEnabled = SettingsManager.iconTouchSelection.value
 
     val tooltipState = rememberTooltipState()
-    var isOverflowing by remember { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(value = false) }
 
     val shape = RoundedCornerShape(8.dp)
 
@@ -371,7 +373,7 @@ private fun FileDetailsView(
     isLead: Boolean,
     appState: FileExplorerState,
     hScrollState: ScrollState?,
-    toolTipProvider: PopupPositionProvider
+    toolTipProvider: PopupPositionProvider,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -381,11 +383,11 @@ private fun FileDetailsView(
     val nameColumnWidth = appState.folderConfigs.columnWidths.getOrElse(FileColumnType.NAME) {Dp.Unspecified}
 
     val tooltipState = rememberTooltipState()
-    var isOverflowing by remember { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(value = false) }
 
     val shape = RoundedCornerShape(8.dp)
 
-    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+    CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Column(
             modifier = Modifier
                 .then(if (hScrollState != null) Modifier.horizontalScroll(hScrollState) else Modifier)

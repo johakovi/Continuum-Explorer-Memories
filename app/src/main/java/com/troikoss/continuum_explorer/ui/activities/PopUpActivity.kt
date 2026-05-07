@@ -1403,12 +1403,12 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         if (isFtp) {
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                androidx.compose.material3.Checkbox(checked = useTls, onCheckedChange = { useTls = it })
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = useTls, onCheckedChange = { useTls = it })
                 Text(stringResource(R.string.nav_network_use_tls))
             }
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                androidx.compose.material3.Checkbox(checked = ftpPassiveMode, onCheckedChange = { ftpPassiveMode = it })
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = ftpPassiveMode, onCheckedChange = { ftpPassiveMode = it })
                 Text(stringResource(R.string.nav_network_passive_mode))
             }
         }
@@ -1424,8 +1424,8 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
         }
         if ((isFtp && useTls) || isWebDav) {
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                androidx.compose.material3.Checkbox(checked = acceptUntrustedCerts, onCheckedChange = { acceptUntrustedCerts = it })
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = acceptUntrustedCerts, onCheckedChange = { acceptUntrustedCerts = it })
                 Text(stringResource(R.string.nav_network_accept_untrusted))
             }
         }
@@ -1433,7 +1433,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
         if (isFtp || isSftp || isWebDav || isSmb) {
             Spacer(modifier = Modifier.height(8.dp))
             val canTest = (host.isNotBlank() || rootUrl.isNotBlank()) && !isTesting
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedButton(
                     onClick = {
                         isTesting = true
@@ -1463,7 +1463,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                     enabled = canTest
                 ) {
                     if (isTesting) {
-                        androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(6.dp))
                     }
                     Text(stringResource(R.string.nav_network_test))
