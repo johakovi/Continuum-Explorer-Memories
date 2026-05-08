@@ -16,14 +16,19 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
 import com.troikoss.continuum_explorer.managers.IconTheme
+import com.troikoss.continuum_explorer.managers.ThemeTopMode
 
 data class ExtendedColors(
     val sidebarBackground: Color,
     val topBarBackground: Color,
+    val navButtonBackground: Color,
+    val searchBoxBackground: Color,
+    val tabBarBackground: Color,
     val sidebarIcons: Color,
     val folderIcon: Color,
     val galleryIcon: Color,
@@ -46,18 +51,6 @@ object FileExplorerTheme {
         @ReadOnlyComposable
         get() = LocalExtendedColors.current
 }
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-)
 
 private val VeryDarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -108,13 +101,17 @@ fun FileExplorerTheme(
         ThemeMode.VERY_DARK -> VeryDarkColorScheme
         ThemeMode.VERY_LIGHT -> VeryLightColorScheme
         else -> {
+            // For LIGHT, DARK, and SYSTEM themes: use dynamic colors on Android 12+
             if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val context = LocalContext.current
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            } else if (darkTheme) {
-                DarkColorScheme
             } else {
-                LightColorScheme
+                // Fallback to Material 3 default schemes when dynamic colors unavailable
+                if (darkTheme) {
+                    darkColorScheme()
+                } else {
+                    lightColorScheme()
+                }
             }
         }
     }
@@ -124,6 +121,9 @@ fun FileExplorerTheme(
             ExtendedColors(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
+                navButtonBackground = Color(0xFF000000),
+                searchBoxBackground = Color(0xFF000000),
+                tabBarBackground = Color(0xFF2d2d2f),
                 sidebarIcons = VeryDarkIcons,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryDarkIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryDarkIcons,
@@ -132,7 +132,7 @@ fun FileExplorerTheme(
                 documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else VeryDarkIcons,
                 recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else VeryDarkIcons,
                 downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else VeryDarkIcons,
-                tabActiveBackground = Color(0xFF2e2e2e),
+                tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText
             )
         }
@@ -140,6 +140,9 @@ fun FileExplorerTheme(
             ExtendedColors(
                 sidebarBackground = VeryLightSidebar,
                 topBarBackground = VeryLightTopBar,
+                navButtonBackground = VeryLightTopBar,
+                searchBoxBackground = Color(0xFFEEEEEE),
+                tabBarBackground = Color(0xFFECECEC),
                 sidebarIcons = VeryLightIcons,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryLightIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryLightIcons,
@@ -148,7 +151,7 @@ fun FileExplorerTheme(
                 documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else VeryLightIcons,
                 recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else VeryLightIcons,
                 downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else VeryLightIcons,
-                tabActiveBackground = Color(0xFFe8e8e8),
+                tabActiveBackground = Color(0xFFFFFFFF),
                 textColor = VeryLightText
             )
         }
@@ -158,6 +161,9 @@ fun FileExplorerTheme(
             ExtendedColors(
                 sidebarBackground = colorScheme.surfaceContainerLow,
                 topBarBackground = colorScheme.surface,
+                navButtonBackground = colorScheme.surface,
+                searchBoxBackground = colorScheme.surfaceContainerHigh,
+                tabBarBackground = colorScheme.surfaceContainerLow,
                 sidebarIcons = secondary,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else secondary,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else secondary,
@@ -173,13 +179,19 @@ fun FileExplorerTheme(
     }
 
     val context = LocalContext.current
-    DisposableEffect(darkTheme) {
+    val themeTop = SettingsManager.themeTop.value
+    DisposableEffect(darkTheme, themeTop) {
         if (context is ComponentActivity) {
+            val statusBarColor = if (themeTop == ThemeTopMode.FLOAT) {
+                android.graphics.Color.TRANSPARENT
+            } else {
+                extendedColors.tabBarBackground.toArgb()
+            }
             context.enableEdgeToEdge(
                 statusBarStyle = if (darkTheme) {
-                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.dark(statusBarColor)
                 } else {
-                    SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.light(statusBarColor, statusBarColor)
                 },
                 navigationBarStyle = if (darkTheme) {
                     SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)

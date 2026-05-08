@@ -132,7 +132,7 @@ fun TopBar(
         }
         fullPath.split("/").filter { it.isNotEmpty() }
     }
-    
+
     val zeroIndex = allSegments.indexOf("0")
     val visibleSegments = if (zeroIndex != -1) {
         allSegments.subList(zeroIndex, allSegments.size)
@@ -197,156 +197,178 @@ fun TopBar(
         color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.topBarBackground
     ) {
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
-            if (appState.getScreenSize() == ScreenSize.SMALL) {
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
-                }
-            }
-            
-            // NAVIGATION GROUP (Back/Forward/History)
-            val isSmall = appState.getScreenSize() == ScreenSize.SMALL
-            if (!isSmall || !searchBar) Row(verticalAlignment = CenterVertically) {
-                IconButton(
-                    onClick = { appState.goBack() },
-                    enabled = appState.backStack.isNotEmpty()
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = if (appState.backStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                    )
-                }
+            // NAV BUTTON BACKGROUND SURFACE - INSIDE THE TOP BAR
+            Surface(
+                color = LocalExtendedColors.current.navButtonBackground,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(end = 4.dp)
+            ) {
+                Row(verticalAlignment = CenterVertically) {
+                    if (appState.getScreenSize() == ScreenSize.SMALL) {
+                        IconButton(onClick = onMenuClick) {
+                            Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
+                        }
+                    }
 
-                IconButton(
-                    onClick = { appState.goForward() },
-                    enabled = appState.forwardStack.isNotEmpty()
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = stringResource(R.string.forward),
-                        tint = if (appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                    )
-                }
-
-                // UNIFIED HISTORY DROPDOWN (MOVE TO RIGHT OF FORWARD)
-                if (appState.getScreenSize() != ScreenSize.SMALL){
-                    Box {
+                    // NAVIGATION GROUP (Back/Forward/History)
+                    val isSmall = appState.getScreenSize() == ScreenSize.SMALL
+                    if (!isSmall || !searchBar) Row(verticalAlignment = CenterVertically) {
                         IconButton(
-                            onClick = { historyMenuExpanded = true },
-                            enabled = appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty(),
-                            modifier = Modifier
-                                .size(24.dp)
-                                .padding(start = 4.dp)
+                            onClick = { appState.goBack() },
+                            enabled = appState.backStack.isNotEmpty()
                         ) {
                             Icon(
-                                imageVector = Icons.Default.KeyboardArrowDown,
-                                contentDescription = stringResource(R.string.history),
-                                modifier = Modifier.size(16.dp),
-                                tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back),
+                                tint = if (appState.backStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             )
                         }
 
-                        DropdownMenu(
-                            expanded = historyMenuExpanded,
-                            onDismissRequest = { historyMenuExpanded = false }
+                        IconButton(
+                            onClick = { appState.goForward() },
+                            enabled = appState.forwardStack.isNotEmpty()
                         ) {
-                            // Forward History (Latest at top)
-                            appState.forwardStack.take(5)
-                                .forEachIndexed { reversedIndex, location ->
-                                    val unifiedIndex =
-                                        appState.backStack.size + 1 + (appState.forwardStack.size - 1 - reversedIndex)
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                appState.getLocationName(location),
-                                                maxLines = 1
-                                            )
-                                        },
-                                        onClick = {
-                                            appState.jumpToHistory(unifiedIndex)
-                                            historyMenuExpanded = false
-                                        }
-                                    )
-                                }
-
-                            // Current Location (with Checkmark)
-                            val currentNav = NavLocation(
-                                path = appState.currentPath,
-                                uri = appState.currentSafUri,
-                                archiveFile = appState.currentArchiveFile,
-                                archiveUri = appState.currentArchiveUri,
-                                archivePath = appState.currentArchivePath,
-                                safStack = ArrayList(appState.safStack),
-                                networkConnectionId = appState.currentNetworkConnectionId,
-                                networkPath = appState.currentNetworkId
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = stringResource(R.string.forward),
+                                tint = if (appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             )
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        appState.getLocationName(currentNav),
-                                        maxLines = 1,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                },
-                                leadingIcon = {
+                        }
+
+                        // UNIFIED HISTORY DROPDOWN (MOVE TO RIGHT OF FORWARD)
+                        if (appState.getScreenSize() != ScreenSize.SMALL) {
+                            Box {
+                                IconButton(
+                                    onClick = { historyMenuExpanded = true },
+                                    enabled = appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty(),
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(start = 4.dp)
+                                ) {
                                     Icon(
-                                        Icons.Default.Check,
-                                        null,
-                                        modifier = Modifier.size(18.dp)
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = stringResource(R.string.history),
+                                        modifier = Modifier.size(16.dp),
+                                        tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                        else MaterialTheme.colorScheme.onSurface.copy(
+                                            alpha = 0.3f
+                                        )
                                     )
-                                },
-                                onClick = { historyMenuExpanded = false }
-                            )
+                                }
 
-                            // Back History (Most recent just below current)
-                            appState.backStack.asReversed().take(5)
-                                .forEachIndexed { reversedIndex, location ->
-                                    val originalIndex = appState.backStack.size - 1 - reversedIndex
+                                DropdownMenu(
+                                    expanded = historyMenuExpanded,
+                                    onDismissRequest = { historyMenuExpanded = false }
+                                ) {
+                                    // Forward History (Latest at top)
+                                    appState.forwardStack.take(5)
+                                        .forEachIndexed { reversedIndex, location ->
+                                            val unifiedIndex =
+                                                appState.backStack.size + 1 + (appState.forwardStack.size - 1 - reversedIndex)
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        appState.getLocationName(
+                                                            location
+                                                        ),
+                                                        maxLines = 1
+                                                    )
+                                                },
+                                                onClick = {
+                                                    appState.jumpToHistory(unifiedIndex)
+                                                    historyMenuExpanded = false
+                                                }
+                                            )
+                                        }
+
+                                    // Current Location (with Checkmark)
+                                    val currentNav = NavLocation(
+                                        path = appState.currentPath,
+                                        uri = appState.currentSafUri,
+                                        archiveFile = appState.currentArchiveFile,
+                                        archiveUri = appState.currentArchiveUri,
+                                        archivePath = appState.currentArchivePath,
+                                        safStack = ArrayList(appState.safStack),
+                                        networkConnectionId = appState.currentNetworkConnectionId,
+                                        networkPath = appState.currentNetworkId
+                                    )
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                appState.getLocationName(location),
-                                                maxLines = 1
+                                                appState.getLocationName(currentNav),
+                                                maxLines = 1,
+                                                fontWeight = FontWeight.Bold
                                             )
                                         },
-                                        onClick = {
-                                            appState.jumpToHistory(originalIndex)
-                                            historyMenuExpanded = false
-                                        }
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.Check,
+                                                null,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        },
+                                        onClick = { historyMenuExpanded = false }
                                     )
+
+                                    // Back History (Most recent just below current)
+                                    appState.backStack.asReversed().take(5)
+                                        .forEachIndexed { reversedIndex, location ->
+                                            val originalIndex =
+                                                appState.backStack.size - 1 - reversedIndex
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        appState.getLocationName(
+                                                            location
+                                                        ),
+                                                        maxLines = 1
+                                                    )
+                                                },
+                                                onClick = {
+                                                    appState.jumpToHistory(originalIndex)
+                                                    historyMenuExpanded = false
+                                                }
+                                            )
+                                        }
                                 }
+                            }
                         }
                     }
-                }
-            }
 
-            // UP BUTTON
+                    // UP BUTTON
 
-            if (appState.getScreenSize() != ScreenSize.SMALL){
-                IconButton(
-                    onClick = { appState.goUp() },
-                    enabled = appState.canGoUp
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowUpward,
-                        contentDescription = stringResource(R.string.up),
-                        tint = if (appState.canGoUp) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                    )
-                }
+                    if (appState.getScreenSize() != ScreenSize.SMALL) {
+                        IconButton(
+                            onClick = { appState.goUp() },
+                            enabled = appState.canGoUp
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowUpward,
+                                contentDescription = stringResource(R.string.up),
+                                tint = if (appState.canGoUp) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                            )
+                        }
 
-                // REFRESH / CANCEL BUTTON
-                if (showCancelButton) {
-                    IconButton(onClick = { appState.cancelLoading() }) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
-                    }
-                } else {
-                    // Show Refresh button if not loading, or if loading hasn't reached the 400ms mark yet
-                    IconButton(onClick = { if (!appState.isLoading) appState.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.menu_refresh))
+                        // REFRESH / CANCEL BUTTON
+                        if (showCancelButton) {
+                            IconButton(onClick = { appState.cancelLoading() }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.cancel)
+                                )
+                            }
+                        } else {
+                            // Show Refresh button if not loading, or if loading hasn't reached the 400ms mark yet
+                            IconButton(onClick = { if (!appState.isLoading) appState.refresh() }) {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.menu_refresh)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -363,7 +385,7 @@ fun TopBar(
                     ) {
                         if (!addressBar && !searchBar) addressBar = true
                     },
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                color = LocalExtendedColors.current.searchBoxBackground,
                 shape = RoundedCornerShape(20.dp)
             ) {
                 if (searchBar) {
@@ -423,9 +445,9 @@ fun TopBar(
 
                             DropdownMenu(
                                 expanded = searchOptionsMenuExpanded,
-                                onDismissRequest = { 
+                                onDismissRequest = {
                                     searchOptionsMenuExpanded = false
-                                    searchKindMenuExpanded = false 
+                                    searchKindMenuExpanded = false
                                 }
                             ) {
                                 if (searchKindMenuExpanded) {
@@ -566,7 +588,7 @@ fun TopBar(
                         } else if (appState.currentPath != null || appState.currentArchiveFile != null) {
                             visibleSegments.forEachIndexed { index, folderName ->
                                 val displayName = if (folderName == "0") stringResource(R.string.nav_internal_storage) else folderName
-                                
+
                                 val realIndex = if (zeroIndex != -1) zeroIndex + index else index
                                 val targetPathSegments = allSegments.take(realIndex + 1)
                                 val targetPathString = "/" + targetPathSegments.joinToString("/")
@@ -647,7 +669,7 @@ fun TopBar(
                                         if (index < appState.safStack.size) {
                                             val targetUri = appState.safStack[index]
                                             // We need to truncate the stack to this point
-                                            repeat(appState.safStack.size - index) { 
+                                            repeat(appState.safStack.size - index) {
                                                 appState.safStack.removeAt(appState.safStack.lastIndex)
                                             }
                                             appState.navigateTo(null, targetUri)
