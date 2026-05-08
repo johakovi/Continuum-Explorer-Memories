@@ -42,6 +42,8 @@ The issue with Word files is now resolved, at least for the most part. However, 
 ## Workarounds 
 For text editor I recommend using Editor by Bill Farmer from [F-Droid](https://f-droid.org/packages/org.billthefarmer.editor)
 
+For automatic updates, I recommend to use [Obtanium](https://github.com/ImranR98/Obtainium) and add app source URL: https://github.com/johakovi/Continuum-Explorer-Memories/tree/master
+
 ## More languages?
 If you want contribute to adding more languages to my fork or original troikoss app,
 then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml) or this [link (troikoss)](https://github.com/troikoss/Continuum-Explorer/blob/master/app/src/main/res/values/strings.xml) and send file to us! c:
