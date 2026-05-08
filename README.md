@@ -5,7 +5,6 @@
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
 Note: This project is forked from troikoss / Continuum Explorer
-<img width="1920" height="1080" alt="Screenshot_20260508_160204_Continuum Explorer" src="https://github.com/user-attachments/assets/ca236c10-6886-4be8-b462-43e0e3c32864" />
 
 <img width="1920" height="1080" alt="Screenshot_20260508_160204_Continuum Explorer" src="https://github.com/user-attachments/assets/28f8056d-ab09-4ee1-b582-536f5c3a7278" />
 
