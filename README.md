@@ -28,10 +28,6 @@ Archive Support: Integrated .zip viewer (Support for .7z is planned; .rar suppor
 Network storage managment
 
 ## Planned Features:
-New colours for themes
-
-Icon packs
-
 Text editor
 
 Shizuku permission for Android folder usage
@@ -42,6 +38,9 @@ Shizuku permission for Android folder usage
 
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
+
+## Workarounds 
+For text editor I recommend using Editor by Bill Farmer from [F-Droid](https://f-droid.org/packages/org.billthefarmer.editor)
 
 ## More languages?
 If you want contribute to adding more languages to my fork or original troikoss app,
