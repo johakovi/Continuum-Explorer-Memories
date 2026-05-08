@@ -60,7 +60,7 @@ fun TabBar(
         modifier = modifier
             .fillMaxWidth()
             .height(if (themeTop == ThemeTopMode.FLOAT) 48.dp else 40.dp)
-            .background(if (themeTop == ThemeTopMode.FLOAT) Color.Transparent else LocalExtendedColors.current.tabBarBackground)  // Changed: Use tabBarBackground
+            .background(if (themeTop == ThemeTopMode.FLOAT) LocalExtendedColors.current.tabBarBackground else LocalExtendedColors.current.tabBarBackground)  // Changed: Use tabBarBackground
             .let {
                 if (themeTop == ThemeTopMode.ATTACHED) {
                     it.drawBehind {

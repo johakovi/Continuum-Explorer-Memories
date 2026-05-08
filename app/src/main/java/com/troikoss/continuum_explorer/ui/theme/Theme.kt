@@ -187,7 +187,7 @@ fun FileExplorerTheme(
     DisposableEffect(darkTheme, themeTop) {
         if (context is ComponentActivity) {
             val statusBarColor = if (themeTop == ThemeTopMode.FLOAT) {
-                android.graphics.Color.TRANSPARENT
+                extendedColors.tabBarBackground.toArgb()
             } else {
                 extendedColors.tabBarBackground.toArgb()
             }

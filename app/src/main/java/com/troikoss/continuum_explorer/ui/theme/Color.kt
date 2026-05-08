@@ -22,7 +22,7 @@ val VeryDarkIcons = Color(0xFFCCCCCE)
 val VeryLightSidebar = Color(0xFFEAE9E9)
 val VeryLightTopBar = Color(0xFFF1F1F1)
 val VeryLightText = Color(0xFF090909)
-val VeryLightIcons = Color(0xFF69646E)
+val VeryLightIcons = Color(0xFF444344)
 
 // Common Theme Colors (used in both Very Dark and Very Light)
 val ThemeGallery = Color(0xFFE15D82)
