@@ -1,5 +1,4 @@
 package com.troikoss.continuum_explorer.ui.components
-
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -90,12 +89,12 @@ fun TopBar(
     var searchOptionsMenuExpanded by remember { mutableStateOf(false) }
     var searchSubfolders by remember { mutableStateOf(false) }
     var searchKindMenuExpanded by remember { mutableStateOf(false) }
-
     val interactionSource = remember { MutableInteractionSource() }
-
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
+    val isColorful = SettingsManager.isColorfulBarsEnabled.value
+    val navButtonBg = if (isColorful) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.navButtonBackground
 
     // Sync UI searchBar state to global state
     LaunchedEffect(searchBar) {
@@ -199,7 +198,7 @@ fun TopBar(
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
             // NAV BUTTON BACKGROUND SURFACE - INSIDE THE TOP BAR
             Surface(
-                color = LocalExtendedColors.current.navButtonBackground,
+                color = navButtonBg,
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.padding(end = 4.dp)
             ) {
