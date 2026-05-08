@@ -1,11 +1,13 @@
+
 ## Continuum Explorer (Memories)
 ![alt text](https://github.com/user-attachments/assets/9363592b-b9ec-4abd-8fce-548c74da7b41) 
 
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
 Note: This project is forked from troikoss / Continuum Explorer
+<img width="1920" height="1080" alt="Screenshot_20260508_160204_Continuum Explorer" src="https://github.com/user-attachments/assets/ca236c10-6886-4be8-b462-43e0e3c32864" />
 
-<img width="2160" height="1686" alt="1000287941" src="https://github.com/user-attachments/assets/163a9d7e-e60b-428c-83b7-d00c075d5498" />
+<img width="1920" height="1080" alt="Screenshot_20260508_160204_Continuum Explorer" src="https://github.com/user-attachments/assets/28f8056d-ab09-4ee1-b582-536f5c3a7278" />
 
 <img width="2160" height="1686" alt="1000287942" src="https://github.com/user-attachments/assets/0334dde4-b7d7-47e4-b003-9c8344706547" />
 
@@ -33,7 +35,7 @@ Icon packs
 
 Text editor
 
-More shortcuts for the library (ex. Downloads)
+Shizuku permission for Android folder usage
 
 ## Bugs to fix
 "Square" sidebar and "Rounded" window theme elements overlaps
