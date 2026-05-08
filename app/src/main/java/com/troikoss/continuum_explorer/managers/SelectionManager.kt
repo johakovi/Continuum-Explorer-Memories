@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 
 /**
  * Manages complex selection logic including range selection (Shift),
@@ -232,7 +233,7 @@ fun Modifier.selectionBackground(
     shape: Shape = RectangleShape
 ): Modifier = composed {
 
-    val baseSelectedColor = MaterialTheme.colorScheme.primaryContainer
+    val baseSelectedColor = LocalExtendedColors.current.selectionBackground
     val darkenedSelectedColor = lerp(baseSelectedColor, Color.Black, 0.1f)
     val hoverColor = if (hoverAlpha) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f) else MaterialTheme.colorScheme.onSurface
 

@@ -29,6 +29,7 @@ data class ExtendedColors(
     val navButtonBackground: Color,
     val searchBoxBackground: Color,
     val tabBarBackground: Color,
+    val selectionBackground: Color,
     val sidebarIcons: Color,
     val folderIcon: Color,
     val galleryIcon: Color,
@@ -53,9 +54,9 @@ object FileExplorerTheme {
 }
 
 private val VeryDarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = DarkPrimary,
+    secondary = DarkSecondary,
+    tertiary = DarkTertiary,
     background = Color(0xFF000000),
     surface = VeryDarkTopBar,
     surfaceContainer = VeryDarkTopBar,
@@ -67,9 +68,9 @@ private val VeryDarkColorScheme = darkColorScheme(
 )
 
 private val VeryLightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    primary = LightPrimary,
+    secondary = LightSecondary,
+    tertiary = LightTertiary,
     background = Color(0xFFFFFFFF),
     surface = VeryLightTopBar,
     surfaceContainer = VeryLightTopBar,
@@ -122,8 +123,9 @@ fun FileExplorerTheme(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
                 navButtonBackground = Color(0xFF000000),
-                searchBoxBackground = Color(0xFF000000),
+                searchBoxBackground = Color(0xFF181818),
                 tabBarBackground = Color(0xFF2d2d2f),
+                selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryDarkIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryDarkIcons,
@@ -143,6 +145,7 @@ fun FileExplorerTheme(
                 navButtonBackground = VeryLightTopBar,
                 searchBoxBackground = Color(0xFFEEEEEE),
                 tabBarBackground = Color(0xFFECECEC),
+                selectionBackground = LightPrimarySelection,
                 sidebarIcons = VeryLightIcons,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryLightIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryLightIcons,
@@ -173,7 +176,8 @@ fun FileExplorerTheme(
                 recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else secondary,
                 downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else secondary,
                 tabActiveBackground = colorScheme.surface,
-                textColor = onSurface
+                textColor = onSurface,
+                selectionBackground = colorScheme.primaryContainer
             )
         }
     }

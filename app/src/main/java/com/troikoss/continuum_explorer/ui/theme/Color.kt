@@ -2,12 +2,18 @@ package com.troikoss.continuum_explorer.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val DarkPrimarySelection = Color(0xFF212121)
+val DarkPrimary = Color(0xFF288D76)
+val DarkSecondary = Color(0xFF32564A)
+val DarkTertiary = Color(0xFFE0E0E0)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
+val LightPrimarySelection = Color(0xFFE0E0E0)
+val LightPrimary = Color(0xFF23C09C)
+val LightSecondary = Color(0xFF54A4DA)
+val LightTertiary = Color(0xFFE0E0E0)
+
+val Purple40 = Color(0xFF4060C7)
+val PurpleGrey40 = Color(0xFF484169)
 val Pink40 = Color(0xFF757575)
 
 // Very Dark Theme
