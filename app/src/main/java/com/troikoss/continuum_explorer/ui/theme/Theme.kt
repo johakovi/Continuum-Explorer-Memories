@@ -71,14 +71,14 @@ private val VeryLightColorScheme = lightColorScheme(
     primary = LightPrimary,
     secondary = LightSecondary,
     tertiary = LightTertiary,
-    background = Color(0xFFFFFFFF),
+    background = Color(0xFFF1F1F1),
     surface = VeryLightTopBar,
     surfaceContainer = VeryLightTopBar,
     surfaceContainerLow = VeryLightSidebar,
     surfaceContainerHigh = Color(0xFFE8E8E8),
     onSurface = VeryLightText,
     onSurfaceVariant = VeryLightIcons,
-    outlineVariant = Color(0xFFDDDDDD)
+    outlineVariant = Color(0xFFA2A2A2)
 )
 
 @Composable
@@ -123,7 +123,7 @@ fun FileExplorerTheme(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
                 navButtonBackground = Color(0xFF000000),
-                searchBoxBackground = Color(0xFF181818),
+                searchBoxBackground = Color(0xFF1A1A1A),
                 tabBarBackground = Color(0xFF2d2d2f),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
@@ -143,8 +143,8 @@ fun FileExplorerTheme(
                 sidebarBackground = VeryLightSidebar,
                 topBarBackground = VeryLightTopBar,
                 navButtonBackground = VeryLightTopBar,
-                searchBoxBackground = Color(0xFFEEEEEE),
-                tabBarBackground = Color(0xFFECECEC),
+                searchBoxBackground = Color(0xFFE3E3E3),
+                tabBarBackground = Color(0xFFfcfcfe),
                 selectionBackground = LightPrimarySelection,
                 sidebarIcons = VeryLightIcons,
                 folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryLightIcons,
@@ -154,7 +154,7 @@ fun FileExplorerTheme(
                 documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else VeryLightIcons,
                 recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else VeryLightIcons,
                 downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else VeryLightIcons,
-                tabActiveBackground = Color(0xFFFFFFFF),
+                tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText
             )
         }

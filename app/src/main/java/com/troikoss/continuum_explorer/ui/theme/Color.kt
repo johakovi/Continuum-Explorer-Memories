@@ -8,13 +8,9 @@ val DarkSecondary = Color(0xFF32564A)
 val DarkTertiary = Color(0xFFE0E0E0)
 
 val LightPrimarySelection = Color(0xFFE0E0E0)
-val LightPrimary = Color(0xFF23C09C)
-val LightSecondary = Color(0xFF54A4DA)
+val LightPrimary = Color(0xFF47B99D)
+val LightSecondary = Color(0xFF3D87B7)
 val LightTertiary = Color(0xFFE0E0E0)
-
-val Purple40 = Color(0xFF4060C7)
-val PurpleGrey40 = Color(0xFF484169)
-val Pink40 = Color(0xFF757575)
 
 // Very Dark Theme
 val VeryDarkSidebar = Color(0xFF171719)
@@ -23,10 +19,10 @@ val VeryDarkText = Color(0xFFF3F3F3)
 val VeryDarkIcons = Color(0xFFCCCCCE)
 
 // Very Light Theme
-val VeryLightSidebar = Color(0xFFF2F2F2)
-val VeryLightTopBar = Color(0xFFFFFFFF)
+val VeryLightSidebar = Color(0xFFEAE9E9)
+val VeryLightTopBar = Color(0xFFF1F1F1)
 val VeryLightText = Color(0xFF090909)
-val VeryLightIcons = Color(0xFF5D5C61)
+val VeryLightIcons = Color(0xFF69646E)
 
 // Common Theme Colors (used in both Very Dark and Very Light)
 val ThemeGallery = Color(0xFFE15D82)
