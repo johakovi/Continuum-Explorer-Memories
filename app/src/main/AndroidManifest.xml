@@ -130,6 +130,10 @@
             android:launchMode="singleTop"
             android:taskAffinity="" />
 
+        <activity
+    android:name=".ui.activities.TextEditorActivity"
+    android:exported="false" />
+
         <receiver android:name=".utils.NotificationCancelReceiver" android:exported="false">
              <intent-filter>
                 <action android:name="continuum_explorer.ACTION_CANCEL_OPERATION" />
