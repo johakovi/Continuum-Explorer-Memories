@@ -62,7 +62,47 @@ class MainActivity : AppCompatActivity() {
                 intent.data = "package:$packageName".toUri()
                 startActivity(intent)
             }
+            
         }
+
+        /* if (android api29) {
+        private val REQUEST_CODE_STORAGE_PERMISSION = 1001
+
+private fun checkStoragePermissions() {
+    if (ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
+            REQUEST_CODE_STORAGE_PERMISSION
+        )
+    } else {
+        // Permissions already granted
+        loadFiles()
+    }
+}
+
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            loadFiles()
+        } else {
+            Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+} */
+        
 
         // Initialize settings and storage providers
         SettingsManager.init(applicationContext)
