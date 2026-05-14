@@ -47,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -136,6 +137,7 @@ class PopUpActivity : ComponentActivity() {
                             PopupType.SHORTCUTS -> ShortcutsContent(onClose = { finish() })
                             PopupType.PROPERTIES -> PropertiesContent(onClose = { finish() })
                             PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
+                            PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
                             else -> ProgressContent(onClose = { finish() })
                         }
                     }
@@ -1491,6 +1493,45 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                 enabled = displayName.isNotBlank() && (host.isNotBlank())
             ) {
                 Text(stringResource(R.string.nav_network_save))
+            }
+        }
+    }
+}
+
+@Composable
+fun TerminalDebugContent(onClose: () -> Unit) {
+    val output = FileOperationsManager.terminalOutput.value
+    
+    Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+        Text(
+            text = "Terminal Debug Output",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = output,
+                color = Color.Green,
+                style = androidx.compose.ui.text.TextStyle(
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                    fontSize = 12.sp
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = onClose) {
+                Text(stringResource(R.string.close))
             }
         }
     }

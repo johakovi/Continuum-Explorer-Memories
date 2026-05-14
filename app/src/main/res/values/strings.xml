@@ -440,4 +440,9 @@
     <string name="msg_remote_trash_skipped">Can\'t move network files to trash. They will be deleted permanently.</string>
     <string name="settings_about">About</string>
 
+    <string name="shizuku_status">Shizuku Status</string>
+    <string name="shizuku_status_authorized">Authorized</string>
+    <string name="shizuku_status_not_authorized">Not Authorized</string>
+    <string name="shizuku_status_not_running">Not Running</string>
+    <string name="shizuku_request_permission">Request Shizuku Permission</string>
 </resources>

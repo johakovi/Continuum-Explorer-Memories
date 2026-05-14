@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         if (grantResult == PackageManager.PERMISSION_GRANTED) {
-             // Handle granted
+             com.troikoss.continuum_explorer.utils.GlobalEvents.triggerRefresh()
         }
     }
 

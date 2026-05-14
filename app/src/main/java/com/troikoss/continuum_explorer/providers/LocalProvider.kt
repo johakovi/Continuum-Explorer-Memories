@@ -54,19 +54,19 @@ object LocalProvider : StorageProvider {
     }
 
     override suspend fun listChildren(id: String): List<UniversalFile> {
-        val files = File(id).listFiles()
-        if (files == null) {
-            if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
-                return ShizukuProvider.listChildren(id)
-            }
-            return emptyList()
+        // If we have Shizuku permission and it's a restricted path, FORCE Shizuku
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.listChildren(id)
         }
-        return files.map { it.toUniversalFile() }
+
+        val files = File(id).listFiles()
+        return files?.map { it.toUniversalFile() } ?: emptyList()
     }
 
     override fun getMetadata(id: String): FileMetadata {
         val f = File(id)
-        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+        // If file doesn't exist or is in a restricted path, try Shizuku
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
             return ShizukuProvider.getMetadata(id)
         }
         return FileMetadata(f.length(), f.lastModified(), f.isDirectory, null)
@@ -75,6 +75,8 @@ object LocalProvider : StorageProvider {
     override fun findChild(parentId: String, name: String): UniversalFile? {
         val f = File(parentId, name)
         if (f.exists()) return f.toUniversalFile()
+        
+        // If standard file check failed but it's a restricted path
         if (isRestrictedPath(parentId) && ShizukuManager.hasPermission()) {
             return ShizukuProvider.findChild(parentId, name)
         }
@@ -82,16 +84,14 @@ object LocalProvider : StorageProvider {
     }
 
     override fun openInput(id: String): InputStream {
-        val f = File(id)
-        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
             return ShizukuProvider.openInput(id)
         }
         return FileInputStream(id)
     }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? {
-        val f = File(id)
-        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
             return ShizukuProvider.openReadFd(id)
         }
         return ParcelFileDescriptor.open(File(id), ParcelFileDescriptor.MODE_READ_ONLY)
@@ -142,7 +142,18 @@ object LocalProvider : StorageProvider {
     }
 
     private fun isRestrictedPath(path: String): Boolean {
-        return path.contains("/Android/data") || path.contains("/Android/obb")
+        val p = path.replace("//", "/").lowercase()
+        val sdcard = android.os.Environment.getExternalStorageDirectory().absolutePath.lowercase()
+        
+        // Android 11+ Restricted Folders
+        return p.contains("/android/data") || 
+               p.contains("/android/obb") || 
+               p.contains("/android/obj") ||
+               p.endsWith("/android") ||
+               p.endsWith("/android/") ||
+               p.startsWith("/data/") ||
+               p.startsWith("/data/user/") ||
+               (p.startsWith(sdcard) && p.contains("/android/"))
     }
 
     fun File.toUniversalFile(): UniversalFile = UniversalFile(

@@ -1,6 +1,7 @@
 package com.troikoss.continuum_explorer.services
 
 import com.troikoss.continuum_explorer.IFileService
+import com.troikoss.continuum_explorer.model.ShizukuFileInfo
 import java.io.File
 import android.os.ParcelFileDescriptor
 
@@ -9,8 +10,17 @@ class ShizukuFileService : IFileService.Stub() {
         System.exit(0)
     }
 
-    override fun listFiles(path: String): Array<String> {
-        return File(path).list() ?: emptyArray()
+    override fun getDetailedList(path: String): List<ShizukuFileInfo> {
+        val folder = File(path)
+        val files = folder.listFiles() ?: return emptyList()
+        return files.map { file ->
+            ShizukuFileInfo(
+                name = file.name,
+                isDirectory = file.isDirectory,
+                size = if (file.isDirectory) 0L else file.length(),
+                lastModified = file.lastModified()
+            )
+        }
     }
 
     override fun isDirectory(path: String): Boolean = File(path).isDirectory

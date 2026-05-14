@@ -90,7 +90,7 @@ data class UniversalFile(
 ) {
     // Legacy convenience accessors — delegate to the provider so existing code compiles
     val fileRef: File?
-        get() = if (provider is LocalProvider) File(providerId) else null
+        get() = if (provider is LocalProvider || provider.kind == ProviderKind.SHIZUKU) File(providerId) else null
 
     val documentFileRef: DocumentFile?
         get() = if (provider is SafProvider) {

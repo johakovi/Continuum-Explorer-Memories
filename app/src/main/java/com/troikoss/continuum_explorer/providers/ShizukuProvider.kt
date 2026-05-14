@@ -20,10 +20,10 @@ object ShizukuProvider : StorageProvider {
         isRemote = false,
     )
 
-    override fun rootId(): String = "/storage/emulated/0"
+    override fun rootId(): String = "/"
 
     override fun parentId(childId: String): String? {
-        if (childId == rootId() || childId == "/") return null
+        if (childId == "/" || childId.isEmpty()) return null
         val file = File(childId)
         return file.parent ?: "/"
     }
@@ -33,15 +33,16 @@ object ShizukuProvider : StorageProvider {
     override fun exists(id: String): Boolean = ShizukuManager.getServiceBlocking()?.exists(id) ?: false
 
     override suspend fun listChildren(id: String): List<UniversalFile> {
-        val service = ShizukuManager.getService()
-        val names = service.listFiles(id) ?: return emptyList()
-        return names.map { name ->
-            val path = if (id.endsWith("/")) "$id$name" else "$id/$name"
+        val service = ShizukuManager.getService() ?: return emptyList()
+
+        val infoList = try { service.getDetailedList(id) } catch (_: Exception) { null } ?: return emptyList()
+        return infoList.map { info ->
+            val path = if (id.endsWith("/")) "$id${info.name}" else "$id/${info.name}"
             UniversalFile(
-                name = name,
-                isDirectory = service.isDirectory(path),
-                lastModified = service.getLastModified(path),
-                length = if (service.isDirectory(path)) 0L else service.getLength(path),
+                name = info.name,
+                isDirectory = info.isDirectory,
+                lastModified = info.lastModified,
+                length = info.size,
                 provider = this,
                 providerId = path,
                 parentId = id
@@ -62,7 +63,7 @@ object ShizukuProvider : StorageProvider {
     override fun findChild(parentId: String, name: String): UniversalFile? {
         val path = if (parentId.endsWith("/")) "$parentId$name" else "$parentId/$name"
         val service = ShizukuManager.getServiceBlocking() ?: return null
-        if (!service.exists(path)) return null
+        if (!try { service.exists(path) } catch (_: Exception) { false }) return null
         return UniversalFile(
             name = name,
             isDirectory = service.isDirectory(path),

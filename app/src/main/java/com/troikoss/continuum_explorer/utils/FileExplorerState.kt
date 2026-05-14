@@ -479,8 +479,7 @@ class FileExplorerState(
                             emptyList()
                         }
                     } else if (currentPath != null) {
-                        val rawFiles = currentPath!!.listFiles()?.toList() ?: emptyList()
-                        rawFiles.filter { it.name != ".metadata" }.map { it.toUniversal() }
+                        LocalProvider.listChildren(currentPath!!.absolutePath)
                     } else if (currentSafUri != null) {
                         val docFile = DocumentFile.fromTreeUri(context, currentSafUri!!)
                         val rawDocs = docFile?.listFiles()?.toList() ?: emptyList()

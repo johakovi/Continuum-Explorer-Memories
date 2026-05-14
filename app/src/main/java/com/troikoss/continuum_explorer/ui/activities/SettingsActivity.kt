@@ -37,6 +37,7 @@ import com.troikoss.continuum_explorer.managers.ThemeMode
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.TouchDragBehavior
+import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.model.ViewMode
 
 class SettingsActivity : ComponentActivity() {
@@ -302,6 +303,38 @@ fun SettingsScreen(onBack: () -> Unit) {
                         checked = iconTouchSelection,
                         onCheckedChange = { SettingsManager.setIconTouchSelection(context, it) }
                     )
+                }
+            )
+
+            HorizontalDivider()
+
+            Text(
+                "Shizuku",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            val isShizukuAvailable = ShizukuManager.isAvailable()
+            val hasShizukuPermission = ShizukuManager.hasPermission()
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.shizuku_status)) },
+                supportingContent = {
+                    Text(
+                        when {
+                            !isShizukuAvailable -> stringResource(R.string.shizuku_status_not_running)
+                            hasShizukuPermission -> stringResource(R.string.shizuku_status_authorized)
+                            else -> stringResource(R.string.shizuku_status_not_authorized)
+                        }
+                    )
+                },
+                trailingContent = {
+                    if (isShizukuAvailable && !hasShizukuPermission) {
+                        Button(onClick = { ShizukuManager.requestPermission(1002) }) {
+                            Text(stringResource(R.string.shizuku_request_permission))
+                        }
+                    }
                 }
             )
 

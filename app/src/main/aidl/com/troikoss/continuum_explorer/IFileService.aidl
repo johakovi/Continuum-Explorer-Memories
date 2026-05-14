@@ -1,11 +1,12 @@
 package com.troikoss.continuum_explorer;
 
 import android.os.ParcelFileDescriptor;
+import com.troikoss.continuum_explorer.model.ShizukuFileInfo;
 
 interface IFileService {
     void destroy() = 16777114;
 
-    String[] listFiles(String path) = 1;
+    List<ShizukuFileInfo> getDetailedList(String path) = 1;
     boolean isDirectory(String path) = 2;
     long getLength(String path) = 3;
     long getLastModified(String path) = 4;

@@ -9,26 +9,32 @@ import rikka.shizuku.Shizuku
 import kotlinx.coroutines.CompletableDeferred
 import android.content.pm.PackageManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.runBlocking
 
 object ShizukuManager {
     private var fileService: IFileService? = null
-    private var binderDeferred = CompletableDeferred<IFileService>()
+    private var binderDeferred: CompletableDeferred<IFileService>? = null
+    private var lastError: String? = null
 
-    private val userServiceArgs = Shizuku.UserServiceArgs(
-        ComponentName("com.troikoss.continuum_explorer_memories", ShizukuFileService::class.java.name)
-    ).daemon(false).tag("file_service")
+    private var packageName: String = "com.troikoss.continuum_explorer_memories"
+
+    fun init(packageName: String) {
+        this.packageName = packageName
+    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            val service = IFileService.Stub.asInterface(binder)
-            fileService = service
-            binderDeferred.complete(service)
+            if (binder != null && binder.isBinderAlive) {
+                val service = IFileService.Stub.asInterface(binder)
+                fileService = service
+                binderDeferred?.complete(service)
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             fileService = null
-            binderDeferred = CompletableDeferred<IFileService>()
+            binderDeferred = null
         }
     }
 
@@ -43,35 +49,49 @@ object ShizukuManager {
         }
     }
 
+    fun getLastError(): String = lastError ?: "No error recorded"
+
     fun requestPermission(requestCode: Int) {
         if (isAvailable()) {
-            Shizuku.requestPermission(requestCode)
+            try {
+                Shizuku.requestPermission(requestCode)
+            } catch (_: Exception) {}
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun getService(): IFileService {
+    suspend fun getService(): IFileService? {
         val currentService = fileService
-        if (currentService != null) return currentService
+        if (currentService != null && currentService.asBinder().isBinderAlive) return currentService
         
-        if (binderDeferred.isCompleted) {
-            val completed = binderDeferred.getCompleted()
-            fileService = completed
-            return completed
+        // If already trying to bind, wait for it
+        val currentDeferred = binderDeferred
+        if (currentDeferred != null && !currentDeferred.isCompleted) {
+            return withTimeoutOrNull(10000) { currentDeferred.await() }
         }
+
+        // Start new bind
+        val newDeferred = CompletableDeferred<IFileService>()
+        binderDeferred = newDeferred
         
-        try {
-            Shizuku.bindUserService(userServiceArgs, serviceConnection)
-        } catch (_: Exception) {
+        // Re-create args to ensure tag is set correctly
+        val args = Shizuku.UserServiceArgs(ComponentName(packageName, ShizukuFileService::class.java.name))
+            .daemon(false)
+            .processNameSuffix("fileService") 
+            .tag("fileService")
+
+        return withTimeoutOrNull(10000) {
+            try {
+                Shizuku.bindUserService(args, serviceConnection)
+                newDeferred.await()
+            } catch (e: Exception) {
+                lastError = e.message
+                null
+            }
         }
-        return binderDeferred.await()
     }
 
     fun getServiceBlocking(): IFileService? = runBlocking {
-        try {
-            getService()
-        } catch (_: Exception) {
-            null
-        }
+        getService()
     }
 }

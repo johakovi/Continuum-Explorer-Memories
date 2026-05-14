@@ -441,4 +441,9 @@
         <string name="msg_remote_trash_skipped">Verkkotiedostoja ei voi siirtää roskakoriin. Ne poistetaan pysyvästi.</string>
         <string name="settings_about">Tietoja</string>
 
+        <string name="shizuku_status">Shizuku Tila</string>
+        <string name="shizuku_status_authorized">Valtuutettu</string>
+        <string name="shizuku_status_not_authorized">Ei valtuutettu</string>
+        <string name="shizuku_status_not_running">Ei käynnissä</string>
+        <string name="shizuku_request_permission">Pyydä Shizuku-valtuutus</string>
 </resources>

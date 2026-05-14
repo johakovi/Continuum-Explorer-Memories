@@ -36,7 +36,8 @@ enum class PopupType {
     SHORTCUTS,
     PROPERTIES,
     MOVE_COPY_CHOICE,
-    NETWORK_CONNECTION
+    NETWORK_CONNECTION,
+    TERMINAL_DEBUG
 }
 
 enum class CollisionResult {
@@ -151,6 +152,9 @@ object FileOperationsManager {
     var networkConnectionToEdit = mutableStateOf<NetworkConnection?>(null)
     private var networkConnectionDeferred: CompletableDeferred<NetworkConnection?>? = null
 
+    // Terminal Debug State
+    var terminalOutput = mutableStateOf("")
+
     // List of listeners to be notified on updates
     private val listeners = mutableListOf<() -> Unit>()
 
@@ -164,6 +168,13 @@ object FileOperationsManager {
 
     private fun notifyListeners() {
         listeners.forEach { it() }
+    }
+
+    fun showTerminalDebug(output: String) {
+        terminalOutput.value = output
+        popupType.value = PopupType.TERMINAL_DEBUG
+        isOperating.value = false
+        notifyListeners()
     }
 
     fun getTitleText(context: Context): String {
