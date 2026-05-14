@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 enum class ProviderKind {
-    LOCAL, SAF, ARCHIVE,
+    LOCAL, SAF, ARCHIVE, SHIZUKU,
     NETWORK_FTP, NETWORK_SFTP, NETWORK_WEBDAV, NETWORK_SMB
 }
 

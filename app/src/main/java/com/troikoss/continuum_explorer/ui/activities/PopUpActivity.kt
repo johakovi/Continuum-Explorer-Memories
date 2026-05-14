@@ -859,6 +859,7 @@ fun InputContent(onClose: () -> Unit) {
     val initialText = FileOperationsManager.initialInputText.value
     val onConfirmAction = FileOperationsManager.onTextInputConfirm
     val focusRequester = remember { FocusRequester() }
+    val scope = rememberCoroutineScope()
 
     var textState by remember(initialText) {
         val lastDotIndex = initialText.lastIndexOf('.')

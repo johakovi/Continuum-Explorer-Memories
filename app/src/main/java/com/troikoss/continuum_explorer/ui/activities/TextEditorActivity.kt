@@ -1,83 +1,145 @@
-package ui.activities
+package com.troikoss.continuum_explorer.ui.activities
 
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import java.io.File
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.*
 
-class TextEditorActivity : AppCompatActivity() {
-    private lateinit var editText: EditText
-    private lateinit var readOnlyTab: Button
-    private lateinit var readWriteTab: Button
-    private var filePath: String = ""
-    private var isReadOnly: Boolean = true
+class TextEditorActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_text_editor)
 
-        // Initialize views
-        editText = findViewById(R.id.editText)
-        readOnlyTab = findViewById(R.id.readOnlyTab)
-        readWriteTab = findViewById(R.id.readWriteTab)
+        val uri = intent.data
+        if (uri == null) {
+            Toast.makeText(this, "No file specified", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
-        // Get file path and read-only flag from intent
-        filePath = intent.getStringExtra("FILE_PATH") ?: ""
-        isReadOnly = intent.getBooleanExtra("IS_READ_ONLY", true)
-
-        // Load file content
-        loadFileContent()
-
-        // Set initial mode
-        setReadOnlyMode(isReadOnly)
-
-        // Tab click listeners
-        readOnlyTab.setOnClickListener { setReadOnlyMode(true) }
-        readWriteTab.setOnClickListener { setReadOnlyMode(false) }
-    }
-
-    private fun loadFileContent() {
-        if (filePath.isNotEmpty()) {
-            try {
-                val file = File(filePath)
-                if (file.exists()) {
-                    editText.setText(file.readText())
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error loading file: ${e.message}", Toast.LENGTH_SHORT).show()
+        setContent {
+            FileExplorerTheme {
+                TextEditorScreen(uri, onExit = { finish() })
             }
         }
     }
 
-    private fun setReadOnlyMode(readOnly: Boolean) {
-        isReadOnly = readOnly
-        editText.isEnabled = !readOnly
-        editText.isFocusable = !readOnly
-        editText.isFocusableInTouchMode = !readOnly
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TextEditorScreen(uri: Uri, onExit: () -> Unit) {
+        var text by remember { mutableStateOf("") }
+        var isLoading by remember { mutableStateOf(true) }
+        var isSaving by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
 
-        // Update tab selection
-        readOnlyTab.isSelected = readOnly
-        readWriteTab.isSelected = !readOnly
-    }
-
-    override fun onBackPressed() {
-        // Save changes if in read-write mode
-        if (!isReadOnly) {
-            saveFileContent()
+        val fileName = remember(uri) {
+            uri.lastPathSegment ?: "Unknown File"
         }
-        super.onBackPressed()
+
+        // Load file content
+        LaunchedEffect(uri) {
+            withContext(Dispatchers.IO) {
+                try {
+                    contentResolver.openInputStream(uri)?.use { inputStream ->
+                        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                            text = reader.readText()
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@TextEditorActivity, "Failed to load file: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                } finally {
+                    isLoading = false
+                }
+            }
+        }
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(fileName, fontSize = 18.sp) },
+                    navigationIcon = {
+                        IconButton(onClick = onExit) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        if (isSaving) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        } else {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    isSaving = true
+                                    val success = saveFile(uri, text)
+                                    isSaving = false
+                                    if (success) {
+                                        Toast.makeText(this@TextEditorActivity, "File saved", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(this@TextEditorActivity, "Failed to save file", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }) {
+                                Icon(Icons.Default.Save, contentDescription = "Save")
+                            }
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(modifier = Modifier.padding(padding).consumeWindowInsets(padding).imePadding().fillMaxSize()) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                } else {
+                    BasicTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        textStyle = TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp,
+                            lineHeight = 22.sp
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
+                    )
+                }
+            }
+        }
     }
 
-    private fun saveFileContent() {
-        if (filePath.isNotEmpty()) {
+    private suspend fun saveFile(uri: Uri, content: String): Boolean {
+        return withContext(Dispatchers.IO) {
             try {
-                val file = File(filePath)
-                file.writeText(editText.text.toString())
-                Toast.makeText(this, "File saved", Toast.LENGTH_SHORT).show()
+                contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
+                    BufferedWriter(OutputStreamWriter(outputStream)).use { writer ->
+                        writer.write(content)
+                        true
+                    }
+                } ?: false
             } catch (e: Exception) {
-                Toast.makeText(this, "Error saving file: ${e.message}", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+                false
             }
         }
     }

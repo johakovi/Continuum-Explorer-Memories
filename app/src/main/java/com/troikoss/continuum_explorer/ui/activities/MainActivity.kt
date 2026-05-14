@@ -26,8 +26,16 @@ import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
 import java.util.UUID
+import rikka.shizuku.Shizuku
+import com.troikoss.continuum_explorer.managers.ShizukuManager
 
 class MainActivity : AppCompatActivity() {
+
+    private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
+        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+             // Handle granted
+        }
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -41,8 +49,19 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private val requestStoragePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val readGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] ?: false
+        val writeGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: false
+        if (!readGranted || !writeGranted) {
+            // Handle permission denied
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Shizuku.addRequestPermissionResultListener(shizukuPermissionListener)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -50,59 +69,35 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                // If not already granted, show the system popup asking for permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
 
-        // Request "All Files Access" permission on Android 11+ (API 30+) exactly once on create
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        // Request permissions for Android 10 and below
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            val permissionsToRequest = mutableListOf<String>()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            if (permissionsToRequest.isNotEmpty()) {
+                requestStoragePermissionLauncher.launch(permissionsToRequest.toTypedArray())
+            }
+        } else {
+            // Request "All Files Access" permission on Android 11+ (API 30+)
             if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.data = "package:$packageName".toUri()
                 startActivity(intent)
             }
-            
         }
 
-        /* if (android api29) {
-        private val REQUEST_CODE_STORAGE_PERMISSION = 1001
-
-private fun checkStoragePermissions() {
-    if (ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) != PackageManager.PERMISSION_GRANTED
-    ) {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),
-            REQUEST_CODE_STORAGE_PERMISSION
-        )
-    } else {
-        // Permissions already granted
-        loadFiles()
-    }
-}
-
-override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray
-) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            loadFiles()
-        } else {
-            Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+        // Shizuku check
+        if (ShizukuManager.isAvailable() && !ShizukuManager.hasPermission()) {
+            ShizukuManager.requestPermission(1002)
         }
-    }
-} */
-        
 
         // Initialize settings and storage providers
         SettingsManager.init(applicationContext)
@@ -170,5 +165,10 @@ override fun onRequestPermissionsResult(
             startActivity(newWindowIntent)
             return
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
     }
 }

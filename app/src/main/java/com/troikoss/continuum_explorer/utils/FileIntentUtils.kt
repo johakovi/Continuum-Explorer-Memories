@@ -244,6 +244,19 @@ fun openFile(context: Context, file: UniversalFile) {
         ?: context.contentResolver.getType(uri)
         ?: "*/*"
 
+    // Use internal Text Editor for text files
+    val textExtensions = setOf("txt", "log", "cfg", "ini", "md", "xml", "json", "sh", "py", "js", "html", "css")
+    if (textExtensions.contains(extension) || mimeType.startsWith("text/")) {
+        val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.TextEditorActivity::class.java).apply {
+            setData(uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+        return
+    }
+
     // For Office documents, ACTION_EDIT can sometimes bypass the read-only mode in apps like Word/Excel
     val isOfficeDoc = when (extension) {
         "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "txt" -> true

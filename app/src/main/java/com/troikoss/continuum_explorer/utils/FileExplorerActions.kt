@@ -339,7 +339,15 @@ fun FileExplorerState.createNewFile() {
                 if (success) {
                     refresh()
                     val newFile = files.find { it.name == name }
-                    if (newFile != null) selectionManager.select(newFile)
+                    if (newFile != null) {
+                        selectionManager.select(newFile)
+                        // Automatically open in text editor if it's a text file
+                        val ext = name.substringAfterLast('.', "").lowercase()
+                        val textExtensions = setOf("txt", "log", "cfg", "ini", "md", "xml", "json", "sh", "py", "js", "html", "css")
+                        if (textExtensions.contains(ext)) {
+                            open(newFile)
+                        }
+                    }
                     GlobalEvents.triggerRefresh()
                 } else {
                     Toast.makeText(context, context.getString(R.string.msg_failed_create_file), Toast.LENGTH_SHORT).show()

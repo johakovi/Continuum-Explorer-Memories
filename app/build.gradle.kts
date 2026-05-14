@@ -12,7 +12,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 40
-        versionName = "0.4.1-beta M1"
+        versionName = "0.4.1-beta M1-dev1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +33,7 @@ android {
     }
     buildFeatures {
         compose = true
+        aidl = true
     }
     packaging {
         resources {
@@ -69,6 +70,8 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.commons.net)
     implementation(libs.jsch)
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
     implementation(libs.dav4jvm) {
         exclude(group = "org.ogce", module = "xpp3")
     }

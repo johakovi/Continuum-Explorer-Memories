@@ -4,12 +4,12 @@ import androidx.compose.ui.graphics.Color
 
 val DarkPrimarySelection = Color(0xFF212121)
 val DarkPrimary = Color(0xFF288D76)
-val DarkSecondary = Color(0xFF32564A)
+val DarkSecondary = Color(0xFF505453)
 val DarkTertiary = Color(0xFFE0E0E0)
 
 val LightPrimarySelection = Color(0xFFE0E0E0)
 val LightPrimary = Color(0xFF47B99D)
-val LightSecondary = Color(0xFF3D87B7)
+val LightSecondary = Color(0xFFA7B2B9)
 val LightTertiary = Color(0xFFE0E0E0)
 
 // Very Dark Theme

@@ -42,6 +42,7 @@ object StorageProviders {
     fun providerFor(kind: ProviderKind): StorageProvider = when (kind) {
         ProviderKind.LOCAL -> LocalProvider
         ProviderKind.SAF -> SafProvider
+        ProviderKind.SHIZUKU -> ShizukuProvider
         else -> throw IllegalArgumentException("No singleton provider for $kind — use specific factory")
     }
 

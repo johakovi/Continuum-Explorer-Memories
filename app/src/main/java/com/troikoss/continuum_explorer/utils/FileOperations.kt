@@ -470,6 +470,7 @@ suspend fun createFile(
     parentProvider: StorageProvider? = null,
     parentId: String? = null,
     name: String,
+    content: String = ""
 ): Boolean {
     return withContext(Dispatchers.IO) {
         try {
@@ -478,18 +479,33 @@ suspend fun createFile(
                 if (File(parentPath, targetName).exists()) {
                     targetName = getUniqueName(targetName) { File(parentPath, it).exists() }
                 }
-                File(parentPath, targetName).createNewFile()
+                val file = File(parentPath, targetName)
+                file.createNewFile()
+                if (content.isNotEmpty()) {
+                    file.writeText(content)
+                }
+                true
             } else if (parentSafUri != null) {
                 val parentDoc = DocumentFile.fromTreeUri(context, parentSafUri) ?: return@withContext false
                 if (parentDoc.findFile(targetName) != null) {
                     targetName = getUniqueName(targetName) { parentDoc.findFile(it) != null }
                 }
-                parentDoc.createFile("text/plain", targetName) != null
+                val newFile = parentDoc.createFile("text/plain", targetName)
+                if (newFile != null && content.isNotEmpty()) {
+                    context.contentResolver.openOutputStream(newFile.uri)?.use { 
+                        it.write(content.toByteArray())
+                    }
+                }
+                newFile != null
             } else if (parentProvider != null && parentId != null) {
                 if (parentProvider.findChild(parentId, targetName) != null) {
                     targetName = getUniqueName(targetName) { parentProvider.findChild(parentId, it) != null }
                 }
-                parentProvider.createChild(parentId, targetName, isDirectory = false)
+                val newFile = parentProvider.createChild(parentId, targetName, isDirectory = false)
+                if (content.isNotEmpty()) {
+                    val (_, out) = parentProvider.createAndOpenOutput(parentId, targetName)
+                    out.use { it.write(content.toByteArray()) }
+                }
                 true
             } else false
         } catch (e: Exception) { e.printStackTrace(); false }

@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="rikka.shizuku.permission.API_V23" />
 
     <application
         android:name=".MainApplication"
@@ -24,7 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FileExplorer2"
         android:localeConfig="@xml/locales_config"
-        android:networkSecurityConfig="@xml/network_security_config">
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true">
 
         <activity
             android:name=".ui.activities.MainActivity"
@@ -131,9 +133,31 @@
             android:launchMode="singleTop"
             android:taskAffinity="" />
 
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:exported="true"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
         <activity
-    android:name=".ui.activities.TextEditorActivity"
-    android:exported="false" />
+            android:name=".ui.activities.TextEditorActivity"
+            android:exported="true"
+            android:label="Text Editor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:theme="@style/Theme.FileExplorer2"
+            android:windowSoftInputMode="adjustResize"
+            android:documentLaunchMode="always"
+            android:launchMode="singleTop"
+            android:taskAffinity="" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*" />
+            </intent-filter>
+        </activity>
 
         <receiver android:name=".utils.NotificationCancelReceiver" android:exported="false">
              <intent-filter>

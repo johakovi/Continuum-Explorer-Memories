@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.core.content.FileProvider
+import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.model.FileMetadata
 import com.troikoss.continuum_explorer.model.ProviderCapabilities
 import com.troikoss.continuum_explorer.model.ProviderKind
@@ -43,28 +44,58 @@ object LocalProvider : StorageProvider {
 
     override fun displayName(id: String) = File(id).name.ifEmpty { id }
 
-    override fun exists(id: String) = File(id).exists()
+    override fun exists(id: String): Boolean {
+        val f = File(id)
+        if (f.exists()) return true
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.exists(id)
+        }
+        return false
+    }
 
     override suspend fun listChildren(id: String): List<UniversalFile> {
-        return File(id).listFiles()
-            ?.map { it.toUniversalFile() }
-            ?: emptyList()
+        val files = File(id).listFiles()
+        if (files == null) {
+            if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+                return ShizukuProvider.listChildren(id)
+            }
+            return emptyList()
+        }
+        return files.map { it.toUniversalFile() }
     }
 
     override fun getMetadata(id: String): FileMetadata {
         val f = File(id)
+        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.getMetadata(id)
+        }
         return FileMetadata(f.length(), f.lastModified(), f.isDirectory, null)
     }
 
     override fun findChild(parentId: String, name: String): UniversalFile? {
         val f = File(parentId, name)
-        return if (f.exists()) f.toUniversalFile() else null
+        if (f.exists()) return f.toUniversalFile()
+        if (isRestrictedPath(parentId) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.findChild(parentId, name)
+        }
+        return null
     }
 
-    override fun openInput(id: String): InputStream = FileInputStream(id)
+    override fun openInput(id: String): InputStream {
+        val f = File(id)
+        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.openInput(id)
+        }
+        return FileInputStream(id)
+    }
 
-    override fun openReadFd(id: String): ParcelFileDescriptor =
-        ParcelFileDescriptor.open(File(id), ParcelFileDescriptor.MODE_READ_ONLY)
+    override fun openReadFd(id: String): ParcelFileDescriptor? {
+        val f = File(id)
+        if (!f.exists() && isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.openReadFd(id)
+        }
+        return ParcelFileDescriptor.open(File(id), ParcelFileDescriptor.MODE_READ_ONLY)
+    }
 
     override fun getShareableUri(id: String): Uri? {
         return try {
@@ -78,24 +109,40 @@ object LocalProvider : StorageProvider {
 
     override fun createChild(parentId: String, name: String, isDirectory: Boolean): UniversalFile {
         val f = File(parentId, name)
+        if (isRestrictedPath(parentId) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.createChild(parentId, name, isDirectory)
+        }
         if (isDirectory) f.mkdirs() else f.createNewFile()
         return f.toUniversalFile()
     }
 
     override fun createAndOpenOutput(parentId: String, name: String): Pair<UniversalFile, OutputStream> {
         val f = File(parentId, name)
+        if (isRestrictedPath(parentId) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.createAndOpenOutput(parentId, name)
+        }
         return f.toUniversalFile() to FileOutputStream(f)
     }
 
     override fun delete(id: String): Boolean {
         val f = File(id)
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.delete(id)
+        }
         return if (f.isDirectory) f.deleteRecursively() else f.delete()
     }
 
     override fun rename(id: String, newName: String): UniversalFile? {
         val f = File(id)
+        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.rename(id, newName)
+        }
         val dest = File(f.parent, newName)
         return if (f.renameTo(dest)) dest.toUniversalFile() else null
+    }
+
+    private fun isRestrictedPath(path: String): Boolean {
+        return path.contains("/Android/data") || path.contains("/Android/obb")
     }
 
     fun File.toUniversalFile(): UniversalFile = UniversalFile(
