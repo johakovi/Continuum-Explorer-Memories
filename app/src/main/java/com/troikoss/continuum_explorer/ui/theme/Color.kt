@@ -4,13 +4,13 @@ import androidx.compose.ui.graphics.Color
 
 val DarkPrimarySelection = Color(0xFF212121)
 val DarkPrimary = Color(0xFF288D76)
-val DarkSecondary = Color(0xFF505453)
-val DarkTertiary = Color(0xFFE0E0E0)
+val DarkSecondary = Color(0xFF4A8585)
+val DarkTertiary = Color(0xFF84D9D2)
 
 val LightPrimarySelection = Color(0xFFE0E0E0)
 val LightPrimary = Color(0xFF47B99D)
-val LightSecondary = Color(0xFFA7B2B9)
-val LightTertiary = Color(0xFFE0E0E0)
+val LightSecondary = Color(0xFF848E94)
+val LightTertiary = Color(0xFFCCCACA)
 
 // Very Dark Theme
 val VeryDarkSidebar = Color(0xFF171719)

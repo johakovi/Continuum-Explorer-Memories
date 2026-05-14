@@ -6,53 +6,21 @@ import android.text.format.Formatter
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -63,8 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -78,13 +44,13 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.SafProvider
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.managers.ArchiveSettings
 import com.troikoss.continuum_explorer.managers.CollisionResult
 import com.troikoss.continuum_explorer.managers.DeleteResult
 import com.troikoss.continuum_explorer.managers.ExtractSettings
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.MoveCopyResult
-import com.troikoss.continuum_explorer.utils.NotificationHelper
 import com.troikoss.continuum_explorer.managers.PopupType
 import com.troikoss.continuum_explorer.utils.calculateSizeRecursively
 import com.troikoss.continuum_explorer.utils.getDeletedAt
@@ -111,17 +77,19 @@ class PopUpActivity : ComponentActivity() {
 
         setContent {
             FileExplorerTheme {
+                val extendedColors = LocalExtendedColors.current
                 Box(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Surface(
                         modifier = Modifier
-                            .fillMaxWidth(0.95f)
-                            .padding(vertical = 24.dp),
+                            .fillMaxWidth(0.9f)
+                            .padding(vertical = 24.dp)
+                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.medium),
                         shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 6.dp
+                        color = extendedColors.sidebarBackground,
+                        tonalElevation = 4.dp
                     ) {
                         val popupType by FileOperationsManager.popupType
                         
@@ -148,7 +116,6 @@ class PopUpActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
-        // We no longer stop the notification here, so it can run simultaneously.
     }
 }
 
@@ -363,7 +330,11 @@ fun PropertiesContent(onClose: () -> Unit) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = onClose,
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.close))
             }
@@ -378,9 +349,9 @@ fun PropertyRow(label: String, value: String) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.width(80.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(100.dp),
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = value,
@@ -513,7 +484,13 @@ fun ShortcutsContent(onClose: () -> Unit) {
         }
         HorizontalDivider()
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(onClick = onClose) {
+            Button(
+                onClick = onClose,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
                 Text(stringResource(R.string.close))
             }
         }
@@ -705,7 +682,11 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
             Button(
                 onClick = onConfirm,
                 enabled = nameState.text.isNotBlank() && (encryptionMethod == EncryptionMethod.NONE || password.isNotEmpty()),
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.archive_button))
             }
@@ -787,7 +768,11 @@ fun ExtractOptionsContent(onClose: () -> Unit) {
                 onClick = { 
                     FileOperationsManager.onExtractResult(ExtractSettings(toSeparateFolder, deleteSource))
                 },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.extract_button))
             }
@@ -846,7 +831,11 @@ fun PasswordInputContent(onClose: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onConfirm,
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.ok))
             }
@@ -861,7 +850,6 @@ fun InputContent(onClose: () -> Unit) {
     val initialText = FileOperationsManager.initialInputText.value
     val onConfirmAction = FileOperationsManager.onTextInputConfirm
     val focusRequester = remember { FocusRequester() }
-    val scope = rememberCoroutineScope()
 
     var textState by remember(initialText) {
         val lastDotIndex = initialText.lastIndexOf('.')
@@ -872,9 +860,6 @@ fun InputContent(onClose: () -> Unit) {
     val onConfirm = {
         if (textState.text.isNotBlank()) {
             onConfirmAction?.invoke(textState.text)
-            // If the action started an operation (e.g. rename), keep the popup alive so it
-            // can transition to PROGRESS / COLLISION. For non-operation confirms (create
-            // folder/file), isOperating stays false and we close normally.
             if (!FileOperationsManager.isOperating.value) {
                 onClose()
             }
@@ -903,7 +888,11 @@ fun InputContent(onClose: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onConfirm,
-                enabled = textState.text.isNotBlank()
+                enabled = textState.text.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(buttonLabel)
             }
@@ -944,10 +933,20 @@ fun CollisionContent() {
                     Text(stringResource(R.string.conflict_merge))
                 }
             }
-            Button(onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.KEEP_BOTH, rememberSelection) }) { Text(stringResource(R.string.conflict_keep_both)) }
+            Button(
+                onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.KEEP_BOTH, rememberSelection) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) { Text(stringResource(R.string.conflict_keep_both)) }
             Button(
                 onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.REPLACE, rememberSelection) },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) { Text(stringResource(R.string.conflict_replace)) }
         }
     }
@@ -983,16 +982,26 @@ fun MoveCopyContent(onClose: () -> Unit) {
             }) {
                 Text(stringResource(R.string.cancel))
             }
-            Button(onClick = {
-                FileOperationsManager.onMoveCopyChoice(MoveCopyResult.COPY)
-            }) {
+            Button(
+                onClick = {
+                    FileOperationsManager.onMoveCopyChoice(MoveCopyResult.COPY)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
                 Text(stringResource(R.string.menu_copy))
             }
             Button(
                 onClick = {
                     FileOperationsManager.onMoveCopyChoice(MoveCopyResult.MOVE)
                 },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.menu_move))
             }
@@ -1034,14 +1043,22 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
             Button(
                 onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.RECYCLE) },
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.delete_recycle_bin), maxLines = 1, fontSize = 13.sp)
             }
             
             Button(
                 onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.PERMANENT) },
-                contentPadding = PaddingValues(horizontal = 12.dp)
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
                 Text(stringResource(R.string.delete_permanently), maxLines = 1, fontSize = 13.sp)
             }
@@ -1072,7 +1089,11 @@ fun DeletePermanentConfirmContent(onClose: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.PERMANENT) },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) { Text(stringResource(R.string.yes)) }
         }
     }
@@ -1135,12 +1156,22 @@ fun ProgressContent (onClose: () -> Unit) {
             if (!isRunning) {
                 Button(
                     onClick = onClose,
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary
+                    )
                 ) { Text(stringResource(R.string.close)) }
             } else {
                 TextButton(onClick = { onClose() }) { Text(stringResource(R.string.op_background)) }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { FileOperationsManager.cancel() }) { Text(stringResource(R.string.cancel)) }
+                Button(
+                    onClick = { FileOperationsManager.cancel() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary
+                    )
+                ) { Text(stringResource(R.string.cancel)) }
             }
         }
     }
@@ -1537,25 +1568,19 @@ fun TerminalDebugContent(onClose: () -> Unit) {
     }
 }
 
-// Helper to format text like: "1.2 MB (1,234,567 bytes)"
 private fun formatSizeWithBytes(context: Context, sizeInBytes: Long): String {
     val formattedSize = Formatter.formatFileSize(context, sizeInBytes)
     val exactBytes = NumberFormat.getInstance().format(sizeInBytes)
     return "$formattedSize ($exactBytes ${context.getString(R.string.prop_bytes)})"
 }
 
-// Helper to calculate actual space taken on the storage drive (using standard 4KB blocks)
 private fun calculateSizeOnDiskRecursively(file: UniversalFile): Long {
-
-
     if (!file.isDirectory) {
         val length = file.length
         return if (length == 0L) 0L else ((length + 4095L) / 4096L) * 4096L
     }
 
-    var total = 4096L // Folders themselves take up at least one block of space
-
-    // 1. If it's a standard local folder
+    var total = 4096L
     val popupFileRef = file.fileRef
     val popupDocRef = file.documentFileRef
     if (popupFileRef != null) {
