@@ -182,7 +182,7 @@ object FileOperationsManager {
         if (isCancelled.value) return context.getString(R.string.msg_cancelled)
         
         val fileName = currentFileName.value ?: ""
-        val count = currentProcessedItems.intValue
+        val count = if (itemsTotal.intValue > 0) itemsTotal.intValue else currentProcessedItems.intValue
 
         return when (currentOperationType.value) {
             OperationType.DELETE -> {
