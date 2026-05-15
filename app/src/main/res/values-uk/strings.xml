@@ -1,4 +1,453 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_new_window_short">Нове вікно</string>
+    <string name="shortcut_new_window_long">Нове вікно</string>
+
+    <!-- General -->
+    <string name="cancel">Скасувати</string>
+    <string name="ok">ОК</string>
+    <string name="close">Закрити</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="back">Назад</string>
+    <string name="done">Готово</string>
+    <string name="loading">Завантаження…</string>
+    <string name="calculating">Обчислення…</string>
+    <string name="unknown">Невідомо</string>
+    <string name="home">Головна</string>
+    <string name="new_tab">Нова вкладка</string>
+    <string name="create">Створити</string>
+    <string name="forward">Вперед</string>
+    <string name="history">Історія</string>
+    <string name="up">Вгору</string>
+    <string name="menu">Меню</string>
+    <string name="search">Пошук</string>
+    <string name="search_hint">Пошук…</string>
+    <string name="options">Параметри</string>
+    <string name="off">Вимк</string>
+    <string name="previous">Назад</string>
+    <string name="next">Далі</string>
+
+    <!-- Properties / Details -->
+    <string name="properties">Властивості</string>
+    <string name="prop_name">Ім\'я:</string>
+    <string name="prop_type">Тип:</string>
+    <string name="prop_size">Розмір:</string>
+    <string name="prop_size_on_disk">Розмір на диску:</string>
+    <string name="prop_location">Розташування:</string>
+    <string name="prop_modified">Змінено:</string>
+    <string name="prop_deleted">Видалено:</string>
+    <string name="prop_deleted_from">Видалено з:</string>
+    <string name="prop_resolution">Роздільна здатність:</string>
+    <string name="prop_duration">Тривалість:</string>
+    <string name="prop_items">Елементи:</string>
+    <string name="prop_contains">Містить:</string>
+    <string name="prop_folders_count">Папок: %1$d</string>
+    <string name="prop_files_count">Файлів: %1$d</string>
+    <string name="prop_selected_count">Вибрано: %1$d</string>
+    <string name="prop_loading_metadata">Завантаження метаданих…</string>
+    <string name="prop_total_size">Загальний розмір:</string>
+    <string name="prop_bytes">байт</string>
+    <string name="details_item_count_singular">1 елемент</string>
+    <string name="details_item_count_plural">Елементів: %1$d</string>
+    <string name="details_date_modified">Дата зміни: %1$s</string>
+    <string name="details_date_deleted">Дата видалення: %1$s</string>
+    <string name="details_deleted_from">Видалено з: %1$s</string>
+    <string name="details_size">Розмір: %1$s</string>
+    <string name="details_resolution">Роздільна здатність: %1$s</string>
+    <string name="details_duration">Тривалість: %1$s</string>
+
+    <!-- Shortcuts Dialog -->
+    <string name="shortcuts_title">Гарячі клавіші</string>
+    <string name="shortcuts_nav_selection">Навигація та вибір</string>
+    <string name="shortcuts_arrow_keys">Клавіші зі стрілками</string>
+    <string name="shortcuts_arrow_keys_desc">Перемістити вибір</string>
+    <string name="shortcuts_home_end">Home / End</string>
+    <string name="shortcuts_home_end_desc">На початок / кінець списку</string>
+    <string name="shortcuts_page_up_down">Page Up / Down</string>
+    <string name="shortcuts_page_up_down_desc">Прокрутити сторінку вгору / вниз</string>
+    <string name="shortcuts_ctrl_a">Ctrl + A</string>
+    <string name="shortcuts_ctrl_a_desc">Вибрати все</string>
+    <string name="shortcuts_backspace">Backspace</string>
+    <string name="shortcuts_backspace_desc">Повернутися в батьківську папку</string>
+    <string name="shortcuts_file_ops">Операції з файлами</string>
+    <string name="shortcuts_enter">Enter</string>
+    <string name="shortcuts_enter_desc">Відкрити файл або папку</string>
+    <string name="shortcuts_ctrl_enter">Ctrl + Enter</string>
+    <string name="shortcuts_ctrl_enter_desc">Відкрити в новій вкладці</string>
+    <string name="shortcuts_shift_enter">Shift + Enter</string>
+    <string name="shortcuts_shift_enter_desc">Відкрити в новому вікні</string>
+    <string name="shortcuts_ctrl_cvx">Ctrl + C / X / V</string>
+    <string name="shortcuts_ctrl_cvx_desc">Копіювати / Вирізати / Вставити</string>
+    <string name="shortcuts_delete">Delete</string>
+    <string name="shortcuts_delete_desc">Видалити (Shift + Delete для остаточного видалення)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
+    <string name="shortcuts_f2_desc">Перейменувати</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
+    <string name="shortcuts_f5_desc">Оновити</string>
+    <string name="shortcuts_app_actions">Дії додатка</string>
+    <string name="shortcuts_ctrl_n">Ctrl + N</string>
+    <string name="shortcuts_ctrl_n_desc">Нове вікно</string>
+    <string name="shortcuts_ctrl_w">Ctrl + W</string>
+    <string name="shortcuts_ctrl_w_desc">Закрити вікно</string>
+    <string name="shortcuts_ctrl_zy">Ctrl + Z / Y</string>
+    <string name="shortcuts_ctrl_zy_desc">Скасувати / Повернути</string>
+    <string name="shortcuts_ctrl_wheel">Ctrl + коліщатко миші</string>
+    <string name="shortcuts_ctrl_wheel_desc">Масштаб +/-</string>
+    <string name="shortcuts_ctrl_slash">Ctrl + /</string>
+    <string name="shortcuts_ctrl_slash_desc">Список гарячих клавіш</string>
+    <string name="shortcuts_mouse">Миша</string>
+    <string name="shortcuts_right_click">Права кнопка миші</string>
+    <string name="shortcuts_right_click_desc">Контекстне меню</string>
+    <string name="shortcuts_middle_click">Середня кнопка миші</string>
+    <string name="shortcuts_middle_click_desc">Відкрити в новій вкладці</string>
+    <string name="shortcuts_shift_middle_click">Shift + середня кнопка</string>
+    <string name="shortcuts_shift_middle_click_desc">Відкрити в новому вікні</string>
+    <string name="shortcuts_drag">Перетягування</string>
+    <string name="shortcuts_drag_desc">Копіювати</string>
+    <string name="shortcuts_shift_drag">Shift + перетягування</string>
+    <string name="shortcuts_shift_drag_desc">Перемістити</string>
+
+    <!-- Archive Operations -->
+    <string name="archive_create">Створити архів</string>
+    <string name="archive_name">Ім\'я архіву</string>
+    <string name="archive_comp_method">Метод стиснення</string>
+    <string name="archive_comp_level">Рівень стиснення</string>
+    <string name="archive_enc_method">Метод шифрування</string>
+    <string name="archive_password">Пароль</string>
+    <string name="archive_delete_source">Видалити вихідні файли після архівації</string>
+    <string name="archive_extract">Видобути архів</string>
+    <string name="archive_extract_options">Виберіть параметри видобування для: %1$s</string>
+    <string name="archive_extract_separate">Видобути в окрему папку</string>
+    <string name="archive_extract_current">Видобути в поточну папку</string>
+    <string name="archive_extract_delete_source">Видалити вихідний архів після видобування</string>
+    <string name="archive_encrypted_title">Зашифрований архів</string>
+    <string name="archive_enter_password">Введіть пароль для: %1$s</string>
+    <string name="archive_button">Архівувати</string>
+    <string name="extract_button">Видобути</string>
+    <string name="archive_inner_error">Поки що неможливо відкривати файли всередині архіву</string>
+
+    <!-- File Operations Dialogs -->
+    <string name="conflict_title">Конфлікт імен</string>
+    <string name="conflict_message">Файл з ім\'ям \"%1$s\" вже існує. Що ви хочете зробити?</string>
+    <string name="conflict_remember">Запам\'ятати вибір для цієї сесії</string>
+    <string name="conflict_merge">Об\'єднати</string>
+    <string name="conflict_keep_both">Зберегти обидва</string>
+    <string name="conflict_replace">Замінити</string>
+    <string name="delete_confirm_title">Підтвердження видалення</string>
+    <string name="delete_item_this">цей елемент</string>
+    <string name="delete_items_count">Елементів: %1$d</string>
+    <string name="delete_confirm_message">Ви дійсно хочете видалити %1$s?</string>
+    <string name="delete_recycle_bin">У кошик</string>
+    <string name="delete_permanently">Остаточно</string>
+    <string name="delete_permanent_title">Остаточне видалення</string>
+    <string name="delete_permanent_message">Ви дійсно хочете остаточно видалити %1$s? Цю дію неможливо скасувати.</string>
+
+    <!-- Progress Dialog -->
+    <string name="op_deleting">Видалення елементів…</string>
+    <string name="op_extracting">Видобування архіву…</string>
+    <string name="op_compressing">Стиснення елементів…</string>
+    <string name="op_processing">Обробка елементів…</string>
+    <string name="op_finished">Завершено</string>
+    <string name="op_time_remaining">Залишилося часу:</string>
+    <string name="op_items_remaining">Залишилося елементів:</string>
+    <string name="op_speed">Швидкість:</string>
+    <string name="op_background">У фоні</string>
+    <string name="op_min_remaining">Залишилося близько %1$d хв</string>
+    <string name="op_sec_remaining">Залишилося близько %1$d сек</string>
+    <string name="op_renaming">Перейменування %1$s…</string>
+    <string name="op_copying">Копіювання 1 елемента…</string>
+    <string name="op_copying_items">Копіювання %1$d елементів…</string>
+    <string name="op_extracting_an_archive">Видобування 1 архіву…</string>
+    <string name="op_extracting_archives">Видобування %1$d архівів…</string>
+    <string name="op_compressing_an_item">Стиснення 1 елемента…</string>
+    <string name="op_compressing_items">Стиснення %1$d елементів…</string>
+    <string name="op_deleting_an_item">Видалення 1 елемента…</string>
+    <string name="op_deleting_items">Видалення %1$d елементів…</string>
+    <string name="op_trashing">Переміщення 1 елемента в кошик…</string>
+    <string name="op_trashing_items">Переміщення %1$d елементів в кошик…</string>
+    <string name="op_restoring">Відновлення 1 елемента…</string>
+    <string name="op_restoring_items">Відновлення %1$d елементів…</string>
+    <string name="op_sec">сек</string>
+
+    <!-- Notifications -->
+    <string name="notif_description">Прогрес операцій з файлами</string>
+
+    <!-- Settings -->
+    <string name="settings">Налаштування</string>
+    <string name="settings_appearance">Зовнішній вигляд</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_system">Системна</string>
+    <string name="settings_theme_light">Світла</string>
+    <string name="settings_theme_dark">Темна</string>
+    <string name="settings_theme_very_dark">Дуже темна</string>
+    <string name="settings_theme_very_light">Дуже світла</string>
+    <string name="settings_theme_enhanced_system">Покращена системна</string>
+    <string name="settings_themebar">Бічна панель</string>
+    <string name="settings_themebar_rounded">Закруглена</string>
+    <string name="settings_themebar_square">Квадратна</string>
+    <string name="settings_themecontent">Вікно</string>
+    <string name="settings_themecontent_rounded">Закруглене</string>
+    <string name="settings_themecontent_square">Квадратне</string>
+    <string name="settings_themetop">Вкладка</string>
+    <string name="settings_themetop_attached">Прикріплена</string>
+    <string name="settings_themetop_float">Плаває</string>
+    <string name="settings_colorful_bars">Кольорові панелі</string>
+    <string name="settings_colorful_bars_desc">Увімкнути акцентні кольори для верхньої панелі та панелі вкладок.</string>
+    <string name="settings_icon_theme">Тема значків</string>
+    <string name="settings_icon_theme_colourful">Кольорові</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Виберіть тему значків</string>
+    <string name="settings_details_large">Деталі (тільки для великих екранів)</string>
+    <string name="settings_details_hidden">Приховано</string>
+    <string name="settings_details_pane">Бічна панель</string>
+    <string name="settings_details_bar">Нижня панель</string>
+    <string name="settings_show_command_bar">Панель команд</string>
+    <string name="settings_show_command_bar_desc">Панель з кнопками операцій під адресною стрічкою.</string>
+    <string name="settings_show_hidden_files">Приховані файли</string>
+    <string name="settings_show_hidden_files_desc">Показувати файли та папки, що починаються з крапки.</string>
+    <string name="settings_icon_selection">Вибір за значком</string>
+    <string name="settings_icon_selection_desc">Перемикати вибір натисканням на значок файлу.</string>
+    <string name="settings_file_ops">Операції з файлами</string>
+    <string name="settings_deletion_behavior">Видалення</string>
+    <string name="settings_del_ask">Запитувати щоразу</string>
+    <string name="settings_del_recycle">Переміщувати в кошик</string>
+    <string name="settings_del_permanent">Видаляти остаточно</string>
+    <string name="settings_internal_archive">Внутрішній переглядач архівів</string>
+    <string name="settings_internal_archive_desc">Відкривати ZIP-файли безпосередньо в додатку.</string>
+    <string name="settings_shortcuts_desc">Перегляд доступних гарячих клавіш</string>
+    <string name="settings_default_view_mode">Вигляд за замовчуванням</string>
+    <string name="settings_choose_default_view_mode">Виберіть вигляд за замовчуванням</string>
+    <string name="settings_choose_del_behavior">Виберіть спосіб видалення</string>
+    <string name="settings_choose_theme">Виберіть тему</string>
+    <string name="settings_choose_details_mode">Виберіть режим деталей</string>
+    <string name="settings_language">Мова</string>
+    <string name="settings_language_system">Системна</string>
+    <string name="settings_language_english">Англійська</string>
+    <string name="settings_language_finnish">Фінська</string>
+    <string name="settings_language_french">Французька</string>
+    <string name="settings_language_portuguese">Португальська</string>
+    <string name="settings_language_spanish">Іспанська</string>
+    <string name="settings_language_turkish">Турецька</string>
+    <string name="settings_language_german">Німецька</string>
+    <string name="settings_language_russian">Російська</string>
+    <string name="settings_language_swedish">Шведська</string>
+    <string name="settings_language_ukrainian">Українська</string>
+    <string name="settings_language_korean">Корейська</string>
+    <string name="settings_choose_language">Виберіть мову</string>
+
+    <!-- Context Menus/Command Bar -->
+    <string name="menu_restore">Відновити</string>
+    <string name="menu_delete_permanently">Видалити остаточно</string>
+    <string name="menu_properties">Властивості</string>
+    <string name="menu_open">Відкрити</string>
+    <string name="menu_open_with">Відкрити за допомогою…</string>
+    <string name="menu_open_new_tab">Відкрити в новій вкладці</string>
+    <string name="menu_open_new_window">Відкрити в новому вікні</string>
+    <string name="menu_remove_favorites">Видалити з обраного</string>
+    <string name="menu_add_favorites">Додати в обране</string>
+    <string name="menu_add_home">На головний екран</string>
+    <string name="menu_extract">Видобути…</string>
+    <string name="menu_compress">Стиснути…</string>
+    <string name="menu_cut">Вирізати</string>
+    <string name="menu_copy">Копіювати</string>
+    <string name="menu_paste">Вставити</string>
+    <string name="menu_rename">Перейменувати</string>
+    <string name="menu_share">Поділитися</string>
+    <string name="menu_delete">Видалити</string>
+    <string name="menu_new">Створити</string>
+    <string name="menu_sort">Сортування</string>
+    <string name="menu_view">Вигляд</string>
+    <string name="menu_empty_recycle_bin">Очистити кошик</string>
+    <string name="menu_refresh">Оновити</string>
+    <string name="menu_text_document">Текстовий документ</string>
+    <string name="menu_by_name">За ім\'ям</string>
+    <string name="menu_by_date">За датою</string>
+    <string name="menu_by_size">За розміром</string>
+    <string name="menu_by_date_deleted">За датою видалення</string>
+    <string name="menu_by_location">За розташуванням</string>
+    <string name="menu_details">Таблиця</string>
+    <string name="menu_grid">Плитка</string>
+    <string name="menu_gallery">Галерея</string>
+    <string name="menu_content">Контент</string>
+    <string name="menu_subtitles">Субтитри</string>
+    <string name="menu_audio_track">Аудіодоріжка</string>
+    <string name="menu_speed">Швидкість</string>
+    <string name="menu_aspect_ratio">Співвідношення сторін</string>
+    <string name="menu_open_with_no_dots">Відкрити за допомогою</string>
+    <string name="menu_select">Вибрати</string>
+    <string name="menu_clear_selection">Очистити вибір</string>
+    <string name="menu_select_inverse">Інвертувати вибір</string>
+    <string name="menu_remove">Видалити</string>
+    <string name="menu_zoom_in">Збільшити</string>
+    <string name="menu_zoom_out">Зменшити</string>
+    <string name="menu_reset_zoom">Скинути масштаб</string>
+    <string name="menu_copy_image">Копіювати зображення</string>
+    <string name="menu_set_wallpaper">Встановити як шпалери</string>
+    <string name="menu_fullscreen">Повноекранний режим</string>
+    <string name="menu_undo">Скасувати</string>
+    <string name="menu_redo">Повернути</string>
+
+    <!-- Navigation -->
+    <string name="nav_library_items">Елементи бібліотеки</string>
+    <string name="nav_recent">Нещодавні</string>
+    <string name="nav_gallery">Галерея</string>
+    <string name="nav_downloads">Завантаження</string>
+    <string name="nav_documents">Документи</string>
+    <string name="menu_gallery_albums">Альбоми</string>
+    <string name="nav_add_storage">Додати сховище</string>
+    <string name="nav_internal_storage">Внутрішня пам\'ять</string>
+    <string name="nav_trash">Кошик</string>
+    <string name="nav_external_drive">Зовнішній диск</string>
+    <string name="nav_favorites">Обране</string>
+    <string name="nav_no_favorites">Немає обраних шляхів</string>
+    <string name="nav_library">Бібліотека</string>
+    <string name="nav_recycle_bin">Кошик</string>
+    <string name="nav_storage">Сховище</string>
+    <string name="nav_added_locations">Додані місця</string>
+    <string name="nav_sd_card">SD-карта</string>
+    <string name="nav_external_location">Зовнішнє розташування</string>
+    <string name="nav_unknown_folder">Невідома папка</string>
+    <string name="nav_collapse">Згорнути</string>
+    <string name="nav_expand">Розгорнути</string>
+    <string name="nav_storage_usage_label">%1$s вільно з %2$s</string>
+    <string name="nav_network">Мережа</string>
+    <string name="nav_add_local_storage">Додати локальне сховище</string>
+    <string name="nav_add_network_storage">Додати мережеве сховище</string>
+    <string name="nav_network_protocol">Протокол</string>
+    <string name="nav_network_display_name">Назва для відображення</string>
+    <string name="nav_network_host">Хост</string>
+    <string name="nav_network_port">Порт</string>
+    <string name="nav_network_username">Ім\'я користувача</string>
+    <string name="nav_network_password">Пароль</string>
+    <string name="nav_network_remote_path">Віддалений шлях</string>
+    <string name="nav_network_save">Зберегти</string>
+    <string name="nav_network_edit">Змінити підключення</string>
+    <string name="nav_network_use_tls">Використовувати FTPS (TLS)</string>
+    <string name="nav_network_passive_mode">Пасивний режим</string>
+    <string name="nav_network_root_url">Повний URL (необов\'язково)</string>
+    <string name="nav_network_accept_untrusted">Приймати самопідписані сертифікати</string>
+    <string name="nav_network_test">Перевірити підключення</string>
+
+    <!-- Item Types -->
+    <string name="archive">Архів</string>
+    <string name="image">Зображення</string>
+    <string name="video">Відео</string>
+    <string name="audio">Аудіо</string>
+    <string name="document">Документ</string>
+    <string name="file">Файл</string>
+    <string name="folder">Папка</string>
+
+    <!-- Actions/Operations Messages -->
+    <string name="msg_preparing">Підготовка…</string>
+    <string name="msg_starting">Запуск…</string>
+    <string name="msg_cancelling">Скасування…</string>
+    <string name="msg_cancelled">Скасовано</string>
+    <string name="msg_rename_failed">Не вдалося перейменувати</string>
+    <string name="msg_select_rename">Виберіть файл для перейменування</string>
+    <string name="msg_select_one_rename">Виберіть лише один файл</string>
+    <string name="msg_failed_create_folder">Не вдалося створити папку</string>
+    <string name="msg_failed_create_file">Не вдалося створити файл</string>
+    <string name="msg_recycle_bin_empty">Кошик уже порожній</string>
+    <string name="msg_select_pin">Виберіть елемент для закріплення</string>
+    <string name="msg_select_one_pin">Виберіть лише один елемент</string>
+    <string name="msg_operation_cancelled">Операцію скасовано</string>
+    <string name="msg_pasted_count">Вставлено файлів: %1$d</string>
+    <string name="msg_moved_count">Переміщено файлів: %1$d</string>
+    <string name="msg_restored_count">Відновлено файлів: %1$d</string>
+    <string name="msg_moved_to_recycle_bin">Переміщено в кошик</string>
+    <string name="msg_moved_to_recycle_bin_count">В кошик переміщено: %1$d</string>
+    <string name="msg_moved_to_recycle_bin_partial">В кошик переміщено: %1$d (деякі не вдалося)</string>
+    <string name="msg_share_failed_prepare">Не вдалося підготувати файли</string>
+    <string name="msg_no_app_share">Немає додатків для надсилання</string>
+    <string name="msg_no_app_open">Немає додатків для відкриття</string>
+    <string name="msg_apk_install_permission">Дозвольте встановлення та натисніть на APK ще раз.</string>
+    <string name="msg_search_results" translatable="false">search_results</string>
+    <string name="msg_search_failed">Пошук не вдався</string>
+    <string name="msg_invalid_path">Неприпустимий шлях</string>
+    <string name="msg_file_not_found">Файл або папку не знайдено</string>
+    <string name="msg_not_dir_archive">Це не папка і не архів</string>
+    <string name="msg_failed_open_image">Не вдалося відкрити зображення</string>
+    <string name="msg_image_copied">Зображення скопійовано</string>
+    <string name="msg_failed_copy_image">Не вдалося скопіювати зображення</string>
+    <string name="msg_failed_set_wallpaper">Не вдалося встановити шпалери</string>
+    <string name="msg_share_image_via">Поділитися через</string>
+    <string name="msg_no_file_specified">Файл не вказано</string>
+    <string name="msg_not_supported_archive">Поки що неможливо відкривати файли всередині архіву</string>
+    <string name="msg_op_completed">Операцію завершено.</string>
+    <string name="msg_already_at_storage_root">Ви вже в корені сховища</string>
+    <string name="msg_already_at_saf_root">Ви вже в корені вибраної папки</string>
+    <string name="msg_empty_clipboard">Буфер обміну порожній</string>
+    <string name="msg_compression_failed">Помилка стиснення: %1$s</string>
+    <string name="msg_unknown_compression_error">Невідома помилка стиснення</string>
+    <string name="menu_set_wallpaper_failed">Не вдалося встановити шпалери</string>
+
+
+    <!-- Dialog Titles -->
+    <string name="dialog_new_folder">Нова папка</string>
+    <string name="dialog_new_file">Новий текстовий документ</string>
+    <string name="dialog_rename">Перейменувати</string>
+    <string name="dialog_search_options">Параметри пошуку</string>
+
+    <!-- Search -->
+    <string name="search_subfolders">Шукати у всіх підпапках</string>
+    <string name="search_kind">тип: (Тип файлу)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
+    <string name="search_ext">*.ext (Розширення)</string>
+
+    <!-- Image Viewer/ Video Player -->
+    <string name="unknown_resolution">Невідома роздільна здатність</string>
+    <string name="media_playing">Відтворення</string>
+    <string name="media_paused">Пауза</string>
+    <string name="media_loop_on">Повтор: Увімк</string>
+    <string name="media_loop_off">Повтор: Вимк</string>
+    <string name="media_speed_normal">Звичайна (1x)</string>
+    <string name="media_no_audio_tracks">Аудіодоріжки не знайдено</string>
+    <string name="media_fit">За розміром (За замовчуванням)</string>
+    <string name="media_fill">Заповнити</string>
+    <string name="media_zoom">Масштаб (Обрізати)</string>
+    <string name="media_fixed_w">Фіксована ширина</string>
+    <string name="media_fixed_h">Фіксована висота</string>
+    <string name="media_audio_track">Аудіодоріжка %1$d</string>
+    <string name="media_subtitle_track">Субтитри %1$d</string>
+    <string name="media_volume">Гучність</string>
+    <string name="media_loop">Повтор</string>
+    <string name="media_viewed">Переглянуто</string>
+    <string name="media_share_image_failed">Не вдалося надіслати зображення</string>
+    <string name="media_thumbnail">Ескіз</string>
+
+    <!-- Details Headers -->
+    <string name="details_header_name">Ім\'я</string>
+    <string name="details_header_size">Розмір</string>
+    <string name="details_header_date">Дата</string>
+    <string name="details_header_date_deleted">Дата видалення</string>
+    <string name="details_header_deleted_from">Розташування</string>
+
+    <string name="menu_move">Перемістити</string>
+    <string name="move_or_copy_title">Перемістити чи копіювати?</string>
+    <string name="move_or_copy_message">Ви хочете перемістити чи копіювати перетягнуті файли в це розташування?</string>
+    <string name="settings_touch_drag">Дія при перетягуванні</string>
+    <string name="settings_touch_drag_title">Виберіть дію при перетягуванні</string>
+    <string name="settings_touch_drag_ask">Запитувати щоразу</string>
+    <string name="settings_touch_drag_copy">Завжди копіювати</string>
+    <string name="settings_touch_drag_move">Завжди переміщувати</string>
+    <string name="msg_cancelled_deletion">Видалення скасовано</string>
+    <string name="msg_deletion">Видалено файлів: %1$d</string>
+    <string name="details_header_type">Тип</string>
+    <string name="menu_by_type">За типом</string>
+
+    <string name="msg_remote_permanent_warning">Мережеві файли будуть видалені остаточно.</string>
+    <string name="msg_archive_remote_unsupported">Архівація в мережі поки не підтримується.</string>
+    <string name="msg_remote_trash_skipped">Не можна перемістити мережеві файли в кошик.</string>
+    <string name="settings_about">Про програму</string>
+
+    <string name="shizuku_status">Статус Shizuku</string>
+    <string name="shizuku_status_authorized">Авторизовано</string>
+    <string name="shizuku_status_not_authorized">Не авторизовано</string>
+    <string name="shizuku_status_not_running">Не запущено</string>
+    <string name="shizuku_request_permission">Запросити дозвіл Shizuku</string>
 </resources>

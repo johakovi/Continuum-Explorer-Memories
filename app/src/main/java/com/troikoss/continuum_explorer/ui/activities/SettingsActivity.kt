@@ -118,6 +118,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
                         ThemeMode.VERY_DARK -> stringResource(R.string.settings_theme_very_dark)
                         ThemeMode.VERY_LIGHT -> stringResource(R.string.settings_theme_very_light)
+                        ThemeMode.ENHANCED_SYSTEM -> stringResource(R.string.settings_theme_enhanced_system)
                     }
                     Text(text)
                 },
@@ -194,6 +195,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                         "fr" -> stringResource(R.string.settings_language_french)
                         "pt" -> stringResource(R.string.settings_language_portuguese)
                         "es" -> stringResource(R.string.settings_language_spanish)
+                        "de" -> stringResource(R.string.settings_language_german)
+                        "ru" -> stringResource(R.string.settings_language_russian)
+                        "sv" -> stringResource(R.string.settings_language_swedish)
+                        "uk" -> stringResource(R.string.settings_language_ukrainian)
+                        "ko" -> stringResource(R.string.settings_language_korean)
                         else -> stringResource(R.string.settings_language_system)
                     }
                     Text(text)
@@ -480,6 +486,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     showThemeDialog = false
                                 }
                             )
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_enhanced_system),
+                                selected = themeMode == ThemeMode.ENHANCED_SYSTEM,
+                                onClick = {
+                                    SettingsManager.setThemeMode(context, ThemeMode.ENHANCED_SYSTEM)
+                                    showThemeDialog = false
+                                }
+                            )
                         }
                     },
                     confirmButton = {
@@ -677,6 +691,46 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 selected = language == "tr",
                                 onClick = {
                                     SettingsManager.setLanguage(context, "tr")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_german),
+                                selected = language == "de",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "de")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_russian),
+                                selected = language == "ru",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "ru")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_swedish),
+                                selected = language == "sv",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "sv")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_ukrainian),
+                                selected = language == "uk",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "uk")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_korean),
+                                selected = language == "ko",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "ko")
                                     showLanguageDialog = false
                                 }
                             )

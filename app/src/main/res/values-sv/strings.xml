@@ -1,4 +1,454 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_new_window_short">Nytt fönster</string>
+    <string name="shortcut_new_window_long">Nytt fönster</string>
+
+    <!-- General -->
+    <string name="cancel">Avbryt</string>
+    <string name="ok">OK</string>
+    <string name="close">Stäng</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
+    <string name="back">Bakåt</string>
+    <string name="done">Klar</string>
+    <string name="loading">Laddar…</string>
+    <string name="calculating">Beräknar…</string>
+    <string name="unknown">Okänd</string>
+    <string name="home">Hem</string>
+    <string name="new_tab">Ny flik</string>
+    <string name="create">Skapa</string>
+    <string name="forward">Framåt</string>
+    <string name="history">Historik</string>
+    <string name="up">Upp</string>
+    <string name="menu">Meny</string>
+    <string name="search">Sök</string>
+    <string name="search_hint">Sök…</string>
+    <string name="options">Alternativ</string>
+    <string name="off">Av</string>
+    <string name="previous">Föregående</string>
+    <string name="next">Nästa</string>
+
+    <!-- Properties / Details -->
+    <string name="properties">Egenskaper</string>
+    <string name="prop_name">Namn:</string>
+    <string name="prop_type">Typ:</string>
+    <string name="prop_size">Storlek:</string>
+    <string name="prop_size_on_disk">Storlek på disk:</string>
+    <string name="prop_location">Plats:</string>
+    <string name="prop_modified">Ändrad:</string>
+    <string name="prop_deleted">Borttagen:</string>
+    <string name="prop_deleted_from">Borttagen från:</string>
+    <string name="prop_resolution">Upplösning:</string>
+    <string name="prop_duration">Längd:</string>
+    <string name="prop_items">Objekt:</string>
+    <string name="prop_contains">Innehåller:</string>
+    <string name="prop_folders_count">%1$d mappar</string>
+    <string name="prop_files_count">%1$d filer</string>
+    <string name="prop_selected_count">%1$d markerade</string>
+    <string name="prop_loading_metadata">Laddar metadata…</string>
+    <string name="prop_total_size">Total storlek:</string>
+    <string name="prop_bytes">byte</string>
+    <string name="details_item_count_singular">1 objekt</string>
+    <string name="details_item_count_plural">%1$d objekt</string>
+    <string name="details_date_modified">Ändrad: %1$s</string>
+    <string name="details_date_deleted">Borttagen: %1$s</string>
+    <string name="details_deleted_from">Borttagen från: %1$s</string>
+    <string name="details_size">Storlek: %1$s</string>
+    <string name="details_resolution">Upplösning: %1$s</string>
+    <string name="details_duration">Längd: %1$s</string>
+
+    <!-- Shortcuts Dialog -->
+    <string name="shortcuts_title">Kortkommandon</string>
+    <string name="shortcuts_nav_selection">Navigering &amp; val</string>
+    <string name="shortcuts_arrow_keys">Pilnycklar</string>
+    <string name="shortcuts_arrow_keys_desc">Flytta markering</string>
+    <string name="shortcuts_home_end">Home / End</string>
+    <string name="shortcuts_home_end_desc">Gå till början / slutet av listan</string>
+    <string name="shortcuts_page_up_down">Page Up / Down</string>
+    <string name="shortcuts_page_up_down_desc">Scrolla sidan upp / ned</string>
+    <string name="shortcuts_ctrl_a">Ctrl + A</string>
+    <string name="shortcuts_ctrl_a_desc">Markera alla</string>
+    <string name="shortcuts_backspace">Backsteg</string>
+    <string name="shortcuts_backspace_desc">Gå tillbaka till övermapp</string>
+    <string name="shortcuts_file_ops">Filhantering</string>
+    <string name="shortcuts_enter">Enter</string>
+    <string name="shortcuts_enter_desc">Öppna fil eller mapp</string>
+    <string name="shortcuts_ctrl_enter">Ctrl + Enter</string>
+    <string name="shortcuts_ctrl_enter_desc">Öppna i ny flik</string>
+    <string name="shortcuts_shift_enter">Shift + Enter</string>
+    <string name="shortcuts_shift_enter_desc">Öppna i nytt fönster</string>
+    <string name="shortcuts_ctrl_cvx">Ctrl + C / X / V</string>
+    <string name="shortcuts_ctrl_cvx_desc">Kopiera / Klipp ut / Klistra in</string>
+    <string name="shortcuts_delete">Delete</string>
+    <string name="shortcuts_delete_desc">Ta bort (Shift + Delete för permanent)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
+    <string name="shortcuts_f2_desc">Byt namn</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
+    <string name="shortcuts_f5_desc">Uppdatera</string>
+    <string name="shortcuts_app_actions">App-åtgärder</string>
+    <string name="shortcuts_ctrl_n">Ctrl + N</string>
+    <string name="shortcuts_ctrl_n_desc">Nytt fönster</string>
+    <string name="shortcuts_ctrl_w">Ctrl + W</string>
+    <string name="shortcuts_ctrl_w_desc">Stäng fönster</string>
+    <string name="shortcuts_ctrl_zy">Ctrl + Z / Y</string>
+    <string name="shortcuts_ctrl_zy_desc">Ångra / Gör om</string>
+    <string name="shortcuts_ctrl_wheel">Ctrl + Mushjul</string>
+    <string name="shortcuts_ctrl_wheel_desc">Zooma in / ut</string>
+    <string name="shortcuts_ctrl_slash">Ctrl + /</string>
+    <string name="shortcuts_ctrl_slash_desc">Lista över kortkommandon</string>
+    <string name="shortcuts_mouse">Mus</string>
+    <string name="shortcuts_right_click">Högerklick</string>
+    <string name="shortcuts_right_click_desc">Snabbmeny</string>
+    <string name="shortcuts_middle_click">Mittenklick</string>
+    <string name="shortcuts_middle_click_desc">Öppna i ny flik</string>
+    <string name="shortcuts_shift_middle_click">Shift + Mittenklick</string>
+    <string name="shortcuts_shift_middle_click_desc">Öppna i nytt fönster</string>
+    <string name="shortcuts_drag">Dra</string>
+    <string name="shortcuts_drag_desc">Kopiera</string>
+    <string name="shortcuts_shift_drag">Shift + Dra</string>
+    <string name="shortcuts_shift_drag_desc">Flytta</string>
+
+    <!-- Archive Operations -->
+    <string name="archive_create">Skapa arkiv</string>
+    <string name="archive_name">Arkivnamn</string>
+    <string name="archive_comp_method">Komprimeringsmetod</string>
+    <string name="archive_comp_level">Komprimeringsnivå</string>
+    <string name="archive_enc_method">Krypteringsmetod</string>
+    <string name="archive_password">Lösenord</string>
+    <string name="archive_delete_source">Ta bort källfiler efter arkivering</string>
+    <string name="archive_extract">Extrahera arkiv</string>
+    <string name="archive_extract_options">Välj extraheringsalternativ för: %1$s</string>
+    <string name="archive_extract_separate">Extrahera till separat mapp</string>
+    <string name="archive_extract_current">Extrahera till aktuell mapp</string>
+    <string name="archive_extract_delete_source">Ta bort källarkiv efter extrahering</string>
+    <string name="archive_encrypted_title">Krypterat arkiv</string>
+    <string name="archive_enter_password">Ange lösenord för: %1$s</string>
+    <string name="archive_button">Arkivera</string>
+    <string name="extract_button">Extrahera</string>
+    <string name="archive_inner_error">Kan inte öppna fil inuti arkiv än</string>
+
+    <!-- File Operations Dialogs -->
+    <string name="conflict_title">Filkonflikt</string>
+    <string name="conflict_message">En fil med namnet \"%1$s\" finns redan. Vad vill du göra?</string>
+    <string name="conflict_remember">Kom ihåg val för denna session</string>
+    <string name="conflict_merge">Slå ihop</string>
+    <string name="conflict_keep_both">Behåll båda</string>
+    <string name="conflict_replace">Ersätt</string>
+    <string name="delete_confirm_title">Bekräfta borttagning</string>
+    <string name="delete_item_this">detta objekt</string>
+    <string name="delete_items_count">%1$d objekt</string>
+    <string name="delete_confirm_message">Är du säker på att du vill ta bort %1$s?</string>
+    <string name="delete_recycle_bin">Papperskorg</string>
+    <string name="delete_permanently">Permanent</string>
+    <string name="delete_permanent_title">Ta bort permanent</string>
+    <string name="delete_permanent_message">Är du säker på att du vill ta bort %1$s permanent? Denna åtgärd kan inte ångras.</string>
+
+    <!-- Progress Dialog -->
+    <string name="op_deleting">Tar bort objekt…</string>
+    <string name="op_extracting">Extraherar arkiv…</string>
+    <string name="op_compressing">Komprimerar objekt…</string>
+    <string name="op_processing">Bearbetar objekt…</string>
+    <string name="op_finished">Klar</string>
+    <string name="op_time_remaining">Återstående tid:</string>
+    <string name="op_items_remaining">Återstående objekt:</string>
+    <string name="op_speed">Hastighet:</string>
+    <string name="op_background">Bakgrund</string>
+    <string name="op_min_remaining">Cirka %1$d min återstår</string>
+    <string name="op_sec_remaining">Cirka %1$d sek återstår</string>
+    <string name="op_renaming">Byter namn på %1$s…</string>
+    <string name="op_copying">Kopierar 1 objekt…</string>
+    <string name="op_copying_items">Kopierar %1$d objekt…</string>
+    <string name="op_extracting_an_archive">Extraherar 1 arkiv…</string>
+    <string name="op_extracting_archives">Extraherar %1$d arkiv…</string>
+    <string name="op_compressing_an_item">Komprimerar 1 objekt…</string>
+    <string name="op_compressing_items">Komprimerar %1$d objekt…</string>
+    <string name="op_deleting_an_item">Tar bort 1 objekt…</string>
+    <string name="op_deleting_items">Tar bort %1$d objekt…</string>
+    <string name="op_trashing">Flyttar 1 objekt till papperskorgen…</string>
+    <string name="op_trashing_items">Flyttar %1$d objekt till papperskorgen…</string>
+    <string name="op_restoring">Återställer 1 objekt…</string>
+    <string name="op_restoring_items">Återställer %1$d objekt…</string>
+    <string name="op_sec">sek</string>
+
+    <!-- Notifications -->
+    <string name="notif_description">Förlopp för filåtgärder</string>
+
+    <!-- Settings -->
+    <string name="settings">Inställningar</string>
+    <string name="settings_appearance">Utseende</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Systemstandard</string>
+    <string name="settings_theme_light">Ljust läge</string>
+    <string name="settings_theme_dark">Mörkt läge</string>
+    <string name="settings_theme_very_dark">Mycket mörkt</string>
+    <string name="settings_theme_very_light">Mycket ljust</string>
+    <string name="settings_theme_enhanced_system">Förbättrad system</string>
+    <string name="settings_themebar">Sidopanel</string>
+    <string name="settings_themebar_rounded">Rundad</string>
+    <string name="settings_themebar_square">Fyrkantig</string>
+    <string name="settings_themecontent">Fönster</string>
+    <string name="settings_themecontent_rounded">Rundad</string>
+    <string name="settings_themecontent_square">Fyrkantig</string>
+    <string name="settings_themetop">Flik</string>
+    <string name="settings_themetop_attached">Fäst</string>
+    <string name="settings_themetop_float">Flytande</string>
+    <string name="settings_colorful_bars">Färgglada fält</string>
+    <string name="settings_colorful_bars_desc">Aktivera accentfärger för toppfältet och flikfältet.</string>
+    <string name="settings_icon_theme">Ikontema</string>
+    <string name="settings_icon_theme_colourful">Färgglad</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Välj ikontema</string>
+    <string name="settings_details_large">Detaljer (endast stora skärmar)</string>
+    <string name="settings_details_hidden">Dold</string>
+    <string name="settings_details_pane">Sidopanel</string>
+    <string name="settings_details_bar">Bottenfält</string>
+    <string name="settings_show_command_bar">Visa kommandofält</string>
+    <string name="settings_show_command_bar_desc">Verktygsfält med filåtgärder under adressfältet.</string>
+    <string name="settings_show_hidden_files">Visa dolda filer/mappar</string>
+    <string name="settings_show_hidden_files_desc">Visa filer och mappar som börjar med en punkt.</string>
+    <string name="settings_icon_selection">Ikonmarkering</string>
+    <string name="settings_icon_selection_desc">Växla markering genom att trycka på filikonen.</string>
+    <string name="settings_file_ops">Filhantering</string>
+    <string name="settings_deletion_behavior">Borttagningsbeteende</string>
+    <string name="settings_del_ask">Fråga varje gång</string>
+    <string name="settings_del_recycle">Flytta till papperskorgen</string>
+    <string name="settings_del_permanent">Ta bort permanent</string>
+    <string name="settings_internal_archive">Använd intern arkivvisare</string>
+    <string name="settings_internal_archive_desc">Öppna zip-filer direkt i appen istället för att starta externa appar.</string>
+    <string name="settings_shortcuts_desc">Visa tillgängliga tangentbords- och musgenvägar</string>
+    <string name="settings_default_view_mode">Standardvisning</string>
+    <string name="settings_choose_default_view_mode">Välj standardvisning</string>
+    <string name="settings_choose_del_behavior">Välj borttagningsbeteende</string>
+    <string name="settings_choose_theme">Välj tema</string>
+    <string name="settings_choose_details_mode">Välj detaljläge</string>
+    <string name="settings_language">Språk</string>
+    <string name="settings_language_system">Systemstandard</string>
+    <string name="settings_language_english">Engelska</string>
+    <string name="settings_language_finnish">Finska</string>
+    <string name="settings_language_french">Franska</string>
+    <string name="settings_language_portuguese">Portugisiska</string>
+    <string name="settings_language_spanish">Spanska</string>
+    <string name="settings_language_turkish">Turkiska</string>
+    <string name="settings_language_german">Tyska</string>
+    <string name="settings_language_russian">Ryska</string>
+    <string name="settings_language_swedish">Svenska</string>
+    <string name="settings_language_ukrainian">Ukrainska</string>
+    <string name="settings_language_korean">Koreanska</string>
+    <string name="settings_choose_language">Välj språk</string>
+
+    <!-- Context Menus/Command Bar -->
+    <string name="menu_restore">Återställ</string>
+    <string name="menu_delete_permanently">Ta bort permanent</string>
+    <string name="menu_properties">Egenskaper</string>
+    <string name="menu_open">Öppna</string>
+    <string name="menu_open_with">Öppna med…</string>
+    <string name="menu_open_new_tab">Öppna i ny flik</string>
+    <string name="menu_open_new_window">Öppna i nytt fönster</string>
+    <string name="menu_remove_favorites">Ta bort från favoriter</string>
+    <string name="menu_add_favorites">Lägg till i favoriter</string>
+    <string name="menu_add_home">Lägg till på startskärmen</string>
+    <string name="menu_extract">Extrahera…</string>
+    <string name="menu_compress">Komprimera…</string>
+    <string name="menu_cut">Klipp ut</string>
+    <string name="menu_copy">Kopiera</string>
+    <string name="menu_paste">Klistra in</string>
+    <string name="menu_rename">Byt namn</string>
+    <string name="menu_share">Dela</string>
+    <string name="menu_delete">Ta bort</string>
+    <string name="menu_new">Ny</string>
+    <string name="menu_sort">Sortera</string>
+    <string name="menu_view">Visa</string>
+    <string name="menu_empty_recycle_bin">Töm papperskorgen</string>
+    <string name="menu_refresh">Uppdatera</string>
+    <string name="menu_text_document">Textdokument</string>
+    <string name="menu_by_name">Efter namn</string>
+    <string name="menu_by_date">Efter datum</string>
+    <string name="menu_by_size">Efter storlek</string>
+    <string name="menu_by_date_deleted">Efter borttagningsdatum</string>
+    <string name="menu_by_location">Efter plats</string>
+    <string name="menu_details">Detaljer</string>
+    <string name="menu_grid">Rutnät</string>
+    <string name="menu_gallery">Galleri</string>
+    <string name="menu_content">Innehåll</string>
+    <string name="menu_subtitles">Undertexter</string>
+    <string name="menu_audio_track">Ljudspår</string>
+    <string name="menu_speed">Hastighet</string>
+    <string name="menu_aspect_ratio">Bildförhållande</string>
+    <string name="menu_open_with_no_dots">Öppna med</string>
+    <string name="menu_select">Markera</string>
+    <string name="menu_clear_selection">Rensa markering</string>
+    <string name="menu_select_inverse">Invertera markering</string>
+    <string name="menu_remove">Ta bort</string>
+    <string name="menu_zoom_in">Zooma in</string>
+    <string name="menu_zoom_out">Zooma ut</string>
+    <string name="menu_reset_zoom">Återställ zoom</string>
+    <string name="menu_copy_image">Kopiera bild</string>
+    <string name="menu_set_wallpaper">Använd som bakgrund</string>
+    <string name="menu_fullscreen">Helskärm</string>
+    <string name="menu_undo">Ångra</string>
+    <string name="menu_redo">Gör om</string>
+
+    <!-- Navigation -->
+    <string name="nav_library_items">Biblioteksobjekt</string>
+    <string name="nav_recent">Senaste</string>
+    <string name="nav_gallery">Galleri</string>
+    <string name="nav_downloads">Hämtningar</string>
+    <string name="nav_documents">Dokument</string>
+    <string name="menu_gallery_albums">Album</string>
+    <string name="nav_add_storage">Lägg till lagring</string>
+    <string name="nav_internal_storage">Intern lagring</string>
+    <string name="nav_trash">Papperskorg</string>
+    <string name="nav_external_drive">Extern enhet</string>
+    <string name="nav_favorites">Favoriter</string>
+    <string name="nav_no_favorites">Inga favoriter tillagda</string>
+    <string name="nav_library">Bibliotek</string>
+    <string name="nav_recycle_bin">Papperskorg</string>
+    <string name="nav_storage">Lagring</string>
+    <string name="nav_added_locations">Tillagda platser</string>
+    <string name="nav_sd_card">SD-kort</string>
+    <string name="nav_external_location">Extern plats</string>
+    <string name="nav_unknown_folder">Okänd mapp</string>
+    <string name="nav_collapse">Fäll ihop</string>
+    <string name="nav_expand">Expandera</string>
+    <string name="nav_storage_usage_label">%1$s ledigt av %2$s</string>
+    <string name="nav_network">Nätverk</string>
+    <string name="nav_add_local_storage">Lägg till lokal lagring</string>
+    <string name="nav_add_network_storage">Lägg till nätverkslagring</string>
+    <string name="nav_network_protocol">Protokoll</string>
+    <string name="nav_network_display_name">Visningsnamn</string>
+    <string name="nav_network_host">Värd</string>
+    <string name="nav_network_port">Port</string>
+    <string name="nav_network_username">Användarnamn</string>
+    <string name="nav_network_password">Lösenord</string>
+    <string name="nav_network_remote_path">Fjärrsökväg</string>
+    <string name="nav_network_save">Spara</string>
+    <string name="nav_network_edit">Redigera anslutning</string>
+    <string name="nav_network_use_tls">Använd FTPS (TLS)</string>
+    <string name="nav_network_passive_mode">Passivt läge</string>
+    <string name="nav_network_root_url">Fullständig URL (valfri)</string>
+    <string name="nav_network_accept_untrusted">Acceptera självsignerade certifikat</string>
+    <string name="nav_network_test">Testa anslutning</string>
+
+    <!-- Item Types -->
+    <string name="archive">Arkiv</string>
+    <string name="image">Bild</string>
+    <string name="video">Video</string>
+    <string name="audio">Ljud</string>
+    <string name="document">Dokument</string>
+    <string name="file">Fil</string>
+    <string name="folder">Mapp</string>
+
+    <!-- Actions/Operations Messages -->
+    <string name="msg_preparing">Förbereder…</string>
+    <string name="msg_starting">Startar…</string>
+    <string name="msg_cancelling">Avbryter…</string>
+    <string name="msg_cancelled">Avbruten</string>
+    <string name="msg_rename_failed">Kunde inte byta namn</string>
+    <string name="msg_select_rename">Välj en fil att byta namn på</string>
+    <string name="msg_select_one_rename">Välj endast en fil att byta namn på</string>
+    <string name="msg_failed_create_folder">Misslyckades med att skapa mapp</string>
+    <string name="msg_failed_create_file">Misslyckades med att skapa fil</string>
+    <string name="msg_recycle_bin_empty">Papperskorgen är redan tom</string>
+    <string name="msg_select_pin">Välj en fil eller mapp att lägga till</string>
+    <string name="msg_select_one_pin">Välj endast ett objekt att lägga till</string>
+    <string name="msg_operation_cancelled">Åtgärden avbröts</string>
+    <string name="msg_pasted_count">Klistrade in %1$d filer</string>
+    <string name="msg_moved_count">Flyttade %1$d filer</string>
+    <string name="msg_restored_count">Återställde %1$d filer</string>
+    <string name="msg_moved_to_recycle_bin">Flyttad till papperskorgen</string>
+    <string name="msg_moved_to_recycle_bin_count">Flyttade %1$d filer till papperskorgen</string>
+    <string name="msg_moved_to_recycle_bin_partial">Flyttade %1$d filer till papperskorgen (vissa misslyckades)</string>
+    <string name="msg_share_failed_prepare">Kunde inte förbereda filer för delning</string>
+    <string name="msg_no_app_share">Ingen app hittades för att dela denna fil</string>
+    <string name="msg_no_app_open">Ingen app hittades för att öppna denna fil</string>
+    <string name="msg_apk_install_permission">Tillåt behörighet och klicka sedan på APK igen för att installera.</string>
+    <string name="msg_search_results" translatable="false">sökresultat</string>
+    <string name="msg_search_failed">Sökningen misslyckades</string>
+    <string name="msg_invalid_path">Ogiltig sökväg</string>
+    <string name="msg_file_not_found">Filen eller mappen hittades inte</string>
+    <string name="msg_not_dir_archive">Inte en mapp eller ett arkiv</string>
+    <string name="msg_failed_open_image">Kunde inte öppna bild</string>
+    <string name="msg_image_copied">Bilden kopierades till urklipp</string>
+    <string name="msg_failed_copy_image">Misslyckades med att kopiera bild</string>
+    <string name="msg_failed_set_wallpaper">Misslyckades med att ställa in bakgrund</string>
+    <string name="msg_share_image_via">Dela bild via</string>
+    <string name="msg_no_file_specified">Ingen fil angiven</string>
+    <string name="msg_not_supported_archive">Kan inte öppna fil inuti arkiv än</string>
+    <string name="msg_op_completed">Filåtgärd slutförd.</string>
+    <string name="msg_already_at_storage_root">Redan i lagringens rotmapp</string>
+    <string name="msg_already_at_saf_root">Redan i den valda mappens rot</string>
+    <string name="msg_empty_clipboard">Urklipp är tomt</string>
+    <string name="msg_compression_failed">Komprimering misslyckades: %1$s</string>
+    <string name="msg_unknown_compression_error">Okänt komprimeringsfel</string>
+    <string name="menu_set_wallpaper_failed">Misslyckades med att ställa in bakgrund</string>
+
+
+    <!-- Dialog Titles -->
+    <string name="dialog_new_folder">Ny mapp</string>
+    <string name="dialog_new_file">Nytt textdokument</string>
+    <string name="dialog_rename">Byt namn</string>
+    <string name="dialog_search_options">Sökalternativ</string>
+
+    <!-- Search -->
+    <string name="search_subfolders">Sök i alla undermappar</string>
+    <string name="search_kind">typ: (Filtyp)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
+    <string name="search_ext">*.ext (Tillägg)</string>
+
+    <!-- Image Viewer/ Video Player -->
+    <string name="unknown_resolution">Okänd upplösning</string>
+    <string name="media_playing">Spelar</string>
+    <string name="media_paused">Pausad</string>
+    <string name="media_loop_on">Loop: På</string>
+    <string name="media_loop_off">Loop: Av</string>
+    <string name="media_speed_normal">Normal (1x)</string>
+    <string name="media_no_audio_tracks">Inga ljudspår hittades</string>
+    <string name="media_fit">Anpassa (Standard)</string>
+    <string name="media_fill">Fyll</string>
+    <string name="media_zoom">Zooma (Beskär)</string>
+    <string name="media_fixed_w">Fast bredd</string>
+    <string name="media_fixed_h">Fast höjd</string>
+    <string name="media_audio_track">Ljudspår %1$d</string>
+    <string name="media_subtitle_track">Undertextspår %1$d</string>
+    <string name="media_volume">Volym</string>
+    <string name="media_loop">Loop</string>
+    <string name="media_viewed">Visad bild</string>
+    <string name="media_share_image_failed">Kunde inte dela bild</string>
+    <string name="media_thumbnail">Miniatyr</string>
+
+    <!-- Details Headers -->
+    <string name="details_header_name">Namn</string>
+    <string name="details_header_size">Storlek</string>
+    <string name="details_header_date">Datum</string>
+    <string name="details_header_date_deleted">Borttagningsdatum</string>
+    <string name="details_header_deleted_from">Plats</string>
+
+    <string name="menu_move">Flytta</string>
+    <string name="move_or_copy_title">Flytta eller kopiera?</string>
+    <string name="move_or_copy_message">Vill du flytta eller kopiera de dragna filerna till denna plats?</string>
+    <string name="settings_touch_drag">Touch-dragbeteende</string>
+    <string name="settings_touch_drag_title">Välj touch-dragbeteende</string>
+    <string name="settings_touch_drag_ask">Fråga varje gång</string>
+    <string name="settings_touch_drag_copy">Kopiera alltid</string>
+    <string name="settings_touch_drag_move">Flytta alltid</string>
+    <string name="msg_cancelled_deletion">Borttagning avbruten</string>
+    <string name="msg_deletion">Tog bort %1$d filer</string>
+    <string name="details_header_type">Typ</string>
+    <string name="menu_by_type">Efter typ</string>
+
+    <!-- Network file operations -->
+    <string name="msg_remote_permanent_warning">Nätverksfiler tas bort permanent (kan inte flyttas till papperskorgen).</string>
+    <string name="msg_archive_remote_unsupported">Arkivering stöds inte för nätverksplatser än.</string>
+    <string name="msg_remote_trash_skipped">Kan inte flytta nätverksfiler till papperskorgen. De kommer att tas bort permanent.</string>
+    <string name="settings_about">Om</string>
+
+    <string name="shizuku_status">Shizuku-status</string>
+    <string name="shizuku_status_authorized">Auktoriserad</string>
+    <string name="shizuku_status_not_authorized">Inte auktoriserad</string>
+    <string name="shizuku_status_not_running">Körs inte</string>
+    <string name="shizuku_request_permission">Begär Shizuku-behörighet</string>
 </resources>

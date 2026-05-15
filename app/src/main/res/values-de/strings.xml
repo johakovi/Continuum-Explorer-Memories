@@ -1,4 +1,453 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_new_window_short">Neues Fenster</string>
+    <string name="shortcut_new_window_long">Neues Fenster</string>
+
+    <!-- General -->
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">OK</string>
+    <string name="close">Schließen</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="back">Zurück</string>
+    <string name="done">Fertig</string>
+    <string name="loading">Wird geladen…</string>
+    <string name="calculating">Berechnung…</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="home">Startseite</string>
+    <string name="new_tab">Neuer Tab</string>
+    <string name="create">Erstellen</string>
+    <string name="forward">Vorwärts</string>
+    <string name="history">Verlauf</string>
+    <string name="up">Aufwärts</string>
+    <string name="menu">Menü</string>
+    <string name="search">Suchen</string>
+    <string name="search_hint">Suchen…</string>
+    <string name="options">Optionen</string>
+    <string name="off">Aus</string>
+    <string name="previous">Vorherige</string>
+    <string name="next">Nächste</string>
+
+    <!-- Properties / Details -->
+    <string name="properties">Eigenschaften</string>
+    <string name="prop_name">Name:</string>
+    <string name="prop_type">Typ:</string>
+    <string name="prop_size">Größe:</string>
+    <string name="prop_size_on_disk">Größe auf Datenträger:</string>
+    <string name="prop_location">Ort:</string>
+    <string name="prop_modified">Geändert:</string>
+    <string name="prop_deleted">Gelöscht:</string>
+    <string name="prop_deleted_from">Gelöscht von:</string>
+    <string name="prop_resolution">Auflösung:</string>
+    <string name="prop_duration">Dauer:</string>
+    <string name="prop_items">Elemente:</string>
+    <string name="prop_contains">Inhalt:</string>
+    <string name="prop_folders_count">%1$d Ordner</string>
+    <string name="prop_files_count">%1$d Dateien</string>
+    <string name="prop_selected_count">%1$d ausgewählt</string>
+    <string name="prop_loading_metadata">Metadaten werden geladen…</string>
+    <string name="prop_total_size">Gesamtgröße:</string>
+    <string name="prop_bytes">Bytes</string>
+    <string name="details_item_count_singular">1 Element</string>
+    <string name="details_item_count_plural">%1$d Elemente</string>
+    <string name="details_date_modified">Änderungsdatum: %1$s</string>
+    <string name="details_date_deleted">Löschdatum: %1$s</string>
+    <string name="details_deleted_from">Gelöscht von: %1$s</string>
+    <string name="details_size">Größe: %1$s</string>
+    <string name="details_resolution">Auflösung: %1$s</string>
+    <string name="details_duration">Dauer: %1$s</string>
+
+    <!-- Shortcuts Dialog -->
+    <string name="shortcuts_title">Tastenkürzel-Übersicht</string>
+    <string name="shortcuts_nav_selection">Navigation &amp; Auswahl</string>
+    <string name="shortcuts_arrow_keys">Pfeiltasten</string>
+    <string name="shortcuts_arrow_keys_desc">Auswahl verschieben</string>
+    <string name="shortcuts_home_end">Pos1 / Ende</string>
+    <string name="shortcuts_home_end_desc">Zum Anfang / Ende der Liste springen</string>
+    <string name="shortcuts_page_up_down">Bild auf / ab</string>
+    <string name="shortcuts_page_up_down_desc">Seite nach oben / unten scrollen</string>
+    <string name="shortcuts_ctrl_a">Strg + A</string>
+    <string name="shortcuts_ctrl_a_desc">Alles auswählen</string>
+    <string name="shortcuts_backspace">Rücktaste</string>
+    <string name="shortcuts_backspace_desc">Zum übergeordneten Ordner zurückgehen</string>
+    <string name="shortcuts_file_ops">Dateioperationen</string>
+    <string name="shortcuts_enter">Eingabetaste</string>
+    <string name="shortcuts_enter_desc">Datei oder Ordner öffnen</string>
+    <string name="shortcuts_ctrl_enter">Strg + Eingabe</string>
+    <string name="shortcuts_ctrl_enter_desc">In neuem Tab öffnen</string>
+    <string name="shortcuts_shift_enter">Umschalt + Eingabe</string>
+    <string name="shortcuts_shift_enter_desc">In neuem Fenster öffnen</string>
+    <string name="shortcuts_ctrl_cvx">Strg + C / X / V</string>
+    <string name="shortcuts_ctrl_cvx_desc">Kopieren / Ausschneiden / Einfügen</string>
+    <string name="shortcuts_delete">Entf</string>
+    <string name="shortcuts_delete_desc">Löschen (Umschalt + Entf für dauerhaftes Löschen)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
+    <string name="shortcuts_f2_desc">Umbenennen</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
+    <string name="shortcuts_f5_desc">Aktualisieren</string>
+    <string name="shortcuts_app_actions">App-Aktionen</string>
+    <string name="shortcuts_ctrl_n">Strg + N</string>
+    <string name="shortcuts_ctrl_n_desc">Neues Fenster</string>
+    <string name="shortcuts_ctrl_w">Strg + W</string>
+    <string name="shortcuts_ctrl_w_desc">Fenster schließen</string>
+    <string name="shortcuts_ctrl_zy">Strg + Z / Y</string>
+    <string name="shortcuts_ctrl_zy_desc">Rückgängig / Wiederholen</string>
+    <string name="shortcuts_ctrl_wheel">Strg + Mausrad</string>
+    <string name="shortcuts_ctrl_wheel_desc">Vergrößern / Verkleinern</string>
+    <string name="shortcuts_ctrl_slash">Strg + /</string>
+    <string name="shortcuts_ctrl_slash_desc">Tastenkürzel-Übersicht</string>
+    <string name="shortcuts_mouse">Maus</string>
+    <string name="shortcuts_right_click">Rechtsklick</string>
+    <string name="shortcuts_right_click_desc">Kontextmenü</string>
+    <string name="shortcuts_middle_click">Mittlere Maustaste</string>
+    <string name="shortcuts_middle_click_desc">In neuem Tab öffnen</string>
+    <string name="shortcuts_shift_middle_click">Umschalt + Mitteltaste</string>
+    <string name="shortcuts_shift_middle_click_desc">In neuem Fenster öffnen</string>
+    <string name="shortcuts_drag">Ziehen</string>
+    <string name="shortcuts_drag_desc">Kopieren</string>
+    <string name="shortcuts_shift_drag">Umschalt + Ziehen</string>
+    <string name="shortcuts_shift_drag_desc">Verschieben</string>
+
+    <!-- Archive Operations -->
+    <string name="archive_create">Archiv erstellen</string>
+    <string name="archive_name">Archivname</string>
+    <string name="archive_comp_method">Kompressionsmethode</string>
+    <string name="archive_comp_level">Kompressionsstufe</string>
+    <string name="archive_enc_method">Verschlüsselungsmethode</string>
+    <string name="archive_password">Passwort</string>
+    <string name="archive_delete_source">Quelldateien nach Archivierung löschen</string>
+    <string name="archive_extract">Archiv extrahieren</string>
+    <string name="archive_extract_options">Extraktionsoptionen wählen für: %1$s</string>
+    <string name="archive_extract_separate">In separaten Ordner extrahieren</string>
+    <string name="archive_extract_current">In aktuellen Ordner extrahieren</string>
+    <string name="archive_extract_delete_source">Quellarchiv nach Extraktion löschen</string>
+    <string name="archive_encrypted_title">Verschlüsseltes Archiv</string>
+    <string name="archive_enter_password">Bitte Passwort eingeben für: %1$s</string>
+    <string name="archive_button">Archivieren</string>
+    <string name="extract_button">Extrahieren</string>
+    <string name="archive_inner_error">Datei im Archiv kann noch nicht geöffnet werden</string>
+
+    <!-- File Operations Dialogs -->
+    <string name="conflict_title">Dateikonflikt</string>
+    <string name="conflict_message">Eine Datei namens \"%1$s\" existiert bereits. Was möchten Sie tun?</string>
+    <string name="conflict_remember">Auswahl für diese Sitzung merken</string>
+    <string name="conflict_merge">Zusammenführen</string>
+    <string name="conflict_keep_both">Beide behalten</string>
+    <string name="conflict_replace">Ersetzen</string>
+    <string name="delete_confirm_title">Löschen bestätigen</string>
+    <string name="delete_item_this">dieses Element</string>
+    <string name="delete_items_count">%1$d Elemente</string>
+    <string name="delete_confirm_message">Sind Sie sicher, dass Sie %1$s löschen möchten?</string>
+    <string name="delete_recycle_bin">Papierkorb</string>
+    <string name="delete_permanently">Dauerhaft</string>
+    <string name="delete_permanent_title">Dauerhaft löschen</string>
+    <string name="delete_permanent_message">Sind Sie sicher, dass Sie %1$s dauerhaft löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+
+    <!-- Progress Dialog -->
+    <string name="op_deleting">Elemente werden gelöscht…</string>
+    <string name="op_extracting">Archiv wird extrahiert…</string>
+    <string name="op_compressing">Elemente werden komprimiert…</string>
+    <string name="op_processing">Elemente werden verarbeitet…</string>
+    <string name="op_finished">Abgeschlossen</string>
+    <string name="op_time_remaining">Verbleibende Zeit:</string>
+    <string name="op_items_remaining">Verbleibende Elemente:</string>
+    <string name="op_speed">Geschwindigkeit:</string>
+    <string name="op_background">Hintergrund</string>
+    <string name="op_min_remaining">Noch etwa %1$d Min.</string>
+    <string name="op_sec_remaining">Noch etwa %1$d Sek.</string>
+    <string name="op_renaming">%1$s wird umbenannt…</string>
+    <string name="op_copying">1 Element wird kopiert…</string>
+    <string name="op_copying_items">%1$d Elemente werden kopiert…</string>
+    <string name="op_extracting_an_archive">1 Archiv wird extrahiert…</string>
+    <string name="op_extracting_archives">%1$d Archive werden extrahiert…</string>
+    <string name="op_compressing_an_item">1 Element wird komprimiert…</string>
+    <string name="op_compressing_items">%1$d Elemente werden komprimiert…</string>
+    <string name="op_deleting_an_item">1 Element wird gelöscht…</string>
+    <string name="op_deleting_items">%1$d Elemente werden gelöscht…</string>
+    <string name="op_trashing">1 Element wird in den Papierkorb verschoben…</string>
+    <string name="op_trashing_items">%1$d Elemente werden in den Papierkorb verschoben…</string>
+    <string name="op_restoring">1 Element wird wiederhergestellt…</string>
+    <string name="op_restoring_items">%1$d Elemente werden wiederhergestellt…</string>
+    <string name="op_sec">Sek.</string>
+
+    <!-- Notifications -->
+    <string name="notif_description">Fortschritt der Datei operationen</string>
+
+    <!-- Settings -->
+    <string name="settings">Einstellungen</string>
+    <string name="settings_appearance">Erscheinungsbild</string>
+    <string name="settings_theme">Design</string>
+    <string name="settings_theme_system">Systemstandard</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_dark">Dunkel</string>
+    <string name="settings_theme_very_dark">Sehr dunkel</string>
+    <string name="settings_theme_very_light">Sehr hell</string>
+    <string name="settings_theme_enhanced_system">Erweitertes System</string>
+    <string name="settings_themebar">Seitenleiste</string>
+    <string name="settings_themebar_rounded">Abgerundet</string>
+    <string name="settings_themebar_square">Eckig</string>
+    <string name="settings_themecontent">Fenster</string>
+    <string name="settings_themecontent_rounded">Abgerundet</string>
+    <string name="settings_themecontent_square">Eckig</string>
+    <string name="settings_themetop">Tab</string>
+    <string name="settings_themetop_attached">Angeheftet</string>
+    <string name="settings_themetop_float">Schwebend</string>
+    <string name="settings_colorful_bars">Farbige Kopf- und Tab-Leisten</string>
+    <string name="settings_colorful_bars_desc">Akzentfarben für die Kopfzeile und die Tab-Leiste aktivieren.</string>
+    <string name="settings_icon_theme">Symbol-Design</string>
+    <string name="settings_icon_theme_colourful">Farbenfroh</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Symbol-Design wählen</string>
+    <string name="settings_details_large">Details (nur große Bildschirme)</string>
+    <string name="settings_details_hidden">Ausgeblendet</string>
+    <string name="settings_details_pane">Seitenbereich</string>
+    <string name="settings_details_bar">Fußleiste</string>
+    <string name="settings_show_command_bar">Befehlsleiste anzeigen</string>
+    <string name="settings_show_command_bar_desc">Symbolleiste mit Dateioperationen unter der Adressleiste.</string>
+    <string name="settings_show_hidden_files">Versteckte Dateien anzeigen</string>
+    <string name="settings_show_hidden_files_desc">Dateien und Ordner anzeigen, die mit einem Punkt beginnen.</string>
+    <string name="settings_icon_selection">Symbol-Auswahl umschalten</string>
+    <string name="settings_icon_selection_desc">Auswahl durch Tippen auf das Dateisymbol umschalten.</string>
+    <string name="settings_file_ops">Dateioperationen</string>
+    <string name="settings_deletion_behavior">Löschverhalten</string>
+    <string name="settings_del_ask">Jedes Mal fragen</string>
+    <string name="settings_del_recycle">In den Papierkorb verschieben</string>
+    <string name="settings_del_permanent">Dauerhaft löschen</string>
+    <string name="settings_internal_archive">Internen Archiv-Betrachter verwenden</string>
+    <string name="settings_internal_archive_desc">Zip-Dateien direkt in der App öffnen statt externe Apps zu starten.</string>
+    <string name="settings_shortcuts_desc">Verfügbare Tastatur- und Mauskürzel anzeigen</string>
+    <string name="settings_default_view_mode">Standard-Ansichtsmodus</string>
+    <string name="settings_choose_default_view_mode">Standard-Ansichtsmodus wählen</string>
+    <string name="settings_choose_del_behavior">Löschverhalten wählen</string>
+    <string name="settings_choose_theme">Design wählen</string>
+    <string name="settings_choose_details_mode">Detailmodus wählen</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_language_system">Systemstandard</string>
+    <string name="settings_language_english">Englisch</string>
+    <string name="settings_language_finnish">Finnisch</string>
+    <string name="settings_language_french">Französisch</string>
+    <string name="settings_language_portuguese">Portugiesisch</string>
+    <string name="settings_language_spanish">Spanisch</string>
+    <string name="settings_language_turkish">Türkisch</string>
+    <string name="settings_language_german">Deutsch</string>
+    <string name="settings_language_russian">Russisch</string>
+    <string name="settings_language_swedish">Schwedisch</string>
+    <string name="settings_language_ukrainian">Ukrainisch</string>
+    <string name="settings_language_korean">Koreanisch</string>
+    <string name="settings_choose_language">Sprache wählen</string>
+
+    <!-- Context Menus/Command Bar -->
+    <string name="menu_restore">Wiederherstellen</string>
+    <string name="menu_delete_permanently">Dauerhaft löschen</string>
+    <string name="menu_properties">Eigenschaften</string>
+    <string name="menu_open">Öffnen</string>
+    <string name="menu_open_with">Öffnen mit…</string>
+    <string name="menu_open_new_tab">In neuem Tab öffnen</string>
+    <string name="menu_open_new_window">In neuem Fenster öffnen</string>
+    <string name="menu_remove_favorites">Aus Favoriten entfernen</string>
+    <string name="menu_add_favorites">Zu Favoriten hinzufügen</string>
+    <string name="menu_add_home">Zum Startbildschirm hinzufügen</string>
+    <string name="menu_extract">Extrahieren…</string>
+    <string name="menu_compress">Komprimieren…</string>
+    <string name="menu_cut">Ausschneiden</string>
+    <string name="menu_copy">Kopieren</string>
+    <string name="menu_paste">Einfügen</string>
+    <string name="menu_rename">Umbenennen</string>
+    <string name="menu_share">Teilen</string>
+    <string name="menu_delete">Löschen</string>
+    <string name="menu_new">Neu</string>
+    <string name="menu_sort">Sortieren</string>
+    <string name="menu_view">Ansicht</string>
+    <string name="menu_empty_recycle_bin">Papierkorb leeren</string>
+    <string name="menu_refresh">Aktualisieren</string>
+    <string name="menu_text_document">Textdokument</string>
+    <string name="menu_by_name">Nach Name</string>
+    <string name="menu_by_date">Nach Datum</string>
+    <string name="menu_by_size">Nach Größe</string>
+    <string name="menu_by_date_deleted">Nach Löschdatum</string>
+    <string name="menu_by_location">Nach Ort</string>
+    <string name="menu_details">Details</string>
+    <string name="menu_grid">Raster</string>
+    <string name="menu_gallery">Galerie</string>
+    <string name="menu_content">Inhalt</string>
+    <string name="menu_subtitles">Untertitel</string>
+    <string name="menu_audio_track">Tonspur</string>
+    <string name="menu_speed">Geschwindigkeit</string>
+    <string name="menu_aspect_ratio">Seitenverhältnis</string>
+    <string name="menu_open_with_no_dots">Öffnen mit</string>
+    <string name="menu_select">Auswählen</string>
+    <string name="menu_clear_selection">Auswahl aufheben</string>
+    <string name="menu_select_inverse">Auswahl umkehren</string>
+    <string name="menu_remove">Entfernen</string>
+    <string name="menu_zoom_in">Vergrößern</string>
+    <string name="menu_zoom_out">Verkleinern</string>
+    <string name="menu_reset_zoom">Zoom zurücksetzen</string>
+    <string name="menu_copy_image">Bild kopieren</string>
+    <string name="menu_set_wallpaper">Als Hintergrundbild festlegen</string>
+    <string name="menu_fullscreen">Vollbild</string>
+    <string name="menu_undo">Rückgängig</string>
+    <string name="menu_redo">Wiederholen</string>
+
+    <!-- Navigation -->
+    <string name="nav_library_items">Bibliothekselemente</string>
+    <string name="nav_recent">Zuletzt verwendet</string>
+    <string name="nav_gallery">Galerie</string>
+    <string name="nav_downloads">Downloads</string>
+    <string name="nav_documents">Dokumente</string>
+    <string name="menu_gallery_albums">Alben</string>
+    <string name="nav_add_storage">Speicher hinzufügen</string>
+    <string name="nav_internal_storage">Interner Speicher</string>
+    <string name="nav_trash">Papierkorb</string>
+    <string name="nav_external_drive">Externes Laufwerk</string>
+    <string name="nav_favorites">Favoriten</string>
+    <string name="nav_no_favorites">Keine Favoriten hinzugefügt</string>
+    <string name="nav_library">Bibliothek</string>
+    <string name="nav_recycle_bin">Papierkorb</string>
+    <string name="nav_storage">Speicher</string>
+    <string name="nav_added_locations">Hinzugefügte Orte</string>
+    <string name="nav_sd_card">SD-Karte</string>
+    <string name="nav_external_location">Externer Ort</string>
+    <string name="nav_unknown_folder">Unbekannter Ordner</string>
+    <string name="nav_collapse">Einklappen</string>
+    <string name="nav_expand">Ausklappen</string>
+    <string name="nav_storage_usage_label">%1$s frei von %2$s</string>
+    <string name="nav_network">Netzwerk</string>
+    <string name="nav_add_local_storage">Lokalen Speicher hinzufügen</string>
+    <string name="nav_add_network_storage">Netzwerkspeicher hinzufügen</string>
+    <string name="nav_network_protocol">Protokoll</string>
+    <string name="nav_network_display_name">Anzeigename</string>
+    <string name="nav_network_host">Host</string>
+    <string name="nav_network_port">Port</string>
+    <string name="nav_network_username">Benutzername</string>
+    <string name="nav_network_password">Passwort</string>
+    <string name="nav_network_remote_path">Remotepfad</string>
+    <string name="nav_network_save">Speichern</string>
+    <string name="nav_network_edit">Verbindung bearbeiten</string>
+    <string name="nav_network_use_tls">FTPS (TLS) verwenden</string>
+    <string name="nav_network_passive_mode">Passiver Modus</string>
+    <string name="nav_network_root_url">Vollständige URL (optionaler Override)</string>
+    <string name="nav_network_accept_untrusted">Selbstsignierte Zertifikate akzeptieren</string>
+    <string name="nav_network_test">Verbindung testen</string>
+
+    <!-- Item Types -->
+    <string name="archive">Archiv</string>
+    <string name="image">Bild</string>
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="document">Dokument</string>
+    <string name="file">Datei</string>
+    <string name="folder">Ordner</string>
+
+    <!-- Actions/Operations Messages -->
+    <string name="msg_preparing">Vorbereitung…</string>
+    <string name="msg_starting">Startvorgang…</string>
+    <string name="msg_cancelling">Abbruchvorgang…</string>
+    <string name="msg_cancelled">Abgebrochen</string>
+    <string name="msg_rename_failed">Umbenennen fehlgeschlagen</string>
+    <string name="msg_select_rename">Wählen Sie eine Datei zum Umbenennen aus</string>
+    <string name="msg_select_one_rename">Wählen Sie nur eine Datei zum Umbenennen aus</string>
+    <string name="msg_failed_create_folder">Ordner konnte nicht erstellt werden</string>
+    <string name="msg_failed_create_file">Datei konnte nicht erstellt werden</string>
+    <string name="msg_recycle_bin_empty">Papierkorb ist bereits leer</string>
+    <string name="msg_select_pin">Wählen Sie eine Datei oder einen Ordner zum Hinzufügen aus</string>
+    <string name="msg_select_one_pin">Wählen Sie nur ein Element zum Hinzufügen aus</string>
+    <string name="msg_operation_cancelled">Vorgang abgebrochen</string>
+    <string name="msg_pasted_count">%1$d Dateien eingefügt</string>
+    <string name="msg_moved_count">%1$d Dateien verschoben</string>
+    <string name="msg_restored_count">%1$d Dateien wiederhergestellt</string>
+    <string name="msg_moved_to_recycle_bin">In den Papierkorb verschoben</string>
+    <string name="msg_moved_to_recycle_bin_count">%1$d Dateien in den Papierkorb verschoben</string>
+    <string name="msg_moved_to_recycle_bin_partial">%1$d Dateien in den Papierkorb verschoben (einige fehlgeschlagen)</string>
+    <string name="msg_share_failed_prepare">Dateien konnten nicht zum Teilen vorbereitet werden</string>
+    <string name="msg_no_app_share">Keine App zum Teilen dieser Datei gefunden</string>
+    <string name="msg_no_app_open">Keine App zum Öffnen dieser Datei gefunden</string>
+    <string name="msg_apk_install_permission">Bitte Berechtigung erteilen, dann erneut auf die APK klicken, um sie zu installieren.</string>
+    <string name="msg_search_results" translatable="false">Suchergebnisse</string>
+    <string name="msg_search_failed">Suche fehlgeschlagen</string>
+    <string name="msg_invalid_path">Ungültiger Pfad</string>
+    <string name="msg_file_not_found">Datei oder Verzeichnis nicht gefunden</string>
+    <string name="msg_not_dir_archive">Kein Verzeichnis oder Archiv</string>
+    <string name="msg_failed_open_image">Bild konnte nicht geöffnet werden</string>
+    <string name="msg_image_copied">Bild in die Zwischenablage kopiert</string>
+    <string name="msg_failed_copy_image">Bild konnte nicht kopiert werden</string>
+    <string name="msg_failed_set_wallpaper">Hintergrundbild konnte nicht festgelegt werden</string>
+    <string name="msg_share_image_via">Bild teilen über</string>
+    <string name="msg_no_file_specified">Keine Datei angegeben</string>
+    <string name="msg_not_supported_archive">Datei im Archiv kann noch nicht geöffnet werden</string>
+    <string name="msg_op_completed">Dateioperation abgeschlossen.</string>
+    <string name="msg_already_at_storage_root">Bereits im Speicher-Stammverzeichnis</string>
+    <string name="msg_already_at_saf_root">Bereits im gewählten Ordner-Stammverzeichnis</string>
+    <string name="msg_empty_clipboard">Zwischenablage ist leer</string>
+    <string name="msg_compression_failed">Komprimierung fehlgeschlagen: %1$s</string>
+    <string name="msg_unknown_compression_error">Unbekannter Komprimierungsfehler</string>
+    <string name="menu_set_wallpaper_failed">Hintergrundbild konnte nicht festgelegt werden</string>
+
+
+    <!-- Dialog Titles -->
+    <string name="dialog_new_folder">Neuer Ordner</string>
+    <string name="dialog_new_file">Neues Textdokument</string>
+    <string name="dialog_rename">Umbenennen</string>
+    <string name="dialog_search_options">Sucheinstellungen</string>
+
+    <!-- Search -->
+    <string name="search_subfolders">Unterordner durchsuchen</string>
+    <string name="search_kind">Typ: (Dateityp)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
+    <string name="search_ext">*.ext (Erweiterung)</string>
+
+    <!-- Image Viewer/ Video Player -->
+    <string name="unknown_resolution">Unbekannte Auflösung</string>
+    <string name="media_playing">Wiedergabe</string>
+    <string name="media_paused">Pause</string>
+    <string name="media_loop_on">Wiederholung: Ein</string>
+    <string name="media_loop_off">Wiederholung: Aus</string>
+    <string name="media_speed_normal">Normal (1x)</string>
+    <string name="media_no_audio_tracks">Keine Tonspuren gefunden</string>
+    <string name="media_fit">Anpassen (Standard)</string>
+    <string name="media_fill">Ausfüllen</string>
+    <string name="media_zoom">Zoom (Zuschneiden)</string>
+    <string name="media_fixed_w">Feste Breite</string>
+    <string name="media_fixed_h">Feste Höhe</string>
+    <string name="media_audio_track">Tonspur %1$d</string>
+    <string name="media_subtitle_track">Untertitel %1$d</string>
+    <string name="media_volume">Lautstärke</string>
+    <string name="media_loop">Wiederholung</string>
+    <string name="media_viewed">Gesehen</string>
+    <string name="media_share_image_failed">Bildfreigabe fehlgeschlagen</string>
+    <string name="media_thumbnail">Miniaturansicht</string>
+
+    <!-- Details Headers -->
+    <string name="details_header_name">Name</string>
+    <string name="details_header_size">Größe</string>
+    <string name="details_header_date">Datum</string>
+    <string name="details_header_date_deleted">Löschdatum</string>
+    <string name="details_header_deleted_from">Pfad</string>
+
+    <string name="menu_move">Verschieben</string>
+    <string name="move_or_copy_title">Verschieben oder Kopieren?</string>
+    <string name="move_or_copy_message">Möchten Sie die gezogenen Dateien an diesen Ort verschieben oder kopieren?</string>
+    <string name="settings_touch_drag">Touch-Zieh-Verhalten</string>
+    <string name="settings_touch_drag_title">Touch-Zieh-Verhalten wählen</string>
+    <string name="settings_touch_drag_ask">Jedes Mal fragen</string>
+    <string name="settings_touch_drag_copy">Immer kopieren</string>
+    <string name="settings_touch_drag_move">Immer verschieben</string>
+    <string name="msg_cancelled_deletion">Löschen abgebrochen</string>
+    <string name="msg_deletion">%1$d Dateien gelöscht</string>
+    <string name="details_header_type">Typ</string>
+    <string name="menu_by_type">Nach Typ</string>
+
+    <string name="msg_remote_permanent_warning">Netzwerk dateien werden dauerhaft gelöscht.</string>
+    <string name="msg_archive_remote_unsupported">Archivierung wird noch nicht unterstützt für Netzwerk.</string>
+    <string name="msg_remote_trash_skipped">Netzwerk dateien können nicht in den Papierkorb verschoben werden.</string>
+    <string name="settings_about">Über</string>
+
+    <string name="shizuku_status">Shizuku-Status</string>
+    <string name="shizuku_status_authorized">Autorisiert</string>
+    <string name="shizuku_status_not_authorized">Nicht autorisiert</string>
+    <string name="shizuku_status_not_running">Läuft nicht</string>
+    <string name="shizuku_request_permission">Shizuku-Berechtigung anfordern</string>
 </resources>

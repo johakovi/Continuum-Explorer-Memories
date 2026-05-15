@@ -1,4 +1,453 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_new_window_short">Новое окно</string>
+    <string name="shortcut_new_window_long">Новое окно</string>
+
+    <!-- General -->
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="close">Закрыть</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="back">Назад</string>
+    <string name="done">Готово</string>
+    <string name="loading">Загрузка…</string>
+    <string name="calculating">Вычисление…</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="home">Главная</string>
+    <string name="new_tab">Новая вкладка</string>
+    <string name="create">Создать</string>
+    <string name="forward">Вперед</string>
+    <string name="history">История</string>
+    <string name="up">Вверх</string>
+    <string name="menu">Меню</string>
+    <string name="search">Поиск</string>
+    <string name="search_hint">Поиск…</string>
+    <string name="options">Параметры</string>
+    <string name="off">Выкл</string>
+    <string name="previous">Назад</string>
+    <string name="next">Вперед</string>
+
+    <!-- Properties / Details -->
+    <string name="properties">Свойства</string>
+    <string name="prop_name">Имя:</string>
+    <string name="prop_type">Тип:</string>
+    <string name="prop_size">Размер:</string>
+    <string name="prop_size_on_disk">Размер на диске:</string>
+    <string name="prop_location">Расположение:</string>
+    <string name="prop_modified">Изменен:</string>
+    <string name="prop_deleted">Удален:</string>
+    <string name="prop_deleted_from">Удален из:</string>
+    <string name="prop_resolution">Разрешение:</string>
+    <string name="prop_duration">Длительность:</string>
+    <string name="prop_items">Элементы:</string>
+    <string name="prop_contains">Содержит:</string>
+    <string name="prop_folders_count">Папок: %1$d</string>
+    <string name="prop_files_count">Файлов: %1$d</string>
+    <string name="prop_selected_count">Выбрано: %1$d</string>
+    <string name="prop_loading_metadata">Загрузка метаданных…</string>
+    <string name="prop_total_size">Общий размер:</string>
+    <string name="prop_bytes">байт</string>
+    <string name="details_item_count_singular">1 элемент</string>
+    <string name="details_item_count_plural">Элементов: %1$d</string>
+    <string name="details_date_modified">Дата изменения: %1$s</string>
+    <string name="details_date_deleted">Дата удаления: %1$s</string>
+    <string name="details_deleted_from">Удален из: %1$s</string>
+    <string name="details_size">Размер: %1$s</string>
+    <string name="details_resolution">Разрешение: %1$s</string>
+    <string name="details_duration">Длительность: %1$s</string>
+
+    <!-- Shortcuts Dialog -->
+    <string name="shortcuts_title">Горячие клавиши</string>
+    <string name="shortcuts_nav_selection">Навигация и выбор</string>
+    <string name="shortcuts_arrow_keys">Клавиши со стрелками</string>
+    <string name="shortcuts_arrow_keys_desc">Переместить выбор</string>
+    <string name="shortcuts_home_end">Home / End</string>
+    <string name="shortcuts_home_end_desc">В начало / конец списка</string>
+    <string name="shortcuts_page_up_down">Page Up / Down</string>
+    <string name="shortcuts_page_up_down_desc">Прокрутить страницу вверх / вниз</string>
+    <string name="shortcuts_ctrl_a">Ctrl + A</string>
+    <string name="shortcuts_ctrl_a_desc">Выбрать все</string>
+    <string name="shortcuts_backspace">Backspace</string>
+    <string name="shortcuts_backspace_desc">Вернуться в родительскую папку</string>
+    <string name="shortcuts_file_ops">Операции с файлами</string>
+    <string name="shortcuts_enter">Enter</string>
+    <string name="shortcuts_enter_desc">Открыть файл или папку</string>
+    <string name="shortcuts_ctrl_enter">Ctrl + Enter</string>
+    <string name="shortcuts_ctrl_enter_desc">Открыть в новой вкладке</string>
+    <string name="shortcuts_shift_enter">Shift + Enter</string>
+    <string name="shortcuts_shift_enter_desc">Открыть в новом окне</string>
+    <string name="shortcuts_ctrl_cvx">Ctrl + C / X / V</string>
+    <string name="shortcuts_ctrl_cvx_desc">Копировать / Вырезать / Вставить</string>
+    <string name="shortcuts_delete">Delete</string>
+    <string name="shortcuts_delete_desc">Удалить (Shift + Delete для безвозвратного удаления)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
+    <string name="shortcuts_f2_desc">Переименовать</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
+    <string name="shortcuts_f5_desc">Обновить</string>
+    <string name="shortcuts_app_actions">Действия приложения</string>
+    <string name="shortcuts_ctrl_n">Ctrl + N</string>
+    <string name="shortcuts_ctrl_n_desc">Новое окно</string>
+    <string name="shortcuts_ctrl_w">Ctrl + W</string>
+    <string name="shortcuts_ctrl_w_desc">Закрыть окно</string>
+    <string name="shortcuts_ctrl_zy">Ctrl + Z / Y</string>
+    <string name="shortcuts_ctrl_zy_desc">Отменить / Вернуть</string>
+    <string name="shortcuts_ctrl_wheel">Ctrl + колесо мыши</string>
+    <string name="shortcuts_ctrl_wheel_desc">Масштаб +/-</string>
+    <string name="shortcuts_ctrl_slash">Ctrl + /</string>
+    <string name="shortcuts_ctrl_slash_desc">Список горячих клавиш</string>
+    <string name="shortcuts_mouse">Мышь</string>
+    <string name="shortcuts_right_click">Правая кнопка мыши</string>
+    <string name="shortcuts_right_click_desc">Контекстное меню</string>
+    <string name="shortcuts_middle_click">Средняя кнопка мыши</string>
+    <string name="shortcuts_middle_click_desc">Открыть в новой вкладке</string>
+    <string name="shortcuts_shift_middle_click">Shift + средняя кнопка</string>
+    <string name="shortcuts_shift_middle_click_desc">Открыть в новом окне</string>
+    <string name="shortcuts_drag">Перетаскивание</string>
+    <string name="shortcuts_drag_desc">Копировать</string>
+    <string name="shortcuts_shift_drag">Shift + перетаскивание</string>
+    <string name="shortcuts_shift_drag_desc">Переместить</string>
+
+    <!-- Archive Operations -->
+    <string name="archive_create">Создать архив</string>
+    <string name="archive_name">Имя архива</string>
+    <string name="archive_comp_method">Метод сжатия</string>
+    <string name="archive_comp_level">Уровень сжатия</string>
+    <string name="archive_enc_method">Метод шифрования</string>
+    <string name="archive_password">Пароль</string>
+    <string name="archive_delete_source">Удалить исходные файлы после архивации</string>
+    <string name="archive_extract">Извлечь архив</string>
+    <string name="archive_extract_options">Выберите параметры извлечения для: %1$s</string>
+    <string name="archive_extract_separate">Извлечь в отдельную папку</string>
+    <string name="archive_extract_current">Извлечь в текущую папку</string>
+    <string name="archive_extract_delete_source">Удалить исходный архив после извлечения</string>
+    <string name="archive_encrypted_title">Зашифрованный архив</string>
+    <string name="archive_enter_password">Введите пароль для: %1$s</string>
+    <string name="archive_button">Архивировать</string>
+    <string name="extract_button">Извлечь</string>
+    <string name="archive_inner_error">Пока нельзя открывать файлы внутри архива</string>
+
+    <!-- File Operations Dialogs -->
+    <string name="conflict_title">Конфликт имен</string>
+    <string name="conflict_message">Файл с именем \"%1$s\" уже существует. Что вы хотите сделать?</string>
+    <string name="conflict_remember">Запомнить выбор для этой сессии</string>
+    <string name="conflict_merge">Объединить</string>
+    <string name="conflict_keep_both">Сохранить оба</string>
+    <string name="conflict_replace">Заменить</string>
+    <string name="delete_confirm_title">Подтверждение удаления</string>
+    <string name="delete_item_this">этот элемент</string>
+    <string name="delete_items_count">Элементов: %1$d</string>
+    <string name="delete_confirm_message">Вы действительно хотите удалить %1$s?</string>
+    <string name="delete_recycle_bin">В корзину</string>
+    <string name="delete_permanently">Безвозвратно</string>
+    <string name="delete_permanent_title">Безвозвратное удаление</string>
+    <string name="delete_permanent_message">Вы действительно хотите безвозвратно удалить %1$s? Это действие нельзя отменить.</string>
+
+    <!-- Progress Dialog -->
+    <string name="op_deleting">Удаление элементов…</string>
+    <string name="op_extracting">Извлечение архива…</string>
+    <string name="op_compressing">Сжатие элементов…</string>
+    <string name="op_processing">Обработка элементов…</string>
+    <string name="op_finished">Завершено</string>
+    <string name="op_time_remaining">Осталось времени:</string>
+    <string name="op_items_remaining">Осталось элементов:</string>
+    <string name="op_speed">Скорость:</string>
+    <string name="op_background">В фоне</string>
+    <string name="op_min_remaining">Осталось около %1$d мин</string>
+    <string name="op_sec_remaining">Осталось около %1$d сек</string>
+    <string name="op_renaming">Переименование %1$s…</string>
+    <string name="op_copying">Копирование 1 элемента…</string>
+    <string name="op_copying_items">Копирование %1$d элементов…</string>
+    <string name="op_extracting_an_archive">Извлечение 1 архива…</string>
+    <string name="op_extracting_archives">Извлечение %1$d архивов…</string>
+    <string name="op_compressing_an_item">Сжатие 1 элемента…</string>
+    <string name="op_compressing_items">Сжатие %1$d элементов…</string>
+    <string name="op_deleting_an_item">Удаление 1 элемента…</string>
+    <string name="op_deleting_items">Удаление %1$d элементов…</string>
+    <string name="op_trashing">Перемещение 1 элемента в корзину…</string>
+    <string name="op_trashing_items">Перемещение %1$d элементов в корзину…</string>
+    <string name="op_restoring">Восстановление 1 элемента…</string>
+    <string name="op_restoring_items">Восстановление %1$d элементов…</string>
+    <string name="op_sec">сек</string>
+
+    <!-- Notifications -->
+    <string name="notif_description">Прогресс операций с файлами</string>
+
+    <!-- Settings -->
+    <string name="settings">Настройки</string>
+    <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Темная</string>
+    <string name="settings_theme_very_dark">Очень темная</string>
+    <string name="settings_theme_very_light">Очень светлая</string>
+    <string name="settings_theme_enhanced_system">Улучшенная системная</string>
+    <string name="settings_themebar">Боковая панель</string>
+    <string name="settings_themebar_rounded">Закругленная</string>
+    <string name="settings_themebar_square">Квадратная</string>
+    <string name="settings_themecontent">Окно</string>
+    <string name="settings_themecontent_rounded">Закругленное</string>
+    <string name="settings_themecontent_square">Квадратное</string>
+    <string name="settings_themetop">Вкладка</string>
+    <string name="settings_themetop_attached">Прикрепленная</string>
+    <string name="settings_themetop_float">Плавающая</string>
+    <string name="settings_colorful_bars">Цветные панели</string>
+    <string name="settings_colorful_bars_desc">Включить акцентные цвета для верхней панели и панели вкладок.</string>
+    <string name="settings_icon_theme">Тема значков</string>
+    <string name="settings_icon_theme_colourful">Цветные</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_choose_icon_theme">Выберите тему значков</string>
+    <string name="settings_details_large">Детали (только для больших экранов)</string>
+    <string name="settings_details_hidden">Скрыты</string>
+    <string name="settings_details_pane">Боковая панель</string>
+    <string name="settings_details_bar">Нижняя панель</string>
+    <string name="settings_show_command_bar">Панель команд</string>
+    <string name="settings_show_command_bar_desc">Панель с кнопками операций под адресной строкой.</string>
+    <string name="settings_show_hidden_files">Скрытые файлы</string>
+    <string name="settings_show_hidden_files_desc">Показывать файлы и папки, начинающиеся с точки.</string>
+    <string name="settings_icon_selection">Выбор по значку</string>
+    <string name="settings_icon_selection_desc">Переключать выбор нажатием на значок файла.</string>
+    <string name="settings_file_ops">Операции с файлами</string>
+    <string name="settings_deletion_behavior">Удаление</string>
+    <string name="settings_del_ask">Спрашивать каждый раз</string>
+    <string name="settings_del_recycle">Перемещать в корзину</string>
+    <string name="settings_del_permanent">Удалять безвозвратно</string>
+    <string name="settings_internal_archive">Внутренний просмотрщик архивов</string>
+    <string name="settings_internal_archive_desc">Открывать ZIP-файлы прямо в приложении.</string>
+    <string name="settings_shortcuts_desc">Просмотр доступных горячих клавиш</string>
+    <string name="settings_default_view_mode">Вид по умолчанию</string>
+    <string name="settings_choose_default_view_mode">Выберите вид по умолчанию</string>
+    <string name="settings_choose_del_behavior">Выберите способ удаления</string>
+    <string name="settings_choose_theme">Выберите тему</string>
+    <string name="settings_choose_details_mode">Выберите режим деталей</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_system">Системный</string>
+    <string name="settings_language_english">Английский</string>
+    <string name="settings_language_finnish">Финский</string>
+    <string name="settings_language_french">Французский</string>
+    <string name="settings_language_portuguese">Португальский</string>
+    <string name="settings_language_spanish">Испанский</string>
+    <string name="settings_language_turkish">Турецкий</string>
+    <string name="settings_language_german">Немецкий</string>
+    <string name="settings_language_russian">Русский</string>
+    <string name="settings_language_swedish">Шведский</string>
+    <string name="settings_language_ukrainian">Украинский</string>
+    <string name="settings_language_korean">Корейский</string>
+    <string name="settings_choose_language">Выберите язык</string>
+
+    <!-- Context Menus/Command Bar -->
+    <string name="menu_restore">Восстановить</string>
+    <string name="menu_delete_permanently">Удалить безвозвратно</string>
+    <string name="menu_properties">Свойства</string>
+    <string name="menu_open">Открыть</string>
+    <string name="menu_open_with">Открыть с помощью…</string>
+    <string name="menu_open_new_tab">Открыть в новой вкладке</string>
+    <string name="menu_open_new_window">Открыть в новом окне</string>
+    <string name="menu_remove_favorites">Удалить из избранного</string>
+    <string name="menu_add_favorites">Добавить в избранное</string>
+    <string name="menu_add_home">На главный экран</string>
+    <string name="menu_extract">Извлечь…</string>
+    <string name="menu_compress">Сжать…</string>
+    <string name="menu_cut">Вырезать</string>
+    <string name="menu_copy">Копировать</string>
+    <string name="menu_paste">Вставить</string>
+    <string name="menu_rename">Переименовать</string>
+    <string name="menu_share">Поделиться</string>
+    <string name="menu_delete">Удалить</string>
+    <string name="menu_new">Создать</string>
+    <string name="menu_sort">Сортировка</string>
+    <string name="menu_view">Вид</string>
+    <string name="menu_empty_recycle_bin">Очистить корзину</string>
+    <string name="menu_refresh">Обновить</string>
+    <string name="menu_text_document">Текстовый документ</string>
+    <string name="menu_by_name">По имени</string>
+    <string name="menu_by_date">По дате</string>
+    <string name="menu_by_size">По размеру</string>
+    <string name="menu_by_date_deleted">По дате удаления</string>
+    <string name="menu_by_location">По расположению</string>
+    <string name="menu_details">Таблица</string>
+    <string name="menu_grid">Плитка</string>
+    <string name="menu_gallery">Галерея</string>
+    <string name="menu_content">Контент</string>
+    <string name="menu_subtitles">Субтитры</string>
+    <string name="menu_audio_track">Аудиодорожка</string>
+    <string name="menu_speed">Скорость</string>
+    <string name="menu_aspect_ratio">Соотношение сторон</string>
+    <string name="menu_open_with_no_dots">Открыть с помощью</string>
+    <string name="menu_select">Выбрать</string>
+    <string name="menu_clear_selection">Очистить выбор</string>
+    <string name="menu_select_inverse">Инвертировать выбор</string>
+    <string name="menu_remove">Удалить</string>
+    <string name="menu_zoom_in">Увеличить</string>
+    <string name="menu_zoom_out">Уменьшить</string>
+    <string name="menu_reset_zoom">Сбросить масштаб</string>
+    <string name="menu_copy_image">Копировать изображение</string>
+    <string name="menu_set_wallpaper">Установить как обои</string>
+    <string name="menu_fullscreen">Полноэкранный режим</string>
+    <string name="menu_undo">Отменить</string>
+    <string name="menu_redo">Вернуть</string>
+
+    <!-- Navigation -->
+    <string name="nav_library_items">Элементы библиотеки</string>
+    <string name="nav_recent">Недавние</string>
+    <string name="nav_gallery">Галерея</string>
+    <string name="nav_downloads">Загрузки</string>
+    <string name="nav_documents">Документы</string>
+    <string name="menu_gallery_albums">Альбомы</string>
+    <string name="nav_add_storage">Добавить хранилище</string>
+    <string name="nav_internal_storage">Внутренняя память</string>
+    <string name="nav_trash">Корзина</string>
+    <string name="nav_external_drive">Внешний диск</string>
+    <string name="nav_favorites">Избранное</string>
+    <string name="nav_no_favorites">Нет избранных путей</string>
+    <string name="nav_library">Библиотека</string>
+    <string name="nav_recycle_bin">Корзина</string>
+    <string name="nav_storage">Хранилище</string>
+    <string name="nav_added_locations">Добавленные места</string>
+    <string name="nav_sd_card">SD-карта</string>
+    <string name="nav_external_location">Внешнее расположение</string>
+    <string name="nav_unknown_folder">Неизвестная папка</string>
+    <string name="nav_collapse">Свернуть</string>
+    <string name="nav_expand">Развернуть</string>
+    <string name="nav_storage_usage_label">%1$s свободно из %2$s</string>
+    <string name="nav_network">Сеть</string>
+    <string name="nav_add_local_storage">Добавить локальное хранилище</string>
+    <string name="nav_add_network_storage">Добавить сетевое хранилище</string>
+    <string name="nav_network_protocol">Протокол</string>
+    <string name="nav_network_display_name">Отображаемое имя</string>
+    <string name="nav_network_host">Хост</string>
+    <string name="nav_network_port">Порт</string>
+    <string name="nav_network_username">Имя пользователя</string>
+    <string name="nav_network_password">Пароль</string>
+    <string name="nav_network_remote_path">Удаленный путь</string>
+    <string name="nav_network_save">Сохранить</string>
+    <string name="nav_network_edit">Изменить подключение</string>
+    <string name="nav_network_use_tls">Использовать FTPS (TLS)</string>
+    <string name="nav_network_passive_mode">Пассивный режим</string>
+    <string name="nav_network_root_url">Полный URL (опционально)</string>
+    <string name="nav_network_accept_untrusted">Принимать самоподписанные сертификаты</string>
+    <string name="nav_network_test">Проверить подключение</string>
+
+    <!-- Item Types -->
+    <string name="archive">Архив</string>
+    <string name="image">Изображение</string>
+    <string name="video">Видео</string>
+    <string name="audio">Аудио</string>
+    <string name="document">Документ</string>
+    <string name="file">Файл</string>
+    <string name="folder">Папка</string>
+
+    <!-- Actions/Operations Messages -->
+    <string name="msg_preparing">Подготовка…</string>
+    <string name="msg_starting">Запуск…</string>
+    <string name="msg_cancelling">Отмена…</string>
+    <string name="msg_cancelled">Отменено</string>
+    <string name="msg_rename_failed">Не удалось переименовать</string>
+    <string name="msg_select_rename">Выберите файл для переименования</string>
+    <string name="msg_select_one_rename">Выберите только один файл</string>
+    <string name="msg_failed_create_folder">Не удалось создать папку</string>
+    <string name="msg_failed_create_file">Не удалось создать файл</string>
+    <string name="msg_recycle_bin_empty">Корзина уже пуста</string>
+    <string name="msg_select_pin">Выберите элемент для закрепления</string>
+    <string name="msg_select_one_pin">Выберите только один элемент</string>
+    <string name="msg_operation_cancelled">Операция отменена</string>
+    <string name="msg_pasted_count">Вставлено файлов: %1$d</string>
+    <string name="msg_moved_count">Перемещено файлов: %1$d</string>
+    <string name="msg_restored_count">Восстановлено файлов: %1$d</string>
+    <string name="msg_moved_to_recycle_bin">Перемещено в корзину</string>
+    <string name="msg_moved_to_recycle_bin_count">В корзину перемещено: %1$d</string>
+    <string name="msg_moved_to_recycle_bin_partial">В корзину перемещено: %1$d (некоторые не удалось)</string>
+    <string name="msg_share_failed_prepare">Не удалось подготовить файлы</string>
+    <string name="msg_no_app_share">Нет приложений для отправки</string>
+    <string name="msg_no_app_open">Нет приложений для открытия</string>
+    <string name="msg_apk_install_permission">Разрешите установку и нажмите на APK еще раз.</string>
+    <string name="msg_search_results" translatable="false">search_results</string>
+    <string name="msg_search_failed">Поиск не удался</string>
+    <string name="msg_invalid_path">Недопустимый путь</string>
+    <string name="msg_file_not_found">Файл или папка не найдены</string>
+    <string name="msg_not_dir_archive">Это не папка и не архив</string>
+    <string name="msg_failed_open_image">Не удалось открыть изображение</string>
+    <string name="msg_image_copied">Изображение скопировано</string>
+    <string name="msg_failed_copy_image">Не удалось скопировать изображение</string>
+    <string name="msg_failed_set_wallpaper">Не удалось установить обои</string>
+    <string name="msg_share_image_via">Поделиться через</string>
+    <string name="msg_no_file_specified">Файл не указан</string>
+    <string name="msg_not_supported_archive">Пока нельзя открывать файлы внутри архива</string>
+    <string name="msg_op_completed">Операция завершена.</string>
+    <string name="msg_already_at_storage_root">Вы уже в корне хранилища</string>
+    <string name="msg_already_at_saf_root">Вы уже в корне выбранной папки</string>
+    <string name="msg_empty_clipboard">Буфер обмена пуст</string>
+    <string name="msg_compression_failed">Ошибка сжатия: %1$s</string>
+    <string name="msg_unknown_compression_error">Неизвестная ошибка сжатия</string>
+    <string name="menu_set_wallpaper_failed">Не удалось установить обои</string>
+
+
+    <!-- Dialog Titles -->
+    <string name="dialog_new_folder">Новая папка</string>
+    <string name="dialog_new_file">Новый текстовый документ</string>
+    <string name="dialog_rename">Переименовать</string>
+    <string name="dialog_search_options">Параметры поиска</string>
+
+    <!-- Search -->
+    <string name="search_subfolders">Искать во всех подпапках</string>
+    <string name="search_kind">тип: (Тип файла)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
+    <string name="search_ext">*.ext (Расширение)</string>
+
+    <!-- Image Viewer/ Video Player -->
+    <string name="unknown_resolution">Неизвестное разрешение</string>
+    <string name="media_playing">Воспроизведение</string>
+    <string name="media_paused">Пауза</string>
+    <string name="media_loop_on">Повтор: Вкл</string>
+    <string name="media_loop_off">Повтор: Выкл</string>
+    <string name="media_speed_normal">Обычная (1x)</string>
+    <string name="media_no_audio_tracks">Аудиодорожки не найдены</string>
+    <string name="media_fit">По размеру (По умолчанию)</string>
+    <string name="media_fill">Заполнить</string>
+    <string name="media_zoom">Масштаб (Обрезать)</string>
+    <string name="media_fixed_w">Фиксированная ширина</string>
+    <string name="media_fixed_h">Фиксированная высота</string>
+    <string name="media_audio_track">Аудиодорожка %1$d</string>
+    <string name="media_subtitle_track">Субтитры %1$d</string>
+    <string name="media_volume">Громкость</string>
+    <string name="media_loop">Повтор</string>
+    <string name="media_viewed">Просмотрено</string>
+    <string name="media_share_image_failed">Не удалось отправить изображение</string>
+    <string name="media_thumbnail">Эскиз</string>
+
+    <!-- Details Headers -->
+    <string name="details_header_name">Имя</string>
+    <string name="details_header_size">Размер</string>
+    <string name="details_header_date">Дата</string>
+    <string name="details_header_date_deleted">Дата удаления</string>
+    <string name="details_header_deleted_from">Расположение</string>
+
+    <string name="menu_move">Переместить</string>
+    <string name="move_or_copy_title">Переместить или скопировать?</string>
+    <string name="move_or_copy_message">Вы хотите переместить или скопировать перетащенные файлы в это расположение?</string>
+    <string name="settings_touch_drag">Действие при перетаскивании</string>
+    <string name="settings_touch_drag_title">Выберите действие при перетаскивании</string>
+    <string name="settings_touch_drag_ask">Спрашивать каждый раз</string>
+    <string name="settings_touch_drag_copy">Всегда копировать</string>
+    <string name="settings_touch_drag_move">Всегда перемещать</string>
+    <string name="msg_cancelled_deletion">Удаление отменено</string>
+    <string name="msg_deletion">Удалено файлов: %1$d</string>
+    <string name="details_header_type">Тип</string>
+    <string name="menu_by_type">По типу</string>
+
+    <string name="msg_remote_permanent_warning">Сетевые файлы будут удалены безвозвратно.</string>
+    <string name="msg_archive_remote_unsupported">Архивация в сети пока не поддерживается.</string>
+    <string name="msg_remote_trash_skipped">Нельзя переместить сетевые файлы в корзину.</string>
+    <string name="settings_about">О приложении</string>
+
+    <string name="shizuku_status">Статус Shizuku</string>
+    <string name="shizuku_status_authorized">Авторизовано</string>
+    <string name="shizuku_status_not_authorized">Не авторизовано</string>
+    <string name="shizuku_status_not_running">Не запущено</string>
+    <string name="shizuku_request_permission">Запросить разрешение Shizuku</string>
 </resources>

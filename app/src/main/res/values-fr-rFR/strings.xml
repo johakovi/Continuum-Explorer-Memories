@@ -81,7 +81,9 @@
     <string name="shortcuts_ctrl_cvx_desc">Copier / Couper / Coller</string>
     <string name="shortcuts_delete">Suppr</string>
     <string name="shortcuts_delete_desc">Supprimer (Maj + Suppr pour définitif)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">Renommer</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">Actualiser</string>
     <string name="shortcuts_app_actions">Actions de l\'application</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -181,6 +183,7 @@
     <string name="settings_theme_dark">Mode sombre</string>
     <string name="settings_theme_very_dark">Mode très sombre</string>
     <string name="settings_theme_very_light">Mode très clair</string>
+    <string name="settings_theme_enhanced_system">Système amélioré</string>
     <string name="settings_themebar">Barre latérale</string>
     <string name="settings_themebar_rounded">Arrondie</string>
     <string name="settings_themebar_square">Carrée</string>
@@ -215,12 +218,17 @@
     <string name="settings_choose_details_mode">Choisir le mode de détails</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_system">Par défaut du système</string>
-    <string name="settings_language_english">English</string>
-    <string name="settings_language_finnish">Finnish</string>
-    <string name="settings_language_french">French</string>
-    <string name="settings_language_portuguese">Portuguese</string>
-    <string name="settings_language_spanish">Spanish</string>
-    <string name="settings_language_turkish">Turkish</string>
+    <string name="settings_language_english">Anglais</string>
+    <string name="settings_language_finnish">Finnois</string>
+    <string name="settings_language_french">Français</string>
+    <string name="settings_language_portuguese">Portugais</string>
+    <string name="settings_language_spanish">Espagnol</string>
+    <string name="settings_language_turkish">Turc</string>
+    <string name="settings_language_german">Allemand</string>
+    <string name="settings_language_russian">Russe</string>
+    <string name="settings_language_swedish">Suédois</string>
+    <string name="settings_language_ukrainian">Ukrainien</string>
+    <string name="settings_language_korean">Coréen</string>
     <string name="settings_choose_language">Choisir la langue</string>
 
     <!-- Context Menus/Command Bar -->
@@ -358,6 +366,9 @@
     <!-- Search -->
     <string name="search_subfolders">Rechercher dans tous les sous-dossiers</string>
     <string name="search_kind">genre : (Type de fichier)</string>
+    <string name="search_and" translatable="false">AND</string>
+    <string name="search_or" translatable="false">OR</string>
+    <string name="search_not" translatable="false">NOT</string>
     <string name="search_ext">*.ext (Extension)</string>
 
     <!-- Image Viewer/ Video Player -->
@@ -382,8 +393,8 @@
     <string name="media_zoom">Zoom (rogner)</string>
     <string name="media_fixed_w">Largeur fixe</string>
     <string name="media_fixed_h">Hauteur fixe</string>
-    <string name="media_audio_track">Piste audio $1%d</string>
-    <string name="media_subtitle_track">Piste de sous-titres $1%d</string>
+    <string name="media_audio_track">Piste audio %1$d</string>
+    <string name="media_subtitle_track">Piste de sous-titres %1$d</string>
     <string name="previous">Précédent</string>
     <string name="next">Suivant</string>
     <string name="media_volume">Volume</string>
@@ -434,9 +445,9 @@
     <string name="msg_remote_trash_skipped">Impossible de déplacer les fichiers réseau vers la corbeille. Ils seront supprimés définitivement.</string>
     <string name="settings_about">À propos</string>
 
-    <string name="shizuku_status">Shizuku Status</string>
-    <string name="shizuku_status_authorized">Authorized</string>
-    <string name="shizuku_status_not_authorized">Not Authorized</string>
-    <string name="shizuku_status_not_running">Not Running</string>
-    <string name="shizuku_request_permission">Request Shizuku Permission</string>
+    <string name="shizuku_status">État de Shizuku</string>
+    <string name="shizuku_status_authorized">Autorisé</string>
+    <string name="shizuku_status_not_authorized">Non autorisé</string>
+    <string name="shizuku_status_not_running">Pas en cours d\'exécution</string>
+    <string name="shizuku_request_permission">Demander la permission Shizuku</string>
 </resources>

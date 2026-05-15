@@ -31,7 +31,8 @@ enum class ThemeMode {
     LIGHT,
     DARK,
     VERY_DARK,
-    VERY_LIGHT
+    VERY_LIGHT,
+    ENHANCED_SYSTEM
 }
 
 enum class ThemeShape {

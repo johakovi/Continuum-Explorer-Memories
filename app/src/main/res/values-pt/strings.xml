@@ -183,6 +183,7 @@
     <string name="settings_theme_dark">Modo escuro</string>
     <string name="settings_theme_very_dark">Modo muito escuro</string>
     <string name="settings_theme_very_light">Modo muito claro</string>
+    <string name="settings_theme_enhanced_system">Sistema aprimorado</string>
     <string name="settings_themebar">Barra lateral</string>
     <string name="settings_themebar_rounded">Arredondada</string>
     <string name="settings_themebar_square">Quadrada</string>
@@ -217,12 +218,17 @@
     <string name="settings_choose_details_mode">Escolher Modo de Detalhes</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_system">Padrão do sistema</string>
-    <string name="settings_language_english">English</string>
-    <string name="settings_language_finnish">Finnish</string>
-    <string name="settings_language_french">French</string>
-    <string name="settings_language_portuguese">Portuguese</string>
-    <string name="settings_language_spanish">Spanish</string>
-    <string name="settings_language_turkish">Turkish</string>
+    <string name="settings_language_english">Inglês</string>
+    <string name="settings_language_finnish">Finlandês</string>
+    <string name="settings_language_french">Francês</string>
+    <string name="settings_language_portuguese">Português</string>
+    <string name="settings_language_spanish">Espanhol</string>
+    <string name="settings_language_turkish">Turco</string>
+    <string name="settings_language_german">Alemão</string>
+    <string name="settings_language_russian">Russo</string>
+    <string name="settings_language_swedish">Sueco</string>
+    <string name="settings_language_ukrainian">Ucraniano</string>
+    <string name="settings_language_korean">Coreano</string>
     <string name="settings_choose_language">Escolher Idioma</string>
 
     <!-- Context Menus/Command Bar -->
@@ -381,8 +387,8 @@
     <string name="media_zoom">Zoom (Recortar)</string>
     <string name="media_fixed_w">Largura fixa</string>
     <string name="media_fixed_h">Altura fixa</string>
-    <string name="media_audio_track">Faixa de áudio $1%d</string>
-    <string name="media_subtitle_track">Faixa de legenda $1%d</string>
+    <string name="media_audio_track">Faixa de áudio %1$d</string>
+    <string name="media_subtitle_track">Faixa de legenda %1$d</string>
     <string name="previous">Anterior</string>
     <string name="next">Próximo</string>
     <string name="media_volume">Volume</string>
@@ -439,9 +445,9 @@
     <string name="msg_remote_trash_skipped">Não é possível mover arquivos de rede para a lixeira. Eles serão excluídos permanentemente.</string>
     <string name="settings_about">Sobre</string>
 
-    <string name="shizuku_status">Shizuku Status</string>
-    <string name="shizuku_status_authorized">Authorized</string>
-    <string name="shizuku_status_not_authorized">Not Authorized</string>
-    <string name="shizuku_status_not_running">Not Running</string>
-    <string name="shizuku_request_permission">Request Shizuku Permission</string>
+    <string name="shizuku_status">Estado do Shizuku</string>
+    <string name="shizuku_status_authorized">Autorizado</string>
+    <string name="shizuku_status_not_authorized">Não autorizado</string>
+    <string name="shizuku_status_not_running">Não está em execução</string>
+    <string name="shizuku_request_permission">Solicitar permissão do Shizuku</string>
 </resources>

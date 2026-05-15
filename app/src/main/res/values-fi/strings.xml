@@ -23,7 +23,7 @@
         <string name="forward">Eteenpäin</string>
         <string name="history">Historia</string>
         <string name="up">Ylös</string>
-        <string name="menu">Menu</string>
+        <string name="menu">Valikko</string>
         <string name="search">Etsi</string>
         <string name="search_hint">Etsitään…</string>
         <string name="options">Asetukset</string>
@@ -95,7 +95,7 @@
         <string name="shortcuts_ctrl_w_desc">Sulje ikkuna</string>
         <string name="shortcuts_ctrl_zy">Ctrl + Z / Y</string>
         <string name="shortcuts_ctrl_zy_desc">Peruuta toiminto / Kumoa toiminto</string>
-        <string name="shortcuts_ctrl_wheel">Ctrl + Mouse Wheel</string>
+        <string name="shortcuts_ctrl_wheel">Ctrl + hiiren rulla</string>
         <string name="shortcuts_ctrl_wheel_desc">Suurenna sisään / ulos</string>
         <string name="shortcuts_ctrl_slash">Ctrl + /</string>
         <string name="shortcuts_ctrl_slash_desc">Lista pikakomennoista</string>
@@ -194,6 +194,7 @@
         <string name="settings_theme_dark">Tumma tyyli</string>
         <string name="settings_theme_very_dark">Erittäin tumma tyyli</string>
         <string name="settings_theme_very_light">Erittäin vaalea tyyli</string>
+        <string name="settings_theme_enhanced_system">Parannettu järjestelmä</string>
         <string name="settings_colorful_bars">Värikäs ylä ja ala palkit</string>
         <string name="settings_colorful_bars_desc">Aktivoi aksentti värit välilehdelle ja ylä ja ala palkeille.</string>
         <string name="settings_icon_theme">Kuvakkeiden tyyli</string>
@@ -224,14 +225,19 @@
         <string name="settings_choose_theme">Valitse teema</string>
         <string name="settings_choose_details_mode">Valitse yksityiskohdatalle asetus</string>
         <string name="settings_language">Kieli</string>
-        <string name="settings_language_system">Järjestelmän oma</string>
-        <string name="settings_language_english">English</string>
-        <string name="settings_language_finnish">Finnish</string>
-        <string name="settings_language_french">French</string>
-        <string name="settings_language_portuguese">Portuguese</string>
-        <string name="settings_language_spanish">Spanish</string>
-        <string name="settings_language_turkish">Turkish</string>
-        <string name="settings_choose_language">Valitse kieli</string>
+    <string name="settings_language_system">Järjestelmän oma</string>
+    <string name="settings_language_english">Englanti</string>
+    <string name="settings_language_finnish">Suomi</string>
+    <string name="settings_language_french">Ranska</string>
+    <string name="settings_language_portuguese">Portugali</string>
+    <string name="settings_language_spanish">Espanja</string>
+    <string name="settings_language_turkish">Turkki</string>
+    <string name="settings_language_german">Saksa</string>
+    <string name="settings_language_russian">Venäjä</string>
+    <string name="settings_language_swedish">Ruotsi</string>
+    <string name="settings_language_ukrainian">Ukraina</string>
+    <string name="settings_language_korean">Korea</string>
+    <string name="settings_choose_language">Valitse kieli</string>
 
         <!-- Context Menus/Command Bar -->
         <string name="menu_restore">Palauta</string>
@@ -302,7 +308,7 @@
         <string name="nav_recycle_bin">Roskakori</string>
         <string name="nav_storage">Tallennustila</string>
         <string name="nav_added_locations">Lisättyjä paikkoja</string>
-        <string name="nav_sd_card">SD Card</string>
+        <string name="nav_sd_card">SD-kortti</string>
         <string name="nav_external_location">Ulkoinen tallennustila</string>
         <string name="nav_unknown_folder">Tuntematon kansio</string>
         <string name="nav_collapse">Vähennä</string>
@@ -388,52 +394,52 @@
 
         <!-- Search -->
         <string name="search_subfolders">Hae kaikista alikansioista</string>
-        <string name="search_kind">Tyyppi: </string>
+        <string name="search_kind">tyyppi: (Tiedostotyyppi)</string>
         <string name="search_and" translatable="false">AND</string>
         <string name="search_or" translatable="false">OR</string>
         <string name="search_not" translatable="false">NOT</string>
-        <string name="search_ext">*.ext (Extension)</string>
+        <string name="search_ext">*.ext (Tiedostopääte)</string>
 
         <!-- Image Viewer/ Video Player -->
         <string name="unknown_resolution">Tuntematon resoluutio</string>
         <string name="media_playing">Toistetaan</string>
-        <string name="media_paused">Paussissa</string>
-        <string name="media_loop_on">Loop: päällä</string>
-        <string name="media_loop_off">Loop: pois</string>
+        <string name="media_paused">Tauko</string>
+        <string name="media_loop_on">Silmukka: Päällä</string>
+        <string name="media_loop_off">Silmukka: Pois</string>
         <string name="media_speed_normal">Normaali (1x)</string>
-        <string name="media_no_audio_tracks">Ei ääniraitoja löydetty</string>
-        <string name="media_fit">Sovita (vakio)</string>
+        <string name="media_no_audio_tracks">Ääniraitoja ei löytynyt</string>
+        <string name="media_fit">Sovita (Oletus)</string>
         <string name="media_fill">Täytä</string>
-        <string name="media_zoom">Suurenna (leikkaa)</string>
+        <string name="media_zoom">Zumaa (Rajaa)</string>
         <string name="media_fixed_w">Kiinteä leveys</string>
         <string name="media_fixed_h">Kiinteä korkeus</string>
-        <string name="media_audio_track">Ääniraita $1%d</string>
-        <string name="media_subtitle_track">Tekstitys $1%d</string>
-        <string name="media_volume">Voluumi</string>
-        <string name="media_loop">Loop</string>
-        <string name="media_viewed">Näytetty kuva</string>
+        <string name="media_audio_track">Ääniraita %1$d</string>
+        <string name="media_subtitle_track">Tekstitys %1$d</string>
+        <string name="media_volume">Äänenvoimakkuus</string>
+        <string name="media_loop">Silmukka</string>
+        <string name="media_viewed">Katsottu</string>
         <string name="media_share_image_failed">Kuvan jakaminen epäonnistui</string>
         <string name="media_thumbnail">Pikkukuva</string>
 
         <!-- Details Headers -->
         <string name="details_header_name">Nimi</string>
-        <string name="details_header_size">koko</string>
+        <string name="details_header_size">Koko</string>
         <string name="details_header_date">Päivämäärä</string>
-        <string name="details_header_date_deleted">Poiston päivämäärä</string>
+        <string name="details_header_date_deleted">Poistopäivämäärä</string>
         <string name="details_header_deleted_from">Sijainti</string>
 
         <string name="menu_move">Siirrä</string>
         <string name="move_or_copy_title">Siirrä vai kopioi?</string>
-        <string name="move_or_copy_message">Haluatko siirtää tai kopioida vedetyt tiedostot tähän sijaintiin?</string>
-        <string name="settings_touch_drag">Kosketusvetokäyttäytyminen</string>
-        <string name="settings_touch_drag_title">Valitse kosketusvetokäyttäytyminen</string>
-        <string name="settings_touch_drag_ask">Kysy aina</string>
+        <string name="move_or_copy_message">Haluatko siirtää vai kopioida vedetyt tiedostot tähän sijaintiin?</string>
+        <string name="settings_touch_drag">Kosketusvedon toiminta</string>
+        <string name="settings_touch_drag_title">Valitse kosketusvedon toiminta</string>
+        <string name="settings_touch_drag_ask">Kysy joka kerta</string>
         <string name="settings_touch_drag_copy">Kopioi aina</string>
         <string name="settings_touch_drag_move">Siirrä aina</string>
         <string name="msg_cancelled_deletion">Poisto peruutettu</string>
-        <string name="msg_deletion">Poistettu %1$d tiedostoja</string>
+        <string name="msg_deletion">Poistettu %1$d tiedostoa</string>
         <string name="details_header_type">Tyyppi</string>
-        <string name="menu_by_type">Tyyppi</string>
+        <string name="menu_by_type">Tyypin mukaan</string>
 
         <!-- Network file operations -->
         <string name="msg_remote_permanent_warning">Verkkotiedostot poistetaan pysyvästi (ei voi siirtää roskakoriin).</string>
@@ -447,3 +453,4 @@
         <string name="shizuku_status_not_running">Ei käynnissä</string>
         <string name="shizuku_request_permission">Pyydä Shizuku-valtuutus</string>
 </resources>
+

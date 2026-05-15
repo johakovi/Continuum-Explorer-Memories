@@ -332,8 +332,8 @@ fun PropertiesContent(onClose: () -> Unit) {
                 onClick = onClose,
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.close))
@@ -487,8 +487,8 @@ fun ShortcutsContent(onClose: () -> Unit) {
             Button(
                 onClick = onClose,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.close))
@@ -684,8 +684,8 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
                 enabled = nameState.text.isNotBlank() && (encryptionMethod == EncryptionMethod.NONE || password.isNotEmpty()),
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.archive_button))
@@ -770,8 +770,8 @@ fun ExtractOptionsContent(onClose: () -> Unit) {
                 },
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.extract_button))
@@ -833,8 +833,8 @@ fun PasswordInputContent(onClose: () -> Unit) {
                 onClick = onConfirm,
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.ok))
@@ -890,8 +890,8 @@ fun InputContent(onClose: () -> Unit) {
                 onClick = onConfirm,
                 enabled = textState.text.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(buttonLabel)
@@ -936,16 +936,16 @@ fun CollisionContent() {
             Button(
                 onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.KEEP_BOTH, rememberSelection) },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) { Text(stringResource(R.string.conflict_keep_both)) }
             Button(
                 onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.REPLACE, rememberSelection) },
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) { Text(stringResource(R.string.conflict_replace)) }
         }
@@ -987,8 +987,8 @@ fun MoveCopyContent(onClose: () -> Unit) {
                     FileOperationsManager.onMoveCopyChoice(MoveCopyResult.COPY)
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.menu_copy))
@@ -999,8 +999,8 @@ fun MoveCopyContent(onClose: () -> Unit) {
                 },
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.menu_move))
@@ -1045,8 +1045,8 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.delete_recycle_bin), maxLines = 1, fontSize = 13.sp)
@@ -1056,8 +1056,8 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
                 onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.PERMANENT) },
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(stringResource(R.string.delete_permanently), maxLines = 1, fontSize = 13.sp)
@@ -1091,8 +1091,8 @@ fun DeletePermanentConfirmContent(onClose: () -> Unit) {
                 onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.PERMANENT) },
                 modifier = Modifier.focusRequester(focusRequester),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) { Text(stringResource(R.string.yes)) }
         }
@@ -1158,8 +1158,8 @@ fun ProgressContent (onClose: () -> Unit) {
                     onClick = onClose,
                     modifier = Modifier.focusRequester(focusRequester),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) { Text(stringResource(R.string.close)) }
             } else {
@@ -1168,8 +1168,8 @@ fun ProgressContent (onClose: () -> Unit) {
                 Button(
                     onClick = { FileOperationsManager.cancel() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) { Text(stringResource(R.string.cancel)) }
             }

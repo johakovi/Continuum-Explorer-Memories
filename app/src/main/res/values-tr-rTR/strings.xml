@@ -167,6 +167,7 @@
     <string name="settings_theme_dark">Koyu tema</string>
     <string name="settings_theme_very_dark">Çok koyu tema</string>
     <string name="settings_theme_very_light">Çok açık tema</string>
+    <string name="settings_theme_enhanced_system">Gelişmiş sistem</string>
     <string name="settings_themebar">Kenar Çubuğu</string>
     <string name="settings_themebar_rounded">Yuvarlak</string>
     <string name="settings_themebar_square">Kare</string>
@@ -201,12 +202,17 @@
     <string name="settings_choose_details_mode">Ayrıntılar Modunu Seç</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem varsayılanı</string>
-    <string name="settings_language_english">English</string>
-    <string name="settings_language_finnish">Finnish</string>
-    <string name="settings_language_french">French</string>
-    <string name="settings_language_portuguese">Portuguese</string>
-    <string name="settings_language_spanish">Spanish</string>
-    <string name="settings_language_turkish">Turkish</string>
+    <string name="settings_language_english">İngilizce</string>
+    <string name="settings_language_finnish">Fince</string>
+    <string name="settings_language_french">Fransızca</string>
+    <string name="settings_language_portuguese">Portekizce</string>
+    <string name="settings_language_spanish">İspanyolca</string>
+    <string name="settings_language_turkish">Türkçe</string>
+    <string name="settings_language_german">Almanca</string>
+    <string name="settings_language_russian">Rusça</string>
+    <string name="settings_language_swedish">İsveççe</string>
+    <string name="settings_language_ukrainian">Ukraynaca</string>
+    <string name="settings_language_korean">Korece</string>
     <string name="settings_choose_language">Dil Seç</string>
     <string name="menu_restore">Geri Yükle</string>
     <string name="menu_delete_permanently">Kalıcı Sil</string>
@@ -352,8 +358,8 @@
     <string name="media_zoom">Yakınlaştır (Kırp)</string>
     <string name="media_fixed_w">Sabit genişlik</string>
     <string name="media_fixed_h">Sabit yükseklik</string>
-    <string name="media_audio_track">Ses parçası $1%d</string>
-    <string name="media_subtitle_track">Altyazı parçası $1%d</string>
+    <string name="media_audio_track">Ses parçası %1$d</string>
+    <string name="media_subtitle_track">Altyazı parçası %1$d</string>
     <string name="previous">Önceki</string>
     <string name="next">Sonraki</string>
     <string name="media_volume">Ses Seviyesi</string>
@@ -406,9 +412,9 @@
     <string name="msg_remote_trash_skipped">Ağ dosyaları çöp kutusuna taşınamaz. Kalıcı olarak silinecekler.</string>
     <string name="settings_about">Hakkında</string>
 
-    <string name="shizuku_status">Shizuku Status</string>
-    <string name="shizuku_status_authorized">Authorized</string>
-    <string name="shizuku_status_not_authorized">Not Authorized</string>
-    <string name="shizuku_status_not_running">Not Running</string>
-    <string name="shizuku_request_permission">Request Shizuku Permission</string>
+    <string name="shizuku_status">Shizuku Durumu</string>
+    <string name="shizuku_status_authorized">Yetkili</string>
+    <string name="shizuku_status_not_authorized">Yetkili Değil</string>
+    <string name="shizuku_status_not_running">Çalışmıyor</string>
+    <string name="shizuku_request_permission">Shizuku İzni İste</string>
 </resources>

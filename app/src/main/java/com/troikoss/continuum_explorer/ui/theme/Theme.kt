@@ -55,37 +55,61 @@ object FileExplorerTheme {
 
 private val VeryDarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
+    onPrimary = Color.Black,
+    primaryContainer = Color(0xFF00372A),
+    onPrimaryContainer = Color(0xFF84D9D2),
     secondary = DarkSecondary,
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF1B3535),
+    onSecondaryContainer = Color(0xFFCCCCCE),
     tertiary = DarkTertiary,
     onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFF00372A),
+    onTertiaryContainer = Color(0xFF84D9D2),
     background = Color(0xFF000000),
+    onBackground = VeryDarkText,
     surface = VeryDarkTopBar,
+    onSurface = VeryDarkText,
+    surfaceVariant = Color(0xFF1A1A1A),
+    onSurfaceVariant = VeryDarkIcons,
     surfaceContainer = VeryDarkTopBar,
     surfaceContainerLow = VeryDarkSidebar,
     surfaceContainerHigh = Color(0xFF1C1C1C),
-    onSurface = VeryDarkText,
-    onSurfaceVariant = VeryDarkIcons,
+    surfaceContainerLowest = Color(0xFF000000),
+    outline = Color(0xFF444446),
     outlineVariant = Color(0xFF353537)
 )
 
 private val VeryLightColorScheme = lightColorScheme(
     primary = LightPrimary,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFC8E6C9),
+    onPrimaryContainer = Color(0xFF00372A),
     secondary = LightSecondary,
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE0E0E0),
+    onSecondaryContainer = Color(0xFF444344),
     tertiary = LightTertiary,
     onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFFF1F1F1),
+    onTertiaryContainer = Color(0xFF090909),
     background = Color(0xFFF1F1F1),
+    onBackground = VeryLightText,
     surface = VeryLightTopBar,
+    onSurface = VeryLightText,
+    surfaceVariant = Color(0xFFE8E8E8),
+    onSurfaceVariant = VeryLightIcons,
     surfaceContainer = VeryLightTopBar,
     surfaceContainerLow = VeryLightSidebar,
     surfaceContainerHigh = Color(0xFFE8E8E8),
-    onSurface = VeryLightText,
-    onSurfaceVariant = VeryLightIcons,
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    outline = Color(0xFFA2A2A2),
     outlineVariant = Color(0xFFA2A2A2)
 )
 
 @Composable
 fun FileExplorerTheme(
-    // Dynamic color is available on Android 12+
+    // Dynamic colour is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -94,15 +118,16 @@ fun FileExplorerTheme(
     val isSystemDark = isSystemInDarkTheme()
     val darkTheme = when (themeMode) {
         ThemeMode.SYSTEM -> isSystemDark
+        ThemeMode.ENHANCED_SYSTEM -> isSystemDark
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
         ThemeMode.VERY_DARK -> true
         ThemeMode.VERY_LIGHT -> false
     }
 
-    val colorScheme = when (themeMode) {
-        ThemeMode.VERY_DARK -> VeryDarkColorScheme
-        ThemeMode.VERY_LIGHT -> VeryLightColorScheme
+    val colorScheme = when {
+        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> VeryDarkColorScheme
+        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> VeryLightColorScheme
         else -> {
             // For LIGHT, DARK, and SYSTEM themes: use dynamic colors on Android 12+
             if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -119,8 +144,8 @@ fun FileExplorerTheme(
         }
     }
 
-    val extendedColors = when (themeMode) {
-        ThemeMode.VERY_DARK -> {
+    val extendedColors = when {
+        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
             ExtendedColors(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
@@ -140,7 +165,7 @@ fun FileExplorerTheme(
                 textColor = VeryDarkText
             )
         }
-        ThemeMode.VERY_LIGHT -> {
+        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
             ExtendedColors(
                 sidebarBackground = VeryLightSidebar,
                 topBarBackground = VeryLightTopBar,

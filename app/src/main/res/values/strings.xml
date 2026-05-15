@@ -59,7 +59,7 @@
     <string name="details_resolution">Resolution: %1$s</string>
     <string name="details_duration">Duration: %1$s</string>
 
-    <!-- Shortcuts Dialog -->
+    <!-- Shortcuts Dialogue -->
     <string name="shortcuts_title">Shortcuts Cheatsheet</string>
     <string name="shortcuts_nav_selection">Navigation &amp; Selection</string>
     <string name="shortcuts_arrow_keys">Arrow Keys</string>
@@ -182,8 +182,9 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light mode</string>
     <string name="settings_theme_dark">Dark mode</string>
-    <string name="settings_theme_very_dark">Very dark mode</string>
-    <string name="settings_theme_very_light">Very light mode</string>
+    <string name="settings_theme_very_dark">Very Dark theme</string>
+    <string name="settings_theme_very_light">Very Light theme</string>
+    <string name="settings_theme_enhanced_system">Enhanced system</string>
     <string name="settings_themebar">Sidebar</string>
     <string name="settings_themebar_rounded">Rounded</string>
     <string name="settings_themebar_square">Square</string>
@@ -194,7 +195,7 @@
     <string name="settings_themetop_attached">Attached</string>
     <string name="settings_themetop_float">Float</string>
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
-    <string name="settings_colorful_bars_desc">Enable accent colors for the top bar and tab bar.</string>
+    <string name="settings_colorful_bars_desc">Enable accent colours for the top bar and tab bar.</string>
     <string name="settings_icon_theme">Icon Theme</string>
     <string name="settings_icon_theme_colourful">Colourful</string>
     <string name="settings_icon_theme_material">Material</string>
@@ -230,6 +231,11 @@
     <string name="settings_language_portuguese">Portuguese</string>
     <string name="settings_language_spanish">Spanish</string>
     <string name="settings_language_turkish">Turkish</string>
+    <string name="settings_language_german">German</string>
+    <string name="settings_language_russian">Russian</string>
+    <string name="settings_language_swedish">Swedish</string>
+    <string name="settings_language_ukrainian">Ukrainian</string>
+    <string name="settings_language_korean">Korean</string>
     <string name="settings_choose_language">Choose Language</string>
 
     <!-- Context Menus/Command Bar -->
@@ -406,8 +412,8 @@
     <string name="media_zoom">Zoom (Crop)</string>
     <string name="media_fixed_w">Fixed width</string>
     <string name="media_fixed_h">Fixed height</string>
-    <string name="media_audio_track">Audio track $1%d</string>
-    <string name="media_subtitle_track">Subtitle track $1%d</string>
+    <string name="media_audio_track">Audio track %1$d</string>
+    <string name="media_subtitle_track">Subtitle track %1$d</string>
     <string name="media_volume">Volume</string>
     <string name="media_loop">Loop</string>
     <string name="media_viewed">Viewed image</string>
@@ -446,3 +452,4 @@
     <string name="shizuku_status_not_running">Not Running</string>
     <string name="shizuku_request_permission">Request Shizuku Permission</string>
 </resources>
+

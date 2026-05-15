@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.graphics.RectangleShape
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
+import com.troikoss.continuum_explorer.managers.ThemeShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -149,6 +150,8 @@ fun FileExplorerSQ(
     val safeIndex = selectedTabIndex.coerceIn(0, tabs.lastIndex)
     val appState = tabs[safeIndex]
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val themeTop = SettingsManager.themeTop.value
+    val sidebarBg = if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground
 
     // --- Storage Access Framework Launcher ---
     val safLauncher = rememberLauncherForActivityResult(
@@ -215,7 +218,7 @@ fun FileExplorerSQ(
             drawerContent = {
                 ModalDrawerSheet(
                     drawerShape = RectangleShape,
-                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground
+                    drawerContainerColor = sidebarBg
                 ) {
                     NavigationContent(
                         appState = appState,
@@ -335,6 +338,9 @@ private fun ExplorerBody(
     val screenSize = appState.getScreenSize()
     val navPaneWidth = appState.appConfigs.navPaneWidth
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
+    val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
+    val themeTop = SettingsManager.themeTop.value
+    val sidebarBg = if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.weight(1f)) {
@@ -344,7 +350,7 @@ private fun ExplorerBody(
                     modifier = Modifier.width(navPaneWidth),
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     drawerShape = RectangleShape,
-                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground
+                    drawerContainerColor = sidebarBg
                 ) {
                     NavigationPane(
                         appState = appState,
@@ -362,6 +368,7 @@ private fun ExplorerBody(
                     )
                 }
                 VerticalResizeHandle(
+                    showDivider = !contentIsRounded,
                     onResize = { delta ->
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(200.dp, 300.dp)
                         appState.appConfigs.savePaneWidths()
@@ -370,14 +377,17 @@ private fun ExplorerBody(
             }
 
             // Main Content Area
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .then(if (contentIsRounded) Modifier.padding(8.dp) else Modifier)
+            ) {
                 FileContent(appState = appState)
             }
 
             // Details Pane
             if (screenSize == ScreenSize.LARGE && SettingsManager.detailsMode.value == DetailsMode.PANE) {
                 VerticalResizeHandle(
-
+                    showDivider = !contentIsRounded,
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
                             (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 300.dp)
@@ -386,7 +396,9 @@ private fun ExplorerBody(
                 )
                 DetailsPane(
                     appState = appState,
-                    modifier = Modifier.width(detailsPaneWidth)
+                    modifier = Modifier
+                        .width(detailsPaneWidth)
+                        .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier)
                 )
             }
         }
