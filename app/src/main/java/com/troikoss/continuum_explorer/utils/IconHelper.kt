@@ -118,16 +118,8 @@ object IconHelper {
         if (file.isDirectory) {
             val iconTheme = SettingsManager.iconTheme.value
             if (iconTheme == IconTheme.COLOURFUL) {
-                val painter = when {
-                    file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_gallery)
-                    file.providerId == "virtual://recent" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_recent)
-                    file.providerId == "virtual://downloads" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_downloads)
-                    file.providerId == "virtual://documents" -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_documents)
-                    file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_trash)
-                    else -> androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder)
-                }
                 Icon(
-                    painter = painter,
+                    painter = androidx.compose.ui.res.painterResource(id = getDrawableForItem(file)),
                     contentDescription = null,
                     modifier = modifier.size(iconSize),
                     tint = finalTint
@@ -145,7 +137,7 @@ object IconHelper {
 
         val iconTheme = SettingsManager.iconTheme.value
         val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL) {
-            androidx.compose.ui.res.painterResource(id = getDrawableByFileName(file.name))
+            androidx.compose.ui.res.painterResource(id = getDrawableForItem(file))
         } else {
             rememberVectorPainter(getIconForItem(file))
         }
@@ -239,7 +231,24 @@ object IconHelper {
     /**
      * Internal helper to determine drawable based on file extension for COLOURFUL theme.
      */
-    private fun getDrawableByFileName(fileName: String): Int {
+    fun getDrawableForItem(file: UniversalFile): Int {
+        if (file.isDirectory) {
+            return when {
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
+                file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
+                file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
+                file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
+                file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
+                else -> R.drawable.ic_folder
+            }
+        }
+        return getDrawableByFileName(file.name)
+    }
+
+    /**
+     * Internal helper to determine drawable based on file extension for COLOURFUL theme.
+     */
+    fun getDrawableByFileName(fileName: String): Int {
         val name = fileName.lowercase()
         return when {
             // Archives

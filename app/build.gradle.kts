@@ -12,7 +12,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 40
-        versionName = "0.4.1-beta M2"
+        versionName = "Memories M2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.coil.video)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.zip4j)
+    implementation(libs.commons.compress)
+    implementation(libs.xz)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

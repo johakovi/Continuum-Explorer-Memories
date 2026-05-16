@@ -71,6 +71,7 @@ fun FileExplorerRO(
     initialUri: String? = null,
     initialArchive: File? = null,
     initialArchiveUri: Uri? = null,
+    initialArchiveName: String? = null,
     initialLibraryItem: LibraryItem = LibraryItem.None,
     initialNetworkConnectionId: String? = null
 ) {
@@ -102,13 +103,17 @@ fun FileExplorerRO(
                         if (!trashDir.exists()) trashDir.mkdirs()
                         newState.navigateTo(trashDir, null, addToHistory = false, libraryItem = LibraryItem.RecycleBin)
                     }
-                    ZipUtils.isArchive(item) && tabFileRef != null && SettingsManager.isDefaultArchiveViewerEnabled.value -> newState.navigateTo(
-                        newPath = null,
-                        newUri = null,
-                        addToHistory = false,
-                        archiveFile = tabFileRef,
-                        archivePath = ""
-                    )
+                    ZipUtils.isArchive(item) && SettingsManager.isDefaultArchiveViewerEnabled.value -> {
+                        newState.navigateTo(
+                            newPath = null,
+                            newUri = null,
+                            addToHistory = false,
+                            archiveFile = tabFileRef,
+                            archiveUri = tabDocRef?.uri,
+                            archiveName = item.name,
+                            archivePath = ""
+                        )
+                    }
                     tabFileRef != null -> newState.navigateTo(tabFileRef, null, addToHistory = false)
                     tabDocRef != null -> newState.navigateTo(null, tabDocRef.uri, addToHistory = false)
                 }
@@ -124,7 +129,7 @@ fun FileExplorerRO(
             val firstState = createNewTabState(context, scope)
             when {
                 initialArchive != null -> firstState.navigateTo(null, null, addToHistory = false, archiveFile = initialArchive, archivePath = "")
-                initialArchiveUri != null -> firstState.navigateTo(null, null, addToHistory = false, archiveUri = initialArchiveUri, archivePath = "")
+                initialArchiveUri != null -> firstState.navigateTo(null, null, addToHistory = false, archiveUri = initialArchiveUri, archiveName = initialArchiveName, archivePath = "")
                 initialLibraryItem == LibraryItem.RecycleBin -> {
                     val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                     if (!trashDir.exists()) trashDir.mkdirs()
@@ -156,6 +161,14 @@ fun FileExplorerRO(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         appState.handleSafResult(uri)
+    }
+
+    val sdCardLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            appState.handleSafResult(result.data?.data)
+        }
     }
 
     // --- Network Storage Launcher ---
@@ -221,6 +234,11 @@ fun FileExplorerRO(
                         appState = appState,
                         onCloseDrawer = { scope.launch { drawerState.close() } },
                         onAddStorage = { safLauncher.launch(null) },
+                        onAddSdCard = { volume ->
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
+                            }
+                        },
                         onAddNetwork = onAddNetwork,
                         onEditNetwork = onEditNetwork
                     )
@@ -254,6 +272,11 @@ fun FileExplorerRO(
                     modifier = Modifier.padding(innerPadding),
                     appState = appState,
                     onAddStorage = { safLauncher.launch(null) },
+                    onAddSdCard = { volume ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
+                        }
+                    },
                     onAddNetwork = onAddNetwork,
                     onEditNetwork = onEditNetwork
                 )
@@ -267,6 +290,7 @@ private fun NavigationContent(
     appState: FileExplorerState,
     onCloseDrawer: () -> Unit,
     onAddStorage: () -> Unit,
+    onAddSdCard: (android.os.storage.StorageVolume) -> Unit = {},
     onAddNetwork: () -> Unit = {},
     onEditNetwork: (NetworkConnection) -> Unit = {}
 ) {
@@ -274,7 +298,7 @@ private fun NavigationContent(
     NavigationPane(
         appState = appState,
         onItemSelected = { section ->
-            navigateToSection(appState, context, section)
+            navigateToSection(appState, context, section, onAddSdCard)
             onCloseDrawer()
         },
         onSafItemSelected = { uri ->
@@ -328,6 +352,7 @@ private fun ExplorerBody(
     modifier: Modifier = Modifier,
     appState: FileExplorerState,
     onAddStorage: () -> Unit,
+    onAddSdCard: (android.os.storage.StorageVolume) -> Unit = {},
     onAddNetwork: () -> Unit = {},
     onEditNetwork: (NetworkConnection) -> Unit = {}
 ) {
@@ -353,7 +378,8 @@ private fun ExplorerBody(
                                 navigateToSection(
                                     appState,
                                     context,
-                                    section
+                                    section,
+                                    onAddSdCard
                                 )
                             },
                             onSafItemSelected = { appState.navigateTo(null, it) },
@@ -402,7 +428,12 @@ private fun ExplorerBody(
     }
 }
 
-private fun navigateToSection(appState: FileExplorerState, context: Context, section: NavSection) {
+private fun navigateToSection(
+    appState: FileExplorerState,
+    context: Context,
+    section: NavSection,
+    onAddSdCard: (android.os.storage.StorageVolume) -> Unit = {}
+) {
     val internalRoot = Environment.getExternalStorageDirectory()
     when (section) {
         is NavSection.InternalStorage -> appState.navigateTo(internalRoot, null, newRoot = internalRoot)
@@ -436,11 +467,17 @@ private fun navigateToSection(appState: FileExplorerState, context: Context, sec
                     volume.directory?.let { appState.navigateTo(it, null, newRoot = it) }
                 } else {
                     val externalDirs = context.getExternalFilesDirs(null)
-                    if (volumeIndex < externalDirs.size) {
+                    val guessedRoot = if (volumeIndex < externalDirs.size) {
                         externalDirs[volumeIndex]?.let { dir ->
-                            val root = File(dir.absolutePath.split("/Android")[0])
-                            appState.navigateTo(root, null, newRoot = root)
+                            File(dir.absolutePath.split("/Android")[0])
                         }
+                    } else null
+
+                    if (guessedRoot != null && guessedRoot.exists() && guessedRoot.canRead()) {
+                        appState.navigateTo(guessedRoot, null, newRoot = guessedRoot)
+                    } else {
+                        // Fallback: Trigger SAF for this specific volume on Android 10
+                        onAddSdCard(volume)
                     }
                 }
             }

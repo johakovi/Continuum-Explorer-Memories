@@ -50,14 +50,8 @@ fun FileExplorerState.open(item: UniversalFile) {
             }
         }
     } else {
-        val itemFileRef = item.fileRef
-        if (ZipUtils.isArchive(item) && itemFileRef != null && SettingsManager.isDefaultArchiveViewerEnabled.value) {
-            navigateTo(
-                newPath = null,
-                newUri = null,
-                archiveFile = itemFileRef,
-                archivePath = ""
-            )
+        if (ZipUtils.isArchive(item) && SettingsManager.isDefaultArchiveViewerEnabled.value) {
+            openInNewTab(listOf(item))
         } else if (item.isArchiveEntry) {
             Toast.makeText(context, context.getString(R.string.msg_not_supported_archive), Toast.LENGTH_SHORT).show()
         } else if (item.provider.capabilities.isRemote) {
@@ -69,7 +63,7 @@ fun FileExplorerState.open(item: UniversalFile) {
 }
 
 fun FileExplorerState.openInNewTab(items: List<UniversalFile>) {
-    items.filter { it.isDirectory || (ZipUtils.isArchive(it) && it.fileRef != null && SettingsManager.isDefaultArchiveViewerEnabled.value) }.forEach { item ->
+    items.filter { it.isDirectory || (ZipUtils.isArchive(it) && SettingsManager.isDefaultArchiveViewerEnabled.value) }.forEach { item ->
         onOpenInNewTab?.invoke(item)
     }
 }
@@ -97,8 +91,13 @@ fun FileExplorerState.openInNewWindow(items: List<UniversalFile>) {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                if (ZipUtils.isArchive(item) && itemFileRef != null && SettingsManager.isDefaultArchiveViewerEnabled.value) {
-                    putExtra("archivePath", itemFileRef.absolutePath)
+                if (ZipUtils.isArchive(item) && SettingsManager.isDefaultArchiveViewerEnabled.value) {
+                    if (itemFileRef != null) {
+                        putExtra("archivePath", itemFileRef.absolutePath)
+                    } else if (itemDocRef != null) {
+                        putExtra("archiveUri", itemDocRef.uri)
+                        putExtra("archiveName", item.name)
+                    }
                 } else if (itemFileRef != null) {
                     putExtra("path", itemFileRef.absolutePath)
                 } else if (itemDocRef != null) {

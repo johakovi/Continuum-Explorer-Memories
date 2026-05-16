@@ -20,7 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isTertiaryPressed
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.R
@@ -105,15 +108,21 @@ fun TabBar(
         ) {
             tabStates.forEachIndexed { index, state ->
                 val universalFile = state.currentUniversalPath
-                val tabIcon = if (universalFile != null) {
-                    IconHelper.getIconForItem(universalFile)
+                val iconTheme = SettingsManager.iconTheme.value
+
+                val painter = if (universalFile != null) {
+                    if (iconTheme == IconTheme.COLOURFUL) {
+                        androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
+                    } else {
+                        rememberVectorPainter(IconHelper.getIconForItem(universalFile))
+                    }
                 } else {
-                    Icons.Default.Folder
+                    rememberVectorPainter(Icons.Default.Folder)
                 }
 
                 TabItem(
                     text = state.currentName,
-                    icon = tabIcon,
+                    painter = painter,
                     slotWidth = slotWidth,
                     selected = (selectedTabIndex == index),
                     onClick = { onTabSelected(index) },
@@ -144,7 +153,7 @@ private val TabShapeFloat = RoundedCornerShape(22.dp)
 @Composable
 private fun TabItem(
     text: String,
-    icon: ImageVector,
+    painter: Painter,
     slotWidth: Dp,
     selected: Boolean,
     onClick: () -> Unit,
@@ -192,7 +201,7 @@ private fun TabItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = icon,
+                painter = painter,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
                 tint = textColor

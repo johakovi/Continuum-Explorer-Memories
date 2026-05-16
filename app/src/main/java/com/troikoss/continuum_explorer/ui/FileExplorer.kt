@@ -13,6 +13,7 @@ fun FileExplorer(
     initialUri: String? = null,
     initialArchive: File? = null,
     initialArchiveUri: Uri? = null,
+    initialArchiveName: String? = null,
     initialLibraryItem: LibraryItem = LibraryItem.None,
     initialNetworkConnectionId: String? = null
 ) {
@@ -22,6 +23,7 @@ fun FileExplorer(
             initialUri = initialUri,
             initialArchive = initialArchive,
             initialArchiveUri = initialArchiveUri,
+            initialArchiveName = initialArchiveName,
             initialLibraryItem = initialLibraryItem,
             initialNetworkConnectionId = initialNetworkConnectionId
         )
@@ -31,6 +33,7 @@ fun FileExplorer(
             initialUri = initialUri,
             initialArchive = initialArchive,
             initialArchiveUri = initialArchiveUri,
+            initialArchiveName = initialArchiveName,
             initialLibraryItem = initialLibraryItem,
             initialNetworkConnectionId = initialNetworkConnectionId
         )

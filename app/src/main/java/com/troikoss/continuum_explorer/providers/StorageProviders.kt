@@ -21,13 +21,13 @@ object StorageProviders {
 
     private val archiveCache = java.util.concurrent.ConcurrentHashMap<String, ArchiveProvider>()
 
-    fun archive(context: Context, source: Any): ArchiveProvider {
+    fun archive(context: Context, source: Any, archiveName: String? = null): ArchiveProvider {
         val key = when (source) {
             is File -> source.absolutePath
             is Uri -> source.toString()
             else -> source.toString()
         }
-        return archiveCache.getOrPut(key) { ArchiveProvider(source, context.applicationContext) }
+        return archiveCache.getOrPut(key) { ArchiveProvider(source, context.applicationContext, archiveName) }
     }
 
     fun evictArchive(source: Any) {

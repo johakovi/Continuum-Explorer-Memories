@@ -55,6 +55,7 @@ data class NavLocation(
     val uri: Uri?,
     val archiveFile: File? = null,
     val archiveUri: Uri? = null,
+    val archiveName: String? = null,
     val archivePath: String? = null,
     val safStack: List<Uri>? = null,
     val libraryItem: LibraryItem = LibraryItem.None,

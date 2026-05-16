@@ -24,11 +24,13 @@ class ArchiveViewerActivity : ComponentActivity() {
             return
         }
 
+        val name = com.troikoss.continuum_explorer.utils.ZipUtils.getUriFileName(this, uri)
+
         setContent {
             FileExplorerTheme {
                 // FileExplorer's internal state (appState.isLoading) will handle 
                 // showing the spinner during the initial parse.
-                FileExplorer(initialArchiveUri = uri)
+                FileExplorer(initialArchiveUri = uri, initialArchiveName = name)
             }
         }
     }

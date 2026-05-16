@@ -17,6 +17,7 @@ fun FileExplorerState.navigateTo(
     addToHistory: Boolean = true,
     archiveFile: File? = null,
     archiveUri: Uri? = null,
+    archiveName: String? = null,
     archivePath: String? = null,
     libraryItem: LibraryItem = LibraryItem.None,
     networkProvider: StorageProvider? = null,
@@ -28,13 +29,14 @@ fun FileExplorerState.navigateTo(
     // Network navigation shortcut — skip equality check, always navigate
     if (networkProvider != null && networkId != null) {
         if (addToHistory) {
-            backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
+            backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchiveName, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
             forwardStack.clear()
         }
         currentPath = null
         currentSafUri = null
         currentArchiveFile = null
         currentArchiveUri = null
+        currentArchiveName = null
         currentArchivePath = ""
         this.libraryItem = LibraryItem.None
         currentNetworkProvider = networkProvider
@@ -52,6 +54,7 @@ fun FileExplorerState.navigateTo(
         newUri == currentSafUri &&
         archiveFile == currentArchiveFile &&
         archiveUri == currentArchiveUri &&
+        archiveName == currentArchiveName &&
         targetArchivePath == currentArchivePath &&
         libraryItem == this.libraryItem &&
         currentNetworkProvider == null) {
@@ -63,7 +66,7 @@ fun FileExplorerState.navigateTo(
     }
 
     if (addToHistory) {
-        backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
+        backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchiveName, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
         forwardStack.clear()
     }
 
@@ -80,6 +83,7 @@ fun FileExplorerState.navigateTo(
     currentSafUri = newUri
     currentArchiveFile = archiveFile
     currentArchiveUri = archiveUri
+    currentArchiveName = archiveName
     currentArchivePath = targetArchivePath
     this.libraryItem = libraryItem
     currentNetworkProvider = null
@@ -99,7 +103,7 @@ fun FileExplorerState.goBack() {
         val leavingUri = currentSafUri
 
         val lastLocation = backStack.removeAt(backStack.size - 1)
-        forwardStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
+        forwardStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchiveName, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
 
         val restoredProvider = lastLocation.networkConnectionId?.let { id ->
             appConfigs.networkConnections.find { it.id == id }?.let {
@@ -115,6 +119,7 @@ fun FileExplorerState.goBack() {
                 addToHistory = false,
                 archiveFile = lastLocation.archiveFile,
                 archiveUri = lastLocation.archiveUri,
+                archiveName = lastLocation.archiveName,
                 archivePath = lastLocation.archivePath,
                 libraryItem = lastLocation.libraryItem
             )
@@ -132,7 +137,7 @@ fun FileExplorerState.goBack() {
 fun FileExplorerState.goForward() {
     if (forwardStack.isNotEmpty()) {
         val nextLocation = forwardStack.removeAt(forwardStack.size - 1)
-        backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
+        backStack.add(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchiveName, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId))
 
         val restoredProvider = nextLocation.networkConnectionId?.let { id ->
             appConfigs.networkConnections.find { it.id == id }?.let {
@@ -148,6 +153,7 @@ fun FileExplorerState.goForward() {
                 addToHistory = false,
                 archiveFile = nextLocation.archiveFile,
                 archiveUri = nextLocation.archiveUri,
+                archiveName = nextLocation.archiveName,
                 archivePath = nextLocation.archivePath,
                 libraryItem = nextLocation.libraryItem
             )
@@ -207,7 +213,7 @@ fun FileExplorerState.getLocationName(location: NavLocation): String {
 
 fun FileExplorerState.jumpToHistory(index: Int) {
     val allLocations = backStack.toList() +
-            listOf(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId)) +
+            listOf(NavLocation(currentPath, currentSafUri, currentArchiveFile, currentArchiveUri, currentArchiveName, currentArchivePath, ArrayList(safStack), this.libraryItem, currentNetworkConnectionId, currentNetworkId)) +
             forwardStack.asReversed()
 
     if (index < 0 || index >= allLocations.size) return
@@ -245,6 +251,7 @@ fun FileExplorerState.jumpToHistory(index: Int) {
             addToHistory = false,
             archiveFile = target.archiveFile,
             archiveUri = target.archiveUri,
+            archiveName = target.archiveName,
             archivePath = target.archivePath,
             libraryItem = target.libraryItem
         )
@@ -332,6 +339,7 @@ fun FileExplorerState.goUp() {
             newUri = destinationUri,
             archiveFile = nextArchiveFile,
             archiveUri = nextArchiveUri,
+            archiveName = if (nextArchiveUri != null) currentArchiveName else null,
             archivePath = nextArchivePath
         )
         if (leavingUri != null && destinationUri != null && safStack.isNotEmpty()) {

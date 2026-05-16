@@ -25,6 +25,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.ZipParameters
+import org.apache.commons.compress.archivers.sevenz.SevenZFile
+import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
 
 object ZipUtils {
 
@@ -33,15 +35,19 @@ object ZipUtils {
     /**
      * Parses the archive ONCE and returns a map of Folder Path -> List of Files in that folder.
      */
-    suspend fun parseArchive(context: Context, source: Any): Map<String, List<UniversalFile>> = withContext(Dispatchers.IO) {
-        val name = getName(context, source).lowercase()
-        val provider = StorageProviders.archive(context, source)
+    suspend fun parseArchive(context: Context, source: Any, archiveName: String? = null): Map<String, List<UniversalFile>> = withContext(Dispatchers.IO) {
+        val name = (archiveName ?: getName(context, source)).lowercase()
+        val provider = StorageProviders.archive(context, source, archiveName)
         
         try {
             val rawEntries = when {
                 name.endsWith(".zip") || name.endsWith(".jar") || name.endsWith(".apk") -> {
                     if (source is File) getZipEntriesFile(source)
                     else getZipEntriesUri(context, source as Uri)
+                }
+                name.endsWith(".7z") -> {
+                    if (source is File) get7zEntriesFile(source)
+                    else get7zEntriesUri(context, source as Uri)
                 }
                 else -> emptyList()
             }
@@ -70,7 +76,7 @@ object ZipUtils {
 
     fun isArchive(file: UniversalFile): Boolean {
         val name = file.name.lowercase()
-        return name.endsWith(".zip")
+        return name.endsWith(".zip") || name.endsWith(".7z") || name.endsWith(".rar") || name.endsWith(".tar") || name.endsWith(".gz")
     }
 
     private fun getName(context: Context, source: Any): String {
@@ -78,7 +84,7 @@ object ZipUtils {
         else getUriFileName(context, source as Uri) ?: "unknown.zip"
     }
 
-    private fun getUriFileName(context: Context, uri: Uri): String? {
+    fun getUriFileName(context: Context, uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
             try {
@@ -170,6 +176,36 @@ object ZipUtils {
         return if (lastSlash == -1) cleanPath else cleanPath.substring(lastSlash + 1)
     }
 
+    private fun get7zEntriesFile(file: File): List<RawEntry> {
+        val list = ArrayList<RawEntry>()
+        try {
+            SevenZFile.builder().setFile(file).get().use { sevenZ ->
+                var entry = sevenZ.nextEntry
+                while (entry != null) {
+                    list.add(RawEntry(entry.name, entry.isDirectory, entry.lastModifiedDate?.time ?: 0L, entry.size))
+                    entry = sevenZ.nextEntry
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return list
+    }
+
+    private fun get7zEntriesUri(context: Context, uri: Uri): List<RawEntry> {
+        val list = ArrayList<RawEntry>()
+        try {
+            val cacheFile = copyToCache(context, uri)
+            if (cacheFile != null && cacheFile.exists()) {
+                list.addAll(get7zEntriesFile(cacheFile))
+                cacheFile.delete()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return list
+    }
+
     private suspend fun getZipEntriesUri(context: Context, uri: Uri): List<RawEntry> {
         val list = ArrayList<RawEntry>(1000)
         var pfd: ParcelFileDescriptor? = null
@@ -255,7 +291,34 @@ object ZipUtils {
      * Obtains an InputStream for a single entry within an archive.
      */
     suspend fun getArchiveInputStream(context: Context, archiveSource: Any, entryPath: String): InputStream? = withContext(Dispatchers.IO) {
+        val name = getName(context, archiveSource).lowercase()
         try {
+            if (name.endsWith(".7z")) {
+                val file = if (archiveSource is File) archiveSource else copyToCache(context, archiveSource as Uri)
+                if (file == null || !file.exists()) return@withContext null
+                
+                // For 7z, we have to find the entry and extract it to a temporary stream.
+                // SevenZFile doesn't support multiple concurrent input streams easily.
+                val sevenZ = SevenZFile.builder().setFile(file).get()
+                var entry = sevenZ.nextEntry
+                while (entry != null) {
+                    if (entry.name == entryPath) {
+                        return@withContext object : InputStream() {
+                            override fun read(): Int = sevenZ.read()
+                            override fun read(b: ByteArray, off: Int, len: Int): Int = sevenZ.read(b, off, len)
+                            override fun close() {
+                                sevenZ.close()
+                                if (archiveSource is Uri) file.delete()
+                            }
+                        }
+                    }
+                    entry = sevenZ.nextEntry
+                }
+                sevenZ.close()
+                if (archiveSource is Uri) file.delete()
+                return@withContext null
+            }
+
             val zipFile = when (archiveSource) {
                 is File -> ZipFile(archiveSource)
                 is Uri -> {
@@ -288,8 +351,8 @@ object ZipUtils {
     /**
      * Lists the children of a "virtual directory" inside an archive.
      */
-    suspend fun getArchiveChildren(context: Context, archiveSource: Any, parentArchivePath: String): List<UniversalFile> {
-        val structure = parseArchive(context, archiveSource)
+    suspend fun getArchiveChildren(context: Context, archiveSource: Any, parentArchivePath: String, archiveName: String? = null): List<UniversalFile> {
+        val structure = parseArchive(context, archiveSource, archiveName)
         return structure[parentArchivePath] ?: emptyList()
     }
 
@@ -328,6 +391,28 @@ object ZipUtils {
                         baseDestDir
                     }
                     archivesToProcess.add(file to destDir)
+                } else if (name.endsWith(".7z")) {
+                    SevenZFile.builder().setFile(file).get().use { sevenZ ->
+                        var count = 0
+                        var size = 0L
+                        var entry = sevenZ.nextEntry
+                        while (entry != null) {
+                            count++
+                            size += entry.size
+                            entry = sevenZ.nextEntry
+                        }
+                        totalItems += count
+                        totalBytes += size
+                    }
+                    val destDir = if (toSeparateFolders) {
+                        val folderName = archive.name.substringBeforeLast('.')
+                        val dir = File(baseDestDir, folderName)
+                        dir.mkdirs()
+                        dir
+                    } else {
+                        baseDestDir
+                    }
+                    archivesToProcess.add(file to destDir)
                 }
             }
 
@@ -347,6 +432,82 @@ object ZipUtils {
             for ((zipFile, destDir) in archivesToProcess) {
                 if (FileOperationsManager.isCancelled.value) break
                 
+                val fileName = zipFile.name.lowercase()
+                if (fileName.endsWith(".7z")) {
+                    SevenZFile.builder().setFile(zipFile).get().use { sevenZ ->
+                        var entry = sevenZ.nextEntry
+                        while (entry != null) {
+                            if (FileOperationsManager.isCancelled.value) break
+                            var outFile = File(destDir, entry.name.replace('\\', '/'))
+                            
+                            if (entry.isDirectory) {
+                                outFile.mkdirs()
+                            } else {
+                                outFile.parentFile?.mkdirs()
+                                if (outFile.exists()) {
+                                    val result = FileOperationsManager.resolveCollision(outFile.name)
+                                    when (result) {
+                                        CollisionResult.CANCEL -> { FileOperationsManager.cancel(); break }
+                                        CollisionResult.REPLACE -> outFile.delete()
+                                        CollisionResult.KEEP_BOTH -> {
+                                            val parent = outFile.parentFile ?: destDir
+                                            val newName = getUniqueName(outFile.name) { File(parent, it).exists() }
+                                            outFile = File(parent, newName)
+                                        }
+                                        CollisionResult.MERGE -> {}
+                                    }
+                                }
+                                if (FileOperationsManager.isCancelled.value) break
+                                
+                                try {
+                                    FileOutputStream(outFile).use { output ->
+                                        var totalEntryRead = 0L
+                                        var bytesRead = sevenZ.read(buffer)
+                                        while (bytesRead >= 0) {
+                                            if (FileOperationsManager.isCancelled.value) break
+                                            output.write(buffer, 0, bytesRead)
+                                            globalBytesProcessed += bytesRead
+                                            totalEntryRead += bytesRead
+                                            
+                                            val now = System.currentTimeMillis()
+                                            if (now - lastUpdateTime >= 300) {
+                                                speedWindow.add(now to globalBytesProcessed)
+                                                while (speedWindow.size > 2 && now - speedWindow.first.first > windowMs) {
+                                                    speedWindow.removeFirst()
+                                                }
+                                                val startPoint = speedWindow.first
+                                                val timeDiff = now - startPoint.first
+                                                val bytesDiff = globalBytesProcessed - startPoint.second
+                                                val currentSpeed = if (timeDiff > 0) (bytesDiff * 1000) / timeDiff else 0L
+                                                val remainingBytes = totalBytes - globalBytesProcessed
+                                                val timeRemaining = if (currentSpeed > 0) (remainingBytes * 1000) / currentSpeed else 0L
+                                                
+                                                withContext(Dispatchers.Main) {
+                                                    FileOperationsManager.updateDetailed(
+                                                        processedBytes = globalBytesProcessed,
+                                                        totalBytes = totalBytes,
+                                                        speed = currentSpeed,
+                                                        remainingMillis = timeRemaining,
+                                                        fileName = getEntryName(entry.name)
+                                                    )
+                                                }
+                                                lastUpdateTime = now
+                                            }
+                                            bytesRead = sevenZ.read(buffer)
+                                        }
+                                    }
+                                } catch (e: Exception) { e.printStackTrace() }
+                            }
+                            globalItemsProcessed++
+                            withContext(Dispatchers.Main) {
+                                FileOperationsManager.itemsProcessed.intValue = globalItemsProcessed
+                            }
+                            entry = sevenZ.nextEntry
+                        }
+                    }
+                    continue
+                }
+
                 val zip4jFile = net.lingala.zip4j.ZipFile(zipFile)
                 if (zip4jFile.isEncrypted) {
                     withContext(Dispatchers.Main) { showPasswordPrompt(context) }

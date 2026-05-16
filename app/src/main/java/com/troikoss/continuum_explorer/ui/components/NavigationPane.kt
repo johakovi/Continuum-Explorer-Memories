@@ -165,27 +165,35 @@ fun NavigationPane(
         )
 
         // Add Removable volumes
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val externalDirs = context.getExternalFilesDirs(null)
             storageManager.storageVolumes.forEachIndexed { index, volume ->
                 if (volume.isRemovable) {
-                    val directory = volume.directory
-                    if (directory != null) {
-                        val description = volume.getDescription(context) ?: ""
-                        val isSdCard = description.contains("SD", ignoreCase = true)
-
-                        volumes.add(
-                            StorageVolumeInfo(
-                                label = description.ifEmpty { resources.getString(R.string.nav_external_drive) },
-                                path = directory,
-                                uri = null,
-                                totalSpace = directory.totalSpace,
-                                freeSpace = directory.usableSpace,
-                                icon = if (isSdCard) Icons.Default.SdCard else Icons.Default.Usb,
-                                section = NavSection.RemovableVolume(index),
-                                customIcon = R.drawable.ic_storage
-                            )
-                        )
+                    val description = volume.getDescription(context) ?: ""
+                    val isSdCard = description.contains("SD", ignoreCase = true)
+                    
+                    val directory = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        volume.directory
+                    } else {
+                        // Guess directory on Android 10/11 using getExternalFilesDirs hack
+                        externalDirs.find { it != null && !Environment.isExternalStorageEmulated(it) && it.absolutePath.contains(volume.uuid ?: "") }
+                            ?.let { File(it.absolutePath.split("/Android")[0]) }
+                            ?: externalDirs.find { it != null && !Environment.isExternalStorageEmulated(it) }
+                                ?.let { File(it.absolutePath.split("/Android")[0]) }
                     }
+
+                    volumes.add(
+                        StorageVolumeInfo(
+                            label = description.ifEmpty { resources.getString(R.string.nav_external_drive) },
+                            path = directory,
+                            uri = null,
+                            totalSpace = directory?.totalSpace ?: 0L,
+                            freeSpace = directory?.usableSpace ?: 0L,
+                            icon = if (isSdCard) Icons.Default.SdCard else Icons.Default.Usb,
+                            section = NavSection.RemovableVolume(index),
+                            customIcon = R.drawable.ic_storage
+                        )
+                    )
                 }
             }
         }

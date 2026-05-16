@@ -58,6 +58,7 @@ class FileExplorerState(
     // Archive Navigation State
     var currentArchiveFile by mutableStateOf<File?>(null)
     var currentArchiveUri by mutableStateOf<Uri?>(null)
+    var currentArchiveName by mutableStateOf<String?>(null)
     var currentArchivePath by mutableStateOf("")
 
     // Cache for current archive structure: Path -> List of Files
@@ -207,7 +208,7 @@ class FileExplorerState(
             } else if (currentArchiveFile != null) {
                 currentArchiveFile?.name ?: context.getString(R.string.archive)
             } else if (currentArchiveUri != null) {
-                context.getString(R.string.archive)
+                currentArchiveName ?: context.getString(R.string.archive)
             } else if (currentPath != null) {
                 if (currentPath?.absolutePath == storageRoot.absolutePath) {
                     if (storageRoot.absolutePath == Environment.getExternalStorageDirectory().absolutePath) context.getString(R.string.nav_internal_storage)
@@ -229,6 +230,22 @@ class FileExplorerState(
     val currentUniversalPath: UniversalFile?
         get() = when {
             currentArchiveFile != null -> currentArchiveFile?.toUniversal()
+
+            currentArchiveUri != null -> {
+                val doc = try {
+                    DocumentFile.fromSingleUri(context, currentArchiveUri!!)
+                } catch (_: Exception) {
+                    null
+                }
+                doc?.toUniversal() ?: UniversalFile(
+                    name = currentArchiveName ?: context.getString(R.string.archive),
+                    isDirectory = false,
+                    lastModified = 0L,
+                    length = 0L,
+                    provider = com.troikoss.continuum_explorer.providers.SafProvider,
+                    providerId = currentArchiveUri.toString(),
+                )
+            }
 
             currentNetworkProvider != null && currentNetworkId != null -> UniversalFile(
                 name = currentNetworkProvider!!.displayName(currentNetworkId!!),
@@ -339,7 +356,7 @@ class FileExplorerState(
                 // Parse if we need to load archives
                 if ((currentArchiveFile != null || currentArchiveUri != null) && archiveCache == null) {
                     val source: Any = currentArchiveFile ?: currentArchiveUri!!
-                    archiveCache = withContext(Dispatchers.IO) { ZipUtils.parseArchive(context, source) }
+                    archiveCache = withContext(Dispatchers.IO) { ZipUtils.parseArchive(context, source, currentArchiveName) }
                 }
 
                 val results = SearchManager.search(
@@ -466,10 +483,11 @@ class FileExplorerState(
                     LibraryItem.None -> if (currentArchiveFile != null || currentArchiveUri != null) {
                         if (archiveCache == null) {
                             val source: Any = currentArchiveFile ?: currentArchiveUri!!
-                            archiveCache = ZipUtils.parseArchive(context, source)
+                            archiveCache = ZipUtils.parseArchive(context, source, currentArchiveName)
                         }
                         archiveCache?.get(currentArchivePath) ?: emptyList()
-                    } else if (currentNetworkProvider != null && currentNetworkId != null) {
+                    }
+ else if (currentNetworkProvider != null && currentNetworkId != null) {
                         try {
                             val result = currentNetworkProvider!!.listChildren(currentNetworkId!!)
                             withContext(Dispatchers.Main) { networkError = null }

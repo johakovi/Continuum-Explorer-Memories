@@ -21,7 +21,8 @@ import java.io.OutputStream
  */
 class ArchiveProvider(
     val archiveSource: Any, // File or Uri
-    private val appContext: Context
+    private val appContext: Context,
+    val archiveName: String? = null
 ) : StorageProvider {
 
     override val kind = ProviderKind.ARCHIVE
@@ -61,7 +62,7 @@ class ArchiveProvider(
         val path = entryPath(id).removeSuffix("/")
         return if (path.isEmpty()) when (archiveSource) {
             is File -> archiveSource.name
-            else -> "Archive"
+            else -> archiveName ?: "Archive"
         } else {
             val lastSlash = path.lastIndexOf('/')
             if (lastSlash < 0) path else path.substring(lastSlash + 1)
@@ -72,7 +73,7 @@ class ArchiveProvider(
 
     override suspend fun listChildren(id: String): List<UniversalFile> {
         val ep = entryPath(id)
-        val cache = com.troikoss.continuum_explorer.utils.ZipUtils.parseArchive(appContext, archiveSource)
+        val cache = com.troikoss.continuum_explorer.utils.ZipUtils.parseArchive(appContext, archiveSource, archiveName)
         return cache[ep] ?: emptyList()
     }
 

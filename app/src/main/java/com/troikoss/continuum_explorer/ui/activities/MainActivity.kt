@@ -122,6 +122,8 @@ class MainActivity : AppCompatActivity() {
             val path = intent.getStringExtra("archivePath")
             path?.let { File(it) }
         }
+        val initialArchiveUri = intent.getParcelableExtra<Uri>("archiveUri")
+        val initialArchiveName = intent.getStringExtra("archiveName")
         val initialLibraryItem = when {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
             intent.getBooleanExtra("isGallery", false) -> LibraryItem.Gallery
@@ -147,7 +149,15 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             FileExplorerTheme {
-                FileExplorer(initialPath = initialPath, initialUri = initialUri, initialArchive = initialArchive, initialLibraryItem = initialLibraryItem, initialNetworkConnectionId = initialNetworkConnectionId)
+                FileExplorer(
+                    initialPath = initialPath,
+                    initialUri = initialUri,
+                    initialArchive = initialArchive,
+                    initialArchiveUri = initialArchiveUri,
+                    initialArchiveName = initialArchiveName,
+                    initialLibraryItem = initialLibraryItem,
+                    initialNetworkConnectionId = initialNetworkConnectionId
+                )
             }
         }
     }
