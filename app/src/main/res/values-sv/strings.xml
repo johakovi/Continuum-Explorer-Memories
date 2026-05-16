@@ -297,6 +297,7 @@
     <string name="nav_downloads">Hämtningar</string>
     <string name="nav_documents">Dokument</string>
     <string name="menu_gallery_albums">Album</string>
+    <string name="menu_documents_folder">Mapp</string>
     <string name="nav_add_storage">Lägg till lagring</string>
     <string name="nav_internal_storage">Intern lagring</string>
     <string name="nav_trash">Papperskorg</string>

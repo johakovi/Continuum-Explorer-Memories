@@ -292,6 +292,7 @@
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documentos</string>
     <string name="menu_gallery_albums">Álbuns</string>
+    <string name="menu_documents_folder">Pasta</string>
     <string name="nav_add_storage">Adicionar Armazenamento</string>
     <string name="nav_internal_storage">Armazenamento Interno</string>
     <string name="nav_trash">Lixeira</string>

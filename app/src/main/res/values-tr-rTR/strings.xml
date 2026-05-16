@@ -271,6 +271,7 @@
     <string name="nav_downloads">İndirilenler</string>
     <string name="nav_documents">Belgeler</string>
     <string name="menu_gallery_albums">Albümler</string>
+    <string name="menu_documents_folder">Klasör</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
     <string name="nav_trash">Geri Dönüşüm Kutusu</string>

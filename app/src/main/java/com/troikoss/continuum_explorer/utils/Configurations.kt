@@ -244,6 +244,7 @@ class AppConfigurations(private val context: Context) {
     var isDownloadsVisible by mutableStateOf(true)
     var isDocumentsVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
+    var isDocumentsFolderEnabled by mutableStateOf(false)
 
     var navPaneWidth by mutableStateOf(240.dp)
     var detailsPaneWidth by mutableStateOf(240.dp)
@@ -366,6 +367,7 @@ class AppConfigurations(private val context: Context) {
         isDownloadsVisible = prefs.getBoolean("is_downloads_visible", true)
         isDocumentsVisible = prefs.getBoolean("is_documents_visible", true)
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
+        isDocumentsFolderEnabled = prefs.getBoolean("is_documents_folder_enabled", false)
     }
 
     fun saveLibrarySettings() {
@@ -377,6 +379,7 @@ class AppConfigurations(private val context: Context) {
             putBoolean("is_downloads_visible", isDownloadsVisible)
             putBoolean("is_documents_visible", isDocumentsVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
+            putBoolean("is_documents_folder_enabled", isDocumentsFolderEnabled)
         }.apply()
     }
 
@@ -406,6 +409,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGalleryAlbums() {
         isGalleryAlbumsEnabled = !isGalleryAlbumsEnabled
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleDocumentsFolder() {
+        isDocumentsFolderEnabled = !isDocumentsFolderEnabled
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

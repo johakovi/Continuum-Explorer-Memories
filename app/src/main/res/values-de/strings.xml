@@ -297,6 +297,7 @@
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Dokumente</string>
     <string name="menu_gallery_albums">Alben</string>
+    <string name="menu_documents_folder">Ordner</string>
     <string name="nav_add_storage">Speicher hinzufügen</string>
     <string name="nav_internal_storage">Interner Speicher</string>
     <string name="nav_trash">Papierkorb</string>

@@ -413,6 +413,7 @@
     <string name="msg_cancelled_deletion">Eliminación cancelada</string>
     <string name="msg_deletion">Se han eliminado %1$d archivos</string>
     <string name="menu_gallery_albums">Álbumes</string>
+    <string name="menu_documents_folder">Carpeta</string>
     <string name="details_header_type">Tipo</string>
     <string name="menu_by_type">Por tipo</string>
     <string name="nav_network">Red</string>

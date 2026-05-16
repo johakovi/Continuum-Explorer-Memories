@@ -454,7 +454,15 @@ private fun navigateToSection(
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
-        is NavSection.Documents -> appState.navigateTo(null, null, libraryItem = LibraryItem.Documents)
+        is NavSection.Documents -> {
+            if (appState.appConfigs.isDocumentsFolderEnabled) {
+                val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                if (!docsDir.exists()) docsDir.mkdirs()
+                appState.navigateTo(docsDir, null, newRoot = internalRoot)
+            } else {
+                appState.navigateTo(null, null, libraryItem = LibraryItem.Documents)
+            }
+        }
         is NavSection.NetworkStorage -> {
             val conn = appState.appConfigs.networkConnections.find { it.id == section.connectionId } ?: return
             val provider = StorageProviders.network(conn)

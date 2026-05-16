@@ -819,7 +819,8 @@ private fun NavContextMenu(
     uri: Uri? = null,
     section: NavSection? = null,
     onRemove: (() -> Unit)? = null,
-    onEdit: (() -> Unit)? = null
+    onEdit: (() -> Unit)? = null,
+    onNavigate: (() -> Unit)? = null
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
         DropdownMenuItem(
@@ -947,6 +948,18 @@ private fun NavContextMenu(
                 leadingIcon = { if (appState.appConfigs.isGalleryAlbumsEnabled) Icon(Icons.Default.Check, null) }
             )
         }
+        if (section is NavSection.Documents) {
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_documents_folder)) },
+                onClick = {
+                    onDismissRequest()
+                    appState.appConfigs.toggleDocumentsFolder()
+                    onNavigate?.invoke()
+                },
+                leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
+            )
+        }
         if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.NetworkStorage) {
             HorizontalDivider()
             DropdownMenuItem(
@@ -1028,7 +1041,8 @@ private fun NavItem(
                 onDismissRequest = { expanded = false },
                 appState = appState,
                 label = label,
-                section = section
+                section = section,
+                onNavigate = onClick
             )
         }
     }
@@ -1080,7 +1094,8 @@ private fun NavFavoriteItem(
                 appState = appState,
                 label = label,
                 path = path,
-                onRemove = onRemove
+                onRemove = onRemove,
+                onNavigate = onClick
             )
         }
     }
@@ -1126,7 +1141,8 @@ private fun NavSafItem(
                 appState = appState,
                 label = label,
                 uri = uri,
-                onRemove = onRemove
+                onRemove = onRemove,
+                onNavigate = onClick
             )
         }
     }
@@ -1240,7 +1256,8 @@ private fun NavNetworkItem(
                 label = connection.displayName,
                 section = NavSection.NetworkStorage(connection.id),
                 onRemove = onRemove,
-                onEdit = onEdit
+                onEdit = onEdit,
+                onNavigate = onClick
             )
         }
     }
@@ -1368,7 +1385,8 @@ private fun NavStorageItem(
                     onDismissRequest = { expandedMenu = false },
                     appState = appState,
                     label = label,
-                    path = path?.absolutePath
+                    path = path?.absolutePath,
+                    onNavigate = onClick
                 )
             }
         }
