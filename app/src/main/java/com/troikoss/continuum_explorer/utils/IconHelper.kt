@@ -39,6 +39,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -86,14 +88,28 @@ object IconHelper {
     ) {
         val extendedColors = LocalExtendedColors.current
         val isSelected = tint == MaterialTheme.colorScheme.primary
-        val finalTint = if (file.isDirectory && !isSelected) {
-            when {
-                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
-                file.providerId == "virtual://recent" -> extendedColors.recentIcon
-                file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
-                file.providerId == "virtual://documents" -> extendedColors.documentsIcon
-                file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
-                else -> extendedColors.folderIcon
+        val finalTint = if (!isSelected) {
+            if (file.isDirectory) {
+                when {
+                    file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
+                    file.providerId == "virtual://recent" -> extendedColors.recentIcon
+                    file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
+                    file.providerId == "virtual://documents" -> extendedColors.documentsIcon
+                    file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
+                    else -> extendedColors.folderIcon
+                }
+            } else {
+                val name = file.name.lowercase()
+                when {
+                    name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
+                    name.endsWith(".tar") || name.endsWith(".gz") -> extendedColors.zipIcon
+                    name.endsWith(".pdf") -> extendedColors.pdfIcon
+                    name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") ||
+                    name.endsWith(".csv") -> extendedColors.xlsIcon
+                    name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> extendedColors.docxIcon
+                    name.endsWith(".txt") -> extendedColors.txtIcon
+                    else -> extendedColors.filesIcon
+                }
             }
         } else {
             tint
@@ -126,14 +142,20 @@ object IconHelper {
             }
             return
         }
-        val fallbackIcon = getIconForItem(file)
+
+        val iconTheme = SettingsManager.iconTheme.value
+        val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL) {
+            androidx.compose.ui.res.painterResource(id = getDrawableByFileName(file.name))
+        } else {
+            rememberVectorPainter(getIconForItem(file))
+        }
 
         if (!file.isDirectory && isMimeTypePreviewable(file)) {
             val name = file.name.lowercase()
             when {
-                name.endsWith(".pdf") -> PdfThumbnail(file, fallbackIcon, modifier, iconSize, finalTint)
-                name.endsWith(".apk") -> ApkThumbnail(file, fallbackIcon, modifier, iconSize, finalTint)
-                name.endsWith(".txt") -> TextFilePreview(file, fallbackIcon, modifier, iconSize, finalTint, isDetailView)
+                name.endsWith(".pdf") -> PdfThumbnail(file, fallbackPainter, modifier, iconSize, finalTint)
+                name.endsWith(".apk") -> ApkThumbnail(file, fallbackPainter, modifier, iconSize, finalTint)
+                name.endsWith(".txt") -> TextFilePreview(file, fallbackPainter, modifier, iconSize, finalTint, isDetailView)
                 else -> {
                     SubcomposeAsyncImage(
                         model = if (file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath),
@@ -144,14 +166,14 @@ object IconHelper {
                         if (painter.state is AsyncImagePainter.State.Success) {
                             SubcomposeAsyncImageContent()
                         } else {
-                            Icon(imageVector = fallbackIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
+                            Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
                         }
                     }
                 }
             }
         } else {
             Icon(
-                imageVector = fallbackIcon,
+                painter = fallbackPainter,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
                 tint = finalTint
@@ -211,6 +233,27 @@ object IconHelper {
 
             // Default file icon
             else -> Icons.AutoMirrored.Filled.InsertDriveFile
+        }
+    }
+
+    /**
+     * Internal helper to determine drawable based on file extension for COLOURFUL theme.
+     */
+    private fun getDrawableByFileName(fileName: String): Int {
+        val name = fileName.lowercase()
+        return when {
+            // Archives
+            name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
+            name.endsWith(".tar") || name.endsWith(".gz") -> R.drawable.ic_zip
+
+            // Documents
+            name.endsWith(".pdf") -> R.drawable.ic_pdf
+            name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") || name.endsWith(".csv") -> R.drawable.ic_xls
+            name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> R.drawable.ic_docx
+            name.endsWith(".txt") -> R.drawable.ic_txt
+
+            // Default file icon
+            else -> R.drawable.ic_file
         }
     }
 
@@ -274,7 +317,7 @@ object IconHelper {
     @Composable
     private fun PdfThumbnail(
         file: UniversalFile,
-        fallbackIcon: ImageVector,
+        fallbackPainter: Painter,
         modifier: Modifier = Modifier,
         iconSize: Dp,
         tint: Color = MaterialTheme.colorScheme.primary
@@ -290,13 +333,13 @@ object IconHelper {
             }
         }
 
-        ThumbnailImage(isReady, thumbFile, fallbackIcon, modifier, iconSize, tint)
+        ThumbnailImage(isReady, thumbFile, fallbackPainter, modifier, iconSize, tint)
     }
 
     @Composable
     private fun ApkThumbnail(
         file: UniversalFile,
-        fallbackIcon: ImageVector,
+        fallbackPainter: Painter,
         modifier: Modifier,
         iconSize: Dp,
         tint: Color
@@ -312,11 +355,11 @@ object IconHelper {
             }
         }
 
-        ThumbnailImage(isReady, thumbFile, fallbackIcon, modifier, iconSize, tint)
+        ThumbnailImage(isReady, thumbFile, fallbackPainter, modifier, iconSize, tint)
     }
 
     @Composable
-    private fun ThumbnailImage(isReady: Boolean, thumbFile: File, fallbackIcon: ImageVector, modifier: Modifier, iconSize: Dp, tint: Color) {
+    private fun ThumbnailImage(isReady: Boolean, thumbFile: File, fallbackPainter: Painter, modifier: Modifier, iconSize: Dp, tint: Color) {
         if (isReady) {
             SubcomposeAsyncImage(
                 model = thumbFile,
@@ -327,18 +370,18 @@ object IconHelper {
                 if (painter.state is AsyncImagePainter.State.Success) {
                     SubcomposeAsyncImageContent()
                 } else {
-                    Icon(imageVector = fallbackIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+                    Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
                 }
             }
         } else {
-            Icon(imageVector = fallbackIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+            Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
         }
     }
 
     @Composable
     private fun TextFilePreview(
         file: UniversalFile,
-        fallbackIcon: ImageVector,
+        fallbackPainter: Painter,
         modifier: Modifier,
         iconSize: Dp,
         tint: Color,
@@ -371,7 +414,7 @@ object IconHelper {
                 )
             }
         } else {
-            Icon(imageVector = fallbackIcon, contentDescription = null, modifier = modifier.size(iconSize), tint = tint)
+            Icon(painter = fallbackPainter, contentDescription = null, modifier = modifier.size(iconSize), tint = tint)
         }
     }
 

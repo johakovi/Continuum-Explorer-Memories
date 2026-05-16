@@ -905,6 +905,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
+                                Text(
+                                    text = "IconPark Outline by ByteDance",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
+                                Text(
+                                    text = "Bootstrap Icons by The Bootstrap Authors",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Links:",
