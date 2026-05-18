@@ -1,5 +1,6 @@
 package com.troikoss.continuum_explorer.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -36,6 +38,7 @@ import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.SortOrder
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.VerticalResizeHandle
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
@@ -106,7 +109,10 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
         DropdownMenu(
             expanded = showColumnMenu,
             onDismissRequest = { showColumnMenu = false },
-            offset = columnMenuOffset
+            offset = columnMenuOffset,
+            shape = RoundedCornerShape(16.dp),
+            containerColor = LocalExtendedColors.current.menuBackground,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
         ) {
             appState.folderConfigs.extraColumns.forEach { column ->
                 val isVisible = column.type !in appState.folderConfigs.hiddenColumns

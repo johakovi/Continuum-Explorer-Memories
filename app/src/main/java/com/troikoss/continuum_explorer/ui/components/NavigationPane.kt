@@ -9,6 +9,7 @@ import android.os.Environment
 import android.os.storage.StorageManager
 import android.text.format.Formatter
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -439,7 +440,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_gallery),
                                 icon = Icons.Default.Image,
-                                customIcon = R.drawable.ic_nav_gallery,
+                                customIcon = R.drawable.ic_gallery_logo,
                                 onClick = { onItemSelected(NavSection.Gallery) },
                                 appState = appState,
                                 section = NavSection.Gallery
@@ -468,7 +469,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_downloads),
                                 icon = Icons.Default.FileDownload,
-                                customIcon = R.drawable.ic_nav_downloads,
+                                customIcon = R.drawable.ic_download_logo,
                                 onClick = { onItemSelected(NavSection.Downloads) },
                                 appState = appState,
                                 section = NavSection.Downloads
@@ -477,7 +478,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_documents),
                                 icon = Icons.AutoMirrored.Filled.List,
-                                customIcon = R.drawable.ic_nav_documents,
+                                customIcon = R.drawable.ic_documents_logo,
                                 onClick = { onItemSelected(NavSection.Documents) },
                                 appState = appState,
                                 section = NavSection.Documents
@@ -690,10 +691,16 @@ private fun NavBackgroundContextMenu(
 ) {
     var currentScreen by remember { mutableStateOf("MAIN") }
 
-    DropdownMenu(expanded = expanded, onDismissRequest = {
-        onDismissRequest()
-        currentScreen = "MAIN"
-    }) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            onDismissRequest()
+            currentScreen = "MAIN"
+        },
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        containerColor = LocalExtendedColors.current.menuBackground,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+    ) {
         when (currentScreen) {
             "MAIN" -> {
                 DropdownMenuItem(
@@ -720,8 +727,9 @@ private fun NavBackgroundContextMenu(
                     text = { Text(stringResource(R.string.nav_add_local_storage)) },
                     leadingIcon = {
                         val iconTheme = SettingsManager.iconTheme.value
-                        if (iconTheme == IconTheme.COLOURFUL) {
-                            Icon(painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder), null, modifier = Modifier.size(24.dp))
+                        if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+                            val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                            Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), null, modifier = Modifier.size(24.dp))
                         } else {
                             Icon(Icons.Default.Folder, null)
                         }
@@ -822,7 +830,13 @@ private fun NavContextMenu(
     onEdit: (() -> Unit)? = null,
     onNavigate: (() -> Unit)? = null
 ) {
-    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        containerColor = LocalExtendedColors.current.menuBackground,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+    ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.menu_open_new_tab)) },
             onClick = {
@@ -1015,9 +1029,19 @@ private fun NavItem(
                     is NavSection.Documents -> extendedColors.documentsIcon
                     else -> extendedColors.sidebarIcons
                 }
-                if (customIcon != null && iconTheme == IconTheme.COLOURFUL) {
+                if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+                    val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
+                        when (customIcon) {
+                            R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                            R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                            R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                            R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                            R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                            else -> customIcon
+                        }
+                    } else customIcon
                     Icon(
-                        painter = androidx.compose.ui.res.painterResource(id = customIcon),
+                        painter = androidx.compose.ui.res.painterResource(id = finalIcon),
                         contentDescription = null,
                         tint = tint,
                         modifier = Modifier.size(24.dp)
@@ -1070,8 +1094,9 @@ private fun NavFavoriteItem(
             onClick = onClick,
             icon = {
                 val iconTheme = SettingsManager.iconTheme.value
-                if (iconTheme == IconTheme.COLOURFUL) {
-                    Icon(painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder), contentDescription = null, tint = LocalExtendedColors.current.folderIcon, modifier = Modifier.size(24.dp))
+                if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+                    val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                    Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), contentDescription = null, tint = LocalExtendedColors.current.folderIcon, modifier = Modifier.size(24.dp))
                 } else {
                     Icon(Icons.Default.Folder, contentDescription = null, tint = LocalExtendedColors.current.folderIcon)
                 }
@@ -1228,9 +1253,10 @@ private fun NavNetworkItem(
             onClick = onClick,
             icon = {
                 val iconTheme = SettingsManager.iconTheme.value
-                if (iconTheme == IconTheme.COLOURFUL) {
+                if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+                    val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_network_duo else R.drawable.ic_network
                     Icon(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_network),
+                        painter = androidx.compose.ui.res.painterResource(id = drawableId),
                         contentDescription = null,
                         tint = LocalExtendedColors.current.sidebarIcons,
                         modifier = Modifier.size(24.dp)
@@ -1347,9 +1373,16 @@ private fun NavStorageItem(
                 onClick = onClick,
                 icon = {
                     val iconTheme = SettingsManager.iconTheme.value
-                    if (customIcon != null && iconTheme == IconTheme.COLOURFUL) {
+                    if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+                        val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
+                            when (customIcon) {
+                                R.drawable.ic_folder -> R.drawable.ic_folder_duo
+                                // Add other mappings if storage icons can vary
+                                else -> customIcon
+                            }
+                        } else customIcon
                         Icon(
-                            painter = androidx.compose.ui.res.painterResource(id = customIcon),
+                            painter = androidx.compose.ui.res.painterResource(id = finalIcon),
                             contentDescription = null,
                             tint = LocalExtendedColors.current.sidebarIcons,
                             modifier = Modifier.size(24.dp)
@@ -1448,9 +1481,10 @@ private fun StorageFolderTreeItem(
                 )
             }
             val iconTheme = SettingsManager.iconTheme.value
-            if (iconTheme == IconTheme.COLOURFUL) {
+            if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+                val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
                 Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_folder),
+                    painter = androidx.compose.ui.res.painterResource(id = drawableId),
                     contentDescription = null,
                     tint = LocalExtendedColors.current.folderIcon,
                     modifier = Modifier.size(20.dp)

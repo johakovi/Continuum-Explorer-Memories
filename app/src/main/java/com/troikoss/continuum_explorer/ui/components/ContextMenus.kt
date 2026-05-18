@@ -2,8 +2,10 @@ package com.troikoss.continuum_explorer.ui.components
 
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -59,6 +61,7 @@ import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
 
 
@@ -108,7 +111,10 @@ fun ItemContextMenu(
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(16.dp),
+        containerColor = LocalExtendedColors.current.menuBackground,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
     ) {
         if (onlyOneSelected) {
             val item = selectedItems.first()
@@ -377,7 +383,10 @@ fun BackgroundContextMenu(
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(16.dp),
+        containerColor = LocalExtendedColors.current.menuBackground,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
     ) {
         when (currentScreen) {
             "MAIN" -> {

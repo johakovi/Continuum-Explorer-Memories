@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.text.format.Formatter
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -570,7 +572,10 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
             )
             ExposedDropdownMenu(
                 expanded = expCompMethod,
-                onDismissRequest = { expCompMethod = false }
+                onDismissRequest = { expCompMethod = false },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = LocalExtendedColors.current.menuBackground,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 CompressionMethod.entries.forEach { method ->
                     DropdownMenuItem(
@@ -603,7 +608,10 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
             )
             ExposedDropdownMenu(
                 expanded = expCompLevel,
-                onDismissRequest = { expCompLevel = false }
+                onDismissRequest = { expCompLevel = false },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = LocalExtendedColors.current.menuBackground,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 CompressionLevel.entries.forEach { level ->
                     DropdownMenuItem(
@@ -635,7 +643,10 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
             )
             ExposedDropdownMenu(
                 expanded = expEncMethod,
-                onDismissRequest = { expEncMethod = false }
+                onDismissRequest = { expEncMethod = false },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = LocalExtendedColors.current.menuBackground,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 EncryptionMethod.entries.forEach { method ->
                     DropdownMenuItem(
@@ -1286,7 +1297,10 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             )
             ExposedDropdownMenu(
                 expanded = expProtocol,
-                onDismissRequest = { expProtocol = false }
+                onDismissRequest = { expProtocol = false },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = LocalExtendedColors.current.menuBackground,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
             ) {
                 NetworkProtocol.entries.forEach { p ->
                     DropdownMenuItem(

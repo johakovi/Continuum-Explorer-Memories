@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -44,6 +45,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -113,6 +115,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.getSiblingFiles
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -768,7 +771,10 @@ fun VideoPlayerScreen(
 
                             DropdownMenu(
                                 expanded        = optionsMenuExpanded,
-                                onDismissRequest = { optionsMenuExpanded = false }
+                                onDismissRequest = { optionsMenuExpanded = false },
+                                shape = RoundedCornerShape(16.dp),
+                                containerColor = LocalExtendedColors.current.menuBackground,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                             ) {
                                 when (optionsScreen) {
 

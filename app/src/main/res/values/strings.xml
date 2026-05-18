@@ -197,7 +197,8 @@
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colours for the top bar and tab bar.</string>
     <string name="settings_icon_theme">Icon Theme</string>
-    <string name="settings_icon_theme_colourful">Colourful</string>
+    <string name="settings_icon_theme_colourful" translatable="false">Colourful</string>
+    <string name="settings_icon_theme_colourful_duotone" translatable="false">Colourful Duotone</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Choose Icon Theme</string>
     <string name="settings_details_large">Details (Large screens only)</string>

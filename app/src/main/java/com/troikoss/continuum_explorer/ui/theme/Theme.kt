@@ -43,8 +43,21 @@ data class ExtendedColors(
     val xlsIcon: Color,
     val docxIcon: Color,
     val txtIcon: Color,
+    val folderIconDuo: Color,
+    val filesIconDuo: Color,
+    val recentIconDuo: Color,
+    val documentsIconDuo: Color,
+    val galleryIconDuo: Color,
+    val recycleBinIconDuo: Color,
+    val downloadsIconDuo: Color,
+    val zipIconDuo: Color,
+    val pdfIconDuo: Color,
+    val xlsIconDuo: Color,
+    val docxIconDuo: Color,
+    val txtIconDuo: Color,
     val tabActiveBackground: Color,
-    val textColor: Color
+    val textColor: Color,
+    val menuBackground: Color
 )
 
 val LocalExtendedColors = staticCompositionLocalOf<ExtendedColors> {
@@ -159,20 +172,82 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFF2d2d2f),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryDarkIcons,
-                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryDarkIcons,
-                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else VeryDarkIcons,
-                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else VeryDarkIcons,
-                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else VeryDarkIcons,
-                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else VeryDarkIcons,
-                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else VeryDarkIcons,
-                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else VeryDarkIcons,
-                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else VeryDarkIcons,
-                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else VeryDarkIcons,
-                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else VeryDarkIcons,
-                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else VeryDarkIcons,
+                folderIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFolders
+                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
+                    else -> VeryDarkIcons
+                },
+                galleryIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeGallery
+                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
+                    else -> VeryDarkIcons
+                },
+                recentIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecent
+                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
+                    else -> VeryDarkIcons
+                },
+                filesIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFile
+                    IconTheme.COLOURFULDUO -> ThemeFileDuo
+                    else -> VeryDarkIcons
+                },
+                documentsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFiles
+                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
+                    else -> VeryDarkIcons
+                },
+                recycleBinIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecycleBin
+                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
+                    else -> VeryDarkIcons
+                },
+                downloadsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDownloads
+                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
+                    else -> VeryDarkIcons
+                },
+                zipIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeZip
+                    IconTheme.COLOURFULDUO -> ThemeZipDuo
+                    else -> VeryDarkIcons
+                },
+                pdfIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemePdf
+                    IconTheme.COLOURFULDUO -> ThemePdfDuo
+                    else -> VeryDarkIcons
+                },
+                xlsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> VeryDarkIcons
+                },
+                docxIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDocx
+                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
+                    else -> VeryDarkIcons
+                },
+                txtIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTxt
+                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
+                    else -> VeryDarkIcons
+                },
+
                 tabActiveBackground = Color(0xFF000000),
-                textColor = VeryDarkText
+                textColor = VeryDarkText,
+                menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.85f),
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
+                filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
+                galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
+                recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryDarkIcons,
+                documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryDarkIcons,
+                recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryDarkIcons,
+                downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryDarkIcons,
+                zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryDarkIcons,
+                pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryDarkIcons,
+                xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
+                docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryDarkIcons,
+                txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryDarkIcons,
             )
         }
         themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
@@ -184,20 +259,82 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFFfcfcfe),
                 selectionBackground = LightPrimarySelection,
                 sidebarIcons = VeryLightIcons,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else VeryLightIcons,
-                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else VeryLightIcons,
-                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else VeryLightIcons,
-                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else VeryLightIcons,
-                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else VeryLightIcons,
-                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else VeryLightIcons,
-                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else VeryLightIcons,
-                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else VeryLightIcons,
-                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else VeryLightIcons,
-                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else VeryLightIcons,
-                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else VeryLightIcons,
-                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else VeryLightIcons,
+                folderIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFolders
+                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
+                    else -> VeryLightIcons
+                },
+                galleryIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeGallery
+                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
+                    else -> VeryLightIcons
+                },
+                recentIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecent
+                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
+                    else -> VeryLightIcons
+                },
+                filesIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFile
+                    IconTheme.COLOURFULDUO -> ThemeFileDuo
+                    else -> VeryLightIcons
+                },
+                documentsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFiles
+                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
+                    else -> VeryLightIcons
+                },
+                recycleBinIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecycleBin
+                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
+                    else -> VeryLightIcons
+                },
+                downloadsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDownloads
+                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
+                    else -> VeryLightIcons
+                },
+                zipIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeZip
+                    IconTheme.COLOURFULDUO -> ThemeZipDuo
+                    else -> VeryLightIcons
+                },
+                pdfIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemePdf
+                    IconTheme.COLOURFULDUO -> ThemePdfDuo
+                    else -> VeryLightIcons
+                },
+                xlsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> VeryLightIcons
+                },
+                docxIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDocx
+                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
+                    else -> VeryLightIcons
+                },
+                txtIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTxt
+                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
+                    else -> VeryLightIcons
+                },
+
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
+                filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
+                galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
+                recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryLightIcons,
+                documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryLightIcons,
+                recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryLightIcons,
+                downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryLightIcons,
+                zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryLightIcons,
+                pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryLightIcons,
+                xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
+                docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryLightIcons,
+                txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryLightIcons,
                 tabActiveBackground = Color(0xFFF1F1F1),
-                textColor = VeryLightText
+                textColor = VeryLightText,
+                menuBackground = Color.White.copy(alpha = 0.85f)
             )
         }
         else -> {
@@ -210,22 +347,85 @@ fun FileExplorerTheme(
                 searchBoxBackground = colorScheme.surfaceContainerHigh,
                 tabBarBackground = colorScheme.surfaceContainerLow,
                 sidebarIcons = secondary,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else secondary,
-                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else secondary,
-                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else secondary,
-                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else secondary,
-                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else secondary,
-                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else secondary,
-                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else secondary,
-                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else secondary,
-                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else secondary,
-                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else secondary,
-                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else secondary,
-                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else secondary,
+                folderIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFolders
+                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
+                    else -> secondary
+                },
+                galleryIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeGallery
+                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
+                    else -> secondary
+                },
+                recentIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecent
+                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
+                    else -> secondary
+                },
+                filesIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFile
+                    IconTheme.COLOURFULDUO -> ThemeFileDuo
+                    else -> secondary
+                },
+                documentsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeFiles
+                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
+                    else -> secondary
+                },
+                recycleBinIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeRecycleBin
+                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
+                    else -> secondary
+                },
+                downloadsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDownloads
+                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
+                    else -> secondary
+                },
+                zipIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeZip
+                    IconTheme.COLOURFULDUO -> ThemeZipDuo
+                    else -> secondary
+                },
+                pdfIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemePdf
+                    IconTheme.COLOURFULDUO -> ThemePdfDuo
+                    else -> secondary
+                },
+                xlsIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> secondary
+                },
+                docxIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeDocx
+                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
+                    else -> secondary
+                },
+                txtIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTxt
+                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
+                    else -> secondary
+                },
                 tabActiveBackground = colorScheme.surface,
                 textColor = onSurface,
-                selectionBackground = colorScheme.primaryContainer
+                selectionBackground = colorScheme.primaryContainer,
+
+                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.85f),
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else secondary,
+                filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else secondary,
+                galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else secondary,
+                recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else secondary,
+                documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else secondary,
+                recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else secondary,
+                downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else secondary,
+                zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else secondary,
+                pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else secondary,
+                xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else secondary,
+                docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else secondary,
+                txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else secondary,
             )
+
         }
     }
 

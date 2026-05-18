@@ -19,19 +19,19 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M6,14h12a3,3 0,1 1,0 6H6a3,3 0,1 1,0 -6Z"
+      android:pathData="M13.172,3H9c-1.886,0 -2.828,0 -3.414,0.586S5,5.114 5,7v10c0,1.886 0,2.828 0.586,3.414S7.114,21 9,21h6c1.886,0 2.828,0 3.414,-0.586S19,18.886 19,17V8.828c0,-0.408 0,-0.613 -0.076,-0.796s-0.22,-0.329 -0.51,-0.618l-3.828,-3.828c-0.29,-0.29 -0.434,-0.434 -0.617,-0.51C13.785,3 13.58,3 13.172,3Z"
       android:strokeWidth="2"
       android:fillColor="#00000000"
-      android:strokeColor="#FFF"/>
+      android:strokeColor="#fff"/>
   <path
-      android:pathData="M3,17c0,-1.41 1.491,-7.294 2.37,-10.642c0.22,-0.835 0.33,-1.252 0.572,-1.57c0.212,-0.278 0.5,-0.5 0.823,-0.635C7.134,4 7.57,4 8.445,4h7.11c0.875,0 1.311,0 1.68,0.153c0.323,0.135 0.611,0.357 0.823,0.635c0.242,0.318 0.352,0.735 0.571,1.57C19.51,9.706 21,15.59 21,17"
+      android:pathData="M9,13h6m-6,4h4"
       android:strokeWidth="2"
       android:fillColor="#00000000"
-      android:strokeColor="#FFF"/>
+      android:strokeColor="#fff"
+      android:strokeLineCap="round"/>
   <path
-      android:pathData="M18,16L18,16A1,1 0,0 1,19 17L19,17A1,1 0,0 1,18 18L18,18A1,1 0,0 1,17 17L17,17A1,1 0,0 1,18 16z"
-      android:fillColor="#FFF"/>
-  <path
-      android:pathData="M6,16L8,16A1,1 0,0 1,9 17L9,17A1,1 0,0 1,8 18L6,18A1,1 0,0 1,5 17L5,17A1,1 0,0 1,6 16z"
-      android:fillColor="#FFF"/>
+      android:pathData="M13,3v4c0,0.943 0,1.414 0.293,1.707S14.057,9 15,9h4"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#fff"/>
 </vector>

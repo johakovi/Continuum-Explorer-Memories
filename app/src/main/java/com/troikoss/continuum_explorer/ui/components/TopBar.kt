@@ -1,6 +1,7 @@
 package com.troikoss.continuum_explorer.ui.components
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
@@ -259,7 +260,10 @@ fun TopBar(
 
                                 DropdownMenu(
                                     expanded = historyMenuExpanded,
-                                    onDismissRequest = { historyMenuExpanded = false }
+                                    onDismissRequest = { historyMenuExpanded = false },
+                                    shape = RoundedCornerShape(16.dp),
+                                    containerColor = LocalExtendedColors.current.menuBackground,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                                 ) {
                                     // Forward History (Latest at top)
                                     appState.forwardStack.take(5)
@@ -447,7 +451,10 @@ fun TopBar(
                                 onDismissRequest = {
                                     searchOptionsMenuExpanded = false
                                     searchKindMenuExpanded = false
-                                }
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                containerColor = LocalExtendedColors.current.menuBackground,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                             ) {
                                 if (searchKindMenuExpanded) {
                                     DropdownMenuItem(
@@ -837,7 +844,10 @@ fun TopBar(
 
                 DropdownMenu(
                     expanded = optionsMenuExpanded,
-                    onDismissRequest = { optionsMenuExpanded = false }
+                    onDismissRequest = { optionsMenuExpanded = false },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = LocalExtendedColors.current.menuBackground,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                 ) {
 
                     DropdownMenuItem(

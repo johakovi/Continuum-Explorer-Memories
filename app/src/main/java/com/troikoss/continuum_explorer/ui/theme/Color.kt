@@ -30,7 +30,9 @@ val ThemeFiles = Color(0xFFD7B075)
 val ThemeRecent = Color(0xFF4CBEE0)
 val ThemeRecycleBin = Color(0xFF98C52F)
 val ThemeDownloads = Color(0xFF69CCB8)
-val ThemeFolders = Color(0xFF92A6BE)
+val ThemeFolders = Color(0xFF2196F3)
+
+
 
 val ThemeFile = Color(0xFFB0BEC5)
 val ThemeZip = Color(0xFFE99C47)
@@ -38,3 +40,17 @@ val ThemePdf = Color(0xFFD32F2F)
 val ThemeXls = Color(0xFF43A047)
 val ThemeDocx = Color(0xFF1E88E5)
 val ThemeTxt = Color(0xFF78909C)
+
+val ThemeFoldersDuo = Color(0xFFFFC107)
+val ThemeFileDuo = Color(0xFFB0BEC5)
+val ThemeZipDuo = Color(0xFFE99C47)
+val ThemePdfDuo = Color(0xFFD32F2F)
+val ThemeXlsDuo = Color(0xFF43A047)
+val ThemeDocxDuo = Color(0xFF1E88E5)
+val ThemeTxtDuo = Color(0xFF78909C)
+val ThemeGalleryDuo = Color(0xFFE15D82)
+val ThemeFilesDuo = Color(0xFFD7B075)
+val ThemeRecentDuo = Color(0xFF4CBEE0)
+val ThemeRecycleBinDuo = Color(0xFF98C52F)
+val ThemeDownloadsDuo = Color(0xFF69CCB8)
+

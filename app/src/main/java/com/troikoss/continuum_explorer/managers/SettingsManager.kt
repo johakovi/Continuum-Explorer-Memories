@@ -46,6 +46,7 @@ enum class ThemeTopMode {
 }
 
 enum class IconTheme {
+    COLOURFULDUO,
     COLOURFUL,
     MATERIAL
 }

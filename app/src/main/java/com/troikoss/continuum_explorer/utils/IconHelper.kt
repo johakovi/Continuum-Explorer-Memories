@@ -10,6 +10,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -37,10 +39,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -117,27 +121,53 @@ object IconHelper {
 
         if (file.isDirectory) {
             val iconTheme = SettingsManager.iconTheme.value
-            if (iconTheme == IconTheme.COLOURFUL) {
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = getDrawableForItem(file)),
-                    contentDescription = null,
-                    modifier = modifier.size(iconSize),
-                    tint = finalTint
-                )
-            } else {
+            val overlayRes = getOverlayIconRes(file)
+
+            if (iconTheme == IconTheme.MATERIAL) {
                 Icon(
                     imageVector = getIconForItem(file),
                     contentDescription = null,
                     modifier = modifier.size(iconSize),
                     tint = finalTint
                 )
+                return
+            }
+
+            Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
+                val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                Icon(
+                    painter = painterResource(id = baseFolderRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    tint = finalTint
+                )
+
+                if (overlayRes != null) {
+                    val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
+                        when (overlayRes) {
+                            R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                            R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                            R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                            R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                            R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                            else -> overlayRes
+                        }
+                    } else overlayRes
+
+                    Icon(
+                        painter = painterResource(id = finalOverlayRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(0.40f).offset(y = 6.dp),
+                        tint = Color.White.copy(alpha = 1f)
+                    )
+                }
             }
             return
         }
 
         val iconTheme = SettingsManager.iconTheme.value
-        val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL) {
-            androidx.compose.ui.res.painterResource(id = getDrawableForItem(file))
+        val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+            painterResource(id = getDrawableForItem(file, iconTheme))
         } else {
             rememberVectorPainter(getIconForItem(file))
         }
@@ -231,42 +261,65 @@ object IconHelper {
     /**
      * Internal helper to determine drawable based on file extension for COLOURFUL theme.
      */
-    fun getDrawableForItem(file: UniversalFile): Int {
+    fun getDrawableForItem(file: UniversalFile, iconTheme: IconTheme = IconTheme.COLOURFUL): Int {
         if (file.isDirectory) {
             return when {
-                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_gallery_logo
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
-                file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
-                file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
+                file.providerId == "virtual://downloads" -> R.drawable.ic_download_logo
+                file.providerId == "virtual://documents" -> R.drawable.ic_documents_logo
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
-                else -> R.drawable.ic_folder
+                else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
         }
-        return getDrawableByFileName(file.name)
+        return getDrawableByFileName(file.name, iconTheme)
     }
 
     /**
      * Internal helper to determine drawable based on file extension for COLOURFUL theme.
      */
-    fun getDrawableByFileName(fileName: String): Int {
+    fun getDrawableByFileName(fileName: String, iconTheme: IconTheme = IconTheme.COLOURFUL): Int {
         val name = fileName.lowercase()
         return when {
             // Archives
             name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
-            name.endsWith(".tar") || name.endsWith(".gz") -> R.drawable.ic_zip
+                    name.endsWith(".tar") || name.endsWith(".gz") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_zip_duo else R.drawable.ic_zip
 
             // Documents
-            name.endsWith(".pdf") -> R.drawable.ic_pdf
-            name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") || name.endsWith(".csv") -> R.drawable.ic_xls
-            name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> R.drawable.ic_docx
-            name.endsWith(".txt") -> R.drawable.ic_txt
+            name.endsWith(".pdf") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_pdf_duo else R.drawable.ic_pdf
+            name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") || name.endsWith(
+                ".csv"
+            ) -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_xls_duo else R.drawable.ic_xls
+
+            name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_docx_duo else R.drawable.ic_docx
+            name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
 
             // Default file icon
-            else -> R.drawable.ic_file
+            else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_file_duo else R.drawable.ic_file
         }
     }
 
-    fun isMimeTypePreviewable(file: UniversalFile): Boolean {
+    private fun getOverlayIconRes(file: UniversalFile): Int? {
+        val name = file.name.lowercase()
+        val path = file.absolutePath.lowercase()
+        val providerId = file.providerId
+
+        return when {
+            providerId == "virtual://documents" || name == "documents" || path.endsWith("/documents") -> R.drawable.ic_documents_logo
+            providerId == "virtual://downloads" || name == "download" || name == "downloads" || path.endsWith("/download") || path.endsWith("/downloads") -> R.drawable.ic_download_logo
+            name == "dcim" || path.endsWith("/dcim") || name == "camera" || path.endsWith("/camera") || path.contains("/dcim/camera") -> R.drawable.ic_camera_logo
+            providerId == "virtual://gallery" || providerId.startsWith("virtual://gallery_album:") ||
+                    name == "pictures" || path.endsWith("/pictures") ||
+                    name == "photos" || path.endsWith("/photos") ||
+                    name == "screenshots" || path.contains("/screenshots") -> R.drawable.ic_gallery_logo
+            providerId == "virtual://recycle_bin" || path.contains("/.trash") -> R.drawable.ic_nav_trash
+            providerId == "virtual://recent" -> R.drawable.ic_nav_recent
+            else -> null
+        }
+    }
+
+
+        fun isMimeTypePreviewable(file: UniversalFile): Boolean {
         val name = file.name.lowercase()
         return PREVIEWABLE_EXTENSIONS.any { name.endsWith(it) }
     }
@@ -287,6 +340,11 @@ object IconHelper {
         modifier: Modifier = Modifier,
     ) {
         if (!folder.isDirectory) return
+
+        // Skip previews for folders in the root of internal storage or those with custom overlays
+        val internalRoot = android.os.Environment.getExternalStorageDirectory().absolutePath
+        if (folder.parentId == internalRoot || getOverlayIconRes(folder) != null) return
+
         val cacheKey = "${folder.provider.kind}:${folder.absolutePath}"
         var previewFile by remember(folder) {
             mutableStateOf(folderPreviewCache[cacheKey]?.orElse(null))

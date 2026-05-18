@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -41,6 +43,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,6 +95,7 @@ import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.utils.GlobalEvents
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.deleteFiles
 import com.troikoss.continuum_explorer.utils.getSiblingFiles
@@ -448,7 +452,10 @@ fun ImageViewerScreen(
                     offset = DpOffset(
                         x = with(LocalDensity.current) { menuOffset.x.toDp() },
                         y = with(LocalDensity.current) { menuOffset.y.toDp() }
-                    )
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = LocalExtendedColors.current.menuBackground,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                 ) {
                     // --- GROUP 1: Open With ---
                     DropdownMenuItem(

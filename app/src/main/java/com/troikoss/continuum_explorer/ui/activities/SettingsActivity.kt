@@ -176,6 +176,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 headlineContent = { Text(stringResource(R.string.settings_icon_theme)) },
                 supportingContent = {
                     val text = when (iconTheme) {
+                        IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
                         IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
                         IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
                     }
@@ -543,6 +544,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                     text = {
                         Column {
                             OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = iconTheme == IconTheme.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setIconTheme(context, IconTheme.COLOURFULDUO)
+                                    showIconThemeDialog = false
+                                }
+                            )
+                            OptionItem(
                                 label = stringResource(R.string.settings_icon_theme_colourful),
                                 selected = iconTheme == IconTheme.COLOURFUL,
                                 onClick = {
@@ -558,6 +567,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     showIconThemeDialog = false
                                 }
                             )
+
                         }
                     },
                     confirmButton = {
