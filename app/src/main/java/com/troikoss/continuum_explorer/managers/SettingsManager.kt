@@ -71,6 +71,7 @@ object SettingsManager {
     private const val KEY_ICON_TOUCH_SELECTION = "icon_touch_selection"
     private const val KEY_DEFAULT_VIEW_MODE = "default_view_mode"
     private const val KEY_COLORFUL_BARS = "colorful_bars"
+    private const val KEY_TERMUX_SUPPORT = "termux_support"
 
     private val _deleteBehavior = mutableStateOf(DeleteBehavior.ASK)
     val deleteBehavior: State<DeleteBehavior> = _deleteBehavior
@@ -113,6 +114,9 @@ object SettingsManager {
 
     private val _isColorfulBarsEnabled = mutableStateOf(false)
     val isColorfulBarsEnabled: State<Boolean> = _isColorfulBarsEnabled
+
+    private val _termuxSupport = mutableStateOf(true)
+    val termuxSupport: State<Boolean> = _termuxSupport
 
     // Derived state: enabled if behavior is not PERMANENT
     private val _isRecycleBinEnabled = mutableStateOf(true)
@@ -192,6 +196,7 @@ object SettingsManager {
         _isColorfulBarsEnabled.value = prefs.getBoolean(KEY_COLORFUL_BARS, false)
 
         _isDefaultArchiveViewerEnabled.value = prefs.getBoolean(KEY_DEFAULT_ARCHIVE_VIEWER, true)
+        _termuxSupport.value = prefs.getBoolean(KEY_TERMUX_SUPPORT, true)
 
         val savedViewMode = prefs.getString(KEY_DEFAULT_VIEW_MODE, ViewMode.DETAILS.name)
         _defaultViewMode.value = try {
@@ -251,6 +256,13 @@ object SettingsManager {
         _isColorfulBarsEnabled.value = enabled
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_COLORFUL_BARS, enabled).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setTermuxSupportEnabled(context: Context, enabled: Boolean) {
+        _termuxSupport.value = enabled
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_TERMUX_SUPPORT, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

@@ -43,6 +43,7 @@ data class ExtendedColors(
     val xlsIcon: Color,
     val docxIcon: Color,
     val txtIcon: Color,
+    val terminalIcon: Color,
     val folderIconDuo: Color,
     val filesIconDuo: Color,
     val recentIconDuo: Color,
@@ -55,6 +56,7 @@ data class ExtendedColors(
     val xlsIconDuo: Color,
     val docxIconDuo: Color,
     val txtIconDuo: Color,
+    val terminalIconDuo: Color,
     val tabActiveBackground: Color,
     val textColor: Color,
     val menuBackground: Color
@@ -232,6 +234,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeTxtDuo
                     else -> VeryDarkIcons
                 },
+                terminalIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTerminal
+                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
+                    else -> VeryDarkIcons
+                },
 
                 tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText,
@@ -248,6 +255,7 @@ fun FileExplorerTheme(
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
                 docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryDarkIcons,
                 txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryDarkIcons,
+                terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else VeryDarkIcons,
             )
         }
         themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
@@ -319,6 +327,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeTxtDuo
                     else -> VeryLightIcons
                 },
+                terminalIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTerminal
+                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
+                    else -> VeryLightIcons
+                },
 
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
@@ -332,6 +345,7 @@ fun FileExplorerTheme(
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
                 docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryLightIcons,
                 txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryLightIcons,
+                terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else VeryLightIcons,
                 tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText,
                 menuBackground = Color.White.copy(alpha = 0.98f)
@@ -407,6 +421,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeTxtDuo
                     else -> secondary
                 },
+                terminalIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeTerminal
+                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
+                    else -> secondary
+                },
                 tabActiveBackground = colorScheme.surface,
                 textColor = onSurface,
                 selectionBackground = colorScheme.primaryContainer,
@@ -424,6 +443,7 @@ fun FileExplorerTheme(
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else secondary,
                 docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else secondary,
                 txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else secondary,
+                terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else secondary,
             )
 
         }

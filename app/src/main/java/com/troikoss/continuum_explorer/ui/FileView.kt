@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupPositionProvider
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.selectionBackground
@@ -320,6 +321,7 @@ private fun FileContentView(
     var isOverflowing by remember { mutableStateOf(value = false) }
 
     val shape = RoundedCornerShape(8.dp)
+    val itemSize = appState.folderConfigs.contentItemSize.dp
 
     Column (modifier = Modifier.selectionBackground(isSelected, isHovered, isLead, shape = shape)) {
         ListItem(
@@ -335,24 +337,33 @@ private fun FileContentView(
                         overflow = TextOverflow.Ellipsis,
                         onTextLayout = { textLayoutResult ->
                             isOverflowing = textLayoutResult.hasVisualOverflow
-                        }
+                        },
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = (appState.folderConfigs.contentItemSize * 0.4f).sp)
                     )
                 }
             },
-            supportingContent = { Text(if (file.isDirectory) "Folder - $formattedDate" else "$formattedSize - $formattedDate") },
+            supportingContent = {
+                Text(
+                    text = if (file.isDirectory) "Folder - $formattedDate" else "$formattedSize - $formattedDate",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = (appState.folderConfigs.contentItemSize * 0.35f).sp)
+                )
+            },
             leadingContent = {
                 Box {
+                    val iconModifier = if (iconSelectionEnabled) {
+                        Modifier.size(itemSize).iconTouchToggle(file, appState.selectionManager)
+                    } else {
+                        Modifier.size(itemSize)
+                    }
                     FileThumbnail(
                         file = file,
                         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .then(if (iconSelectionEnabled) Modifier.iconTouchToggle(file, appState.selectionManager) else Modifier),
-                        iconSize = 40.dp
+                        modifier = iconModifier,
+                        iconSize = itemSize
                     )
                     FolderPreview(
                         folder = file,
-                        thumbSize = 24.dp,
+                        thumbSize = itemSize * 0.6f,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
                 }
@@ -386,6 +397,8 @@ private fun FileDetailsView(
     var isOverflowing by remember { mutableStateOf(value = false) }
 
     val shape = RoundedCornerShape(8.dp)
+    val itemSize = appState.folderConfigs.detailsItemSize.dp
+    val fontSize = (appState.folderConfigs.detailsItemSize * 0.5f).sp
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Column(
@@ -399,16 +412,20 @@ private fun FileDetailsView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box{
+                    val iconModifier = if (iconSelectionEnabled) {
+                        Modifier.size(itemSize).iconTouchToggle(file, appState.selectionManager)
+                    } else {
+                        Modifier.size(itemSize)
+                    }
                     FileThumbnail(
                         file = file,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .then(if (iconSelectionEnabled) Modifier.iconTouchToggle(file, appState.selectionManager) else Modifier),
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                        modifier = iconModifier,
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                        iconSize = itemSize
                     )
                     FolderPreview(
                         folder = file,
-                        thumbSize = 16.dp,
+                        thumbSize = itemSize * 0.65f,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
                 }
@@ -425,7 +442,8 @@ private fun FileDetailsView(
                         overflow = TextOverflow.Ellipsis,
                         onTextLayout = { textLayoutResult ->
                             isOverflowing = textLayoutResult.hasVisualOverflow
-                        }
+                        },
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = fontSize)
                     )
                 }
 
@@ -446,7 +464,7 @@ private fun FileDetailsView(
                     Text(
                         text = text,
                         modifier = Modifier.width(width).padding(start = 8.dp),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = fontSize * 0.9f),
                         maxLines = 1
                     )
                 }

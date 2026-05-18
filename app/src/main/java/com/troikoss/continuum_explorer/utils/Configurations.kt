@@ -29,6 +29,8 @@ class FolderConfigurations(private val context: Context) {
         private set
         
     var gridItemSize by mutableIntStateOf(100)
+    var detailsItemSize by mutableIntStateOf(24)
+    var contentItemSize by mutableIntStateOf(40)
 
     val extraColumns = listOf(
         FileColumnDefinition(FileColumnType.DATE, context.getString(R.string.details_header_date), initialWidth = 135.dp),
@@ -206,21 +208,49 @@ class FolderConfigurations(private val context: Context) {
         }
     }
 
+    fun updateDetailsSize(newSize: Int, key: String?) {
+        detailsItemSize = newSize
+        if (key != null) {
+            saveDetailsSizeForCurrentPath(newSize, key)
+        }
+    }
+
+    fun updateContentSize(newSize: Int, key: String?) {
+        contentItemSize = newSize
+        if (key != null) {
+            saveContentSizeForCurrentPath(newSize, key)
+        }
+    }
+
     private fun saveGridSizeForCurrentPath(size: Int, key: String) {
         val prefs = context.getSharedPreferences("folder_grid_sizes", Context.MODE_PRIVATE)
         prefs.edit().putInt(key, size).apply()
     }
 
+    private fun saveDetailsSizeForCurrentPath(size: Int, key: String) {
+        val prefs = context.getSharedPreferences("folder_details_sizes", Context.MODE_PRIVATE)
+        prefs.edit().putInt(key, size).apply()
+    }
+
+    private fun saveContentSizeForCurrentPath(size: Int, key: String) {
+        val prefs = context.getSharedPreferences("folder_content_sizes", Context.MODE_PRIVATE)
+        prefs.edit().putInt(key, size).apply()
+    }
+
     fun resolveGridSize(key: String?) {
-        val prefs = context.getSharedPreferences("folder_grid_sizes", Context.MODE_PRIVATE)
+        val gridPrefs = context.getSharedPreferences("folder_grid_sizes", Context.MODE_PRIVATE)
+        val detailsPrefs = context.getSharedPreferences("folder_details_sizes", Context.MODE_PRIVATE)
+        val contentPrefs = context.getSharedPreferences("folder_content_sizes", Context.MODE_PRIVATE)
+        
         if (key != null) {
-            // Load the saved size, using 100 as a default if nothing is found for that key
-            val savedSize = prefs.getInt(key, 100)
-            gridItemSize = savedSize
+            gridItemSize = gridPrefs.getInt(key, 100)
+            detailsItemSize = detailsPrefs.getInt(key, 24)
+            contentItemSize = contentPrefs.getInt(key, 40)
             return
         }
-        // If there's no specific folder, just use the default
         gridItemSize = 100
+        detailsItemSize = 24
+        contentItemSize = 40
     }
 
 

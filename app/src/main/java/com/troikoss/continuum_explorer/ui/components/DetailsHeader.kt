@@ -42,6 +42,8 @@ import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.VerticalResizeHandle
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 /**
  * Header row for the "Details" view mode. 
@@ -53,6 +55,8 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
     var columnMenuOffset by remember { mutableStateOf(DpOffset.Zero) }
     val nameColumnWidth = appState.folderConfigs.columnWidths.getOrElse(FileColumnType.NAME) { Dp.Unspecified }
 
+    val iconSize = appState.folderConfigs.detailsItemSize.dp
+    val fontSize = (appState.folderConfigs.detailsItemSize * 0.5f).sp
 
     Box {
         Row(
@@ -65,14 +69,15 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(Modifier.width(36.dp))
+            Spacer(Modifier.width(iconSize + 12.dp))
 
             SortableHeaderLabel(
                 label = stringResource(R.string.details_header_name),
                 modifier = Modifier.width(nameColumnWidth),
                 isActive = appState.folderConfigs.sortParams.columnType == FileColumnType.NAME,
                 order = appState.folderConfigs.sortParams.order,
-                onClick = { appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() } }
+                onClick = { appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() } },
+                fontSize = fontSize
             )
 
             appState.folderConfigs.visibleColumns.forEachIndexed { index, column ->
@@ -91,7 +96,7 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                         appState.folderConfigs.columnWidths[prevColumnType] = (w + delta).coerceIn(75.dp, 800.dp)
                         appState.folderConfigs.saveColumnWidths(appState.getCurrentStorageKey())
                     },
-                    modifier = Modifier.height(24.dp)
+                    modifier = Modifier.height(iconSize)
                 )
 
                 SortableHeaderLabel(
@@ -101,7 +106,8 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                         .padding(start = 8.dp),
                     isActive = appState.folderConfigs.sortParams.columnType == column.type,
                     order = appState.folderConfigs.sortParams.order,
-                    onClick = { appState.folderConfigs.toggleSort(column.type, appState.getCurrentStorageKey()) { appState.refresh() } }
+                    onClick = { appState.folderConfigs.toggleSort(column.type, appState.getCurrentStorageKey()) { appState.refresh() } },
+                    fontSize = fontSize
                 )
             }
         }
@@ -148,13 +154,16 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
     }
 }
 
+
+
 @Composable
 fun SortableHeaderLabel(
     label: String,
     modifier: Modifier,
     isActive: Boolean,
     order: SortOrder,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    fontSize: TextUnit = MaterialTheme.typography.labelLarge.fontSize
 ) {
     Row(
         modifier = modifier.clickable(onClick = onClick),
@@ -162,7 +171,7 @@ fun SortableHeaderLabel(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = fontSize),
             color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             maxLines = 1
         )

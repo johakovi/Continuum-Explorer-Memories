@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
+import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.model.UniversalFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -225,6 +226,18 @@ fun openFile(context: Context, file: UniversalFile) {
 
     val uri = getUriForUniversalFile(context, file) ?: return
 
+    val extension = file.name.substringAfterLast('.', "").lowercase()
+
+    if (extension == "sh" && SettingsManager.termuxSupport.value) {
+        if (isTermuxInstalled(context)) {
+            val fileRef = file.fileRef
+            if (fileRef != null) {
+                openInTermux(context, fileRef.absolutePath, isScript = true)
+                return
+            }
+        }
+    }
+
     if (file.name.endsWith(".apk", ignoreCase = true)) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!context.packageManager.canRequestPackageInstalls()) {
@@ -239,7 +252,6 @@ fun openFile(context: Context, file: UniversalFile) {
         }
     }
 
-    val extension = file.name.substringAfterLast('.', "").lowercase()
     val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
         ?: context.contentResolver.getType(uri)
         ?: "*/*"
@@ -285,3 +297,44 @@ fun openFile(context: Context, file: UniversalFile) {
         launchOpenWithIntent(context, uri, file.name)
     }
 }
+
+fun isTermuxInstalled(context: Context): Boolean {
+    return try {
+        context.packageManager.getPackageInfo("com.termux", 0)
+        true
+    } catch (_: Exception) {
+        false
+    }
+}
+
+fun openInTermux(context: Context, path: String, isScript: Boolean = false) {
+    val intent = Intent().apply {
+        setClassName("com.termux", "com.termux.app.RunCommandService")
+        action = "com.termux.RUN_COMMAND"
+        
+        val escapedPath = path.replace("'", "'\\''")
+        
+        if (isScript) {
+            // Run script through sh to handle non-executable files on /sdcard
+            putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/sh")
+            putExtra("com.termux.RUN_COMMAND_ARGUMENTS", arrayOf(path))
+        } else {
+            // Open terminal in the directory by running a command that cd's and then starts a login shell
+            putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/bash")
+            putExtra("com.termux.RUN_COMMAND_ARGUMENTS", arrayOf("-c", "cd '$escapedPath' && exec bash -l"))
+        }
+        
+        // 1 = opens a new terminal session (tab)
+        putExtra("com.termux.RUN_COMMAND_SESSION_ACTION", "1")
+    }
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent)
+        } else {
+            context.startService(intent)
+        }
+    } catch (e: Exception) {
+        Toast.makeText(context, "Failed to open Termux: ${e.message}. Ensure 'Allow external apps' is enabled in Termux settings.", Toast.LENGTH_LONG).show()
+    }
+}
+

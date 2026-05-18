@@ -49,6 +49,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -587,25 +588,25 @@ fun TopBar(
                                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
                                     color = MaterialTheme.colorScheme.onSurface)
                             }
-                            Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
+                            Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                             Text(
                                 text = appState.currentPath!!.name,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary)
                         } else if (appState.libraryItem == LibraryItem.RecycleBin) {
                             Text(
                                 text = stringResource(R.string.nav_recycle_bin),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else if (appState.libraryItem == LibraryItem.Documents) {
                             Text(
                                 text = stringResource(R.string.nav_documents),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else if (appState.currentPath != null || appState.currentArchiveFile != null) {
                             visibleSegments.forEachIndexed { index, folderName ->
@@ -645,10 +646,18 @@ fun TopBar(
                                     contentPadding = PaddingValues(horizontal = 12.dp),
                                     modifier = if (targetFile.isDirectory) Modifier.fileDropTarget(appState, destPath = targetFile) else Modifier
                                 ) {
-                                    Text(text = displayName, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = MaterialTheme.colorScheme.onSurface)
+                                    val isLast = index == visibleSegments.size - 1
+                                    Text(
+                                        text = displayName,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontSize = 13.sp,
+                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                        ),
+                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                                 if (index < visibleSegments.size - 1) {
-                                    Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
+                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                 }
                             }
                         } else if (appState.currentArchiveUri != null) {
@@ -670,10 +679,18 @@ fun TopBar(
                                     contentPadding = PaddingValues(horizontal = 12.dp)
                                     // Drop target not supported for inside URI-based archives yet
                                 ) {
-                                    Text(text = segment, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = MaterialTheme.colorScheme.onSurface)
+                                    val isLast = index == segments.size - 1
+                                    Text(
+                                        text = segment,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontSize = 13.sp,
+                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                        ),
+                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                                 if (index < segments.size - 1) {
-                                    Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
+                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                 }
                             }
                         } else if (appState.currentSafUri != null) {
@@ -701,10 +718,18 @@ fun TopBar(
                                     contentPadding = PaddingValues(horizontal = 12.dp),
                                     modifier = Modifier.fileDropTarget(appState, destSafUri = uri)
                                 ) {
-                                    Text(text = displayName, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = MaterialTheme.colorScheme.onSurface)
+                                    val isLast = index == safItems.size - 1
+                                    Text(
+                                        text = displayName,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontSize = 13.sp,
+                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                        ),
+                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                                 if (index < safItems.size - 1) {
-                                    Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
+                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                 }
                             }
                         } else if (appState.currentNetworkProvider != null && appState.currentNetworkId != null) {
@@ -735,43 +760,47 @@ fun TopBar(
                                     },
                                     contentPadding = PaddingValues(horizontal = 12.dp)
                                 ) {
+                                    val isLast = index == breadcrumbIds.lastIndex
                                     Text(
                                         text = provider.displayName(id),
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontSize = 13.sp,
+                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                        ),
+                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                                 if (index < breadcrumbIds.lastIndex) {
-                                    Icon(Icons.Default.ChevronRight, null, modifier = Modifier.size(16.dp))
+                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                 }
                             }
                         } else if (appState.libraryItem == LibraryItem.Gallery) {
                             Text(
                                 text = stringResource(R.string.nav_gallery),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else if (appState.libraryItem == LibraryItem.Recent) {
                             Text(
                                 text = stringResource(R.string.nav_recent),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else if (appState.libraryItem == LibraryItem.Documents) {
                             Text(
                                 text = stringResource(R.string.nav_documents),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         } else {
                             Text(
                                 text = stringResource(R.string.home),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }

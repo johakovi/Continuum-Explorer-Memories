@@ -69,6 +69,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val iconTouchSelection = SettingsManager.iconTouchSelection.value
     val defaultViewMode = SettingsManager.defaultViewMode.value
     val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
+    val termuxSupport = SettingsManager.termuxSupport.value
     val iconTheme = SettingsManager.iconTheme.value
 
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -298,6 +299,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Switch(
                         checked = isDefaultArchiveViewerEnabled,
                         onCheckedChange = { SettingsManager.setDefaultArchiveViewerEnabled(context, it) }
+                    )
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_termux_support)) },
+                supportingContent = { Text(stringResource(R.string.settings_termux_support_desc)) },
+                trailingContent = {
+                    Switch(
+                        checked = termuxSupport,
+                        onCheckedChange = { SettingsManager.setTermuxSupportEnabled(context, it) }
                     )
                 }
             )

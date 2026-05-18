@@ -31,11 +31,13 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.filled.Tab
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material.icons.filled.ViewModule
@@ -164,6 +166,17 @@ fun ItemContextMenu(
                     )
                 }
             )
+
+            if (onlyOneSelected && selectedItems.first().isDirectory && selectedItems.first().fileRef != null && isTermuxInstalled(context)) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_open_terminal)) },
+                    onClick = {
+                        onDismiss()
+                        openInTermux(context, selectedItems.first().fileRef!!.absolutePath)
+                    },
+                    leadingIcon = { Icon(Icons.Default.Terminal, null) }
+                )
+            }
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.menu_open_new_window)) },
@@ -412,6 +425,17 @@ fun BackgroundContextMenu(
                     trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                     onClick = { currentScreen = "VIEW" }
                 )
+
+                if (appState.currentPath != null && isTermuxInstalled(context)) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_open_terminal)) },
+                        leadingIcon = { Icon(Icons.Default.Terminal, null) },
+                        onClick = {
+                            onDismiss()
+                            openInTermux(context, appState.currentPath!!.absolutePath)
+                        }
+                    )
+                }
 
                 HorizontalDivider()
 

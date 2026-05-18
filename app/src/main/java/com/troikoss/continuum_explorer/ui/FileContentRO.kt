@@ -282,11 +282,29 @@ fun FileContentRO(appState: FileExplorerState) {
                 viewMode = viewMode,
                 columns = columnCount,
                 onZoom = { factor ->
-                    val newSize = (appState.folderConfigs.gridItemSize * factor).toInt()
-                    appState.folderConfigs.updateGridSize(
-                        newSize.coerceIn(60, 300),
-                        appState.getCurrentStorageKey()
-                    )
+                    when (viewMode) {
+                        ViewMode.GRID, ViewMode.GALLERY -> {
+                            val newSize = (appState.folderConfigs.gridItemSize * factor).toInt()
+                            appState.folderConfigs.updateGridSize(
+                                newSize.coerceIn(60, 300),
+                                appState.getCurrentStorageKey()
+                            )
+                        }
+                        ViewMode.DETAILS -> {
+                            val newSize = (appState.folderConfigs.detailsItemSize * factor).toInt()
+                            appState.folderConfigs.updateDetailsSize(
+                                newSize.coerceIn(16, 64),
+                                appState.getCurrentStorageKey()
+                            )
+                        }
+                        ViewMode.CONTENT -> {
+                            val newSize = (appState.folderConfigs.contentItemSize * factor).toInt()
+                            appState.folderConfigs.updateContentSize(
+                                newSize.coerceIn(32, 120),
+                                appState.getCurrentStorageKey()
+                            )
+                        }
+                    }
                 },
                 onDragStart = { offset ->
                     dragStart = offset

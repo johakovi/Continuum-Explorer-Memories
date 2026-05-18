@@ -440,7 +440,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_gallery),
                                 icon = Icons.Default.Image,
-                                customIcon = R.drawable.ic_gallery_logo,
+                                customIcon = R.drawable.ic_nav_gallery,
                                 onClick = { onItemSelected(NavSection.Gallery) },
                                 appState = appState,
                                 section = NavSection.Gallery
@@ -469,7 +469,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_downloads),
                                 icon = Icons.Default.FileDownload,
-                                customIcon = R.drawable.ic_download_logo,
+                                customIcon = R.drawable.ic_nav_downloads,
                                 onClick = { onItemSelected(NavSection.Downloads) },
                                 appState = appState,
                                 section = NavSection.Downloads
@@ -478,7 +478,7 @@ fun NavigationPane(
                             NavItem(
                                 label = stringResource(R.string.nav_documents),
                                 icon = Icons.AutoMirrored.Filled.List,
-                                customIcon = R.drawable.ic_documents_logo,
+                                customIcon = R.drawable.ic_nav_documents,
                                 onClick = { onItemSelected(NavSection.Documents) },
                                 appState = appState,
                                 section = NavSection.Documents

@@ -197,8 +197,8 @@
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colours for the top bar and tab bar.</string>
     <string name="settings_icon_theme">Icon Theme</string>
-    <string name="settings_icon_theme_colourful" translatable="false">Colourful</string>
-    <string name="settings_icon_theme_colourful_duotone" translatable="false">Colourful Duotone</string>
+    <string name="settings_icon_theme_colourful">Colourful</string>
+    <string name="settings_icon_theme_colourful_duotone">Colourful Duotone</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Choose Icon Theme</string>
     <string name="settings_details_large">Details (Large screens only)</string>
@@ -218,6 +218,8 @@
     <string name="settings_del_permanent">Delete permanently</string>
     <string name="settings_internal_archive">Use Internal Archive Viewer</string>
     <string name="settings_internal_archive_desc">Open zip files directly inside the app instead of launching external apps.</string>
+    <string name="settings_termux_support">Execute scripts in Termux</string>
+    <string name="settings_termux_support_desc">Automatically open .sh files in Termux terminal.</string>
     <string name="settings_shortcuts_desc">View available keyboard and mouse shortcuts</string>
     <string name="settings_default_view_mode">Default View Mode</string>
     <string name="settings_choose_default_view_mode">Choose Default View Mode</string>
@@ -243,6 +245,7 @@
     <string name="menu_restore">Restore</string>
     <string name="menu_delete_permanently">Delete Permanently</string>
     <string name="menu_properties">Properties</string>
+    <string name="menu_open_terminal">Open in Terminal</string>
     <string name="menu_open">Open</string>
     <string name="menu_open_with">Open With…</string>
     <string name="menu_open_new_tab">Open in New Tab</string>

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Slideshow
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -112,6 +113,7 @@ object IconHelper {
                     name.endsWith(".csv") -> extendedColors.xlsIcon
                     name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> extendedColors.docxIcon
                     name.endsWith(".txt") -> extendedColors.txtIcon
+                    name.endsWith(".sh") -> Color.Unspecified
                     else -> extendedColors.filesIcon
                 }
             }
@@ -157,7 +159,7 @@ object IconHelper {
                     Icon(
                         painter = painterResource(id = finalOverlayRes),
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(0.40f).offset(y = 6.dp),
+                        modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
                         tint = Color.White.copy(alpha = 1f)
                     )
                 }
@@ -252,6 +254,7 @@ object IconHelper {
             name.endsWith(".ppt") || name.endsWith(".pptx") || name.endsWith(".odp") -> Icons.Default.Slideshow
 
             name.endsWith(".apk") -> Icons.Default.Android
+            name.endsWith(".sh") -> Icons.Default.Terminal
 
             // Default file icon
             else -> Icons.AutoMirrored.Filled.InsertDriveFile
@@ -293,6 +296,7 @@ object IconHelper {
 
             name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_docx_duo else R.drawable.ic_docx
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
+            name.endsWith(".sh") -> R.drawable.ic_terminal
 
             // Default file icon
             else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_file_duo else R.drawable.ic_file
