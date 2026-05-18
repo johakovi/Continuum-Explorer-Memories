@@ -264,10 +264,10 @@ object IconHelper {
     fun getDrawableForItem(file: UniversalFile, iconTheme: IconTheme = IconTheme.COLOURFUL): Int {
         if (file.isDirectory) {
             return when {
-                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_gallery_logo
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
-                file.providerId == "virtual://downloads" -> R.drawable.ic_download_logo
-                file.providerId == "virtual://documents" -> R.drawable.ic_documents_logo
+                file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
+                file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
                 else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
@@ -305,14 +305,11 @@ object IconHelper {
         val providerId = file.providerId
 
         return when {
-            providerId == "virtual://documents" || name == "documents" || path.endsWith("/documents") -> R.drawable.ic_documents_logo
-            providerId == "virtual://downloads" || name == "download" || name == "downloads" || path.endsWith("/download") || path.endsWith("/downloads") -> R.drawable.ic_download_logo
+            name == "documents" || path.endsWith("/documents") -> R.drawable.ic_documents_logo
+            name == "download" || name == "downloads" || path.endsWith("/download") || path.endsWith("/downloads") -> R.drawable.ic_download_logo
             name == "dcim" || path.endsWith("/dcim") || name == "camera" || path.endsWith("/camera") || path.contains("/dcim/camera") -> R.drawable.ic_camera_logo
-            providerId == "virtual://gallery" || providerId.startsWith("virtual://gallery_album:") ||
-                    name == "pictures" || path.endsWith("/pictures") ||
-                    name == "photos" || path.endsWith("/photos") ||
-                    name == "screenshots" || path.contains("/screenshots") -> R.drawable.ic_gallery_logo
-            providerId == "virtual://recycle_bin" || path.contains("/.trash") -> R.drawable.ic_nav_trash
+            name == "pictures" || path.endsWith("/pictures") || name == "photos" || path.endsWith("/photos") || name == "screenshots" || path.contains("/screenshots") -> R.drawable.ic_gallery_logo
+            path.contains("/.trash") -> R.drawable.ic_nav_trash
             providerId == "virtual://recent" -> R.drawable.ic_nav_recent
             else -> null
         }

@@ -23,6 +23,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -61,6 +64,8 @@ import com.troikoss.continuum_explorer.ui.activities.SettingsActivity
 import com.troikoss.continuum_explorer.model.NavLocation
 import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.LibraryItem
+import com.troikoss.continuum_explorer.model.ViewMode
+import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -81,6 +86,7 @@ fun TopBar(
     val resources = LocalResources.current
 
     var optionsMenuExpanded by remember { mutableStateOf(false) }
+    var currentOptionsScreen by remember { mutableStateOf("MAIN") }
     var addressBar by remember { mutableStateOf(false) }
     var historyMenuExpanded by remember { mutableStateOf(false) }
 
@@ -101,6 +107,16 @@ fun TopBar(
     LaunchedEffect(searchBar) {
         appState.isSearchUIActive = searchBar
     }
+
+    LaunchedEffect(optionsMenuExpanded) {
+        if (!optionsMenuExpanded) {
+            currentOptionsScreen = "MAIN"
+        }
+    }
+
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents)
+    val isInVirtualStorage = appState.libraryItem in virtualStorage
+    val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 
     // Logic to determine what to show in the address bar text field
     val currentPathString = remember(appState.currentPath, appState.currentSafUri, appState.currentArchiveFile, appState.currentArchiveUri, appState.currentArchivePath, appState.currentNetworkId) {
@@ -849,18 +865,169 @@ fun TopBar(
                     containerColor = LocalExtendedColors.current.menuBackground,
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
                 ) {
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.settings)) },
-                        onClick = {
-                            optionsMenuExpanded = false
-                            val intent = Intent(context, SettingsActivity::class.java).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    when (currentOptionsScreen) {
+                        "MAIN" -> {
+                            if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.folder)) },
+                                    leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },
+                                    onClick = {
+                                        optionsMenuExpanded = false
+                                        appState.createNewFolder()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.menu_text_document)) },
+                                    leadingIcon = { Icon(Icons.Default.NoteAdd, null) },
+                                    onClick = {
+                                        optionsMenuExpanded = false
+                                        appState.createNewFile()
+                                    }
+                                )
+                                HorizontalDivider()
                             }
-                            context.startActivity(intent)
-                        },
-                        leadingIcon = { Icon(Icons.Default.Settings, stringResource(R.string.settings)) }
-                    )
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_view)) },
+                                leadingIcon = { Icon(Icons.Default.ViewModule, null) },
+                                trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                                onClick = { currentOptionsScreen = "VIEW" }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_sort)) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                                trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                                onClick = { currentOptionsScreen = "SORT" }
+                            )
+
+                            HorizontalDivider()
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings)) },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    val intent = Intent(context, SettingsActivity::class.java).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(intent)
+                                },
+                                leadingIcon = { Icon(Icons.Default.Settings, stringResource(R.string.settings)) }
+                            )
+                        }
+
+                        "VIEW" -> {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = { currentOptionsScreen = "MAIN" }
+                            )
+                            HorizontalDivider()
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_details)) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ListAlt, null) },
+                                trailingIcon = { if (appState.activeViewMode == ViewMode.DETAILS) { Icon(Icons.Default.Done, null) } },
+                                onClick = {
+                                    appState.folderConfigs.updateViewMode(ViewMode.DETAILS, appState.getCurrentStorageKey())
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_grid)) },
+                                leadingIcon = { Icon(Icons.Default.ViewModule, null) },
+                                trailingIcon = { if (appState.activeViewMode == ViewMode.GRID) { Icon(Icons.Default.Done, null) } },
+                                onClick = {
+                                    appState.folderConfigs.updateViewMode(ViewMode.GRID, appState.getCurrentStorageKey())
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_gallery)) },
+                                leadingIcon = { Icon(Icons.Default.PhotoLibrary, null) },
+                                trailingIcon = { if (appState.activeViewMode == ViewMode.GALLERY) { Icon(Icons.Default.Done, null) } },
+                                onClick = {
+                                    appState.folderConfigs.updateViewMode(ViewMode.GALLERY, appState.getCurrentStorageKey())
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_content)) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                                trailingIcon = { if (appState.activeViewMode == ViewMode.CONTENT) { Icon(Icons.Default.Done, null) } },
+                                onClick = {
+                                    appState.folderConfigs.updateViewMode(ViewMode.CONTENT, appState.getCurrentStorageKey())
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                        }
+
+                        "SORT" -> {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = { currentOptionsScreen = "MAIN" }
+                            )
+                            HorizontalDivider()
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_by_name)) },
+                                leadingIcon = { Icon(Icons.Default.TextFormat, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.NAME) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_by_date)) },
+                                leadingIcon = { Icon(Icons.Default.DateRange, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.DATE) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.DATE, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_by_type)) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.TYPE) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.TYPE, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_by_size)) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.SIZE) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.SIZE, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            if (isInRecycleBin) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.menu_by_date_deleted)) },
+                                    leadingIcon = { Icon(Icons.Default.DateRange, null) },
+                                    trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.DATE_DELETED) },
+                                    onClick = {
+                                        appState.folderConfigs.toggleSort(FileColumnType.DATE_DELETED, appState.getCurrentStorageKey()) { appState.refresh() }
+                                        optionsMenuExpanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.menu_by_location)) },
+                                    leadingIcon = { Icon(Icons.Default.LocationOn, null) },
+                                    trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.DELETED_FROM) },
+                                    onClick = {
+                                        appState.folderConfigs.toggleSort(FileColumnType.DELETED_FROM, appState.getCurrentStorageKey()) { appState.refresh() }
+                                        optionsMenuExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
