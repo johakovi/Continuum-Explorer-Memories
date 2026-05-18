@@ -235,7 +235,7 @@ fun FileExplorerTheme(
 
                 tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText,
-                menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.85f),
+                menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
@@ -334,7 +334,7 @@ fun FileExplorerTheme(
                 txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryLightIcons,
                 tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText,
-                menuBackground = Color.White.copy(alpha = 0.85f)
+                menuBackground = Color.White.copy(alpha = 0.98f)
             )
         }
         else -> {
