@@ -42,6 +42,8 @@ New icon pack
 
 Refurbished home directory
 
+More operatoins in three dot menu
+
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
 
