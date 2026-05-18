@@ -36,6 +36,12 @@ Internal PDF reader
 
 More organized theme settings.
 
+Terminal integration (executing .sh files, open in terminal current directory...)
+
+New icon pack
+
+Refurbished home directory
+
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
 
