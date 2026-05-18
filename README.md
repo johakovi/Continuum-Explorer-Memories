@@ -11,6 +11,8 @@ Note: This project is forked from troikoss / Continuum Explorer
 <img width="2160" height="1686" alt="1000287942" src="https://github.com/user-attachments/assets/0334dde4-b7d7-47e4-b003-9c8344706547" />
 
 ## Key Features:
+Dex theme integration
+
 Tabs & Multi-Window: Support for advanced multitasking.
 
 Recycle Bin: File recovery with undo/redo capabilities.
@@ -23,24 +25,21 @@ Full Peripheral Support: Native mouse support (including right-click context men
 
 Responsive Design: A UI that dynamically adapts to any screen or window dimensions.
 
-Archive Support: Integrated .zip viewer (Support for .7z is planned; .rar support is currently excluded due to licensing).
+Archive Support: Integrated .zip viewer
 
 Network storage managment
 
+Shizuku privilege
+
 ## Planned Features:
-Simple text editor.
-
-Shizuku permission for Android folder usage.
-
-Automatic change for Very Light and Very Dark themes like for Material dark and light themes.
+Internal PDF reader
 
 More organized theme settings.
 
-## Bugs to fix
-"Square" sidebar and "Rounded" window theme elements overlaps
-
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
+
+For opening compressed files in the network storage doesn't work, recomended open them in internal storage
 
 ## Recommended apps and sources
 Text editor by Bill Farmer from [F-Droid](https://f-droid.org/packages/org.billthefarmer.editor)
