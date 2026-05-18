@@ -875,7 +875,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                             // App Name and Version
                             Column {
                                 Text(
-                                    "Continuum Explorer (Memories)",
+                                    "Continuum Explorer",
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -890,7 +890,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "and based on troikoss/continuum-explorer",
+                                    text = "and based on troikoss/continuum_explorer",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
