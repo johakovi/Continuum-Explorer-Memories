@@ -43,7 +43,6 @@ import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.VerticalResizeHandle
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
 
 /**
  * Header row for the "Details" view mode. 
@@ -56,7 +55,6 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
     val nameColumnWidth = appState.folderConfigs.columnWidths.getOrElse(FileColumnType.NAME) { Dp.Unspecified }
 
     val iconSize = appState.folderConfigs.detailsItemSize.dp
-    val fontSize = (appState.folderConfigs.detailsItemSize * 0.5f).sp
 
     Box {
         Row(
@@ -76,8 +74,7 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                 modifier = Modifier.width(nameColumnWidth),
                 isActive = appState.folderConfigs.sortParams.columnType == FileColumnType.NAME,
                 order = appState.folderConfigs.sortParams.order,
-                onClick = { appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() } },
-                fontSize = fontSize
+                onClick = { appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() } }
             )
 
             appState.folderConfigs.visibleColumns.forEachIndexed { index, column ->
@@ -106,8 +103,7 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                         .padding(start = 8.dp),
                     isActive = appState.folderConfigs.sortParams.columnType == column.type,
                     order = appState.folderConfigs.sortParams.order,
-                    onClick = { appState.folderConfigs.toggleSort(column.type, appState.getCurrentStorageKey()) { appState.refresh() } },
-                    fontSize = fontSize
+                    onClick = { appState.folderConfigs.toggleSort(column.type, appState.getCurrentStorageKey()) { appState.refresh() } }
                 )
             }
         }

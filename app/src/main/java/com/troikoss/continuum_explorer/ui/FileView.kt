@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupPositionProvider
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.selectionBackground
@@ -94,7 +93,7 @@ fun FileView(
                 val windowMousePos = containerCoordinates.localToWindow(mousePos)
                 return IntOffset(
                     x = windowMousePos.x.toInt() + 15,
-                    y = windowMousePos.y.toInt() + 15
+                    y = windowMousePos.y.toInt() + 15,
                 )
             }
         }
@@ -338,14 +337,14 @@ private fun FileContentView(
                         onTextLayout = { textLayoutResult ->
                             isOverflowing = textLayoutResult.hasVisualOverflow
                         },
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = (appState.folderConfigs.contentItemSize * 0.4f).sp)
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             },
             supportingContent = {
                 Text(
                     text = if (file.isDirectory) "Folder - $formattedDate" else "$formattedSize - $formattedDate",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = (appState.folderConfigs.contentItemSize * 0.35f).sp)
+                    style = MaterialTheme.typography.bodySmall
                 )
             },
             leadingContent = {
@@ -398,7 +397,6 @@ private fun FileDetailsView(
 
     val shape = RoundedCornerShape(8.dp)
     val itemSize = appState.folderConfigs.detailsItemSize.dp
-    val fontSize = (appState.folderConfigs.detailsItemSize * 0.5f).sp
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Column(
@@ -443,7 +441,7 @@ private fun FileDetailsView(
                         onTextLayout = { textLayoutResult ->
                             isOverflowing = textLayoutResult.hasVisualOverflow
                         },
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = fontSize)
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
@@ -464,7 +462,7 @@ private fun FileDetailsView(
                     Text(
                         text = text,
                         modifier = Modifier.width(width).padding(start = 8.dp),
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = fontSize * 0.9f),
+                        style = MaterialTheme.typography.bodySmall,
                         maxLines = 1
                     )
                 }
