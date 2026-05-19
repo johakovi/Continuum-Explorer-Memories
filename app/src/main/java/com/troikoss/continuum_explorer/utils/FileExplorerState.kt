@@ -605,7 +605,13 @@ class FileExplorerState(
 
     fun formatDate(timestamp: Long): String {
         val date = Date(timestamp)
-        val formatter = SimpleDateFormat("dd.M.yyyy HH:mm", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        calendar.time = date
+        val dateYear = calendar.get(Calendar.YEAR)
+
+        val pattern = if (currentYear == dateYear) "dd.MM HH:mm" else "dd.MM.yyyy HH:mm"
+        val formatter = SimpleDateFormat(pattern, Locale.getDefault())
         return formatter.format(date)
     }
     //fun formatDateUS(timestamp: Long): String = dateFormatter.format(timestamp)

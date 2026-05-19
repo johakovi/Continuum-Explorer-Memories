@@ -1152,7 +1152,7 @@ fun ProgressContent (onClose: () -> Unit) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = FileOperationsManager.getTitleText(context), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        Box(modifier = Modifier.fillMaxWidth().height(18.dp).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceVariant)) {
+        Box(modifier = Modifier.fillMaxWidth().height(18.dp).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))) {
             Box(modifier = Modifier.fillMaxWidth(progress).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
         }
         Spacer(modifier = Modifier.height(16.dp))

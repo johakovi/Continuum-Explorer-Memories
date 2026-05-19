@@ -702,7 +702,7 @@ private fun NavSectionHeader(text: String, isMinimized: Boolean = false) {
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         letterSpacing = 0.5.sp
     )
 }
@@ -902,7 +902,7 @@ private fun NavItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -974,7 +974,7 @@ private fun NavFavoriteItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1041,7 +1041,7 @@ private fun NavSafItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1147,7 +1147,7 @@ private fun NavNetworkItem(
                         Column(modifier = Modifier.padding(vertical = 4.dp)) {
                             Text(
                                 text = connection.displayName,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.bodyMedium
@@ -1159,7 +1159,7 @@ private fun NavNetworkItem(
                                     .padding(vertical = 2.dp)
                                     .height(4.dp),
                                 color = if (progress > 0.9f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                                 strokeCap = StrokeCap.Round,
                                 gapSize = 0.dp,
                                 drawStopIndicator = {}
@@ -1173,7 +1173,7 @@ private fun NavNetworkItem(
                             )
                         }
                     } else {
-                        Text(connection.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 },
                 selected = false,
@@ -1303,7 +1303,7 @@ private fun NavStorageItem(
                                     .padding(vertical = 2.dp)
                                     .height(4.dp),
                                 color = if (progress > 0.9f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                                 strokeCap = StrokeCap.Round,
                                 gapSize = 0.dp,
                                 drawStopIndicator = {}

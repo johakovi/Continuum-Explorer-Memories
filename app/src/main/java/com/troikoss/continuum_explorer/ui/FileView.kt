@@ -313,66 +313,85 @@ private fun FileContentView(
     appState: FileExplorerState,
     toolTipProvider: PopupPositionProvider,
 ) {
-
     val formattedSize = remember(file) { appState.formatSize(file.length) }
     val formattedDate = remember(file) { appState.formatDate(file.lastModified) }
-
     val iconSelectionEnabled = SettingsManager.iconTouchSelection.value
-
     val tooltipState = rememberTooltipState()
     var isOverflowing by remember { mutableStateOf(value = false) }
-
     val shape = RoundedCornerShape(8.dp)
     val itemSize = appState.folderConfigs.contentItemSize.dp
 
-    Column (modifier = Modifier.selectionBackground(isSelected, isHovered, isLead, shape = shape)) {
-        ListItem(
-            headlineContent = {
-                TooltipBox(
-                    positionProvider = toolTipProvider,
-                    tooltip = { if (isOverflowing) PlainTooltip { Text(file.name) } },
-                    state = tooltipState
+    Column(
+        modifier = Modifier.selectionBackground(isSelected, isHovered, isLead, shape = shape)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding( start = 1.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box {
+                val iconModifier = if (iconSelectionEnabled) {
+                    Modifier.size(itemSize).iconTouchToggle(file, appState.selectionManager)
+                } else {
+                    Modifier.size(itemSize)
+                }
+                FileThumbnail(
+                    file = file,
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                    modifier = iconModifier,
+                    iconSize = itemSize
+                )
+                FolderPreview(
+                    folder = file,
+                    thumbSize = itemSize * 0.6f,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                )
+            }
+
+            Spacer(Modifier.width(18.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(itemSize),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    TooltipBox(
+                        positionProvider = toolTipProvider,
+                        tooltip = { if (isOverflowing) PlainTooltip { Text(file.name) } },
+                        state = tooltipState
+                    ) {
+                        Text(
+                            text = file.name,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            onTextLayout = { textLayoutResult ->
+                                isOverflowing = textLayoutResult.hasVisualOverflow
+                            },
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().offset(y = (-8).dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = file.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        onTextLayout = { textLayoutResult ->
-                            isOverflowing = textLayoutResult.hasVisualOverflow
-                        },
-                        style = MaterialTheme.typography.bodyLarge
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
                     )
-                }
-            },
-            supportingContent = {
-                Text(
-                    text = if (file.isDirectory) "$formattedDate" else "$formattedSize - $formattedDate",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            leadingContent = {
-                Box {
-                    val iconModifier = if (iconSelectionEnabled) {
-                        Modifier.size(itemSize).iconTouchToggle(file, appState.selectionManager)
-                    } else {
-                        Modifier.size(itemSize)
+                    if (!file.isDirectory) {
+                        Text(
+                            text = formattedSize,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.End
+                        )
                     }
-                    FileThumbnail(
-                        file = file,
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                        modifier = iconModifier,
-                        iconSize = itemSize
-                    )
-                    FolderPreview(
-                        folder = file,
-                        thumbSize = itemSize * 0.6f,
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                    )
                 }
-            },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
+            }
+        }
         HorizontalDivider()
     }
 }

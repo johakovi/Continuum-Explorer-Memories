@@ -430,7 +430,7 @@ fun FileExplorerTheme(
                 textColor = onSurface,
                 selectionBackground = colorScheme.primaryContainer,
 
-                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.85f),
+                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else secondary,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else secondary,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else secondary,
