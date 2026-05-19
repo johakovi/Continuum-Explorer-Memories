@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 /**
  * Manages the core state and logic for the File Explorer.
@@ -602,7 +602,12 @@ class FileExplorerState(
         }
     }
 
-    fun formatDate(timestamp: Long): String = dateFormatter.format(timestamp)
+    fun formatDate(timestamp: Long): String {
+        val date = Date(timestamp)
+        val formatter = SimpleDateFormat("dd.M.yyyy HH:mm", Locale.getDefault())
+        return formatter.format(date)
+    }
+    //fun formatDate(timestamp: Long): String = dateFormatter.format(timestamp)
     fun formatSize(size: Long): String = Formatter.formatFileSize(context, size)
 
     fun getCurrentStorageKey(): String? {

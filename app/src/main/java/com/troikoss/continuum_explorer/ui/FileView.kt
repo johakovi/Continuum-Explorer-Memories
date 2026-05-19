@@ -41,6 +41,8 @@ import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
 import com.troikoss.continuum_explorer.utils.IconHelper.isMimeTypePreviewable
 import com.troikoss.continuum_explorer.R
+import android.text.format.DateFormat
+
 
 /**
  * Renders a single file or folder item, switching layout based on the current ViewMode.
@@ -311,6 +313,7 @@ private fun FileContentView(
     appState: FileExplorerState,
     toolTipProvider: PopupPositionProvider,
 ) {
+
     val formattedSize = remember(file) { appState.formatSize(file.length) }
     val formattedDate = remember(file) { appState.formatDate(file.lastModified) }
 
@@ -343,7 +346,7 @@ private fun FileContentView(
             },
             supportingContent = {
                 Text(
-                    text = if (file.isDirectory) "Folder - $formattedDate" else "$formattedSize - $formattedDate",
+                    text = if (file.isDirectory) "$formattedDate" else "$formattedSize - $formattedDate",
                     style = MaterialTheme.typography.bodySmall
                 )
             },
