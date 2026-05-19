@@ -607,7 +607,7 @@ class FileExplorerState(
         val formatter = SimpleDateFormat("dd.M.yyyy HH:mm", Locale.getDefault())
         return formatter.format(date)
     }
-    //fun formatDate(timestamp: Long): String = dateFormatter.format(timestamp)
+    //fun formatDateUS(timestamp: Long): String = dateFormatter.format(timestamp)
     fun formatSize(size: Long): String = Formatter.formatFileSize(context, size)
 
     fun getCurrentStorageKey(): String? {
