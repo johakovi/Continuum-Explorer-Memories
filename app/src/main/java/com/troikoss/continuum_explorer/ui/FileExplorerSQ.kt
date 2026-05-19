@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.RectangleShape
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.ThemeShape
@@ -374,7 +375,7 @@ private fun ExplorerBody(
                 PermanentDrawerSheet(
                     modifier = Modifier.width(navPaneWidth),
                     windowInsets = WindowInsets(0, 0, 0, 0),
-                    drawerShape = RectangleShape,
+                    drawerShape = if (contentIsRounded) RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp) else RectangleShape,
                     drawerContainerColor = sidebarBg
                 ) {
                     NavigationPane(
@@ -396,7 +397,7 @@ private fun ExplorerBody(
                 VerticalResizeHandle(
                     showDivider = !contentIsRounded,
                     onResize = { delta ->
-                        appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(200.dp, 300.dp)
+                        appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
                         appState.appConfigs.savePaneWidths()
                     },
                 )

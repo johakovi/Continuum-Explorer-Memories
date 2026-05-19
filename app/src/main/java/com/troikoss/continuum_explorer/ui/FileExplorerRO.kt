@@ -392,7 +392,7 @@ private fun ExplorerBody(
                 VerticalResizeHandle(
                     showDivider = false,
                     onResize = { delta ->
-                        appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(200.dp, 300.dp)
+                        appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
                         appState.appConfigs.savePaneWidths()
                     },
                 )

@@ -1,9 +1,7 @@
 package com.troikoss.continuum_explorer.ui.components
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import com.troikoss.continuum_explorer.ui.activities.MainActivity
 import android.os.Build
 import android.os.Environment
 import android.os.storage.StorageManager
@@ -15,64 +13,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FolderSpecial
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.SdCard
-import androidx.compose.material.icons.filled.Splitscreen
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.Lan
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Usb
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -91,15 +51,13 @@ import androidx.compose.ui.zIndex
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.NavSection
-import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol
-import com.troikoss.continuum_explorer.model.UniversalFile
-import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
+import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.emptyRecycleBin
@@ -112,11 +70,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.roundToInt
-
 /**
  * Data class to hold storage information
  */
-private data class StorageVolumeInfo(
+/*private */data class StorageVolumeInfo(
     val label: String,
     val path: File?,
     val uri: Uri?,
@@ -126,6 +83,8 @@ private data class StorageVolumeInfo(
     val section: NavSection,
     val customIcon: Int? = null
 )
+
+private val MINIMIZED_SIDEBAR_WIDTH = 160.dp
 
 /**
  * A revamped navigation sidebar with section headers and organized locations.
@@ -142,6 +101,7 @@ fun NavigationPane(
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
+    val isMinimized = appState.appConfigs.navPaneWidth < MINIMIZED_SIDEBAR_WIDTH
 
     val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
     val isRecycleBinEnabled by SettingsManager.isRecycleBinEnabled
@@ -178,41 +138,39 @@ fun NavigationPane(
                     } else {
                         // Guess directory on Android 10/11 using getExternalFilesDirs hack
                         externalDirs.find { it != null && !Environment.isExternalStorageEmulated(it) && it.absolutePath.contains(volume.uuid ?: "") }
-                            ?.let { File(it.absolutePath.split("/Android")[0]) }
-                            ?: externalDirs.find { it != null && !Environment.isExternalStorageEmulated(it) }
-                                ?.let { File(it.absolutePath.split("/Android")[0]) }
                     }
-
-                    volumes.add(
-                        StorageVolumeInfo(
-                            label = description.ifEmpty { resources.getString(R.string.nav_external_drive) },
-                            path = directory,
-                            uri = null,
-                            totalSpace = directory?.totalSpace ?: 0L,
-                            freeSpace = directory?.usableSpace ?: 0L,
-                            icon = if (isSdCard) Icons.Default.SdCard else Icons.Default.Usb,
-                            section = NavSection.RemovableVolume(index),
-                            customIcon = R.drawable.ic_storage
+                    
+                    if (directory != null) {
+                        volumes.add(
+                            StorageVolumeInfo(
+                                label = description,
+                                path = directory,
+                                uri = null,
+                                totalSpace = directory.totalSpace,
+                                freeSpace = directory.usableSpace,
+                                icon = if (isSdCard) Icons.Default.SdCard else Icons.Default.Usb,
+                                section = NavSection.RemovableVolume(index),
+                                customIcon = R.drawable.ic_storage
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
         volumes
     }
 
-    val lazyListState = rememberLazyListState()
-
-    // Drag-to-reorder state
-    var draggedItemId by remember { mutableStateOf<String?>(null) }
-    var draggingOffset by remember { mutableFloatStateOf(0f) }
-
-    // Background context menu state
+    // Context menu for the background
     var showBgMenu by remember { mutableStateOf(false) }
     var bgMenuOffset by remember { mutableStateOf(DpOffset.Zero) }
     val density = LocalDensity.current
 
-    val handleWidthPx = with(density) { 56.dp.toPx() }
+    val lazyListState = rememberLazyListState()
+
+    // Reordering state
+    var draggedItemId by remember { mutableStateOf<String?>(null) }
+    var draggingOffset by remember { mutableFloatStateOf(0f) }
+    val handleWidthPx = with(density) { 48.dp.toPx() }
 
     // Calculate visible library items directly without 'remember' based on list reference
     val visibleLibraryItems = appState.appConfigs.libraryOrder.filter { id ->
@@ -226,11 +184,11 @@ fun NavigationPane(
         }
     }
 
-    Box(modifier = Modifier.fillMaxHeight()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             state = lazyListState,
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxSize()
                 .contextMenuDetector(enableLongPress = true, aggressive = false) { offset ->
                     bgMenuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
                     showBgMenu = true
@@ -239,9 +197,9 @@ fun NavigationPane(
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // Section: Favorites
-            item { NavSectionHeader(stringResource(R.string.nav_favorites)) }
+            item { NavSectionHeader(stringResource(R.string.nav_favorites), isMinimized = isMinimized) }
 
-            if (appState.appConfigs.favoritePaths.isEmpty()) {
+            if (appState.appConfigs.favoritePaths.isEmpty() && !isMinimized) {
                 item {
                     Text(
                         text = stringResource(R.string.nav_no_favorites),
@@ -333,25 +291,29 @@ fun NavigationPane(
                                     }
                                 }
                             }
-                            .fileDropTarget(appState, destPath = file)
+                            .fileDropTarget(appState, destPath = file),
+                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                     ) {
                         NavFavoriteItem(
                             label = file.name,
                             path = path,
                             onClick = { appState.navigateTo(file, null); onNavigate() },
                             onRemove = { appState.appConfigs.removeFavorite(path) },
-                            appState = appState
+                            appState = appState,
+                            isMinimized = isMinimized
                         )
                     }
                 }
             }
 
             if (visibleLibraryItems.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    NavSectionHeader(stringResource(R.string.nav_library))
+                if (!isMinimized) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        NavSectionHeader(stringResource(R.string.nav_library), isMinimized = false)
+                    }
                 }
 
                 itemsIndexed(
@@ -434,91 +396,104 @@ fun NavigationPane(
                                         }
                                     }
                                 }
-                            }
+                            },
+                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                     ) {
-                        if (id == "gallery") {
-                            NavItem(
+                        when (id) {
+                            "gallery" -> NavItem(
                                 label = stringResource(R.string.nav_gallery),
                                 icon = Icons.Default.Image,
                                 customIcon = R.drawable.ic_nav_gallery,
                                 onClick = { onItemSelected(NavSection.Gallery) },
                                 appState = appState,
-                                section = NavSection.Gallery
+                                section = NavSection.Gallery,
+                                isMinimized = isMinimized
                             )
-                        } else if (id == "recent") {
-                            NavItem(
+                            "recent" -> NavItem(
                                 label = stringResource(R.string.nav_recent),
                                 icon = Icons.Default.History,
                                 customIcon = R.drawable.ic_nav_recent,
                                 onClick = { onItemSelected(NavSection.Recent) },
                                 appState = appState,
-                                section = NavSection.Recent
+                                section = NavSection.Recent,
+                                isMinimized = isMinimized
                             )
-                        } else if (id == "trash") {
-                            val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                            NavItem(
-                                label = stringResource(R.string.nav_trash),
-                                icon = Icons.Default.Delete,
-                                customIcon = R.drawable.ic_nav_trash,
-                                onClick = { onItemSelected(NavSection.RecycleBin) },
-                                modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
-                                appState = appState,
-                                section = NavSection.RecycleBin
-                            )
-                        } else if (id == "downloads") {
-                            NavItem(
+                            "trash" -> {
+                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                NavItem(
+                                    label = stringResource(R.string.nav_trash),
+                                    icon = Icons.Default.Delete,
+                                    customIcon = R.drawable.ic_nav_trash,
+                                    onClick = { onItemSelected(NavSection.RecycleBin) },
+                                    modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
+                                    appState = appState,
+                                    section = NavSection.RecycleBin,
+                                    isMinimized = isMinimized
+                                )
+                            }
+                            "downloads" -> NavItem(
                                 label = stringResource(R.string.nav_downloads),
                                 icon = Icons.Default.FileDownload,
                                 customIcon = R.drawable.ic_nav_downloads,
                                 onClick = { onItemSelected(NavSection.Downloads) },
                                 appState = appState,
-                                section = NavSection.Downloads
+                                section = NavSection.Downloads,
+                                isMinimized = isMinimized
                             )
-                        } else if (id == "documents") {
-                            NavItem(
+                            "documents" -> NavItem(
                                 label = stringResource(R.string.nav_documents),
                                 icon = Icons.AutoMirrored.Filled.List,
                                 customIcon = R.drawable.ic_nav_documents,
                                 onClick = { onItemSelected(NavSection.Documents) },
                                 appState = appState,
-                                section = NavSection.Documents
+                                section = NavSection.Documents,
+                                isMinimized = isMinimized
                             )
                         }
                     }
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Section: Storage
-            item { NavSectionHeader(stringResource(R.string.nav_storage)) }
-            
-            itemsIndexed(storageVolumes) { _, volume ->
-                NavStorageItem(
-                    label = volume.label,
-                    icon = volume.icon,
-                    totalSpace = volume.totalSpace,
-                    freeSpace = volume.freeSpace,
-                    onClick = { onItemSelected(volume.section) },
-                    modifier = Modifier.fileDropTarget(appState, destPath = volume.path),
-                    appState = appState,
-                    path = volume.path,
-                    onNavigate = onNavigate,
-                    customIcon = volume.customIcon
-                )
-            }
-
-            // Section: Added Locations (SAF)
-            if (appState.appConfigs.addedSafUris.isNotEmpty()) {
+            if (!isMinimized) {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     Spacer(modifier = Modifier.height(16.dp))
-                    NavSectionHeader(stringResource(R.string.nav_added_locations))
+                }
+            }
+
+            // Section: Storage
+            if (!isMinimized) {
+                item { NavSectionHeader(stringResource(R.string.nav_storage), isMinimized = false) }
+            }
+            
+            itemsIndexed(storageVolumes) { _, volume ->
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart) {
+                    NavStorageItem(
+                        label = volume.label,
+                        icon = volume.icon,
+                        totalSpace = volume.totalSpace,
+                        freeSpace = volume.freeSpace,
+                        onClick = { onItemSelected(volume.section) },
+                        modifier = Modifier.fileDropTarget(appState, destPath = volume.path),
+                        appState = appState,
+                        path = volume.path,
+                        onNavigate = onNavigate,
+                        customIcon = volume.customIcon,
+                        isMinimized = isMinimized
+                    )
+                }
+            }
+
+            // Section: Added Locations (SAF)
+            if (appState.appConfigs.addedSafUris.isNotEmpty()) {
+                if (!isMinimized) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        NavSectionHeader(stringResource(R.string.nav_added_locations), isMinimized = false)
+                    }
                 }
 
                 itemsIndexed(
@@ -576,7 +551,8 @@ fun NavigationPane(
                                         }
                                     }
                                 }
-                            }
+                            },
+                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                     ) {
                         NavSafItem(
                             label = label,
@@ -584,7 +560,8 @@ fun NavigationPane(
                             onClick = { onSafItemSelected(uri) },
                             onRemove = { appState.removeSafUri(uri) },
                             modifier = Modifier.fileDropTarget(appState, destSafUri = uri),
-                            appState = appState
+                            appState = appState,
+                            isMinimized = isMinimized
                         )
                     }
                 }
@@ -592,11 +569,13 @@ fun NavigationPane(
 
             // Section: Network
             if (appState.appConfigs.networkConnections.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    NavSectionHeader(stringResource(R.string.nav_network))
+                if (!isMinimized) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        NavSectionHeader(stringResource(R.string.nav_network), isMinimized = false)
+                    }
                 }
 
                 itemsIndexed(
@@ -652,14 +631,16 @@ fun NavigationPane(
                                         }
                                     }
                                 }
-                            }
+                            },
+                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                     ) {
                         NavNetworkItem(
                             connection = connection,
                             onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
                             onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
                             onEdit = { onEditNetworkClick(connection) },
-                            appState = appState
+                            appState = appState,
+                            isMinimized = isMinimized
                         )
                     }
                 }
@@ -669,11 +650,10 @@ fun NavigationPane(
         }
 
         // Background context menu
-        Box(modifier = Modifier.offset(bgMenuOffset.x, bgMenuOffset.y)) {
+        Box(modifier = Modifier.offset { IntOffset(bgMenuOffset.x.roundToPx(), bgMenuOffset.y.roundToPx()) }) {
             NavBackgroundContextMenu(
                 expanded = showBgMenu,
                 onDismissRequest = { showBgMenu = false },
-                appState = appState,
                 onAddStorageClick = onAddStorageClick,
                 onAddNetworkClick = onAddNetworkClick
             )
@@ -685,128 +665,38 @@ fun NavigationPane(
 private fun NavBackgroundContextMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    appState: FileExplorerState,
     onAddStorageClick: () -> Unit,
-    onAddNetworkClick: () -> Unit = {}
+    onAddNetworkClick: () -> Unit
 ) {
-    var currentScreen by remember { mutableStateOf("MAIN") }
-
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = {
-            onDismissRequest()
-            currentScreen = "MAIN"
-        },
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
     ) {
-        when (currentScreen) {
-            "MAIN" -> {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_library_items)) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
-                    trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
-                    onClick = { currentScreen = "LIBRARY" }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_add_storage)) },
-                    leadingIcon = { Icon(Icons.Default.Add, null) },
-                    trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
-                    onClick = { currentScreen = "ADD_STORAGE" }
-                )
-            }
-            "ADD_STORAGE" -> {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
-                    onClick = { currentScreen = "MAIN" }
-                )
-                HorizontalDivider()
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_add_local_storage)) },
-                    leadingIcon = {
-                        val iconTheme = SettingsManager.iconTheme.value
-                        if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-                            val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), null, modifier = Modifier.size(24.dp))
-                        } else {
-                            Icon(Icons.Default.Folder, null)
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        onAddStorageClick()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_add_network_storage)) },
-                    leadingIcon = { Icon(Icons.Default.Cloud, null) },
-                    onClick = {
-                        onDismissRequest()
-                        onAddNetworkClick()
-                    }
-                )
-            }
-            "LIBRARY" -> {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
-                    onClick = { currentScreen = "MAIN" }
-                )
-
-                HorizontalDivider()
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_gallery)) },
-                    leadingIcon = { Icon(Icons.Default.Image, null) },
-                    trailingIcon = { if (appState.appConfigs.isGalleryVisible) Icon(Icons.Default.Check, null) },
-                    onClick = {
-                        appState.appConfigs.toggleGalleryVisibility()
-                        onDismissRequest()
-                        currentScreen = "MAIN"
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_recent)) },
-                    leadingIcon = { Icon(Icons.Default.History, null) },
-                    trailingIcon = { if (appState.appConfigs.isRecentVisible) Icon(Icons.Default.Check, null) },
-                    onClick = {
-                        appState.appConfigs.toggleRecentVisibility()
-                        onDismissRequest()
-                        currentScreen = "MAIN"
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_downloads)) },
-                    leadingIcon = { Icon(Icons.Default.FileDownload, null) },
-                    trailingIcon = { if (appState.appConfigs.isDownloadsVisible) Icon(Icons.Default.Check, null) },
-                    onClick = {
-                        appState.appConfigs.toggleDownloadsVisibility()
-                        onDismissRequest()
-                        currentScreen = "MAIN"
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_documents)) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
-                    trailingIcon = { if (appState.appConfigs.isDocumentsVisible) Icon(Icons.Default.Check, null) },
-                    onClick = {
-                        appState.appConfigs.toggleDocumentsVisibility()
-                        onDismissRequest()
-                        currentScreen = "MAIN"
-                    }
-                )
-            }
-        }
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.nav_add_storage)) },
+            onClick = {
+                onDismissRequest()
+                onAddStorageClick()
+            },
+            leadingIcon = { Icon(Icons.Default.Add, null) }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.nav_add_network_storage)) },
+            onClick = {
+                onDismissRequest()
+                onAddNetworkClick()
+            },
+            leadingIcon = { Icon(Icons.Default.Cloud, null) }
+        )
     }
 }
 
 @Composable
-private fun NavSectionHeader(text: String) {
+private fun NavSectionHeader(text: String, isMinimized: Boolean = false) {
+    if (isMinimized) return
     Text(
         text = text.uppercase(),
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -822,7 +712,6 @@ private fun NavContextMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     appState: FileExplorerState,
-    label: String,
     path: String? = null,
     uri: Uri? = null,
     section: NavSection? = null,
@@ -833,101 +722,41 @@ private fun NavContextMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
     ) {
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.menu_open_new_tab)) },
-            onClick = {
-                onDismissRequest()
-                when (section) {
-                    is NavSection.RecycleBin -> appState.onOpenInNewTab?.invoke(
-                        UniversalFile(name = ".Trash", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "virtual://recycle_bin")
-                    )
-                    is NavSection.Downloads -> appState.onOpenInNewTab?.invoke(
-                        UniversalFile(name = "Download", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "virtual://downloads")
-                    )
-                    is NavSection.Recent -> appState.onOpenInNewTab?.invoke(
-                        UniversalFile(name = "Recent", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "virtual://recent")
-                    )
-                    is NavSection.Gallery -> appState.onOpenInNewTab?.invoke(
-                        UniversalFile(name = "Gallery", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "virtual://gallery")
-                    )
-                    is NavSection.Documents -> appState.onOpenInNewTab?.invoke(
-                        UniversalFile(name = "Documents", isDirectory = true, lastModified = 0, length = 0, provider = LocalProvider, providerId = "virtual://documents")
-                    )
-                    is NavSection.NetworkStorage -> {
-                        val conn = appState.appConfigs.networkConnections.find { it.id == section.connectionId }
-                        if (conn != null) {
-                            val provider = StorageProviders.network(conn)
-                            appState.onOpenInNewTab?.invoke(
-                                UniversalFile(name = conn.displayName, isDirectory = true, lastModified = 0, length = 0, provider = provider, providerId = provider.rootId())
-                            )
+        if (onNavigate != null) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_open)) },
+                onClick = {
+                    onDismissRequest()
+                    onNavigate()
+                },
+                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } // Using back arrow as a placeholder for "Open"
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_open_new_window)) },
+                onClick = {
+                    onDismissRequest()
+                    when {
+                        section is NavSection.RecycleBin -> {
+                            val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                            appState.openInNewWindow(listOf(trashDir.toUniversal()))
                         }
-                    }
-                    else -> if (path != null) {
-                        appState.onOpenInNewTab?.invoke(File(path).toUniversal())
-                    } else if (uri != null) {
-                        val doc = DocumentFile.fromTreeUri(appState.context, uri)
-                        if (doc != null) appState.onOpenInNewTab?.invoke(doc.toUniversal())
-                    }
-                }
-            },
-            leadingIcon = { Icon(Icons.Default.Tab, null) }
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.menu_open_new_window)) },
-            onClick = {
-                onDismissRequest()
-                when (section) {
-                    is NavSection.Recent, is NavSection.Gallery, is NavSection.RecycleBin, is NavSection.Downloads -> {
-                        val intent = Intent(appState.context, MainActivity::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                            if (section is NavSection.Recent) putExtra("isRecent", true)
-                            if (section is NavSection.Gallery) putExtra("isGallery", true)
-                            if (section is NavSection.Downloads) putExtra("isDownloads", true)
-                            if (section is NavSection.Documents) putExtra("isDocuments", true)
-                            if (section is NavSection.RecycleBin) putExtra("isRecycleBin", true)
-                        }
-                        appState.context.startActivity(intent)
-                    }
-                    is NavSection.NetworkStorage -> {
-                        val intent = Intent(appState.context, MainActivity::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                            putExtra("networkConnectionId", section.connectionId)
-                        }
-                        appState.context.startActivity(intent)
-                    }
-                    else -> when {
                         path != null -> appState.openInNewWindow(listOf(File(path).toUniversal()))
                         uri != null -> {
-                            val doc = DocumentFile.fromTreeUri(appState.context, uri)
-                            if (doc != null) appState.openInNewWindow(listOf(doc.toUniversal()))
+                            DocumentFile.fromTreeUri(appState.context, uri)?.let {
+                                appState.openInNewWindow(listOf(it.toUniversal()))
+                            }
                         }
                         else -> appState.openInNewWindow(emptyList())
                     }
-                }
-            },
-            leadingIcon = { Icon(Icons.Default.Splitscreen, null) }
-        )
-        if (section is NavSection.RecycleBin) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
-                onClick = {
-                    onDismissRequest()
-                    appState.emptyRecycleBin()
                 },
-                leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
+                leadingIcon = { Icon(Icons.Default.Tab, null) }
             )
         }
-        if (onEdit != null || onRemove != null) {
-            HorizontalDivider()
-        }
+
         if (onEdit != null) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.nav_network_edit)) },
@@ -938,38 +767,40 @@ private fun NavContextMenu(
                 leadingIcon = { Icon(Icons.Default.Edit, null) }
             )
         }
+
         if (onRemove != null) {
             DropdownMenuItem(
-                text = { Text(if (path != null) stringResource(R.string.menu_remove_favorites) else stringResource(R.string.menu_remove)) },
+                text = { Text(stringResource(R.string.menu_remove)) },
                 onClick = {
                     onDismissRequest()
                     onRemove()
                 },
-                leadingIcon = { Icon(Icons.Default.Delete, null, modifier = Modifier.size(18.dp)) }
+                leadingIcon = { Icon(Icons.Default.Delete, null) }
             )
         }
-        if (section is NavSection.Gallery) {
-            HorizontalDivider()
+
+        if (section is NavSection.RecycleBin) {
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_gallery_albums)) },
+                text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
                 onClick = {
                     onDismissRequest()
-                    appState.appConfigs.toggleGalleryAlbums()
-                    if (appState.libraryItem == LibraryItem.Gallery) {
-                        appState.triggerLoad(forceRefresh = true)
+                    appState.emptyRecycleBin()
+                },
+                leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
+            )
+        }
+
+        if (section is NavSection.Documents) {
+            DropdownMenuItem(
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Show Folders")
+                        Spacer(Modifier.weight(1f))
                     }
                 },
-                leadingIcon = { if (appState.appConfigs.isGalleryAlbumsEnabled) Icon(Icons.Default.Check, null) }
-            )
-        }
-        if (section is NavSection.Documents) {
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_documents_folder)) },
                 onClick = {
                     onDismissRequest()
-                    appState.appConfigs.toggleDocumentsFolder()
-                    onNavigate?.invoke()
+                    appState.appConfigs.isDocumentsFolderEnabled = !appState.appConfigs.isDocumentsFolderEnabled
                 },
                 leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
             )
@@ -1007,64 +838,84 @@ private fun NavItem(
     appState: FileExplorerState,
     modifier: Modifier = Modifier,
     section: NavSection? = null,
-    customIcon: Int? = null
+    customIcon: Int? = null,
+    isMinimized: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
     val density = LocalDensity.current
 
-    Box(modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
-        NavigationDrawerItem(
-            label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            selected = false,
-            onClick = onClick,
-            icon = {
-                val extendedColors = LocalExtendedColors.current
-                val iconTheme = SettingsManager.iconTheme.value
-                val tint = when (section) {
-                    is NavSection.Gallery -> extendedColors.galleryIcon
-                    is NavSection.Recent -> extendedColors.recentIcon
-                    is NavSection.Downloads -> extendedColors.downloadsIcon
-                    is NavSection.RecycleBin -> extendedColors.recycleBinIcon
-                    is NavSection.Documents -> extendedColors.documentsIcon
-                    else -> extendedColors.sidebarIcons
-                }
-                if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
-                    val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
-                        when (customIcon) {
-                            R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
-                            R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
-                            R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
-                            R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
-                            R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
-                            else -> customIcon
-                        }
-                    } else customIcon
-                    Icon(
-                        painter = androidx.compose.ui.res.painterResource(id = finalIcon),
-                        contentDescription = null,
-                        tint = tint,
-                        modifier = Modifier.size(24.dp)
-                    )
-                } else {
-                    Icon(icon, contentDescription = null, tint = tint)
-                }
-            },
-            modifier = Modifier
-                .height(36.dp)
-                .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
-                    menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
-                    expanded = true
-                },
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
-        )
+    val themeBar = SettingsManager.themeBar.value
+    val shape = if (isMinimized) {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else CircleShape
+    } else {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
+    }
+    val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
-        Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+    val iconContent = @Composable {
+        val extendedColors = LocalExtendedColors.current
+        val iconTheme = SettingsManager.iconTheme.value
+        val tint = when (section) {
+            is NavSection.Gallery -> extendedColors.galleryIcon
+            is NavSection.Recent -> extendedColors.recentIcon
+            is NavSection.Downloads -> extendedColors.downloadsIcon
+            is NavSection.RecycleBin -> extendedColors.recycleBinIcon
+            is NavSection.Documents -> extendedColors.documentsIcon
+            else -> extendedColors.sidebarIcons
+        }
+        if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+            val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
+                when (customIcon) {
+                    R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                    R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                    R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                    R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                    R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                    else -> customIcon
+                }
+            } else customIcon
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = finalIcon),
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Icon(icon, contentDescription = null, tint = tint)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .padding(itemPadding)
+            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth().height(36.dp))
+            .clip(shape)
+            .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
+            .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
+                menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
+                expanded = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isMinimized) {
+            iconContent()
+        } else {
+            NavigationDrawerItem(
+                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                selected = false,
+                onClick = onClick,
+                icon = iconContent,
+                modifier = Modifier.height(36.dp),
+                shape = shape
+            )
+        }
+
+        Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
             NavContextMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 appState = appState,
-                label = label,
                 section = section,
                 onNavigate = onClick
             )
@@ -1081,43 +932,62 @@ private fun NavFavoriteItem(
     path: String,
     onClick: () -> Unit,
     onRemove: () -> Unit,
-    appState: FileExplorerState
+    appState: FileExplorerState,
+    modifier: Modifier = Modifier,
+    isMinimized: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
     val density = LocalDensity.current
 
-    Box(modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
-        NavigationDrawerItem(
-            label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            selected = false,
-            onClick = onClick,
-            icon = {
-                val iconTheme = SettingsManager.iconTheme.value
-                if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-                    val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                    Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), contentDescription = null, tint = LocalExtendedColors.current.folderIcon, modifier = Modifier.size(24.dp))
-                } else {
-                    Icon(Icons.Default.Folder, contentDescription = null, tint = LocalExtendedColors.current.folderIcon)
-                }
-            },
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-            modifier = Modifier
-                .height(36.dp)
-                .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
-                    menuOffset = with(density) {
-                        DpOffset(offset.x.toDp(), offset.y.toDp())
-                    }
-                    expanded = true
-                }
-        )
+    val themeBar = SettingsManager.themeBar.value
+    val shape = if (isMinimized) {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else CircleShape
+    } else {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
+    }
+    val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
-        Box (modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+    val iconContent = @Composable {
+        val iconTheme = SettingsManager.iconTheme.value
+        if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+            val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+            Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), contentDescription = null, tint = LocalExtendedColors.current.folderIcon, modifier = Modifier.size(24.dp))
+        } else {
+            Icon(Icons.Default.Folder, contentDescription = null, tint = LocalExtendedColors.current.folderIcon)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .padding(itemPadding)
+            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth().height(36.dp))
+            .clip(shape)
+            .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
+            .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
+                menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
+                expanded = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isMinimized) {
+            iconContent()
+        } else {
+            NavigationDrawerItem(
+                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                selected = false,
+                onClick = onClick,
+                icon = iconContent,
+                shape = shape,
+                modifier = Modifier.height(36.dp)
+            )
+        }
+
+        Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
             NavContextMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 appState = appState,
-                label = label,
                 path = path,
                 onRemove = onRemove,
                 onNavigate = onClick
@@ -1136,35 +1006,55 @@ private fun NavSafItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     appState: FileExplorerState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isMinimized: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
     val density = LocalDensity.current
 
-    Box(modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
-        NavigationDrawerItem(
-            label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            selected = false,
-            onClick = onClick,
-            icon = { Icon(Icons.Default.FolderSpecial, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons) },
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-            modifier = Modifier
-                .height(36.dp)
-                .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
-                    menuOffset = with(density) {
-                        DpOffset(offset.x.toDp(), offset.y.toDp())
-                    }
-                    expanded = true
-                }
-        )
+    val themeBar = SettingsManager.themeBar.value
+    val shape = if (isMinimized) {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else CircleShape
+    } else {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
+    }
+    val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
-        Box (modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+    val iconContent = @Composable {
+        Icon(Icons.Default.FolderSpecial, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
+    }
+
+    Box(
+        modifier = modifier
+            .padding(itemPadding)
+            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth().height(36.dp))
+            .clip(shape)
+            .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
+            .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
+                menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
+                expanded = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isMinimized) {
+            iconContent()
+        } else {
+            NavigationDrawerItem(
+                label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                selected = false,
+                onClick = onClick,
+                icon = iconContent,
+                shape = shape,
+                modifier = Modifier.height(36.dp)
+            )
+        }
+
+        Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
             NavContextMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 appState = appState,
-                label = label,
                 uri = uri,
                 onRemove = onRemove,
                 onNavigate = onClick
@@ -1179,7 +1069,8 @@ private fun NavNetworkItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     onEdit: () -> Unit,
-    appState: FileExplorerState
+    appState: FileExplorerState,
+    isMinimized: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
@@ -1207,79 +1098,97 @@ private fun NavNetworkItem(
         }
     }
 
-    Box(modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
-        NavigationDrawerItem(
-            label = {
-                if (isSmb && diskInfo != null) {
-                    val (totalSpace, freeSpace) = diskInfo!!
-                    val usedSpace = totalSpace - freeSpace
-                    val progress = if (totalSpace > 0) usedSpace.toFloat() / totalSpace.toFloat() else 0f
-                    val totalFormatted = Formatter.formatFileSize(context, totalSpace)
-                    val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                    Column(modifier = Modifier.padding(vertical = 12.dp)) {
-                        Text(
-                            text = connection.displayName,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(4.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
-                            Box(
+    val themeBar = SettingsManager.themeBar.value
+    val shape = if (isMinimized) {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else CircleShape
+    } else {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
+    }
+    val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+
+    val iconContent = @Composable {
+        val iconTheme = SettingsManager.iconTheme.value
+        if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+            val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_network_duo else R.drawable.ic_network
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = drawableId),
+                contentDescription = null,
+                tint = LocalExtendedColors.current.sidebarIcons,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Icon(icon, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(itemPadding)
+            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth())
+            .clip(shape)
+            .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
+            .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
+                menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
+                expanded = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isMinimized) {
+            iconContent()
+        } else {
+            NavigationDrawerItem(
+                label = {
+                    if (isSmb && diskInfo != null) {
+                        val (totalSpace, freeSpace) = diskInfo!!
+                        val usedSpace = totalSpace - freeSpace
+                        val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
+                        val totalFormatted = Formatter.formatFileSize(context, totalSpace)
+                        val freeFormatted = Formatter.formatFileSize(context, freeSpace)
+                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                            Text(
+                                text = connection.displayName,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            LinearProgressIndicator(
+                                progress = { progress },
                                 modifier = Modifier
-                                    .fillMaxWidth(progress)
-                                    .fillMaxHeight()
-                                    .background(MaterialTheme.colorScheme.primary)
+                                    .fillMaxWidth()
+                                    .padding(vertical = 2.dp)
+                                    .height(4.dp),
+                                color = if (progress > 0.9f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                strokeCap = StrokeCap.Round,
+                                gapSize = 0.dp,
+                                drawStopIndicator = {}
+                            )
+                            Text(
+                                text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    } else {
+                        Text(connection.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                } else {
-                    Text(connection.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-            },
-            selected = false,
-            onClick = onClick,
-            icon = {
-                val iconTheme = SettingsManager.iconTheme.value
-                if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-                    val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_network_duo else R.drawable.ic_network
-                    Icon(
-                        painter = androidx.compose.ui.res.painterResource(id = drawableId),
-                        contentDescription = null,
-                        tint = LocalExtendedColors.current.sidebarIcons,
-                        modifier = Modifier.size(24.dp)
-                    )
-                } else {
-                    Icon(icon, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
-                }
-            },
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-            modifier = Modifier
-                .then(if (!isSmb || diskInfo == null) Modifier.height(36.dp) else Modifier)
-                .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
-                    menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
-                    expanded = true
-                }
-        )
+                },
+                selected = false,
+                onClick = onClick,
+                icon = iconContent,
+                shape = shape,
+                modifier = Modifier.then(if (!isSmb || diskInfo == null) Modifier.height(36.dp) else Modifier)
+            )
+        }
 
-        Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+        Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
             NavContextMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 appState = appState,
-                label = connection.displayName,
                 section = NavSection.NetworkStorage(connection.id),
                 onRemove = onRemove,
                 onEdit = onEdit,
@@ -1303,7 +1212,8 @@ private fun NavStorageItem(
     path: File?,
     modifier: Modifier = Modifier,
     onNavigate: () -> Unit = {},
-    customIcon: Int? = null
+    customIcon: Int? = null,
+    isMinimized: Boolean = false
 ) {
     val context = LocalContext.current
     var expandedMenu by remember { mutableStateOf(false) }
@@ -1329,102 +1239,117 @@ private fun NavStorageItem(
     val totalFormatted = Formatter.formatFileSize(context, totalSpace)
     val freeFormatted = Formatter.formatFileSize(context, freeSpace)
 
-    val usedSpace = totalSpace - freeSpace
-    val progress = if (totalSpace > 0) usedSpace.toFloat() / totalSpace.toFloat() else 0f
+    val themeBar = SettingsManager.themeBar.value
+    val shape = if (isMinimized) {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else CircleShape
+    } else {
+        if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
+    }
+    val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+
+    val iconContent = @Composable {
+        val iconTheme = SettingsManager.iconTheme.value
+        if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+            val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
+                when (customIcon) {
+                    R.drawable.ic_folder -> R.drawable.ic_folder_duo
+                    // Add other mappings if storage icons can vary
+                    else -> customIcon
+                }
+            } else customIcon
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = finalIcon),
+                contentDescription = null,
+                tint = LocalExtendedColors.current.sidebarIcons,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Icon(icon, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
+        }
+    }
 
     Column {
-        Box(modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
-            NavigationDrawerItem(
-                label = {
-                    Column(modifier = Modifier.padding(vertical = 12.dp)) {
-                        Text(
-                            text = label,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(4.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(progress)
-                                    .fillMaxHeight()
-                                    .background(MaterialTheme.colorScheme.primary)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                selected = false,
-                onClick = onClick,
-                icon = {
-                    val iconTheme = SettingsManager.iconTheme.value
-                    if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
-                        val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
-                            when (customIcon) {
-                                R.drawable.ic_folder -> R.drawable.ic_folder_duo
-                                // Add other mappings if storage icons can vary
-                                else -> customIcon
-                            }
-                        } else customIcon
-                        Icon(
-                            painter = androidx.compose.ui.res.painterResource(id = finalIcon),
-                            contentDescription = null,
-                            tint = LocalExtendedColors.current.sidebarIcons,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    } else {
-                        Icon(icon, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
-                    }
-                },
-                badge = {
-                    if (path != null) {
-                        IconButton(
-                            onClick = { expandedTree = !expandedTree },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = if (expandedTree) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = if (expandedTree) stringResource(R.string.nav_collapse) else stringResource(R.string.nav_expand),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier.contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
+        Box(
+            modifier = modifier
+                .padding(itemPadding)
+                .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth())
+                .clip(shape)
+                .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
+                .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
                     menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
                     expandedMenu = true
                 },
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-            )
+            contentAlignment = Alignment.Center
+        ) {
+            if (isMinimized) {
+                iconContent()
+            } else {
+                NavigationDrawerItem(
+                    label = {
+                        val usedSpace = totalSpace - freeSpace
+                        val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
+                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                            Text(
+                                text = label,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            LinearProgressIndicator(
+                                progress = { progress },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 2.dp)
+                                    .height(4.dp),
+                                color = if (progress > 0.9f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                strokeCap = StrokeCap.Round,
+                                gapSize = 0.dp,
+                                drawStopIndicator = {}
+                            )
+                            Text(
+                                text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    },
+                    selected = false,
+                    onClick = onClick,
+                    icon = iconContent,
+                    badge = {
+                        if (path != null) {
+                            IconButton(
+                                onClick = { expandedTree = !expandedTree },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (expandedTree) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = if (expandedTree) stringResource(R.string.nav_collapse) else stringResource(R.string.nav_expand),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    },
+                    shape = shape
+                )
+            }
 
-            Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
+            Box(modifier = Modifier.offset { IntOffset(menuOffset.x.roundToPx(), menuOffset.y.roundToPx()) }) {
                 NavContextMenu(
                     expanded = expandedMenu,
                     onDismissRequest = { expandedMenu = false },
                     appState = appState,
-                    label = label,
                     path = path?.absolutePath,
                     onNavigate = onClick
                 )
             }
         }
 
-        if (expandedTree) {
+        if (expandedTree && !isMinimized) {
             subDirs.forEach { childFolder ->
                 StorageFolderTreeItem(
                     folder = childFolder,
@@ -1442,7 +1367,7 @@ private fun StorageFolderTreeItem(
     folder: File,
     level: Int,
     appState: FileExplorerState,
-    onNavigate: () -> Unit = {}
+    onNavigate: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var subDirs by remember { mutableStateOf<List<File>>(emptyList()) }
@@ -1461,55 +1386,37 @@ private fun StorageFolderTreeItem(
     }
 
     Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = (16 + level * 16).dp, end = 16.dp, top = 2.dp, bottom = 2.dp)
-                .clip(MaterialTheme.shapes.small)
-                .clickable { appState.navigateTo(folder, null); onNavigate() }
-                .fileDropTarget(appState, destPath = folder),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.size(28.dp)
-            ) {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = if (expanded) stringResource(R.string.nav_collapse) else stringResource(R.string.nav_expand),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            val iconTheme = SettingsManager.iconTheme.value
-            if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-                val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = drawableId),
-                    contentDescription = null,
-                    tint = LocalExtendedColors.current.folderIcon,
-                    modifier = Modifier.size(20.dp)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Folder,
-                    contentDescription = null,
-                    tint = LocalExtendedColors.current.folderIcon,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = folder.name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+        NavigationDrawerItem(
+            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            selected = false,
+            onClick = {
+                appState.navigateTo(folder, null)
+                onNavigate()
+            },
+            icon = {
+                Spacer(modifier = Modifier.width((level * 16).dp))
+                Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(20.dp), tint = LocalExtendedColors.current.folderIcon)
+            },
+            badge = {
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            },
+            modifier = Modifier.height(32.dp),
+            shape = RoundedCornerShape(16.dp)
+        )
 
         if (expanded) {
-            subDirs.forEach { childFolder ->
+            subDirs.forEach { child ->
                 StorageFolderTreeItem(
-                    folder = childFolder,
+                    folder = child,
                     level = level + 1,
                     appState = appState,
                     onNavigate = onNavigate
