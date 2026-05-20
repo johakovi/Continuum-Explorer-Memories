@@ -356,20 +356,75 @@ object IconHelper {
     }
 
     fun getOverlayIconRes(file: UniversalFile): Int? {
-        return getOverlayIconRes(file.name, file.absolutePath, file.providerId)
+        val internalRoot = android.os.Environment.getExternalStorageDirectory().absolutePath
+        val rootId = file.provider.rootId()
+        val isRoot = file.parentId == rootId || file.parentId == internalRoot ||
+                (file.providerId.startsWith("webdav://") && file.parentId != null && file.parentId!!.endsWith("//"))
+        val isVirtual = file.providerId.startsWith("virtual://")
+
+        // Only show overlays if the folder is in a storage root or is a virtual library item
+        if (!isRoot && !isVirtual && !file.absolutePath.contains("/.trash")) {
+            return null
+        }
+        return getOverlayIconRes(file.name, file.providerId, file.providerId)
     }
 
     fun getOverlayIconRes(name: String, path: String, providerId: String = ""): Int? {
         val lName = name.lowercase()
         val lPath = path.replace("\\", "/").lowercase()
+        val lProviderId = providerId.lowercase()
 
+        // 1. Virtual providers always get their icons
+        if (lProviderId.startsWith("virtual://") || lPath.startsWith("virtual://")) {
+            return when {
+                lPath.contains("recent") -> R.drawable.ic_nav_recent
+                lPath.contains("gallery") -> R.drawable.ic_nav_gallery
+                lPath.contains("downloads") -> R.drawable.ic_nav_downloads
+                lPath.contains("documents") -> R.drawable.ic_nav_documents
+                lPath.contains("trash") || lPath.contains("recycle_bin") -> R.drawable.ic_nav_trash
+                else -> null
+            }
+        }
+
+        // 2. Exception for .trash which we always want to show if it matches
+        if (lPath.endsWith("/.trash") || lPath.contains("/.trash/")) return R.drawable.ic_nav_trash
+
+        // 3. Determine if we are at a "root" level for various providers
+        val internalRoot = android.os.Environment.getExternalStorageDirectory().absolutePath.replace("\\", "/").lowercase()
+
+        val isDirectChildOfInternalRoot = lPath.startsWith("$internalRoot/") &&
+                !lPath.substring(internalRoot.length + 1).contains('/')
+
+        val isDirectChildOfStorageRoot = lPath.startsWith("/storage/") && !lPath.startsWith(internalRoot) &&
+                lPath.substring(9).let { it.contains('/') && !it.substringAfter('/').contains('/') }
+
+        // SAF, Network (WebDAV, FTP, SMB, etc.), Archives
+        val isRemoteOrVirtualRoot = when {
+            lProviderId.startsWith("webdav://") -> {
+                val pathPart = lProviderId.substringAfter("://").substringAfter("/", "")
+                pathPart.isNotEmpty() && !pathPart.trimEnd('/').contains('/')
+            }
+            lProviderId.startsWith("ftp://") || lProviderId.startsWith("sftp://") || lProviderId.startsWith("smb://") -> {
+                val pathPart = lProviderId.substringAfter("://").substringAfter("/", "")
+                pathPart.isNotEmpty() && !pathPart.trimEnd('/').contains('/')
+            }
+            lProviderId.startsWith("content://") -> {
+                // For SAF, if there's no parent-like structure in the ID, it's likely a root child
+                !lProviderId.substringAfterLast("%2f", "").contains("%2f") &&
+                !lProviderId.substringAfterLast("/", "").contains("/")
+            }
+            else -> false
+        }
+
+        // 4. Restrict to root directory as requested
+        if (!isDirectChildOfInternalRoot && !isDirectChildOfStorageRoot && !isRemoteOrVirtualRoot) return null
+
+        // 5. Root folders get their overlays
         return when {
             lName == "documents" || lPath.endsWith("/documents") -> R.drawable.ic_documents_logo
             lName == "download" || lName == "downloads" || lPath.endsWith("/download") || lPath.endsWith("/downloads") -> R.drawable.ic_download_logo
-            lName == "dcim" || lPath.endsWith("/dcim") || lName == "camera" || lPath.endsWith("/camera") || lPath.contains("/dcim/camera") -> R.drawable.ic_camera_logo
-            lName == "pictures" || lPath.endsWith("/pictures") || lName == "photos" || lPath.endsWith("/photos") || lName == "screenshots" || lPath.contains("/screenshots") -> R.drawable.ic_gallery_logo
-            lPath.contains("/.trash") -> R.drawable.ic_nav_trash
-            providerId == "virtual://recent" -> R.drawable.ic_nav_recent
+            lName == "dcim" || lPath.endsWith("/dcim") || lName == "camera" || lPath.endsWith("/camera") -> R.drawable.ic_camera_logo
+            lName == "pictures" || lPath.endsWith("/pictures") || lName == "photos" || lPath.endsWith("/photos") || lName == "screenshots" || lPath.endsWith("/screenshots") -> R.drawable.ic_gallery_logo
             else -> null
         }
     }
