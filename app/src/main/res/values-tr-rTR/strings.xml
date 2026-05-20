@@ -194,6 +194,8 @@
     <string name="settings_del_permanent">Kalıcı sil</string>
     <string name="settings_internal_archive">Dahili Arşiv Görüntüleyicisini kullan</string>
     <string name="settings_internal_archive_desc">Harici uygulamalar yerine, arşiv dosyalarını doğrudan bu uygulamada aç.</string>
+    <string name="settings_termux_support">Betikleri Termux\'ta çalıştır</string>
+    <string name="settings_termux_support_desc">.sh dosyalarını otomatik olarak Termux terminalinde aç.</string>
     <string name="settings_shortcuts_desc">Kullanılabilir klavye ve fare kısayollarını görüntüle</string>
     <string name="settings_default_view_mode">Varsayılan Görünüm Modu</string>
     <string name="settings_choose_default_view_mode">Varsayılan Görünüm Modunu Seç</string>
@@ -217,6 +219,7 @@
     <string name="menu_restore">Geri Yükle</string>
     <string name="menu_delete_permanently">Kalıcı Sil</string>
     <string name="menu_properties">Özellikler</string>
+    <string name="menu_open_terminal">Terminalde aç</string>
     <string name="menu_open">Aç</string>
     <string name="menu_open_with">Birlikte Aç…</string>
     <string name="menu_open_new_tab">Yeni Sekmede Aç</string>
@@ -406,6 +409,7 @@
     <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
     <string name="settings_icon_theme">Simge Teması</string>
     <string name="settings_icon_theme_colourful">Renkli</string>
+    <string name="settings_icon_theme_colourful_duotone">Renkli Çift Tonlu</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Simge Teması Seç</string>
     <string name="msg_remote_permanent_warning">Ağ dosyaları kalıcı olarak silinecek (çöp kutusuna taşınamaz).</string>

@@ -210,6 +210,8 @@
     <string name="settings_del_permanent">Eliminar permanentemente</string>
     <string name="settings_internal_archive">Usar visor interno de archivos</string>
     <string name="settings_internal_archive_desc">Abrir archivos zip directamente en la aplicación en lugar de usar aplicaciones externas.</string>
+    <string name="settings_termux_support">Ejecutar scripts en Termux</string>
+    <string name="settings_termux_support_desc">Abrir automáticamente archivos .sh en la terminal de Termux.</string>
     <string name="settings_shortcuts_desc">Ver atajos de teclado y ratón disponibles</string>
     <string name="settings_default_view_mode">Modo de vista predeterminado</string>
     <string name="settings_choose_default_view_mode">Elegir modo de vista predeterminado</string>
@@ -235,6 +237,7 @@
     <string name="menu_restore">Restaurar</string>
     <string name="menu_delete_permanently">Eliminar permanentemente</string>
     <string name="menu_properties">Propiedades</string>
+    <string name="menu_open_terminal">Abrir en terminal</string>
     <string name="menu_open">Abrir</string>
     <string name="menu_open_with">Abrir con…</string>
     <string name="menu_open_new_tab">Abrir en nueva pestaña</string>
@@ -437,6 +440,7 @@
     <string name="settings_colorful_bars_desc">Activar colores de acento para la barra superior y la barra de pestañas.</string>
     <string name="settings_icon_theme">Tema de iconos</string>
     <string name="settings_icon_theme_colourful">Colorido</string>
+    <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Elegir tema de iconos</string>
     <string name="msg_remote_permanent_warning">Los archivos de red se eliminarán permanentemente (no se pueden mover a la papelera).</string>

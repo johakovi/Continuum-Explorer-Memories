@@ -198,6 +198,7 @@
     <string name="settings_colorful_bars_desc">상단 바와 탭 바에 강조 색상을 적용합니다.</string>
     <string name="settings_icon_theme">아이콘 테마</string>
     <string name="settings_icon_theme_colourful">컬러풀</string>
+    <string name="settings_icon_theme_colourful_duotone">다채로운 듀오톤</string>
     <string name="settings_icon_theme_material">머티리얼</string>
     <string name="settings_choose_icon_theme">아이콘 테마 선택</string>
     <string name="settings_details_large">상세 정보 (대화면 전용)</string>
@@ -217,6 +218,8 @@
     <string name="settings_del_permanent">영구 삭제</string>
     <string name="settings_internal_archive">내장 압축 뷰어 사용</string>
     <string name="settings_internal_archive_desc">압축 파일을 외부 앱 대신 앱 내부에서 직접 엽니다.</string>
+    <string name="settings_termux_support">Termux에서 스크립트 실행</string>
+    <string name="settings_termux_support_desc">Termux 터미널에서 .sh 파일을 자동으로 엽니다.</string>
     <string name="settings_shortcuts_desc">사용 가능한 키보드 및 마우스 단축키 보기</string>
     <string name="settings_default_view_mode">기본 보기 모드</string>
     <string name="settings_choose_default_view_mode">기본 보기 모드 선택</string>
@@ -242,6 +245,7 @@
     <string name="menu_restore">복원</string>
     <string name="menu_delete_permanently">영구 삭제</string>
     <string name="menu_properties">속성</string>
+    <string name="menu_open_terminal">터미널에서 열기</string>
     <string name="menu_open">열기</string>
     <string name="menu_open_with">연결 프로그램…</string>
     <string name="menu_open_new_tab">새 탭에서 열기</string>

@@ -198,6 +198,7 @@
     <string name="settings_colorful_bars_desc">Aktivera accentfärger för toppfältet och flikfältet.</string>
     <string name="settings_icon_theme">Ikontema</string>
     <string name="settings_icon_theme_colourful">Färgglad</string>
+    <string name="settings_icon_theme_colourful_duotone">Färgglad duotone</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Välj ikontema</string>
     <string name="settings_details_large">Detaljer (endast stora skärmar)</string>
@@ -217,6 +218,8 @@
     <string name="settings_del_permanent">Ta bort permanent</string>
     <string name="settings_internal_archive">Använd intern arkivvisare</string>
     <string name="settings_internal_archive_desc">Öppna zip-filer direkt i appen istället för att starta externa appar.</string>
+    <string name="settings_termux_support">Kör skript i Termux</string>
+    <string name="settings_termux_support_desc">Öppna .sh-filer automatiskt i Termux-terminalen.</string>
     <string name="settings_shortcuts_desc">Visa tillgängliga tangentbords- och musgenvägar</string>
     <string name="settings_default_view_mode">Standardvisning</string>
     <string name="settings_choose_default_view_mode">Välj standardvisning</string>
@@ -242,6 +245,7 @@
     <string name="menu_restore">Återställ</string>
     <string name="menu_delete_permanently">Ta bort permanent</string>
     <string name="menu_properties">Egenskaper</string>
+    <string name="menu_open_terminal">Öppna i terminal</string>
     <string name="menu_open">Öppna</string>
     <string name="menu_open_with">Öppna med…</string>
     <string name="menu_open_new_tab">Öppna i ny flik</string>

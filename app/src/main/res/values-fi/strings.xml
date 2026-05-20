@@ -199,6 +199,7 @@
         <string name="settings_colorful_bars_desc">Aktivoi aksentti värit välilehdelle ja ylä ja ala palkeille.</string>
         <string name="settings_icon_theme">Kuvakkeiden tyyli</string>
         <string name="settings_icon_theme_colourful">Värikäs</string>
+        <string name="settings_icon_theme_colourful_duotone">Värikäs duotone</string>
         <string name="settings_icon_theme_material">Material</string>
         <string name="settings_choose_icon_theme">Valitse kuvakkeiden tyyli</string>
         <string name="settings_details_large">Yksityiskohdat (Isoille ruuduille)</string>
@@ -218,6 +219,8 @@
         <string name="settings_del_permanent">Poista lopullisesti</string>
         <string name="settings_internal_archive">Käytä sisäistä arkiston näkymää</string>
         <string name="settings_internal_archive_desc">Avaa zip-tiedosto sovelluksen sisältä, ulkoisen sovellusken puolesta.</string>
+        <string name="settings_termux_support">Suorita skriptit Termuxissa</string>
+        <string name="settings_termux_support_desc">Avaa .sh-tiedostot automaattisesti Termux-terminaalissa.</string>
         <string name="settings_shortcuts_desc">Näytä mahdolliset pikakomennot näppäimistölle ja hiirelle.</string>
         <string name="settings_default_view_mode">Perusnäkymän valinta</string>
         <string name="settings_choose_default_view_mode">Valitse perusnäkymä</string>
@@ -243,6 +246,7 @@
         <string name="menu_restore">Palauta</string>
         <string name="menu_delete_permanently">Poista lopullisesti</string>
         <string name="menu_properties">Ominaisuudet</string>
+        <string name="menu_open_terminal">Avaa terminaalissa</string>
         <string name="menu_open">Avaa</string>
         <string name="menu_open_with">Avaa…</string>
         <string name="menu_open_new_tab">Avaa uudessa välilehdessä</string>

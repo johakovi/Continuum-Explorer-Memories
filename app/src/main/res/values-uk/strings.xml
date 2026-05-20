@@ -198,6 +198,7 @@
     <string name="settings_colorful_bars_desc">Увімкнути акцентні кольори для верхньої панелі та панелі вкладок.</string>
     <string name="settings_icon_theme">Тема значків</string>
     <string name="settings_icon_theme_colourful">Кольорові</string>
+    <string name="settings_icon_theme_colourful_duotone">Барвистий дуотон</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Виберіть тему значків</string>
     <string name="settings_details_large">Деталі (тільки для великих екранів)</string>
@@ -217,6 +218,8 @@
     <string name="settings_del_permanent">Видаляти остаточно</string>
     <string name="settings_internal_archive">Внутрішній переглядач архівів</string>
     <string name="settings_internal_archive_desc">Відкривати ZIP-файли безпосередньо в додатку.</string>
+    <string name="settings_termux_support">Виконувати скрипти в Termux</string>
+    <string name="settings_termux_support_desc">Автоматично відкривати .sh файли в терміналі Termux.</string>
     <string name="settings_shortcuts_desc">Перегляд доступних гарячих клавіш</string>
     <string name="settings_default_view_mode">Вигляд за замовчуванням</string>
     <string name="settings_choose_default_view_mode">Виберіть вигляд за замовчуванням</string>
@@ -242,6 +245,7 @@
     <string name="menu_restore">Відновити</string>
     <string name="menu_delete_permanently">Видалити остаточно</string>
     <string name="menu_properties">Властивості</string>
+    <string name="menu_open_terminal">Відкрити в терміналі</string>
     <string name="menu_open">Відкрити</string>
     <string name="menu_open_with">Відкрити за допомогою…</string>
     <string name="menu_open_new_tab">Відкрити в новій вкладці</string>

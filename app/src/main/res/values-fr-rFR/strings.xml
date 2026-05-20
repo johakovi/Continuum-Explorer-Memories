@@ -210,6 +210,8 @@
     <string name="settings_del_permanent">Supprimer définitivement</string>
     <string name="settings_internal_archive">Utiliser le visualiseur d\'archives interne</string>
     <string name="settings_internal_archive_desc">Ouvrir les fichiers zip directement dans l\'application au lieu de lancer des applications externes.</string>
+    <string name="settings_termux_support">Exécuter des scripts dans Termux</string>
+    <string name="settings_termux_support_desc">Ouvrir automatiquement les fichiers .sh dans le terminal Termux.</string>
     <string name="settings_shortcuts_desc">Voir les raccourcis clavier et souris disponibles</string>
     <string name="settings_default_view_mode">Mode d\'affichage par défaut</string>
     <string name="settings_choose_default_view_mode">Choisir le mode d\'affichage par défaut</string>
@@ -235,6 +237,7 @@
     <string name="menu_restore">Restaurer</string>
     <string name="menu_delete_permanently">Supprimer définitivement</string>
     <string name="menu_properties">Propriétés</string>
+    <string name="menu_open_terminal">Ouvrir dans le terminal</string>
     <string name="menu_open">Ouvrir</string>
     <string name="menu_open_with">Ouvrir avec…</string>
     <string name="menu_open_new_tab">Ouvrir dans un nouvel onglet</string>
@@ -439,6 +442,7 @@
     <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
     <string name="settings_icon_theme">Thème d\'icônes</string>
     <string name="settings_icon_theme_colourful">Coloré</string>
+    <string name="settings_icon_theme_colourful_duotone">Bichromie colorée</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Choisir le thème d\'icônes</string>
     <string name="msg_remote_permanent_warning">Les fichiers réseau seront supprimés définitivement (impossible de les déplacer vers la corbeille).</string>

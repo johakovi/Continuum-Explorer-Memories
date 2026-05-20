@@ -198,6 +198,7 @@
     <string name="settings_colorful_bars_desc">Akzentfarben für die Kopfzeile und die Tab-Leiste aktivieren.</string>
     <string name="settings_icon_theme">Symbol-Design</string>
     <string name="settings_icon_theme_colourful">Farbenfroh</string>
+    <string name="settings_icon_theme_colourful_duotone">Farbenfroher Duoton</string>
     <string name="settings_icon_theme_material">Material</string>
     <string name="settings_choose_icon_theme">Symbol-Design wählen</string>
     <string name="settings_details_large">Details (nur große Bildschirme)</string>
@@ -217,6 +218,8 @@
     <string name="settings_del_permanent">Dauerhaft löschen</string>
     <string name="settings_internal_archive">Internen Archiv-Betrachter verwenden</string>
     <string name="settings_internal_archive_desc">Zip-Dateien direkt in der App öffnen statt externe Apps zu starten.</string>
+    <string name="settings_termux_support">Skripte in Termux ausführen</string>
+    <string name="settings_termux_support_desc">.sh-Dateien automatisch im Termux-Terminal öffnen.</string>
     <string name="settings_shortcuts_desc">Verfügbare Tastatur- und Mauskürzel anzeigen</string>
     <string name="settings_default_view_mode">Standard-Ansichtsmodus</string>
     <string name="settings_choose_default_view_mode">Standard-Ansichtsmodus wählen</string>
@@ -242,6 +245,7 @@
     <string name="menu_restore">Wiederherstellen</string>
     <string name="menu_delete_permanently">Dauerhaft löschen</string>
     <string name="menu_properties">Eigenschaften</string>
+    <string name="menu_open_terminal">Im Terminal öffnen</string>
     <string name="menu_open">Öffnen</string>
     <string name="menu_open_with">Öffnen mit…</string>
     <string name="menu_open_new_tab">In neuem Tab öffnen</string>
