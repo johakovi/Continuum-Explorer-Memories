@@ -29,6 +29,8 @@ object ShizukuManager {
                 val service = IFileService.Stub.asInterface(binder)
                 fileService = service
                 binderDeferred?.complete(service)
+            } else {
+                binderDeferred?.completeExceptionally(RuntimeException("Binder is null or not alive"))
             }
         }
 
@@ -91,7 +93,20 @@ object ShizukuManager {
         }
     }
 
-    fun getServiceBlocking(): IFileService? = runBlocking {
-        getService()
+    fun getServiceBlocking(): IFileService? {
+        val currentService = fileService
+        if (currentService != null && currentService.asBinder().isBinderAlive) return currentService
+
+        // If we're on the main thread and not connected, return null immediately to avoid deadlock.
+        // runBlocking on the main thread prevents the service connection callback from running.
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            // If already trying to bind, getService() was likely called from a background thread
+            // and it's currently waiting. We'll just return null here.
+            return null
+        }
+
+        return runBlocking {
+            getService()
+        }
     }
 }

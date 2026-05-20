@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.documentfile.provider.DocumentFile
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.NavSection
 import com.troikoss.continuum_explorer.model.NetworkConnection
@@ -195,12 +197,26 @@ fun NavigationPane(
         return volumes
     }
 
-    var storageVolumes by remember { mutableStateOf(getStorageVolumes()) }
+    val scope = rememberCoroutineScope()
+    var storageVolumes by remember { mutableStateOf<List<StorageVolumeInfo>>(emptyList()) }
+
+    fun refreshVolumes() {
+        scope.launch(Dispatchers.IO) {
+            val volumes = getStorageVolumes()
+            withContext(Dispatchers.Main) {
+                storageVolumes = volumes
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        refreshVolumes()
+    }
 
     DisposableEffect(context) {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                storageVolumes = getStorageVolumes()
+                refreshVolumes()
             }
         }
         val filter = IntentFilter().apply {
@@ -215,7 +231,7 @@ fun NavigationPane(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val callback = object : StorageManager.StorageVolumeCallback() {
                 override fun onStateChanged(volume: android.os.storage.StorageVolume) {
-                    storageVolumes = getStorageVolumes()
+                    refreshVolumes()
                 }
             }
             storageManager.registerStorageVolumeCallback(context.mainExecutor, callback)
