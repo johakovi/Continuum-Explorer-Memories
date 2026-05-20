@@ -127,6 +127,61 @@ private val VeryLightColorScheme = lightColorScheme(
     outlineVariant = Color(0xFFA2A2A2)
 )
 
+/*private val MateriaLightlColorScheme = lightColorScheme(
+    primary = LightPrimary,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFC8E6C9),
+    onPrimaryContainer = Color(0xFF00372A),
+    secondary = LightSecondary,
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE0E0E0),
+    onSecondaryContainer = Color(0xFF444344),
+    tertiary = LightTertiary,
+    onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFFF1F1F1),
+    onTertiaryContainer = Color(0xFF090909),
+    background = Color(0xFFF1F1F1),
+    onBackground = VeryLightText,
+    surface = VeryLightTopBar,
+    onSurface = VeryLightText,
+    surfaceVariant = Color(0xFFE8E8E8),
+    onSurfaceVariant = VeryLightIcons,
+    surfaceContainer = VeryLightTopBar,
+    surfaceContainerLow = VeryLightSidebar,
+    surfaceContainerHigh = Color(0xFFE8E8E8),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    outline = Color(0xFFA2A2A2),
+    outlineVariant = Color(0xFFA2A2A2)
+)
+
+private val MateriaDarklColorScheme = darkColorScheme(
+    primary = LightPrimary,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFC8E6C9),
+    onPrimaryContainer = Color(0xFF00372A),
+    secondary = LightSecondary,
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE0E0E0),
+    onSecondaryContainer = Color(0xFF444344),
+    tertiary = LightTertiary,
+    onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFFF1F1F1),
+    onTertiaryContainer = Color(0xFF090909),
+    background = Color(0xFFF1F1F1),
+    onBackground = VeryLightText,
+    surface = VeryLightTopBar,
+    onSurface = VeryLightText,
+    surfaceVariant = Color(0xFFE8E8E8),
+    onSurfaceVariant = VeryLightIcons,
+    surfaceContainer = VeryLightTopBar,
+    surfaceContainerLow = VeryLightSidebar,
+    surfaceContainerHigh = Color(0xFFE8E8E8),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    outline = Color(0xFFA2A2A2),
+    outlineVariant = Color(0xFFA2A2A2)
+)
+*/
+
 @Composable
 fun FileExplorerTheme(
     // Dynamic colour is available on Android 12+
@@ -144,25 +199,42 @@ fun FileExplorerTheme(
         ThemeMode.VERY_DARK -> true
         ThemeMode.VERY_LIGHT -> false
     }
+    val dynamicScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else null
 
     val colorScheme = when {
-        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> VeryDarkColorScheme
-        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> VeryLightColorScheme
-        else -> {
-            // For LIGHT, DARK, and SYSTEM themes: use dynamic colors on Android 12+
-            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val context = LocalContext.current
-                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        // 2. Use .copy() to override your primary with the system primary
+        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
+            if (dynamicScheme != null) {
+                VeryDarkColorScheme.copy(
+                    primary = dynamicScheme.primary,
+                    secondary = dynamicScheme.secondary,
+                    tertiary = dynamicScheme.tertiary,
+                    // Optional: you can also copy containers if you want
+                    primaryContainer = dynamicScheme.primaryContainer
+                )
             } else {
-                // Fallback to Material 3 default schemes when dynamic colors unavailable
-                if (darkTheme) {
-                    darkColorScheme()
-                } else {
-                    lightColorScheme()
-                }
+                VeryDarkColorScheme
             }
         }
+
+        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
+            if (dynamicScheme != null) {
+                VeryLightColorScheme.copy(
+                    primary = dynamicScheme.primary,
+                    secondary = dynamicScheme.secondary
+                )
+            } else {
+                VeryLightColorScheme
+            }
+        }
+
+        else -> dynamicScheme ?: if (darkTheme) darkColorScheme() else lightColorScheme()
     }
+
+
 
     val extendedColors = when {
         themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
@@ -352,100 +424,102 @@ fun FileExplorerTheme(
             )
         }
         else -> {
+
+            val primary = colorScheme.primary
             val secondary = colorScheme.secondary
+            val tertiary = colorScheme.tertiary
             val onSurface = colorScheme.onSurface
             ExtendedColors(
-                sidebarBackground = colorScheme.surfaceContainerLow,
-                topBarBackground = colorScheme.surface,
-                navButtonBackground = colorScheme.surface,
-                searchBoxBackground = colorScheme.surfaceContainerHigh,
-                tabBarBackground = colorScheme.surfaceContainerLow,
-                sidebarIcons = secondary,
+                sidebarBackground = colorScheme.surfaceContainer,
+                topBarBackground = colorScheme.surfaceContainerLow,
+                navButtonBackground = colorScheme.surfaceContainerLow,
+                searchBoxBackground = colorScheme.surfaceContainerHighest,
+                tabBarBackground = colorScheme.surfaceContainerHigh,
+                selectionBackground = colorScheme.primaryContainer,
+                sidebarIcons = primary,
                 folderIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeFolders
                     IconTheme.COLOURFULDUO -> ThemeFoldersDuo
-                    else -> secondary
+                    else -> primary
                 },
                 galleryIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeGallery
                     IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> secondary
+                    else -> primary
                 },
                 recentIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeRecent
                     IconTheme.COLOURFULDUO -> ThemeRecentDuo
-                    else -> secondary
+                    else -> primary
                 },
                 filesIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeFile
                     IconTheme.COLOURFULDUO -> ThemeFileDuo
-                    else -> secondary
+                    else -> primary
                 },
                 documentsIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeFiles
                     IconTheme.COLOURFULDUO -> ThemeFilesDuo
-                    else -> secondary
+                    else -> primary
                 },
                 recycleBinIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeRecycleBin
                     IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
-                    else -> secondary
+                    else -> primary
                 },
                 downloadsIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeDownloads
                     IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
-                    else -> secondary
+                    else -> primary
                 },
                 zipIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeZip
                     IconTheme.COLOURFULDUO -> ThemeZipDuo
-                    else -> secondary
+                    else ->  Color(0xFF6E6E6E)
                 },
                 pdfIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemePdf
                     IconTheme.COLOURFULDUO -> ThemePdfDuo
-                    else -> secondary
+                    else -> ThemePdf
                 },
                 xlsIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeXls
                     IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> secondary
+                    else -> ThemeXls
                 },
                 docxIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeDocx
                     IconTheme.COLOURFULDUO -> ThemeDocxDuo
-                    else -> secondary
+                    else -> ThemeDocx
                 },
                 txtIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeTxt
                     IconTheme.COLOURFULDUO -> ThemeTxtDuo
-                    else -> secondary
+                    else -> ThemeTxt
                 },
                 terminalIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeTerminal
                     IconTheme.COLOURFULDUO -> ThemeTerminalDuo
-                    else -> secondary
+                    else -> ThemeTerminal
                 },
-                tabActiveBackground = colorScheme.surface,
+
+                tabActiveBackground = colorScheme.surfaceContainerLow,
                 textColor = onSurface,
-                selectionBackground = colorScheme.primaryContainer,
-
                 menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
-                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else secondary,
-                filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else secondary,
-                galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else secondary,
-                recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else secondary,
-                documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else secondary,
-                recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else secondary,
-                downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else secondary,
-                zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else secondary,
-                pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else secondary,
-                xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else secondary,
-                docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else secondary,
-                txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else secondary,
-                terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else secondary,
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
+                filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
+                galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
+                recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
+                documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else primary,
+                recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else primary,
+                downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else primary,
+                zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else primary,
+                pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else primary,
+                xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
+                docxIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else primary,
+                txtIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else primary,
+                terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else primary,
             )
-
         }
     }
 

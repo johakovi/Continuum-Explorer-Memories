@@ -1,5 +1,6 @@
 package com.troikoss.continuum_explorer.ui
 
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.ScrollState

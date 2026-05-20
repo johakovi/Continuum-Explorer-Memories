@@ -56,3 +56,4 @@ val ThemeRecentDuo = Color(0xFF4CBEE0)
 val ThemeRecycleBinDuo = Color(0xFF98C52F)
 val ThemeDownloadsDuo = Color(0xFF69CCB8)
 
+

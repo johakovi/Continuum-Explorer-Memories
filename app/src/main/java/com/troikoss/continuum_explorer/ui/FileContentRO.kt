@@ -548,9 +548,9 @@ private fun FileGrid(
             else -> GridCells.Fixed(1)
         },
         modifier = if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
-                   else Modifier.fillMaxSize().padding(horizontal = 32.dp),
+        else Modifier.fillMaxSize().padding(horizontal = 32.dp),
         contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(0.dp)
-                         else PaddingValues(16.dp)
+        else PaddingValues(16.dp)
     ) {
         items(
             items = appState.files,

@@ -160,7 +160,7 @@ fun FileExplorerSQ(
     val focusManager = LocalFocusManager.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val themeTop = SettingsManager.themeTop.value
-    val sidebarBg = if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground
+    val sidebarBg = LocalExtendedColors.current.sidebarBackground
 
     // --- Storage Access Framework Launcher ---
     val safLauncher = rememberLauncherForActivityResult(
@@ -383,7 +383,7 @@ private fun ExplorerBody(
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
     val themeTop = SettingsManager.themeTop.value
-    val sidebarBg = if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground
+    val sidebarBg = LocalExtendedColors.current.topBarBackground
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.weight(1f)) {
