@@ -73,6 +73,7 @@ object FileExplorerTheme {
         get() = LocalExtendedColors.current
 }
 
+
 private val VeryDarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
     onPrimary = Color.Black,
@@ -145,23 +146,43 @@ fun FileExplorerTheme(
         ThemeMode.VERY_LIGHT -> false
     }
 
+    val dynamicScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else null
+
     val colorScheme = when {
-        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> VeryDarkColorScheme
-        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> VeryLightColorScheme
-        else -> {
-            // For LIGHT, DARK, and SYSTEM themes: use dynamic colors on Android 12+
-            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val context = LocalContext.current
-                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            } else {
-                // Fallback to Material 3 default schemes when dynamic colors unavailable
-                if (darkTheme) {
-                    darkColorScheme()
-                } else {
-                    lightColorScheme()
-                }
-            }
+        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
+            if (dynamicScheme != null) {
+                VeryDarkColorScheme.copy(
+                    primary = dynamicScheme.primary,
+                    secondary = dynamicScheme.secondary,
+                    tertiary = dynamicScheme.tertiary,
+                    primaryContainer = dynamicScheme.primaryContainer,
+                    onPrimaryContainer = dynamicScheme.onPrimaryContainer,
+                    secondaryContainer = dynamicScheme.secondaryContainer,
+                    onSecondaryContainer = dynamicScheme.onSecondaryContainer,
+                    tertiaryContainer = dynamicScheme.tertiaryContainer,
+                    onTertiaryContainer = dynamicScheme.onTertiaryContainer
+                )
+            } else VeryDarkColorScheme
         }
+        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
+            if (dynamicScheme != null) {
+                VeryLightColorScheme.copy(
+                    primary = dynamicScheme.primary,
+                    secondary = dynamicScheme.secondary,
+                    tertiary = dynamicScheme.tertiary,
+                    primaryContainer = dynamicScheme.primaryContainer,
+                    onPrimaryContainer = dynamicScheme.onPrimaryContainer,
+                    secondaryContainer = dynamicScheme.secondaryContainer,
+                    onSecondaryContainer = dynamicScheme.onSecondaryContainer,
+                    tertiaryContainer = dynamicScheme.tertiaryContainer,
+                    onTertiaryContainer = dynamicScheme.onTertiaryContainer
+                )
+            } else VeryLightColorScheme
+        }
+        else -> dynamicScheme ?: if (darkTheme) darkColorScheme() else lightColorScheme()
     }
 
     val extendedColors = when {
@@ -172,7 +193,7 @@ fun FileExplorerTheme(
                 navButtonBackground = Color(0xFF000000),
                 searchBoxBackground = Color(0xFF1A1A1A),
                 tabBarBackground = Color(0xFF2d2d2f),
-                selectionBackground = DarkPrimarySelection,
+                selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = VeryDarkIcons,
                 folderIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeFolders
@@ -265,7 +286,7 @@ fun FileExplorerTheme(
                 navButtonBackground = VeryLightTopBar,
                 searchBoxBackground = Color(0xFFE3E3E3),
                 tabBarBackground = Color(0xFFfcfcfe),
-                selectionBackground = LightPrimarySelection,
+                selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = VeryLightIcons,
                 folderIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeFolders
