@@ -83,6 +83,58 @@ object IconHelper {
     // --- Public UI Components ---
 
     @Composable
+    fun FolderIcon(
+        name: String,
+        path: String,
+        providerId: String = "",
+        modifier: Modifier = Modifier,
+        iconSize: Dp = 24.dp,
+        tint: Color = LocalExtendedColors.current.folderIcon
+    ) {
+        val iconTheme = SettingsManager.iconTheme.value
+        if (iconTheme == IconTheme.MATERIAL) {
+            Icon(
+                imageVector = Icons.Default.Folder,
+                contentDescription = null,
+                modifier = modifier.size(iconSize),
+                tint = tint
+            )
+            return
+        }
+
+        val overlayRes = getOverlayIconRes(name, path, providerId)
+        Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
+            val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+            Icon(
+                painter = painterResource(id = baseFolderRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                tint = tint
+            )
+
+                if (overlayRes != null) {
+                    val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
+                        when (overlayRes) {
+                            R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                            R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                            R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                            R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                            R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                            else -> overlayRes
+                        }
+                    } else overlayRes
+
+                    Icon(
+                        painter = painterResource(id = finalOverlayRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
+                        tint = Color.White
+                    )
+                }
+        }
+    }
+
+    @Composable
     fun FileThumbnail(
         file: UniversalFile,
         modifier: Modifier = Modifier,
@@ -303,17 +355,20 @@ object IconHelper {
         }
     }
 
-    private fun getOverlayIconRes(file: UniversalFile): Int? {
-        val name = file.name.lowercase()
-        val path = file.absolutePath.lowercase()
-        val providerId = file.providerId
+    fun getOverlayIconRes(file: UniversalFile): Int? {
+        return getOverlayIconRes(file.name, file.absolutePath, file.providerId)
+    }
+
+    fun getOverlayIconRes(name: String, path: String, providerId: String = ""): Int? {
+        val lName = name.lowercase()
+        val lPath = path.replace("\\", "/").lowercase()
 
         return when {
-            name == "documents" || path.endsWith("/documents") -> R.drawable.ic_documents_logo
-            name == "download" || name == "downloads" || path.endsWith("/download") || path.endsWith("/downloads") -> R.drawable.ic_download_logo
-            name == "dcim" || path.endsWith("/dcim") || name == "camera" || path.endsWith("/camera") || path.contains("/dcim/camera") -> R.drawable.ic_camera_logo
-            name == "pictures" || path.endsWith("/pictures") || name == "photos" || path.endsWith("/photos") || name == "screenshots" || path.contains("/screenshots") -> R.drawable.ic_gallery_logo
-            path.contains("/.trash") -> R.drawable.ic_nav_trash
+            lName == "documents" || lPath.endsWith("/documents") -> R.drawable.ic_documents_logo
+            lName == "download" || lName == "downloads" || lPath.endsWith("/download") || lPath.endsWith("/downloads") -> R.drawable.ic_download_logo
+            lName == "dcim" || lPath.endsWith("/dcim") || lName == "camera" || lPath.endsWith("/camera") || lPath.contains("/dcim/camera") -> R.drawable.ic_camera_logo
+            lName == "pictures" || lPath.endsWith("/pictures") || lName == "photos" || lPath.endsWith("/photos") || lName == "screenshots" || lPath.contains("/screenshots") -> R.drawable.ic_gallery_logo
+            lPath.contains("/.trash") -> R.drawable.ic_nav_trash
             providerId == "virtual://recent" -> R.drawable.ic_nav_recent
             else -> null
         }

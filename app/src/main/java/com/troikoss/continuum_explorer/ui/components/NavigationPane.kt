@@ -65,6 +65,7 @@ import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
+import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.emptyRecycleBin
 import com.troikoss.continuum_explorer.utils.fileDropTarget
@@ -998,13 +999,7 @@ private fun NavFavoriteItem(
     val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
-        val iconTheme = SettingsManager.iconTheme.value
-        if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-            val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-            Icon(painter = androidx.compose.ui.res.painterResource(id = drawableId), contentDescription = null, tint = LocalExtendedColors.current.folderIcon, modifier = Modifier.size(24.dp))
-        } else {
-            Icon(Icons.Default.Folder, contentDescription = null, tint = LocalExtendedColors.current.folderIcon)
-        }
+        IconHelper.FolderIcon(name = label, path = path)
     }
 
     Box(
@@ -1081,7 +1076,7 @@ private fun NavSafItem(
     val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
-        Icon(Icons.Default.FolderSpecial, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
+        IconHelper.FolderIcon(name = label, path = uri.toString(), tint = LocalExtendedColors.current.sidebarIcons)
     }
 
     Box(
@@ -1499,7 +1494,7 @@ private fun StorageFolderTreeItem(
             },
             icon = {
                 Spacer(modifier = Modifier.width((level * 16).dp))
-                Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(20.dp), tint = LocalExtendedColors.current.folderIcon)
+                IconHelper.FolderIcon(name = folder.name, path = folder.absolutePath, iconSize = 20.dp)
             },
             badge = {
                 IconButton(

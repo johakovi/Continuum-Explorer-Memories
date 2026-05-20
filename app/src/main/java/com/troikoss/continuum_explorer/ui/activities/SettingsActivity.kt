@@ -923,23 +923,39 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "Fluent UI System Color Icons by Microsoft Corporation",
+                                    text = "- Fluent UI System Color Icons",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "Lets Icons by Leonid Tsvetkov",
+                                    text = "  by Microsoft Corporation",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "IconPark Outline by ByteDance",
+                                    text = "- Lets Icons by Leonid Tsvetkov",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "- IconPark Outline by ByteDance",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
 
                                 Text(
-                                    text = "Bootstrap Icons by The Bootstrap Authors",
+                                    text = "- Bootstrap Icons by The Bootstrap Authors",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = "Font:",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "- Inter Designed by Rasmus Andersson ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
