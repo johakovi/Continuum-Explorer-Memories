@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
@@ -89,10 +90,12 @@ fun TopBar(
     var optionsMenuExpanded by remember { mutableStateOf(false) }
     var currentOptionsScreen by remember { mutableStateOf("MAIN") }
     var addressBar by remember { mutableStateOf(false) }
+    var addressBarFocusedOnce by remember { mutableStateOf(false) }
     var historyMenuExpanded by remember { mutableStateOf(false) }
 
     // Search related state
     var searchBar by remember { mutableStateOf(false) }
+    var searchBarFocusedOnce by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var searchOptionsMenuExpanded by remember { mutableStateOf(false) }
     var searchSubfolders by remember { mutableStateOf(false) }
@@ -167,6 +170,8 @@ fun TopBar(
             textPathValue = textPathValue.copy(
                 selection = TextRange(0, textPathValue.text.length)
             )
+        } else {
+            addressBarFocusedOnce = false
         }
     }
 
@@ -176,6 +181,8 @@ fun TopBar(
             searchQuery = searchQuery.copy(
                 selection = TextRange(0, searchQuery.text.length)
             )
+        } else {
+            searchBarFocusedOnce = false
         }
     }
 
@@ -421,6 +428,10 @@ fun TopBar(
                             modifier = Modifier
                                 .weight(1f)
                                 .focusRequester(focusRequester)
+                                .onFocusChanged { 
+                                    if (it.isFocused) searchBarFocusedOnce = true
+                                    if (searchBar && searchBarFocusedOnce && !it.isFocused) searchBar = false 
+                                }
                                 .focusProperties {
                                     down = FocusRequester.Cancel
                                     up = FocusRequester.Cancel
@@ -816,7 +827,11 @@ fun TopBar(
                             onValueChange = { textPathValue = it },
                             modifier = Modifier
                                 .weight(1f)
-                                .focusRequester(focusRequester),
+                                .focusRequester(focusRequester)
+                                .onFocusChanged { 
+                                    if (it.isFocused) addressBarFocusedOnce = true
+                                    if (addressBar && addressBarFocusedOnce && !it.isFocused) addressBar = false
+                                },
                             singleLine = true,
                             textStyle = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = 14.sp,

@@ -54,6 +54,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -448,10 +449,14 @@ fun Modifier.itemGestures(
     focusRequester: FocusRequester,
     appState: FileExplorerState
 ): Modifier = composed {
+    val focusManager = LocalFocusManager.current
     var lastClickTime by remember { mutableLongStateOf(0L) }
     var isPrimaryClick by remember { mutableStateOf(false) }
 
-    this.pointerInput(file, selectionManager) {
+    this
+        .focusRequester(focusRequester)
+        .focusable()
+        .pointerInput(file, selectionManager) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent()
@@ -464,6 +469,7 @@ fun Modifier.itemGestures(
                     // Consume immediately so containerGestures knows a finger landed on an item
                     // and doesn't clear selection via its own touch-press handler.
                     event.changes.forEach { it.consume() }
+                    focusManager.clearFocus()
                     val pointerId = event.changes[0].id
                     val longPress = awaitLongPressOrCancellation(pointerId)
                     if (longPress != null) {
