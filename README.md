@@ -1,6 +1,7 @@
 
 ## Continuum Explorer (Memories)
-![alt text](https://github.com/user-attachments/assets/9363592b-b9ec-4abd-8fce-548c74da7b41) 
+<img width="72" height="72" alt="ic_launcher" src="https://github.com/user-attachments/assets/4da8432b-f41d-443b-af68-88bec19c9cd7" />
+ 
 
 A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
 
@@ -36,13 +37,7 @@ Internal PDF reader
 
 More organized theme settings.
 
-Terminal integration (executing .sh files, open in terminal current directory...)
-
-New icon pack
-
-Refurbished home directory
-
-More operatoins in three dot menu
+Google Drive and OneDrive optional integration
 
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
