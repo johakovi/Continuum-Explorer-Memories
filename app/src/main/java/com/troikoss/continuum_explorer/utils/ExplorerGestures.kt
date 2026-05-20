@@ -594,7 +594,18 @@ fun Modifier.fileDragSource(
                     // TOUCH LOGIC
                     val longPress = awaitLongPressOrCancellation(down.id)
 
-                    if (longPress != null && wasAlreadySelectedAtPress) {
+                    if (longPress != null) {
+                        // If it wasn't selected, select it now (marking it)
+                        if (!wasAlreadySelectedAtPress) {
+                            if (selectionManager.isInSelectionMode()) {
+                                selectionManager.handleRowClick(file, isShiftPressed = true, isCtrlPressed = false, isTouch = true)
+                            } else {
+                                selectionManager.touchToggle(file)
+                            }
+                        }
+
+                        // Consume the long press so other modifiers (like itemGestures) don't process it again.
+                        longPress.consume()
 
                         if (onShowContextMenu != null) {
                             onShowContextMenu(longPress.position)
@@ -833,11 +844,13 @@ fun Modifier.fileDropTarget(
 fun VerticalResizeHandle(
     onResize: (Dp) -> Unit,
     modifier: Modifier = Modifier,
-    showDivider: Boolean = true
+    showDivider: Boolean = true,
+    onResizeFinished: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
     val currentOnResize by rememberUpdatedState(onResize)
+    val currentOnResizeFinished by rememberUpdatedState(onResizeFinished)
 
     val resizeIcon = remember(context) {
         androidx.compose.ui.input.pointer.PointerIcon(
@@ -867,7 +880,10 @@ fun VerticalResizeHandle(
                         while (true) {
                             val event = awaitPointerEvent()
                             val dragChange = event.changes.firstOrNull() ?: break
-                            if (!dragChange.pressed) break
+                            if (!dragChange.pressed) {
+                                currentOnResizeFinished?.invoke()
+                                break
+                            }
                             val deltaPx = dragChange.positionChange().x
                             if (deltaPx != 0f) {
                                 currentOnResize(with(density) { deltaPx.toDp() })

@@ -29,10 +29,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -43,6 +48,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -87,6 +93,31 @@ import kotlin.math.roundToInt
 private val MINIMIZED_SIDEBAR_WIDTH = 160.dp
 
 /**
+ * Extension to apply a horizontal fading edge to text to prevent jitter from ellipsis
+ * and provide a smooth "slide to invisible" effect.
+ */
+private fun Modifier.fadingEdge(alpha: Float = 1f): Modifier = this
+    .graphicsLayer {
+        this.alpha = alpha
+        this.compositingStrategy = CompositingStrategy.Offscreen
+    }
+    .drawWithContent {
+        drawContent()
+        val fadeWidth = 32.dp.toPx()
+        if (size.width > 0) {
+            val stop = ((size.width - fadeWidth) / size.width).coerceIn(0f, 1f)
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    0f to Color.Black,
+                    stop to Color.Black,
+                    1f to Color.Transparent
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+    }
+
+/**
  * A revamped navigation sidebar with section headers and organized locations.
  */
 @Composable
@@ -97,11 +128,12 @@ fun NavigationPane(
     onAddStorageClick: () -> Unit,
     onAddNetworkClick: () -> Unit = {},
     onEditNetworkClick: (NetworkConnection) -> Unit = {},
-    onNavigate: () -> Unit = {}
+    onNavigate: () -> Unit = {},
+    currentWidth: Dp = appState.appConfigs.navPaneWidth
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
-    val isMinimized = appState.appConfigs.navPaneWidth < MINIMIZED_SIDEBAR_WIDTH
+    val isMinimized = currentWidth < MINIMIZED_SIDEBAR_WIDTH
 
     val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
     val isRecycleBinEnabled by SettingsManager.isRecycleBinEnabled
@@ -197,7 +229,7 @@ fun NavigationPane(
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // Section: Favorites
-            item { NavSectionHeader(stringResource(R.string.nav_favorites), isMinimized = isMinimized) }
+            item { NavSectionHeader(currentWidth, stringResource(R.string.nav_favorites), isMinimized = isMinimized) }
 
             if (appState.appConfigs.favoritePaths.isEmpty() && !isMinimized) {
                 item {
@@ -300,6 +332,7 @@ fun NavigationPane(
                             onClick = { appState.navigateTo(file, null); onNavigate() },
                             onRemove = { appState.appConfigs.removeFavorite(path) },
                             appState = appState,
+                            currentWidth = currentWidth,
                             isMinimized = isMinimized
                         )
                     }
@@ -312,7 +345,7 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_library), isMinimized = false)
+                        NavSectionHeader(currentWidth, stringResource(R.string.nav_library), isMinimized = false)
                     }
                 }
 
@@ -406,6 +439,7 @@ fun NavigationPane(
                                 customIcon = R.drawable.ic_nav_gallery,
                                 onClick = { onItemSelected(NavSection.Gallery) },
                                 appState = appState,
+                                currentWidth = currentWidth,
                                 section = NavSection.Gallery,
                                 isMinimized = isMinimized
                             )
@@ -415,6 +449,7 @@ fun NavigationPane(
                                 customIcon = R.drawable.ic_nav_recent,
                                 onClick = { onItemSelected(NavSection.Recent) },
                                 appState = appState,
+                                currentWidth = currentWidth,
                                 section = NavSection.Recent,
                                 isMinimized = isMinimized
                             )
@@ -427,6 +462,7 @@ fun NavigationPane(
                                     onClick = { onItemSelected(NavSection.RecycleBin) },
                                     modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
                                     appState = appState,
+                                    currentWidth = currentWidth,
                                     section = NavSection.RecycleBin,
                                     isMinimized = isMinimized
                                 )
@@ -437,6 +473,7 @@ fun NavigationPane(
                                 customIcon = R.drawable.ic_nav_downloads,
                                 onClick = { onItemSelected(NavSection.Downloads) },
                                 appState = appState,
+                                currentWidth = currentWidth,
                                 section = NavSection.Downloads,
                                 isMinimized = isMinimized
                             )
@@ -446,6 +483,7 @@ fun NavigationPane(
                                 customIcon = R.drawable.ic_nav_documents,
                                 onClick = { onItemSelected(NavSection.Documents) },
                                 appState = appState,
+                                currentWidth = currentWidth,
                                 section = NavSection.Documents,
                                 isMinimized = isMinimized
                             )
@@ -464,7 +502,7 @@ fun NavigationPane(
 
             // Section: Storage
             if (!isMinimized) {
-                item { NavSectionHeader(stringResource(R.string.nav_storage), isMinimized = false) }
+                item { NavSectionHeader(currentWidth, stringResource(R.string.nav_storage), isMinimized = false) }
             }
             
             itemsIndexed(storageVolumes) { _, volume ->
@@ -477,6 +515,7 @@ fun NavigationPane(
                         onClick = { onItemSelected(volume.section) },
                         modifier = Modifier.fileDropTarget(appState, destPath = volume.path),
                         appState = appState,
+                        currentWidth = currentWidth,
                         path = volume.path,
                         onNavigate = onNavigate,
                         customIcon = volume.customIcon,
@@ -492,7 +531,7 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_added_locations), isMinimized = false)
+                        NavSectionHeader(currentWidth, stringResource(R.string.nav_added_locations), isMinimized = false)
                     }
                 }
 
@@ -561,6 +600,7 @@ fun NavigationPane(
                             onRemove = { appState.removeSafUri(uri) },
                             modifier = Modifier.fileDropTarget(appState, destSafUri = uri),
                             appState = appState,
+                            currentWidth = currentWidth,
                             isMinimized = isMinimized
                         )
                     }
@@ -574,7 +614,7 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_network), isMinimized = false)
+                        NavSectionHeader(currentWidth, stringResource(R.string.nav_network), isMinimized = false)
                     }
                 }
 
@@ -640,6 +680,7 @@ fun NavigationPane(
                             onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
                             onEdit = { onEditNetworkClick(connection) },
                             appState = appState,
+                            currentWidth = currentWidth,
                             isMinimized = isMinimized
                         )
                     }
@@ -695,11 +736,15 @@ private fun NavBackgroundContextMenu(
 }
 
 @Composable
-private fun NavSectionHeader(text: String, isMinimized: Boolean = false) {
-    if (isMinimized) return
+private fun NavSectionHeader(currentWidth: Dp, text: String, isMinimized: Boolean = false) {
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
+    if (textAlpha <= 0f) return
     Text(
         text = text.uppercase(),
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .fadingEdge(textAlpha),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.Normal,
@@ -836,6 +881,7 @@ private fun NavItem(
     icon: ImageVector,
     onClick: () -> Unit,
     appState: FileExplorerState,
+    currentWidth: Dp,
     modifier: Modifier = Modifier,
     section: NavSection? = null,
     customIcon: Int? = null,
@@ -852,6 +898,7 @@ private fun NavItem(
         if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
     }
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
         val extendedColors = LocalExtendedColors.current
@@ -902,7 +949,7 @@ private fun NavItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -933,6 +980,7 @@ private fun NavFavoriteItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     appState: FileExplorerState,
+    currentWidth: Dp,
     modifier: Modifier = Modifier,
     isMinimized: Boolean = false
 ) {
@@ -947,6 +995,7 @@ private fun NavFavoriteItem(
         if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
     }
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
         val iconTheme = SettingsManager.iconTheme.value
@@ -974,7 +1023,7 @@ private fun NavFavoriteItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1006,12 +1055,21 @@ private fun NavSafItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     appState: FileExplorerState,
+    currentWidth: Dp,
     modifier: Modifier = Modifier,
     isMinimized: Boolean = false
 ) {
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
     val density = LocalDensity.current
+
+    var diskInfo by remember(uri) { mutableStateOf<Pair<Long, Long>?>(null) }
+    LaunchedEffect(uri) {
+        withContext(Dispatchers.IO) {
+            diskInfo = com.troikoss.continuum_explorer.providers.SafProvider.getDiskInfo(uri)
+        }
+    }
 
     val themeBar = SettingsManager.themeBar.value
     val shape = if (isMinimized) {
@@ -1020,6 +1078,7 @@ private fun NavSafItem(
         if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
     }
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
         Icon(Icons.Default.FolderSpecial, contentDescription = null, tint = LocalExtendedColors.current.sidebarIcons)
@@ -1028,7 +1087,7 @@ private fun NavSafItem(
     Box(
         modifier = modifier
             .padding(itemPadding)
-            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth().height(36.dp))
+            .then(if (isMinimized) Modifier.size(40.dp) else Modifier.fillMaxWidth())
             .clip(shape)
             .then(if (isMinimized) Modifier.clickable { onClick() } else Modifier)
             .contextMenuDetector(enableLongPress = true, aggressive = true) { offset ->
@@ -1041,12 +1100,50 @@ private fun NavSafItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = {
+                    if (diskInfo != null) {
+                        val (totalSpace, freeSpace) = diskInfo!!
+                        val usedSpace = totalSpace - freeSpace
+                        val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
+                        val totalFormatted = Formatter.formatFileSize(context, totalSpace)
+                        val freeFormatted = Formatter.formatFileSize(context, freeSpace)
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
+                            Text(
+                                text = label,
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            LinearProgressIndicator(
+                                progress = { progress },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 2.dp)
+                                    .height(4.dp),
+                                color = if (progress > 0.9f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                                strokeCap = StrokeCap.Round,
+                                gapSize = 0.dp,
+                                drawStopIndicator = {}
+                            )
+                            Text(
+                                text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip
+                            )
+                        }
+                    } else {
+                        Text(label, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha))
+                    }
+                },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
                 shape = shape,
-                modifier = Modifier.height(36.dp)
+                modifier = Modifier.then(if (diskInfo == null) Modifier.height(36.dp) else Modifier)
             )
         }
 
@@ -1070,6 +1167,7 @@ private fun NavNetworkItem(
     onRemove: () -> Unit,
     onEdit: () -> Unit,
     appState: FileExplorerState,
+    currentWidth: Dp,
     isMinimized: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -1105,6 +1203,7 @@ private fun NavNetworkItem(
         if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
     }
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
         val iconTheme = SettingsManager.iconTheme.value
@@ -1144,12 +1243,12 @@ private fun NavNetworkItem(
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
                         val totalFormatted = Formatter.formatFileSize(context, totalSpace)
                         val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
                             Text(
                                 text = connection.displayName,
                                 fontWeight = FontWeight.Normal,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             LinearProgressIndicator(
@@ -1168,12 +1267,12 @@ private fun NavNetworkItem(
                                 text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip
                             )
                         }
                     } else {
-                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha))
                     }
                 },
                 selected = false,
@@ -1209,6 +1308,7 @@ private fun NavStorageItem(
     freeSpace: Long,
     onClick: () -> Unit,
     appState: FileExplorerState,
+    currentWidth: Dp,
     path: File?,
     modifier: Modifier = Modifier,
     onNavigate: () -> Unit = {},
@@ -1246,6 +1346,7 @@ private fun NavStorageItem(
         if (themeBar == ThemeShape.SQUARE) RectangleShape else RoundedCornerShape(18.dp)
     }
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
+    val textAlpha = if (isMinimized) 0f else ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     val iconContent = @Composable {
         val iconTheme = SettingsManager.iconTheme.value
@@ -1288,12 +1389,12 @@ private fun NavStorageItem(
                     label = {
                         val usedSpace = totalSpace - freeSpace
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
-                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
                             Text(
                                 text = label,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             LinearProgressIndicator(
@@ -1312,8 +1413,8 @@ private fun NavStorageItem(
                                 text = stringResource(R.string.nav_storage_usage_label, freeFormatted, totalFormatted),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                maxLines = 2,
+                                overflow = TextOverflow.Clip
                             )
                         }
                     },
@@ -1355,6 +1456,7 @@ private fun NavStorageItem(
                     folder = childFolder,
                     level = 1,
                     appState = appState,
+                    currentWidth = currentWidth,
                     onNavigate = onNavigate
                 )
             }
@@ -1367,10 +1469,12 @@ private fun StorageFolderTreeItem(
     folder: File,
     level: Int,
     appState: FileExplorerState,
+    currentWidth: Dp,
     onNavigate: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var subDirs by remember { mutableStateOf<List<File>>(emptyList()) }
+    val textAlpha = ((currentWidth - 160.dp) / 40.dp).coerceIn(0f, 1f)
 
     LaunchedEffect(expanded) {
         if (expanded) {
@@ -1387,7 +1491,7 @@ private fun StorageFolderTreeItem(
 
     Column {
         NavigationDrawerItem(
-            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
             selected = false,
             onClick = {
                 appState.navigateTo(folder, null)
@@ -1419,6 +1523,7 @@ private fun StorageFolderTreeItem(
                     folder = child,
                     level = level + 1,
                     appState = appState,
+                    currentWidth = currentWidth,
                     onNavigate = onNavigate
                 )
             }

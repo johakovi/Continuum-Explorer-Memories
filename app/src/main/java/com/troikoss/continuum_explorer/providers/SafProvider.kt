@@ -95,6 +95,38 @@ object SafProvider : StorageProvider {
         return if (doc.renameTo(newName)) docFromId(id)?.toUniversalFile() else null
     }
 
+    fun getDiskInfo(uri: Uri): Pair<Long, Long>? {
+        return try {
+            val authority = uri.authority ?: return null
+            val rootId = if (android.provider.DocumentsContract.isTreeUri(uri)) {
+                android.provider.DocumentsContract.getTreeDocumentId(uri).split(":")[0]
+            } else {
+                android.provider.DocumentsContract.getRootId(uri)
+            }
+            val rootUri = android.provider.DocumentsContract.buildRootUri(authority, rootId)
+            appContext.contentResolver.query(
+                rootUri,
+                arrayOf(
+                    android.provider.DocumentsContract.Root.COLUMN_CAPACITY_BYTES,
+                    android.provider.DocumentsContract.Root.COLUMN_AVAILABLE_BYTES
+                ),
+                null, null, null
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val capacityIndex = cursor.getColumnIndex(android.provider.DocumentsContract.Root.COLUMN_CAPACITY_BYTES)
+                    val availableIndex = cursor.getColumnIndex(android.provider.DocumentsContract.Root.COLUMN_AVAILABLE_BYTES)
+                    if (capacityIndex != -1 && availableIndex != -1) {
+                        val total = cursor.getLong(capacityIndex)
+                        val available = cursor.getLong(availableIndex)
+                        if (total > 0) total to available else null
+                    } else null
+                } else null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun DocumentFile.toUniversalFile(): UniversalFile = UniversalFile(
         name = this.name ?: "Unknown",
         isDirectory = this.isDirectory,

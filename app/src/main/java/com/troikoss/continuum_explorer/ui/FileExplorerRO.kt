@@ -308,7 +308,8 @@ private fun NavigationContent(
         onAddStorageClick = onAddStorage,
         onAddNetworkClick = onAddNetwork,
         onEditNetworkClick = onEditNetwork,
-        onNavigate = onCloseDrawer
+        onNavigate = onCloseDrawer,
+        currentWidth = appState.appConfigs.navPaneWidth // Modal drawer usually full width or fixed, but passing for consistency
     )
 }
 
@@ -358,7 +359,15 @@ private fun ExplorerBody(
 ) {
     val context = LocalContext.current
     val screenSize = appState.getScreenSize()
-    val navPaneWidth = appState.appConfigs.navPaneWidth
+    val rawNavPaneWidth = appState.appConfigs.navPaneWidth
+    val navPaneWidth by androidx.compose.animation.core.animateDpAsState(
+        targetValue = rawNavPaneWidth,
+        label = "NavPaneWidthAnimation",
+        animationSpec = androidx.compose.animation.core.spring(
+            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
+            stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+        )
+    )
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -385,7 +394,8 @@ private fun ExplorerBody(
                             onSafItemSelected = { appState.navigateTo(null, it) },
                             onAddStorageClick = onAddStorage,
                             onAddNetworkClick = onAddNetwork,
-                            onEditNetworkClick = onEditNetwork
+                            onEditNetworkClick = onEditNetwork,
+                            currentWidth = navPaneWidth
                         )
                     }
                 }
@@ -393,8 +403,14 @@ private fun ExplorerBody(
                     showDivider = false,
                     onResize = { delta ->
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
-                        appState.appConfigs.savePaneWidths()
                     },
+                    onResizeFinished = {
+                        val currentWidth = appState.appConfigs.navPaneWidth
+                        if (currentWidth > 80.dp && currentWidth < 160.dp) {
+                            appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                        }
+                        appState.appConfigs.savePaneWidths()
+                    }
                 )
             }
 
