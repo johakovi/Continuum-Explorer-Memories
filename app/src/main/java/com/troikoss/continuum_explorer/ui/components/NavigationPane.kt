@@ -1,6 +1,9 @@
 package com.troikoss.continuum_explorer.ui.components
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -139,8 +142,7 @@ fun NavigationPane(
     val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
     val isRecycleBinEnabled by SettingsManager.isRecycleBinEnabled
 
-    // Gather all storage volumes
-    val storageVolumes = remember(context) {
+    fun getStorageVolumes(): List<StorageVolumeInfo> {
         val volumes = mutableListOf<StorageVolumeInfo>()
 
         // Add Internal Storage
@@ -165,14 +167,14 @@ fun NavigationPane(
                 if (volume.isRemovable) {
                     val description = volume.getDescription(context) ?: ""
                     val isSdCard = description.contains("SD", ignoreCase = true)
-                    
+
                     val directory = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         volume.directory
                     } else {
                         // Guess directory on Android 10/11 using getExternalFilesDirs hack
                         externalDirs.find { it != null && !Environment.isExternalStorageEmulated(it) && it.absolutePath.contains(volume.uuid ?: "") }
                     }
-                    
+
                     if (directory != null) {
                         volumes.add(
                             StorageVolumeInfo(
@@ -190,7 +192,42 @@ fun NavigationPane(
                 }
             }
         }
-        volumes
+        return volumes
+    }
+
+    var storageVolumes by remember { mutableStateOf(getStorageVolumes()) }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                storageVolumes = getStorageVolumes()
+            }
+        }
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_MEDIA_MOUNTED)
+            addAction(Intent.ACTION_MEDIA_UNMOUNTED)
+            addAction(Intent.ACTION_MEDIA_EJECT)
+            addAction(Intent.ACTION_MEDIA_REMOVED)
+            addDataScheme("file")
+        }
+        context.registerReceiver(receiver, filter)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val callback = object : StorageManager.StorageVolumeCallback() {
+                override fun onStateChanged(volume: android.os.storage.StorageVolume) {
+                    storageVolumes = getStorageVolumes()
+                }
+            }
+            storageManager.registerStorageVolumeCallback(context.mainExecutor, callback)
+            onDispose {
+                context.unregisterReceiver(receiver)
+                storageManager.unregisterStorageVolumeCallback(callback)
+            }
+        } else {
+            onDispose {
+                context.unregisterReceiver(receiver)
+            }
+        }
     }
 
     // Context menu for the background

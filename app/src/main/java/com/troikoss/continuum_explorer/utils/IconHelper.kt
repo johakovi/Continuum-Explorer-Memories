@@ -145,6 +145,7 @@ object IconHelper {
     ) {
         val extendedColors = LocalExtendedColors.current
         val isSelected = tint == MaterialTheme.colorScheme.primary
+        val iconTheme = SettingsManager.iconTheme.value
         val finalTint = if (!isSelected) {
             if (file.isDirectory) {
                 when {
@@ -160,7 +161,7 @@ object IconHelper {
                 when {
                     name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
                     name.endsWith(".tar") || name.endsWith(".gz") -> extendedColors.zipIcon
-                    name.endsWith(".pdf") -> extendedColors.pdfIcon
+                    name.endsWith(".pdf") -> if (iconTheme == IconTheme.COLOURFULDUO) Color.Unspecified else extendedColors.pdfIcon
                     name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") ||
                     name.endsWith(".csv") -> extendedColors.xlsIcon
                     name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> extendedColors.docxIcon
@@ -174,7 +175,6 @@ object IconHelper {
         }
 
         if (file.isDirectory) {
-            val iconTheme = SettingsManager.iconTheme.value
             val overlayRes = getOverlayIconRes(file)
 
             if (iconTheme == IconTheme.MATERIAL) {
@@ -219,7 +219,6 @@ object IconHelper {
             return
         }
 
-        val iconTheme = SettingsManager.iconTheme.value
         val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
             painterResource(id = getDrawableForItem(file, iconTheme))
         } else {
@@ -348,7 +347,7 @@ object IconHelper {
 
             name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_docx_duo else R.drawable.ic_docx
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
-            name.endsWith(".sh") -> R.drawable.ic_terminal
+            name.endsWith(".sh") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_terminal_duo else R.drawable.ic_terminal
 
             // Default file icon
             else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_file_duo else R.drawable.ic_file
