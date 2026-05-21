@@ -10,12 +10,19 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemGestures
+import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -48,8 +55,10 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -897,6 +906,39 @@ fun TopBar(
             }) {
                 Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
             }
+            
+            // DEV BUTTON FOR TESTING INSETS
+            var showDevInfo by remember { mutableStateOf(false) }
+            val density = LocalDensity.current
+            val captionInsets = WindowInsets.captionBar
+            
+            IconButton(onClick = { showDevInfo = true }) {
+                Icon(Icons.Default.BugReport, contentDescription = "Dev Info", tint = Color.Red)
+            }
+            
+            if (showDevInfo) {
+                AlertDialog(
+                    onDismissRequest = { showDevInfo = false },
+                    confirmButton = { TextButton(onClick = { showDevInfo = false }) { Text("OK") } },
+                    title = { Text("Dev Info - Window Insets") },
+                    text = {
+                        Column {
+                            val config = androidx.compose.ui.platform.LocalConfiguration.current
+                            val ctx = androidx.compose.ui.platform.LocalContext.current
+                            val isMulti = try { (ctx as? android.app.Activity)?.isInMultiWindowMode == true } catch(_: Exception) { false }
+                            val configStr = config.toString()
+                            val isSemConfig = configStr.contains("dexMode", ignoreCase = true) || configStr.contains("semDesktopModeEnabled=1")
+                            val isSemGlobal = try { android.provider.Settings.Global.getInt(ctx.contentResolver, "sem_desktop_mode_enabled", 0) == 1 } catch(_: Exception) { false }
+                            
+                            Text("Multi-Window: $isMulti")
+                            Text("DeX Config: ${configStr.contains("dexMode")}")
+                            Text("DeX Global: $isSemGlobal")
+                            Text("Caption T: ${with(density) { captionInsets.getTop(density).toDp() }}")
+                        }
+                    }
+                )
+            }
+
             Box {
                 IconButton(onClick = { optionsMenuExpanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.options))

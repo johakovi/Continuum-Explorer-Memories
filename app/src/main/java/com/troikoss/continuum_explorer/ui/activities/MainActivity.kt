@@ -23,6 +23,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import android.Manifest
+import androidx.compose.ui.unit.dp
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
 import java.util.UUID
@@ -60,7 +62,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            window.setRestrictedCaptionAreaListener { rect ->
+                val density = resources.displayMetrics.density
+                val screenWidth = resources.displayMetrics.widthPixels
+                
+                if (rect.width() > 0) {
+                    val rightPadding = if (rect.left > screenWidth / 2) rect.width() else 0
+                    val leftPadding = if (rect.right < screenWidth / 2) rect.width() else 0
+                    
+                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(
+                        (leftPadding / density).dp,
+                        (rightPadding / density).dp
+                    )
+                } else {
+                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(0.dp, 0.dp)
+                }
+            }
+        }
         Shizuku.addRequestPermissionResultListener(shizukuPermissionListener)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

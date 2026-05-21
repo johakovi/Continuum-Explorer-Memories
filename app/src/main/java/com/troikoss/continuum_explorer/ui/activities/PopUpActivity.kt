@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.format.Formatter
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,8 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -75,7 +79,25 @@ import java.util.UUID
 
 class PopUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            window.setRestrictedCaptionAreaListener { rect ->
+                val density = resources.displayMetrics.density
+                val screenWidth = resources.displayMetrics.widthPixels
+                if (rect.width() > 0) {
+                    val rightPadding = if (rect.left > screenWidth / 2) rect.width() else 0
+                    val leftPadding = if (rect.right < screenWidth / 2) rect.width() else 0
+                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(
+                        (leftPadding / density).dp,
+                        (rightPadding / density).dp
+                    )
+                } else {
+                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(0.dp, 0.dp)
+                }
+            }
+        }
 
         setContent {
             FileExplorerTheme {
@@ -95,20 +117,54 @@ class PopUpActivity : ComponentActivity() {
                     ) {
                         val popupType by FileOperationsManager.popupType
                         
-                        when (popupType) {
-                            PopupType.INPUT_TEXT -> InputContent(onClose = { finish() })
-                            PopupType.COLLISION -> CollisionContent()
-                            PopupType.MOVE_COPY_CHOICE -> MoveCopyContent(onClose = { finish() })
-                            PopupType.DELETE_CONFIRM -> DeleteConfirmContent(onClose = { finish() })
-                            PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent(onClose = { finish() })
-                            PopupType.PASSWORD_INPUT -> PasswordInputContent(onClose = { finish() })
-                            PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent(onClose = { finish() })
-                            PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent(onClose = { finish() })
-                            PopupType.SHORTCUTS -> ShortcutsContent(onClose = { finish() })
-                            PopupType.PROPERTIES -> PropertiesContent(onClose = { finish() })
-                            PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
-                            PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
-                            else -> ProgressContent(onClose = { finish() })
+                        Box {
+                            when (popupType) {
+                                PopupType.INPUT_TEXT -> InputContent(onClose = { finish() })
+                                PopupType.COLLISION -> CollisionContent()
+                                PopupType.MOVE_COPY_CHOICE -> MoveCopyContent(onClose = { finish() })
+                                PopupType.DELETE_CONFIRM -> DeleteConfirmContent(onClose = { finish() })
+                                PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent(onClose = { finish() })
+                                PopupType.PASSWORD_INPUT -> PasswordInputContent(onClose = { finish() })
+                                PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent(onClose = { finish() })
+                                PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent(onClose = { finish() })
+                                PopupType.SHORTCUTS -> ShortcutsContent(onClose = { finish() })
+                                PopupType.PROPERTIES -> PropertiesContent(onClose = { finish() })
+                                PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
+                                PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
+                                else -> ProgressContent(onClose = { finish() })
+                            }
+                            
+                            // DEV BUTTON
+                            var showDevInfo by remember { mutableStateOf(false) }
+                            val density = LocalDensity.current
+                            val captionInsets = WindowInsets.captionBar
+                            
+                            IconButton(
+                                onClick = { showDevInfo = true },
+                                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                            ) {
+                                Icon(Icons.Default.BugReport, "Dev", tint = Color.Red.copy(alpha = 0.5f))
+                            }
+                            
+                            if (showDevInfo) {
+                                AlertDialog(
+                                    onDismissRequest = { showDevInfo = false },
+                                    confirmButton = { TextButton(onClick = { showDevInfo = false }) { Text("OK") } },
+                                    title = { Text("Dev Info") },
+                                    text = {
+                                        Column {
+                                            val config = androidx.compose.ui.platform.LocalConfiguration.current
+                                            val ctx = androidx.compose.ui.platform.LocalContext.current
+                                            val isMulti = try { (ctx as? android.app.Activity)?.isInMultiWindowMode == true } catch(_: Exception) { false }
+                                            val isSetting = try { android.provider.Settings.System.getInt(ctx.contentResolver, "sem_desktop_mode_enabled", 0) == 1 } catch(_: Exception) { false }
+
+                                            Text("DeX Setting: $isSetting")
+                                            Text("Multi-Window: $isMulti")
+                                            Text("Caption T: ${with(density) { WindowInsets.captionBar.getTop(density).toDp() }}")
+                                        }
+                                    }
+                                )
+                            }
                         }
                     }
                 }

@@ -59,7 +59,8 @@ data class ExtendedColors(
     val terminalIconDuo: Color,
     val tabActiveBackground: Color,
     val textColor: Color,
-    val menuBackground: Color
+    val menuBackground: Color,
+    val background: Color
 )
 
 val LocalExtendedColors = staticCompositionLocalOf<ExtendedColors> {
@@ -189,7 +190,7 @@ fun FileExplorerTheme(
                 topBarBackground = VeryDarkTopBar,
                 navButtonBackground = Color(0xFF000000),
                 searchBoxBackground = Color(0xFF1A1A1A),
-                tabBarBackground = Color(0xFF2d2d2f),
+                tabBarBackground = Color(0xFF131313),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
                 folderIcon = when (iconTheme) {
@@ -261,6 +262,7 @@ fun FileExplorerTheme(
                 tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText,
                 menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
+                background = Color(0xFF000000),
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
@@ -366,7 +368,8 @@ fun FileExplorerTheme(
                 terminalIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else VeryLightIcons,
                 tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText,
-                menuBackground = Color.White.copy(alpha = 0.98f)
+                menuBackground = Color.White.copy(alpha = 0.98f),
+                background = Color(0xFFF1F1F1)
             )
         }
         else -> {
@@ -381,9 +384,7 @@ fun FileExplorerTheme(
                 navButtonBackground = colorScheme.surfaceContainerLow,
                 searchBoxBackground = colorScheme.surfaceContainerHighest,
                 tabBarBackground = colorScheme.surfaceContainerHigh,
-                /* background = primary, */
-                /* background = colorScheme.surfaceVariant */
-                /* background = colorScheme.surface */
+                background = colorScheme.surface,
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
                 folderIcon = when (iconTheme) {
@@ -493,6 +494,16 @@ fun FileExplorerTheme(
                     SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
                 }
             )
+            
+            androidx.core.view.WindowCompat.setDecorFitsSystemWindows(context.window, false)
+
+            if (Build.VERSION.SDK_INT >= 35) {
+                // For Android 15+ Desktop Windowing
+                context.window.insetsController?.setSystemBarsAppearance(
+                    android.view.WindowInsetsController.APPEARANCE_TRANSPARENT_CAPTION_BAR_BACKGROUND,
+                    android.view.WindowInsetsController.APPEARANCE_TRANSPARENT_CAPTION_BAR_BACKGROUND
+                )
+            }
         }
         onDispose {}
     }
