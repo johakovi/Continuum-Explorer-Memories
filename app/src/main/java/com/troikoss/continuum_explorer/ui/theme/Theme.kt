@@ -382,6 +382,8 @@ fun FileExplorerTheme(
                 searchBoxBackground = colorScheme.surfaceContainerHighest,
                 tabBarBackground = colorScheme.surfaceContainerHigh,
                 /* background = primary, */
+                /* background = colorScheme.surfaceVariant */
+                /* background = colorScheme.surface */
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
                 folderIcon = when (iconTheme) {
