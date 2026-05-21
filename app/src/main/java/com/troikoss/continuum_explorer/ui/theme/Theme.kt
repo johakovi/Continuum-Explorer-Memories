@@ -127,60 +127,6 @@ private val VeryLightColorScheme = lightColorScheme(
     outlineVariant = Color(0xFFA2A2A2)
 )
 
-/*private val MateriaLightlColorScheme = lightColorScheme(
-    primary = LightPrimary,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFC8E6C9),
-    onPrimaryContainer = Color(0xFF00372A),
-    secondary = LightSecondary,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE0E0E0),
-    onSecondaryContainer = Color(0xFF444344),
-    tertiary = LightTertiary,
-    onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFFF1F1F1),
-    onTertiaryContainer = Color(0xFF090909),
-    background = Color(0xFFF1F1F1),
-    onBackground = VeryLightText,
-    surface = VeryLightTopBar,
-    onSurface = VeryLightText,
-    surfaceVariant = Color(0xFFE8E8E8),
-    onSurfaceVariant = VeryLightIcons,
-    surfaceContainer = VeryLightTopBar,
-    surfaceContainerLow = VeryLightSidebar,
-    surfaceContainerHigh = Color(0xFFE8E8E8),
-    surfaceContainerLowest = Color(0xFFFFFFFF),
-    outline = Color(0xFFA2A2A2),
-    outlineVariant = Color(0xFFA2A2A2)
-)
-
-private val MateriaDarklColorScheme = darkColorScheme(
-    primary = LightPrimary,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFC8E6C9),
-    onPrimaryContainer = Color(0xFF00372A),
-    secondary = LightSecondary,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE0E0E0),
-    onSecondaryContainer = Color(0xFF444344),
-    tertiary = LightTertiary,
-    onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFFF1F1F1),
-    onTertiaryContainer = Color(0xFF090909),
-    background = Color(0xFFF1F1F1),
-    onBackground = VeryLightText,
-    surface = VeryLightTopBar,
-    onSurface = VeryLightText,
-    surfaceVariant = Color(0xFFE8E8E8),
-    onSurfaceVariant = VeryLightIcons,
-    surfaceContainer = VeryLightTopBar,
-    surfaceContainerLow = VeryLightSidebar,
-    surfaceContainerHigh = Color(0xFFE8E8E8),
-    surfaceContainerLowest = Color(0xFFFFFFFF),
-    outline = Color(0xFFA2A2A2),
-    outlineVariant = Color(0xFFA2A2A2)
-)
-*/
 
 @Composable
 fun FileExplorerTheme(
@@ -435,6 +381,7 @@ fun FileExplorerTheme(
                 navButtonBackground = colorScheme.surfaceContainerLow,
                 searchBoxBackground = colorScheme.surfaceContainerHighest,
                 tabBarBackground = colorScheme.surfaceContainerHigh,
+                /* background = primary, */
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
                 folderIcon = when (iconTheme) {
