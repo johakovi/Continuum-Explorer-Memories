@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.RectangleShape
@@ -267,11 +266,14 @@ fun FileExplorerSQ(
                             tabs.add(createNewTabState(context, scope))
                             selectedTabIndex = tabs.size - 1
                         },
-                        onCloseTab = { index ->
+                        onCloseTab = { stateToRemove ->
                             if (tabs.size > 1) {
-                                tabs.removeAt(index)
-                                if (selectedTabIndex >= tabs.size) {
-                                    selectedTabIndex = (tabs.size - 1).coerceAtLeast(0)
+                                val idx = tabs.indexOf(stateToRemove)
+                                if (idx != -1) {
+                                    tabs.removeAt(idx)
+                                    if (selectedTabIndex >= tabs.size) {
+                                        selectedTabIndex = (tabs.size - 1).coerceAtLeast(0)
+                                    }
                                 }
                             }
                         },
@@ -331,7 +333,7 @@ private fun ExplorerTopBar(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
     onAddTab: () -> Unit,
-    onCloseTab: (Int) -> Unit,
+    onCloseTab: (FileExplorerState) -> Unit,
     onMenuClick: () -> Unit,
     appState: FileExplorerState
 ) {
@@ -339,7 +341,6 @@ private fun ExplorerTopBar(
     Column(
         modifier = Modifier
             .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground)
-            .statusBarsPadding()
     ) {
         TabBar(
             tabStates = tabs,

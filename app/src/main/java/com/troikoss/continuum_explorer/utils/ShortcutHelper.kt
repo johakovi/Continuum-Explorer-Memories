@@ -38,7 +38,7 @@ object ShortcutHelper {
             ShortcutInfoCompat.Builder(context, "fav_$path")
                 .setShortLabel(name)
                 .setLongLabel("$name")
-                .setIcon(IconCompat.createWithResource(context, R.drawable.ic_folder))
+                .setIcon(IconCompat.createWithBitmap(IconHelper.getFolderBitmap(context, path, name)))
                 .setIntent(intent)
                 .build()
         }

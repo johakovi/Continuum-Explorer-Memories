@@ -16,7 +16,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
@@ -477,16 +476,11 @@ fun FileExplorerTheme(
     val themeTop = SettingsManager.themeTop.value
     DisposableEffect(darkTheme, themeTop) {
         if (context is ComponentActivity) {
-            val statusBarColor = if (themeTop == ThemeTopMode.FLOAT) {
-                extendedColors.tabBarBackground.toArgb()
-            } else {
-                extendedColors.tabBarBackground.toArgb()
-            }
             context.enableEdgeToEdge(
                 statusBarStyle = if (darkTheme) {
-                    SystemBarStyle.dark(statusBarColor)
+                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
                 } else {
-                    SystemBarStyle.light(statusBarColor, statusBarColor)
+                    SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
                 },
                 navigationBarStyle = if (darkTheme) {
                     SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)

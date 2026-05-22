@@ -1,21 +1,50 @@
 package com.troikoss.continuum_explorer.ui.components
 
-import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.foundation.systemGestureExclusion
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +54,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
@@ -38,14 +66,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.troikoss.continuum_explorer.utils.FileExplorerState
-import com.troikoss.continuum_explorer.utils.IconHelper
-import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.IconTheme
-import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
+import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.WindowManager
-import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
+import com.troikoss.continuum_explorer.utils.FileExplorerState
+import com.troikoss.continuum_explorer.utils.IconHelper
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private val TAB_SLOT_MIN = 80.dp   // minimum total slot width per tab (inc. 4dp side padding)
@@ -58,7 +87,7 @@ fun TabBar(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
     onAddTab: () -> Unit,
-    onCloseTab: (Int) -> Unit,
+    onCloseTab: (FileExplorerState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -68,32 +97,40 @@ fun TabBar(
     val density = LocalDensity.current
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val context = androidx.compose.ui.platform.LocalContext.current
-    
+
     val isInWindowMode = remember(configuration) {
-        val isInMultiWindow = try {
+        val isMulti = try {
             (context as? android.app.Activity)?.isInMultiWindowMode == true
         } catch (_: Exception) { false }
         val isLargeScreen = configuration.smallestScreenWidthDp >= 600
-        isInMultiWindow && isLargeScreen
+        val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+        // Window mode logic: DeX, or Multi-window on Large Screens
+        isDeX || (isMulti && isLargeScreen)
     }
 
-    val captionBarTop = WindowInsets.captionBar.getTop(density)
-    val statusBarTop = WindowInsets.statusBars.getTop(density)
+    val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val captionPadding = WindowInsets.captionBar.asPaddingValues().calculateTopPadding()
+
+    // hasCaption: strictly for when the system provides a caption handle area
+    val hasCaption = captionPadding > 0.dp
     
-    // Immediate detection: If in Window mode, we assume 40dp handle exists pre-emptively
-    val hasCaption = captionBarTop > 0 || isInWindowMode
+    // Always move tabs into title bar area if a handle is detected or in window mode
+    val useInCaptionTabs = hasCaption || isInWindowMode
     
-    val topInsetHeight = with(density) { 
-        if (captionBarTop > 0) captionBarTop.toDp() 
-        else if (isInWindowMode) 40.dp 
-        else statusBarTop.toDp() 
+    val topInsetHeight = if (useInCaptionTabs) {
+        // In window mode, we assume at least 40dp for the handle if not specified
+        maxOf(captionPadding, if (isInWindowMode) 40.dp else 0.dp)
+    } else {
+        // On phone, we use the status bar height
+        statusBarPadding
     }
-    
-    // Always move tabs into title bar area if a handle is detected
-    val useInCaptionTabs = hasCaption
-    
+
     val tabContentHeight = if (themeTop == ThemeTopMode.FLOAT) 48.dp else 40.dp
-    val totalBarHeight = if (useInCaptionTabs) topInsetHeight else (topInsetHeight + tabContentHeight)
+    val totalBarHeight = if (useInCaptionTabs) {
+        maxOf(topInsetHeight, tabContentHeight)
+    } else {
+        topInsetHeight + tabContentHeight
+    }
 
     val horizontalPaddingLeft = with(density) { WindowInsets.captionBar.getLeft(density, LayoutDirection.Ltr).toDp() }
     val horizontalPaddingRight = with(density) { WindowInsets.captionBar.getRight(density, LayoutDirection.Ltr).toDp() }
@@ -121,28 +158,36 @@ fun TabBar(
             },
         contentAlignment = Alignment.BottomStart
     ) {
+        val currentMaxWidth = maxWidth
+
         // Unified Safety Fallback for all windowed modes (DeX & Pop-ups)
         val safetyPaddingLeft = if (hasCaption && restrictedLeft == 0.dp && horizontalPaddingLeft == 0.dp) {
-            minOf(80.dp, maxWidth * 0.2f)
+            minOf(80.dp, currentMaxWidth * 0.2f)
         } else 0.dp
 
         val safetyPaddingRight = if (hasCaption && restrictedRight == 0.dp && horizontalPaddingRight == 0.dp) {
-            minOf(160.dp, maxWidth * 0.4f)
+            minOf(160.dp, currentMaxWidth * 0.4f)
         } else 0.dp
         
         val finalPaddingLeft = maxOf(horizontalPaddingLeft, restrictedLeft, safetyPaddingLeft)
         val finalPaddingRight = maxOf(horizontalPaddingRight, restrictedRight, safetyPaddingRight)
 
         // Prevent layout explosion in very narrow windows
-        val maxTotalPadding = maxWidth * 0.7f
+        val maxTotalPadding = currentMaxWidth * 0.7f
         val adjustedPaddingRight = if (finalPaddingLeft + finalPaddingRight > maxTotalPadding) {
             (maxTotalPadding - finalPaddingLeft).coerceAtLeast(0.dp)
         } else finalPaddingRight
 
-        val available = maxWidth - ADD_BUTTON_WIDTH - finalPaddingLeft - adjustedPaddingRight - 16.dp
-        val slotWidth: Dp = if (tabStates.isEmpty()) TAB_SLOT_MAX else {
+        val available = currentMaxWidth - ADD_BUTTON_WIDTH - finalPaddingLeft - adjustedPaddingRight - 16.dp
+        val targetSlotWidth: Dp = if (tabStates.isEmpty()) TAB_SLOT_MAX else {
             (available / tabStates.size).coerceIn(TAB_SLOT_MIN, TAB_SLOT_MAX)
         }
+        
+        val slotWidth by animateDpAsState(
+            targetValue = targetSlotWidth,
+            animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+            label = "slotWidth"
+        )
 
         Row(
             modifier = Modifier
@@ -166,28 +211,56 @@ fun TabBar(
             verticalAlignment = Alignment.Bottom
         ) {
             tabStates.forEachIndexed { index, state ->
-                val universalFile = state.currentUniversalPath
-                val iconTheme = SettingsManager.iconTheme.value
+                key(state) {
+                    val universalFile = state.currentUniversalPath
+                    val iconTheme = SettingsManager.iconTheme.value
 
-                val painter = if (universalFile != null) {
-                    if (iconTheme == IconTheme.COLOURFUL) {
-                        androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
+                    val painter = if (universalFile != null) {
+                        if (iconTheme == IconTheme.COLOURFUL) {
+                            androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
+                        } else {
+                            rememberVectorPainter(IconHelper.getIconForItem(universalFile))
+                        }
                     } else {
-                        rememberVectorPainter(IconHelper.getIconForItem(universalFile))
+                        rememberVectorPainter(Icons.Default.Folder)
                     }
-                } else {
-                    rememberVectorPainter(Icons.Default.Folder)
-                }
 
-                TabItem(
-                    text = state.currentName,
-                    painter = painter,
-                    slotWidth = slotWidth,
-                    selected = (selectedTabIndex == index),
-                    onClick = { onTabSelected(index) },
-                    onClose = { onCloseTab(index) },
-                    modifier = if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier
-                )
+                    // Visibility logic: Immediate for the first tab of a window to avoid DeX startup races
+                    var isActuallyClosing by remember(state) { mutableStateOf(false) }
+                    val isInitialTab = remember { index == 0 && tabStates.size == 1 }
+                    var isVisible by remember(state) { mutableStateOf(isInitialTab) }
+                    
+                    val isLayoutReady = currentMaxWidth > 0.dp
+                    LaunchedEffect(state, isLayoutReady) {
+                        if (isLayoutReady && !isVisible) {
+                            if (!isInitialTab) delay(100)
+                            isVisible = true
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = isVisible && !isActuallyClosing,
+                        enter = if (isInitialTab) androidx.compose.animation.EnterTransition.None else (expandHorizontally(animationSpec = tween(200)) + fadeIn(tween(200))),
+                        exit = shrinkHorizontally(animationSpec = tween(200)) + fadeOut(tween(200)),
+                        modifier = if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier
+                    ) {
+                        TabItem(
+                            text = state.currentName,
+                            painter = painter,
+                            slotWidth = slotWidth,
+                            selected = (selectedTabIndex == index),
+                            canClose = tabStates.size > 1,
+                            onClick = { onTabSelected(index) },
+                            onClose = {
+                                isActuallyClosing = true
+                                coroutineScope.launch {
+                                    delay(200) // Match exit animation duration
+                                    onCloseTab(state)
+                                }
+                            }
+                        )
+                    }
+                }
             }
 
             IconButton(
@@ -217,6 +290,7 @@ private fun TabItem(
     painter: Painter,
     slotWidth: Dp,
     selected: Boolean,
+    canClose: Boolean,
     onClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -268,12 +342,12 @@ private fun TabItem(
                 }
             }
             .height(if (themeTop == ThemeTopMode.FLOAT) 36.dp else 32.dp)
-            .pointerInput(Unit) {
+            .pointerInput(canClose) {
                 awaitEachGesture {
                     val event = awaitPointerEvent()
                     val isMouse = event.changes.any { it.type == PointerType.Mouse }
                     val isTertiary = event.buttons.isTertiaryPressed
-                    if (isMouse && event.type == PointerEventType.Press && isTertiary) {
+                    if (canClose && isMouse && event.type == PointerEventType.Press && isTertiary) {
                         onClose()
                     }
                 }
@@ -304,16 +378,18 @@ private fun TabItem(
                 modifier = Modifier.weight(1f)
             )
 
-            Spacer(Modifier.width(8.dp))
+            if (canClose) {
+                Spacer(Modifier.width(8.dp))
 
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.close),
-                modifier = Modifier
-                    .size(16.dp)
-                    .clickable { onClose() },
-                tint = textColor
-            )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.close),
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clickable { onClose() },
+                    tint = textColor
+                )
+            }
         }
     }
 }

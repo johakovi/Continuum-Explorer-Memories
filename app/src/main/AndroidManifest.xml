@@ -33,22 +33,26 @@
             android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="standard"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:documentLaunchMode="always"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.troikoss.continuum_explorer.OPEN_NEW_WINDOW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
-        
+
         <activity
             android:name=".ui.activities.ArchiveViewerActivity"
             android:exported="true"
             android:label="Archive Viewer"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -66,7 +70,7 @@
             android:name=".ui.activities.ImageViewerActivity"
             android:exported="true"
             android:label="Image Viewer"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2"
             android:documentLaunchMode="always"
             android:launchMode="singleTop"
@@ -90,7 +94,7 @@
             android:name=".ui.activities.VideoPlayerActivity"
             android:exported="true"
             android:label="Video Player"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2"
             android:documentLaunchMode="always"
             android:launchMode="singleTop"
@@ -109,7 +113,7 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
-        
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -124,6 +128,7 @@
             android:name=".ui.activities.PopUpActivity"
             android:label="File Progress"
             android:theme="@style/Theme.FloatingDialog"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:excludeFromRecents="true"
             android:launchMode="singleTop"
             android:taskAffinity="" />
@@ -132,6 +137,7 @@
             android:name=".ui.activities.SettingsActivity"
             android:label="Settings"
             android:theme="@style/Theme.FileExplorer2"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:excludeFromRecents="true"
             android:launchMode="singleTop"
             android:taskAffinity="" />
@@ -148,7 +154,7 @@
             android:name=".ui.activities.TextEditorActivity"
             android:exported="true"
             android:label="Text Editor"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2"
             android:windowSoftInputMode="adjustResize"
             android:documentLaunchMode="always"

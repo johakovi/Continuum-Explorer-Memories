@@ -118,14 +118,18 @@ object SettingsManager {
     private val _termuxSupport = mutableStateOf(true)
     val termuxSupport: State<Boolean> = _termuxSupport
 
-    // Derived state: enabled if behavior is not PERMANENT
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
 
     private val _isDefaultArchiveViewerEnabled = mutableStateOf(true)
     val isDefaultArchiveViewerEnabled: State<Boolean> = _isDefaultArchiveViewerEnabled
 
+    private var isInitialized = false
+
     fun init(context: Context) {
+        if (isInitialized) return
+        isInitialized = true
+
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         
         val savedBehavior = prefs.getString(KEY_DELETE_BEHAVIOR, DeleteBehavior.ASK.name)

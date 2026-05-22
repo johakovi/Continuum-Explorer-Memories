@@ -647,6 +647,56 @@ object IconHelper {
 
     // --- Utilities ---
 
+    fun getFolderBitmap(context: Context, path: String, name: String): Bitmap {
+        val iconTheme = SettingsManager.iconTheme.value
+        val folderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+        val overlayRes = getOverlayIconRes(name, path, "")
+
+        val folderColor = when (iconTheme) {
+            IconTheme.COLOURFUL -> 0xFF2196F3.toInt() // ThemeFolders
+            IconTheme.COLOURFULDUO -> 0xFFFFC107.toInt() // ThemeFoldersDuo
+            else -> android.graphics.Color.DKGRAY
+        }
+
+        val size = 128
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // Draw folder
+        val folderDrawable = androidx.core.content.ContextCompat.getDrawable(context, folderRes)
+        folderDrawable?.let {
+            it.setTint(folderColor)
+            it.setBounds(0, 0, size, size)
+            it.draw(canvas)
+        }
+
+        // Draw overlay
+        if (overlayRes != null && iconTheme != IconTheme.MATERIAL) {
+            val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
+                when (overlayRes) {
+                    R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                    R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                    R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                    R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                    R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                    else -> overlayRes
+                }
+            } else overlayRes
+
+            val overlayDrawable = androidx.core.content.ContextCompat.getDrawable(context, finalOverlayRes)
+            overlayDrawable?.let {
+                it.setTint(android.graphics.Color.WHITE)
+                val overlaySize = (size * 0.40f).toInt()
+                val x = (size - overlaySize) / 2
+                val y = (size - overlaySize) / 2 + (size * 0.1f).toInt()
+                it.setBounds(x, y, x + overlaySize, y + overlaySize)
+                it.draw(canvas)
+            }
+        }
+
+        return bitmap
+    }
+
     suspend fun getFileBitmap(context: Context, file: UniversalFile): Bitmap = withContext(Dispatchers.IO) {
         getThumbnailBitmap(context, file) ?: getIconForItem(file).toBitmap(sizePx = 96)
     }

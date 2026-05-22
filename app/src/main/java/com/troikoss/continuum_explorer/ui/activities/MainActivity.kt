@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
-import java.util.UUID
 import rikka.shizuku.Shizuku
 import com.troikoss.continuum_explorer.managers.ShizukuManager
 
@@ -125,19 +124,6 @@ class MainActivity : AppCompatActivity() {
         SettingsManager.init(applicationContext)
         StorageProviders.init(applicationContext)
 
-        if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
-            val freshIntent = Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
-                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT
-                data = Uri.fromParts("window", UUID.randomUUID().toString(), null)
-                putExtra("path", Environment.getExternalStorageDirectory().absolutePath)
-            }
-            startActivity(freshIntent)
-            finish()
-            return
-        }
-
         val initialPath = intent.getStringExtra("path")
         val initialUri = intent.getStringExtra("uri")
         val initialArchive = run {
@@ -186,17 +172,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.action == "com.troikoss.continuum_explorer.OPEN_NEW_WINDOW") {
-            val newWindowIntent = Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
-                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT
-                data = Uri.fromParts("window", UUID.randomUUID().toString(), null)
-                putExtra("path", Environment.getExternalStorageDirectory().absolutePath)
-            }
-            startActivity(newWindowIntent)
-            return
-        }
     }
 
     override fun onDestroy() {
