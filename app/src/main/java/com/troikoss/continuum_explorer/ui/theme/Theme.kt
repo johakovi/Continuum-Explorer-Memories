@@ -59,6 +59,7 @@ data class ExtendedColors(
     val tabActiveBackground: Color,
     val textColor: Color,
     val menuBackground: Color,
+    val fileViewBackground: Color,
     val background: Color
 )
 
@@ -261,6 +262,7 @@ fun FileExplorerTheme(
                 tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText,
                 menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
+                fileViewBackground = Color(0xFF000000),
                 background = Color(0xFF000000),
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
@@ -368,6 +370,7 @@ fun FileExplorerTheme(
                 tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText,
                 menuBackground = Color.White.copy(alpha = 0.98f),
+                fileViewBackground = Color(0xFFF1F1F1),
                 background = Color(0xFFF1F1F1)
             )
         }
@@ -378,12 +381,15 @@ fun FileExplorerTheme(
             val tertiary = colorScheme.tertiary
             val onSurface = colorScheme.onSurface
             ExtendedColors(
-                sidebarBackground = colorScheme.surfaceContainer,
+                sidebarBackground = colorScheme.surfaceContainerHigh,
                 topBarBackground = colorScheme.surfaceContainerLow,
                 navButtonBackground = colorScheme.surfaceContainerLow,
-                searchBoxBackground = colorScheme.surfaceContainerHighest,
-                tabBarBackground = colorScheme.surfaceContainerHigh,
-                background = colorScheme.surface,
+                searchBoxBackground = colorScheme.surfaceContainerHigh,
+                tabBarBackground = colorScheme.surfaceContainerHighest,
+                fileViewBackground = colorScheme.surfaceContainerLow,
+                background = colorScheme.surfaceContainerLow,
+                tabActiveBackground = colorScheme.surfaceContainerLow,
+
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
                 folderIcon = when (iconTheme) {
@@ -452,9 +458,10 @@ fun FileExplorerTheme(
                     else -> ThemeTerminal
                 },
 
-                tabActiveBackground = colorScheme.surfaceContainerLow,
+
                 textColor = onSurface,
                 menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
+
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,

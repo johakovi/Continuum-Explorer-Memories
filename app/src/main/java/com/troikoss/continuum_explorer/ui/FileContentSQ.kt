@@ -69,6 +69,7 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
 import com.troikoss.continuum_explorer.ui.components.DetailsHeader
+import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -277,6 +278,7 @@ fun FileContentSQ(appState: FileExplorerState) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(FileExplorerTheme.extendedColors.fileViewBackground)
             .clipToBounds()
 
 

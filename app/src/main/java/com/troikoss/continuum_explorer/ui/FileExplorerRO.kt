@@ -213,9 +213,11 @@ fun FileExplorerRO(
     }
 
     // --- Main Layout ---
+    val extendedColors = LocalExtendedColors.current
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(extendedColors.background)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
@@ -258,6 +260,7 @@ fun FileExplorerRO(
             }
         ) {
             Scaffold(
+                containerColor = extendedColors.background,
                 topBar = {
                     ExplorerTopBar(
                         tabs = tabs,

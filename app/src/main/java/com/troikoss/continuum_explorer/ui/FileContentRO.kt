@@ -66,6 +66,7 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
 import com.troikoss.continuum_explorer.ui.components.DetailsHeader
+import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -274,7 +275,7 @@ fun FileContentRO(appState: FileExplorerState) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .then( if (appState.getScreenSize() != ScreenSize.SMALL) Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, fileListShape).clip(fileListShape).background(MaterialTheme.colorScheme.surfaceContainerLowest) else Modifier)
+            .then( if (appState.getScreenSize() != ScreenSize.SMALL) Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground) else Modifier)
             .onGloballyPositioned { containerCoordinates = it }
             .containerGestures(
                 selectionManager = selectionManager,
