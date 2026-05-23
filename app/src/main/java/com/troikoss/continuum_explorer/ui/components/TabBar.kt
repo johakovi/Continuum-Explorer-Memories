@@ -76,7 +76,7 @@ import com.troikoss.continuum_explorer.utils.IconHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private val TAB_SLOT_MIN = 80.dp   // minimum total slot width per tab (inc. 4dp side padding)
+private val TAB_SLOT_MIN = 100.dp  // minimum total slot width per tab (inc. 4dp side padding)
 private val TAB_SLOT_MAX = 204.dp  // maximum total slot width per tab (inc. 4dp side padding)
 private val ADD_BUTTON_WIDTH = 40.dp
 
@@ -151,7 +151,7 @@ fun TabBar(
         } else 0.dp
 
         val safetyPaddingRight = if (hasCaption && restrictedRight == 0.dp && horizontalPaddingRight == 0.dp) {
-            minOf(160.dp, currentMaxWidth * 0.4f)
+            minOf(220.dp, currentMaxWidth * 0.4f)
         } else 0.dp
 
         val finalPaddingLeft = maxOf(horizontalPaddingLeft, restrictedLeft, safetyPaddingLeft)
@@ -174,76 +174,89 @@ fun TabBar(
             label = "slotWidth"
         )
 
+        LaunchedEffect(tabStates.size) {
+            if (tabStates.isNotEmpty()) {
+                delay(100)
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = finalPaddingLeft, end = adjustedPaddingRight)
-                .height(tabContentHeight)
-                .horizontalScroll(scrollState)
-                .pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            if (event.type == PointerEventType.Scroll) {
-                                val delta = event.changes.first().scrollDelta
-                                coroutineScope.launch {
-                                    scrollState.scrollBy(delta.y * 60f)
-                                }
-                            }
-                        }
-                    }
-                },
+                .height(tabContentHeight),
             verticalAlignment = Alignment.Bottom
         ) {
-            tabStates.forEachIndexed { index, state ->
-                key(state) {
-                    val universalFile = state.currentUniversalPath
-                    val iconTheme = SettingsManager.iconTheme.value
-
-                    val painter = if (universalFile != null) {
-                        if (iconTheme == IconTheme.COLOURFUL) {
-                            androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
-                        } else {
-                            rememberVectorPainter(IconHelper.getIconForItem(universalFile))
-                        }
-                    } else {
-                        rememberVectorPainter(Icons.Default.Folder)
-                    }
-
-                    // Visibility logic: Immediate for the first tab of a window to avoid DeX startup races
-                    var isActuallyClosing by remember(state) { mutableStateOf(false) }
-                    val isInitialTab = remember { index == 0 && tabStates.size == 1 }
-                    var isVisible by remember(state) { mutableStateOf(isInitialTab) }
-
-                    val isLayoutReady = currentMaxWidth > 0.dp
-                    LaunchedEffect(state, isLayoutReady) {
-                        if (isLayoutReady && !isVisible) {
-                            if (!isInitialTab) delay(100)
-                            isVisible = true
-                        }
-                    }
-
-                    AnimatedVisibility(
-                        visible = isVisible && !isActuallyClosing,
-                        enter = if (isInitialTab) androidx.compose.animation.EnterTransition.None else (expandHorizontally(animationSpec = tween(200)) + fadeIn(tween(200))),
-                        exit = shrinkHorizontally(animationSpec = tween(200)) + fadeOut(tween(200)),
-                        modifier = if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier
-                    ) {
-                        TabItem(
-                            text = state.currentName,
-                            painter = painter,
-                            slotWidth = slotWidth,
-                            selected = (selectedTabIndex == index),
-                            canClose = tabStates.size > 1,
-                            onClick = { onTabSelected(index) },
-                            onClose = {
-                                isActuallyClosing = true
-                                coroutineScope.launch {
-                                    delay(200) // Match exit animation duration
-                                    onCloseTab(state)
+            Row(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .horizontalScroll(scrollState)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                if (event.type == PointerEventType.Scroll) {
+                                    val delta = event.changes.first().scrollDelta
+                                    coroutineScope.launch {
+                                        scrollState.scrollBy(delta.y * 60f)
+                                    }
                                 }
                             }
-                        )
+                        }
+                    },
+                verticalAlignment = Alignment.Bottom
+            ) {
+                tabStates.forEachIndexed { index, state ->
+                    key(state) {
+                        val universalFile = state.currentUniversalPath
+                        val iconTheme = SettingsManager.iconTheme.value
+
+                        val painter = if (universalFile != null) {
+                            if (iconTheme == IconTheme.COLOURFUL) {
+                                androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
+                            } else {
+                                rememberVectorPainter(IconHelper.getIconForItem(universalFile))
+                            }
+                        } else {
+                            rememberVectorPainter(Icons.Default.Folder)
+                        }
+
+                        // Visibility logic: Immediate for the first tab of a window to avoid DeX startup races
+                        var isActuallyClosing by remember(state) { mutableStateOf(false) }
+                        val isInitialTab = remember { index == 0 && tabStates.size == 1 }
+                        var isVisible by remember(state) { mutableStateOf(isInitialTab) }
+
+                        val isLayoutReady = currentMaxWidth > 0.dp
+                        LaunchedEffect(state, isLayoutReady) {
+                            if (isLayoutReady && !isVisible) {
+                                if (!isInitialTab) delay(1)
+                                isVisible = true
+                            }
+                        }
+
+                        AnimatedVisibility(
+                            visible = isVisible && !isActuallyClosing,
+                            enter = if (isInitialTab) androidx.compose.animation.EnterTransition.None else (expandHorizontally(animationSpec = tween(200)) + fadeIn(tween(200))),
+                            exit = shrinkHorizontally(animationSpec = tween(200)) + fadeOut(tween(200)),
+                            modifier = if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier
+                        ) {
+                            TabItem(
+                                text = state.currentName,
+                                painter = painter,
+                                slotWidth = slotWidth,
+                                selected = (selectedTabIndex == index),
+                                canClose = tabStates.size > 1,
+                                onClick = { onTabSelected(index) },
+                                onClose = {
+                                    isActuallyClosing = true
+                                    coroutineScope.launch {
+                                        delay(200) // Match exit animation duration
+                                        onCloseTab(state)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
