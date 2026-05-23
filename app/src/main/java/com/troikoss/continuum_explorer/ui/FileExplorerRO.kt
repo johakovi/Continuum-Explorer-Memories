@@ -377,7 +377,8 @@ private fun NavigationContent(
         onEditNetworkClick = onEditNetwork,
         onNavigate = onCloseDrawer,
         currentWidth = appState.appConfigs.navPaneWidth, // Modal drawer usually full width or fixed, but passing for consistency
-        isInWindowMode = isInWindowMode
+        isInWindowMode = isInWindowMode,
+        modifier = Modifier.navigationBarsPadding()
     )
 }
 

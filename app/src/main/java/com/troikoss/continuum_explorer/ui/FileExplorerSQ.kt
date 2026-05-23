@@ -377,7 +377,8 @@ private fun NavigationContent(
         onEditNetworkClick = onEditNetwork,
         onNavigate = onCloseDrawer,
         currentWidth = appState.appConfigs.navPaneWidth,
-        isInWindowMode = isInWindowMode
+        isInWindowMode = isInWindowMode,
+        modifier = Modifier.navigationBarsPadding()
     )
 }
 

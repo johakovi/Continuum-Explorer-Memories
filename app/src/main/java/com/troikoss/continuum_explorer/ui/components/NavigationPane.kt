@@ -133,6 +133,7 @@ fun NavigationPane(
     onItemSelected: (NavSection) -> Unit,
     onSafItemSelected: (Uri) -> Unit,
     onAddStorageClick: () -> Unit,
+    modifier: Modifier = Modifier,
     onAddNetworkClick: () -> Unit = {},
     onEditNetworkClick: (NetworkConnection) -> Unit = {},
     onNavigate: () -> Unit = {},
@@ -272,7 +273,7 @@ fun NavigationPane(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = lazyListState,
             modifier = Modifier
