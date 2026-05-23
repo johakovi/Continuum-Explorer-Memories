@@ -1,13 +1,10 @@
 package com.troikoss.continuum_explorer.ui.components
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -213,20 +210,10 @@ fun TopBar(
         }
     }
 
-    val topBarBorderColor = MaterialTheme.colorScheme.outlineVariant
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .drawBehind {
-                val strokeWidth = 1.dp.toPx()
-                drawLine(
-                    color = topBarBorderColor,
-                    start = Offset(0f, size.height - strokeWidth / 2),
-                    end = Offset(size.width, size.height - strokeWidth / 2),
-                    strokeWidth = strokeWidth
-                )
-            },
+            .height(56.dp),
         color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.topBarBackground
     ) {
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
@@ -295,8 +282,7 @@ fun TopBar(
                                     expanded = historyMenuExpanded,
                                     onDismissRequest = { historyMenuExpanded = false },
                                     shape = RoundedCornerShape(16.dp),
-                                    containerColor = LocalExtendedColors.current.menuBackground,
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                                    containerColor = LocalExtendedColors.current.menuBackground
                                 ) {
                                     // Forward History (Latest at top)
                                     appState.forwardStack.take(5)
@@ -490,8 +476,7 @@ fun TopBar(
                                     searchKindMenuExpanded = false
                                 },
                                 shape = RoundedCornerShape(16.dp),
-                                containerColor = LocalExtendedColors.current.menuBackground,
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                                containerColor = LocalExtendedColors.current.menuBackground
                             ) {
                                 if (searchKindMenuExpanded) {
                                     DropdownMenuItem(
@@ -906,38 +891,6 @@ fun TopBar(
             }) {
                 Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
             }
-            
-            // DEV BUTTON FOR TESTING INSETS
-            var showDevInfo by remember { mutableStateOf(false) }
-            val density = LocalDensity.current
-            val captionInsets = WindowInsets.captionBar
-            
-            IconButton(onClick = { showDevInfo = true }) {
-                Icon(Icons.Default.BugReport, contentDescription = "Dev Info", tint = Color.Red)
-            }
-            
-            if (showDevInfo) {
-                AlertDialog(
-                    onDismissRequest = { showDevInfo = false },
-                    confirmButton = { TextButton(onClick = { showDevInfo = false }) { Text("OK") } },
-                    title = { Text("Dev Info - Window Insets") },
-                    text = {
-                        Column {
-                            val config = androidx.compose.ui.platform.LocalConfiguration.current
-                            val ctx = androidx.compose.ui.platform.LocalContext.current
-                            val isMulti = try { (ctx as? android.app.Activity)?.isInMultiWindowMode == true } catch(_: Exception) { false }
-                            val configStr = config.toString()
-                            val isSemConfig = configStr.contains("dexMode", ignoreCase = true) || configStr.contains("semDesktopModeEnabled=1")
-                            val isSemGlobal = try { android.provider.Settings.Global.getInt(ctx.contentResolver, "sem_desktop_mode_enabled", 0) == 1 } catch(_: Exception) { false }
-                            
-                            Text("Multi-Window: $isMulti")
-                            Text("DeX Config: ${configStr.contains("dexMode")}")
-                            Text("DeX Global: $isSemGlobal")
-                            Text("Caption T: ${with(density) { captionInsets.getTop(density).toDp() }}")
-                        }
-                    }
-                )
-            }
 
             Box {
                 IconButton(onClick = { optionsMenuExpanded = true }) {
@@ -948,8 +901,7 @@ fun TopBar(
                     expanded = optionsMenuExpanded,
                     onDismissRequest = { optionsMenuExpanded = false },
                     shape = RoundedCornerShape(16.dp),
-                    containerColor = LocalExtendedColors.current.menuBackground,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                    containerColor = LocalExtendedColors.current.menuBackground
                 ) {
                     when (currentOptionsScreen) {
                         "MAIN" -> {

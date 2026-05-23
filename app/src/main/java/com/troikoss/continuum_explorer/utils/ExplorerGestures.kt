@@ -26,11 +26,16 @@ import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -936,3 +941,59 @@ fun Modifier.iconTouchToggle(
         }
     }
 }
+
+/**
+ * Applies a fading edge effect to a scrollable container.
+ * The fade is only visible when the container can be scrolled in that direction.
+ */
+fun Modifier.fadingEdge(
+    state: androidx.compose.foundation.gestures.ScrollableState,
+    topFadeHeight: Dp = 32.dp,
+    bottomFadeHeight: Dp = 32.dp,
+    showTop: Boolean = true,
+    showBottom: Boolean = true
+): Modifier = this
+    .graphicsLayer { alpha = 0.99f } // Create a layer for BlendMode.DstIn to work
+    .drawWithContent {
+        drawContent()
+
+        val canScrollBackward = state.canScrollBackward && showTop
+        val canScrollForward = state.canScrollForward && showBottom
+
+        if (canScrollBackward || canScrollForward) {
+            val topFadeHeightPx = topFadeHeight.toPx()
+            val bottomFadeHeightPx = bottomFadeHeight.toPx()
+
+            val colors = mutableListOf<Color>()
+            val stops = mutableListOf<Float>()
+
+            if (canScrollBackward) {
+                colors.add(Color.Transparent)
+                stops.add(0f)
+                colors.add(Color.Black)
+                stops.add((topFadeHeightPx / size.height).coerceIn(0f, 1f))
+            } else {
+                colors.add(Color.Black)
+                stops.add(0f)
+            }
+
+            if (canScrollForward) {
+                colors.add(Color.Black)
+                stops.add((1f - bottomFadeHeightPx / size.height).coerceIn(0f, 1f))
+                colors.add(Color.Transparent)
+                stops.add(1f)
+            } else {
+                colors.add(Color.Black)
+                stops.add(1f)
+            }
+
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colorStops = stops.zip(colors).map { it.first to it.second }.toTypedArray(),
+                    startY = 0f,
+                    endY = size.height
+                ),
+                blendMode = BlendMode.DstIn
+            )
+        }
+    }

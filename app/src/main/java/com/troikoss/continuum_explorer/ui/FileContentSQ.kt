@@ -44,9 +44,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -64,6 +67,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
@@ -274,11 +279,18 @@ fun FileContentSQ(appState: FileExplorerState) {
 
 
 
+    val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
+
     // --- UI Layout ---
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FileExplorerTheme.extendedColors.fileViewBackground)
+            .then(
+                if (contentIsRounded)
+                    Modifier.shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(FileExplorerTheme.extendedColors.fileViewBackground)
+                else
+                    Modifier.background(FileExplorerTheme.extendedColors.background)
+            )
             .clipToBounds()
 
 
@@ -554,8 +566,9 @@ private fun FileGrid(
             ViewMode.GRID, ViewMode.GALLERY -> GridCells.Adaptive(minSize = appState.folderConfigs.gridItemSize.dp)
             else -> GridCells.Fixed(1)
         },
-        modifier = if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        else Modifier.fillMaxSize().padding(horizontal = 32.dp),
+        modifier = (if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
+        else Modifier.fillMaxSize().padding(horizontal = 32.dp))
+            .fadingEdge(gridState, showBottom = false),
         contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(0.dp)
         else PaddingValues(16.dp)
     ) {

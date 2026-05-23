@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -45,8 +44,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -57,6 +54,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
@@ -562,7 +561,6 @@ fun VideoPlayerScreen(
                                 modifier = Modifier
                                     .offset(x = previewXDp)
                                     .width(previewW)
-                                    .border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(Color(0xDD000000)),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -773,8 +771,7 @@ fun VideoPlayerScreen(
                                 expanded        = optionsMenuExpanded,
                                 onDismissRequest = { optionsMenuExpanded = false },
                                 shape = RoundedCornerShape(16.dp),
-                                containerColor = LocalExtendedColors.current.menuBackground,
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                                containerColor = LocalExtendedColors.current.menuBackground
                             ) {
                                 when (optionsScreen) {
 

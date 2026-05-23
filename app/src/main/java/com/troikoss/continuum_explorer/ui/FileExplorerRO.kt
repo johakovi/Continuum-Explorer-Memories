@@ -18,9 +18,15 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +45,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isShiftPressed
@@ -47,12 +57,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.windowInsetsPadding
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.NavSection
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
@@ -242,7 +255,8 @@ fun FileExplorerRO(
             gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
             drawerContent = {
                 ModalDrawerSheet(
-                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground
+                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground,
+                    windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     NavigationContent(
                         appState = appState,
@@ -287,7 +301,11 @@ fun FileExplorerRO(
                 }
             ) { innerPadding ->
                 ExplorerBody(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                    ),
                     appState = appState,
                     onAddStorage = { safLauncher.launch(null) },
                     onAddSdCard = { volume ->
@@ -299,6 +317,34 @@ fun FileExplorerRO(
                     onEditNetwork = onEditNetwork
                 )
             }
+        }
+
+        val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+        val isInWindowMode = remember(configuration) {
+            val isMulti = try { (context as? android.app.Activity)?.isInMultiWindowMode == true } catch (_: Exception) { false }
+            val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+            isDeX || isMulti
+        }
+
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 32.dp else if (isInWindowMode) 32.dp else 0.dp
+
+        if (fadeHeight > 0.dp) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(fadeHeight)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                extendedColors.background.copy(alpha = 0.5f),
+                                extendedColors.background
+                            )
+                        )
+                    )
+            )
         }
     }
 }
@@ -359,6 +405,7 @@ private fun ExplorerTopBar(
             onMenuClick = onMenuClick,
             appState = appState
         )
+        
 
         if (SettingsManager.isCommandBarVisible.value) {
             CommandBar(appState = appState)
@@ -388,16 +435,27 @@ private fun ExplorerBody(
     )
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
 
+    val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
+    val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
+    val sidebarBg = LocalExtendedColors.current.sidebarBackground
+
     Column(modifier = modifier.fillMaxSize()) {
-        Row(modifier = Modifier.weight(1f).padding(8.dp)) {
+        Row(modifier = Modifier.weight(1f).padding(horizontal = 8.dp).padding(top = 8.dp)) {
             // Navigation Pane (Side)
             if (screenSize != ScreenSize.SMALL) {
-                Box(modifier = Modifier.fillMaxHeight().padding(end = 8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(end = 8.dp)
+                        .then(if (sidebarIsRounded) Modifier.padding(8.dp) else Modifier)
+                        .navigationBarsPadding()
+                        .zIndex(2f)
+                ) {
                     PermanentDrawerSheet(
                         modifier = Modifier.width(navPaneWidth).fillMaxHeight(),
                         windowInsets = WindowInsets(0, 0, 0, 0),
-                        drawerShape = RoundedCornerShape(16.dp),
-                        drawerContainerColor = LocalExtendedColors.current.sidebarBackground
+                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(16.dp) else androidx.compose.ui.graphics.RectangleShape,
+                        drawerContainerColor = sidebarBg
                     ) {
                         NavigationPane(
                             appState = appState,
@@ -418,6 +476,7 @@ private fun ExplorerBody(
                     }
                 }
                 VerticalResizeHandle(
+                    modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = false,
                     onResize = { delta ->
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
@@ -433,14 +492,18 @@ private fun ExplorerBody(
             }
 
             // Main Content Area
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .then(if (contentIsRounded) Modifier.padding(8.dp) else Modifier)
+            ) {
                 FileContent(appState = appState)
             }
 
             // Details Pane
             if (screenSize == ScreenSize.LARGE && SettingsManager.detailsMode.value == DetailsMode.PANE) {
                 VerticalResizeHandle(
-                    showDivider = false,
+                    modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
+                    showDivider = !contentIsRounded,
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
                             (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 300.dp)
@@ -449,7 +512,12 @@ private fun ExplorerBody(
                 )
                 DetailsPane(
                     appState = appState,
-                    modifier = Modifier.width(detailsPaneWidth).padding(start = 8.dp).fillMaxHeight()
+                    modifier = Modifier
+                        .width(detailsPaneWidth)
+                        .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier.padding(start = 8.dp))
+                        .fillMaxHeight()
+                        .navigationBarsPadding()
+                        .zIndex(2f)
                 )
             }
         }
@@ -457,7 +525,9 @@ private fun ExplorerBody(
         // Details Bar (Bottom)
         if (screenSize == ScreenSize.LARGE && SettingsManager.detailsMode.value == DetailsMode.BAR) {
             HorizontalDivider()
-            DetailsBar(appState = appState)
+            Box(modifier = Modifier.navigationBarsPadding().zIndex(2f)) {
+                DetailsBar(appState = appState)
+            }
         }
     }
 }

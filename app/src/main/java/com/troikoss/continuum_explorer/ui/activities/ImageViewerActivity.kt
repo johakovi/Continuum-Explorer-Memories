@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -454,8 +453,7 @@ fun ImageViewerScreen(
                         y = with(LocalDensity.current) { menuOffset.y.toDp() }
                     ),
                     shape = RoundedCornerShape(16.dp),
-                    containerColor = LocalExtendedColors.current.menuBackground,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                    containerColor = LocalExtendedColors.current.menuBackground
                 ) {
                     // --- GROUP 1: Open With ---
                     DropdownMenuItem(

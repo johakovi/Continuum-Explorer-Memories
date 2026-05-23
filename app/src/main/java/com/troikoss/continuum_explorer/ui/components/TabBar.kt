@@ -49,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -92,7 +91,6 @@ fun TabBar(
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    val borderColor = MaterialTheme.colorScheme.outlineVariant
     val themeTop = SettingsManager.themeTop.value
     val density = LocalDensity.current
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
@@ -142,20 +140,7 @@ fun TabBar(
         modifier = modifier
             .fillMaxWidth()
             .height(totalBarHeight)
-            .background(LocalExtendedColors.current.tabBarBackground)
-            .let {
-                if (themeTop == ThemeTopMode.ATTACHED) {
-                    it.drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        drawLine(
-                            color = borderColor,
-                            start = Offset(0f, size.height - strokeWidth / 2),
-                            end = Offset(size.width, size.height - strokeWidth / 2),
-                            strokeWidth = strokeWidth
-                        )
-                    }
-                } else it
-            },
+            .background(LocalExtendedColors.current.tabBarBackground),
         contentAlignment = Alignment.BottomStart
     ) {
         val currentMaxWidth = maxWidth
@@ -168,7 +153,7 @@ fun TabBar(
         val safetyPaddingRight = if (hasCaption && restrictedRight == 0.dp && horizontalPaddingRight == 0.dp) {
             minOf(160.dp, currentMaxWidth * 0.4f)
         } else 0.dp
-        
+
         val finalPaddingLeft = maxOf(horizontalPaddingLeft, restrictedLeft, safetyPaddingLeft)
         val finalPaddingRight = maxOf(horizontalPaddingRight, restrictedRight, safetyPaddingRight)
 
@@ -182,7 +167,7 @@ fun TabBar(
         val targetSlotWidth: Dp = if (tabStates.isEmpty()) TAB_SLOT_MAX else {
             (available / tabStates.size).coerceIn(TAB_SLOT_MIN, TAB_SLOT_MAX)
         }
-        
+
         val slotWidth by animateDpAsState(
             targetValue = targetSlotWidth,
             animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
@@ -229,7 +214,7 @@ fun TabBar(
                     var isActuallyClosing by remember(state) { mutableStateOf(false) }
                     val isInitialTab = remember { index == 0 && tabStates.size == 1 }
                     var isVisible by remember(state) { mutableStateOf(isInitialTab) }
-                    
+
                     val isLayoutReady = currentMaxWidth > 0.dp
                     LaunchedEffect(state, isLayoutReady) {
                         if (isLayoutReady && !isVisible) {
@@ -316,7 +301,7 @@ private fun TabItem(
         modifier = modifier
             .width(slotWidth)
             .padding(start = 4.dp, end = 4.dp, top = if (themeTop == ThemeTopMode.FLOAT) 0.dp else 8.dp)
-            .let { 
+            .let {
                 if (selected && themeTop == ThemeTopMode.ATTACHED) {
                     it.drawBehind {
                         val r = 8.dp.toPx()

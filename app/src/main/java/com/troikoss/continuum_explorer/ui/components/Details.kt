@@ -25,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +37,7 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
+import com.troikoss.continuum_explorer.utils.fadingEdge
 import com.troikoss.continuum_explorer.utils.getFileType
 import com.troikoss.continuum_explorer.utils.getImageResolution
 import com.troikoss.continuum_explorer.utils.getMediaDuration
@@ -78,21 +81,26 @@ fun DetailsPane(
     val selectionCount = selectedItems.size
     val totalFiles = appState.files.size
     val currentPath = appState.currentUniversalPath
+    val contentIsRounded = com.troikoss.continuum_explorer.managers.SettingsManager.themeContent.value == com.troikoss.continuum_explorer.managers.ThemeShape.ROUNDED
 
     val fileType = if (selectionCount >= 1) getFileType(selectedItems.first(), context) else null
 
-    val detailsShape = RoundedCornerShape(16.dp)
+    val detailsShape = if (contentIsRounded) RoundedCornerShape(16.dp) else androidx.compose.ui.graphics.RectangleShape
+
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
             .fillMaxHeight()
+            .then(if (contentIsRounded) Modifier.shadow(elevation = 8.dp, shape = detailsShape) else Modifier)
             .clip(detailsShape)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .fadingEdge(scrollState, showBottom = false)
+                .verticalScroll(scrollState)
         ) {
             Box(
                 modifier = Modifier

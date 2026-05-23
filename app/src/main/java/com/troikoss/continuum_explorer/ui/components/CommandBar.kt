@@ -2,7 +2,6 @@ package com.troikoss.continuum_explorer.ui.components
 
 import android.content.ClipboardManager
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.filled.List
@@ -116,20 +113,10 @@ fun CommandBar(
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    val commandBarBorderColor = MaterialTheme.colorScheme.outlineVariant
 
     Surface(
         modifier = Modifier
-            .fillMaxWidth()
-            .drawBehind {
-                val strokeWidth = 1.dp.toPx()
-                drawLine(
-                    color = commandBarBorderColor,
-                    start = Offset(0f, size.height - strokeWidth / 2),
-                    end = Offset(size.width, size.height - strokeWidth / 2),
-                    strokeWidth = strokeWidth
-                )
-            },
+            .fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface
     ) {
         Row(
@@ -520,8 +507,7 @@ fun CommandDropDown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             shape = RoundedCornerShape(16.dp),
-            containerColor = LocalExtendedColors.current.menuBackground,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+            containerColor = LocalExtendedColors.current.menuBackground
         ) {
             menuItems { expanded = false }
         }

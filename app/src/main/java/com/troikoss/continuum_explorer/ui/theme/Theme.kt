@@ -190,7 +190,7 @@ fun FileExplorerTheme(
                 topBarBackground = VeryDarkTopBar,
                 navButtonBackground = Color(0xFF000000),
                 searchBoxBackground = Color(0xFF1A1A1A),
-                tabBarBackground = Color(0xFF131313),
+                tabBarBackground = Color(0xFF2D2D2F),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
                 folderIcon = when (iconTheme) {
@@ -262,7 +262,7 @@ fun FileExplorerTheme(
                 tabActiveBackground = Color(0xFF000000),
                 textColor = VeryDarkText,
                 menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
-                fileViewBackground = Color(0xFF000000),
+                fileViewBackground = Color(0xFF0F0F11),
                 background = Color(0xFF000000),
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
@@ -370,7 +370,7 @@ fun FileExplorerTheme(
                 tabActiveBackground = Color(0xFFF1F1F1),
                 textColor = VeryLightText,
                 menuBackground = Color.White.copy(alpha = 0.98f),
-                fileViewBackground = Color(0xFFF1F1F1),
+                fileViewBackground = Color(0xFFFFFFFF),
                 background = Color(0xFFF1F1F1)
             )
         }
@@ -386,7 +386,7 @@ fun FileExplorerTheme(
                 navButtonBackground = colorScheme.surfaceContainerLow,
                 searchBoxBackground = colorScheme.surfaceContainerHigh,
                 tabBarBackground = colorScheme.surfaceContainerHighest,
-                fileViewBackground = colorScheme.surfaceContainerLow,
+                fileViewBackground = colorScheme.surfaceContainerLowest,
                 background = colorScheme.surfaceContainerLow,
                 tabActiveBackground = colorScheme.surfaceContainerLow,
 

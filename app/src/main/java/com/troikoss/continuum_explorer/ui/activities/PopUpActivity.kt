@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -110,7 +111,7 @@ class PopUpActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .padding(vertical = 24.dp)
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.medium),
+                            .shadow(12.dp, MaterialTheme.shapes.medium),
                         shape = MaterialTheme.shapes.medium,
                         color = extendedColors.sidebarBackground,
                         tonalElevation = 4.dp
@@ -132,38 +133,6 @@ class PopUpActivity : ComponentActivity() {
                                 PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
                                 PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
                                 else -> ProgressContent(onClose = { finish() })
-                            }
-                            
-                            // DEV BUTTON
-                            var showDevInfo by remember { mutableStateOf(false) }
-                            val density = LocalDensity.current
-                            val captionInsets = WindowInsets.captionBar
-                            
-                            IconButton(
-                                onClick = { showDevInfo = true },
-                                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
-                            ) {
-                                Icon(Icons.Default.BugReport, "Dev", tint = Color.Red.copy(alpha = 0.5f))
-                            }
-                            
-                            if (showDevInfo) {
-                                AlertDialog(
-                                    onDismissRequest = { showDevInfo = false },
-                                    confirmButton = { TextButton(onClick = { showDevInfo = false }) { Text("OK") } },
-                                    title = { Text("Dev Info") },
-                                    text = {
-                                        Column {
-                                            val config = androidx.compose.ui.platform.LocalConfiguration.current
-                                            val ctx = androidx.compose.ui.platform.LocalContext.current
-                                            val isMulti = try { (ctx as? android.app.Activity)?.isInMultiWindowMode == true } catch(_: Exception) { false }
-                                            val isSetting = try { android.provider.Settings.System.getInt(ctx.contentResolver, "sem_desktop_mode_enabled", 0) == 1 } catch(_: Exception) { false }
-
-                                            Text("DeX Setting: $isSetting")
-                                            Text("Multi-Window: $isMulti")
-                                            Text("Caption T: ${with(density) { WindowInsets.captionBar.getTop(density).toDp() }}")
-                                        }
-                                    }
-                                )
                             }
                         }
                     }
@@ -630,8 +599,7 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
                 expanded = expCompMethod,
                 onDismissRequest = { expCompMethod = false },
                 shape = RoundedCornerShape(16.dp),
-                containerColor = LocalExtendedColors.current.menuBackground,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                containerColor = LocalExtendedColors.current.menuBackground
             ) {
                 CompressionMethod.entries.forEach { method ->
                     DropdownMenuItem(
@@ -666,8 +634,7 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
                 expanded = expCompLevel,
                 onDismissRequest = { expCompLevel = false },
                 shape = RoundedCornerShape(16.dp),
-                containerColor = LocalExtendedColors.current.menuBackground,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                containerColor = LocalExtendedColors.current.menuBackground
             ) {
                 CompressionLevel.entries.forEach { level ->
                     DropdownMenuItem(
@@ -701,8 +668,7 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
                 expanded = expEncMethod,
                 onDismissRequest = { expEncMethod = false },
                 shape = RoundedCornerShape(16.dp),
-                containerColor = LocalExtendedColors.current.menuBackground,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                containerColor = LocalExtendedColors.current.menuBackground
             ) {
                 EncryptionMethod.entries.forEach { method ->
                     DropdownMenuItem(
@@ -1355,8 +1321,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                 expanded = expProtocol,
                 onDismissRequest = { expProtocol = false },
                 shape = RoundedCornerShape(16.dp),
-                containerColor = LocalExtendedColors.current.menuBackground,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                containerColor = LocalExtendedColors.current.menuBackground
             ) {
                 NetworkProtocol.entries.forEach { p ->
                     DropdownMenuItem(

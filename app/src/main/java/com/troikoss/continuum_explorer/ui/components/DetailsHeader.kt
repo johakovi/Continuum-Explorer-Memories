@@ -1,6 +1,5 @@
 package com.troikoss.continuum_explorer.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -113,8 +112,7 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
             onDismissRequest = { showColumnMenu = false },
             offset = columnMenuOffset,
             shape = RoundedCornerShape(16.dp),
-            containerColor = LocalExtendedColors.current.menuBackground,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+            containerColor = LocalExtendedColors.current.menuBackground
         ) {
             appState.folderConfigs.extraColumns.forEach { column ->
                 val isVisible = column.type !in appState.folderConfigs.hiddenColumns

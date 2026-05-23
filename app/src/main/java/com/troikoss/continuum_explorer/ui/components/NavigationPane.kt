@@ -73,6 +73,7 @@ import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.emptyRecycleBin
+import com.troikoss.continuum_explorer.utils.fadingEdge
 import com.troikoss.continuum_explorer.utils.fileDropTarget
 import com.troikoss.continuum_explorer.utils.navigateTo
 import com.troikoss.continuum_explorer.utils.openInNewWindow
@@ -102,7 +103,7 @@ private val MINIMIZED_SIDEBAR_WIDTH = 160.dp
  * Extension to apply a horizontal fading edge to text to prevent jitter from ellipsis
  * and provide a smooth "slide to invisible" effect.
  */
-private fun Modifier.fadingEdge(alpha: Float = 1f): Modifier = this
+private fun Modifier.horizontalFadingEdge(alpha: Float = 1f): Modifier = this
     .graphicsLayer {
         this.alpha = alpha
         this.compositingStrategy = CompositingStrategy.Offscreen
@@ -275,6 +276,7 @@ fun NavigationPane(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
+                .fadingEdge(lazyListState, showBottom = false)
                 .contextMenuDetector(enableLongPress = true, aggressive = false) { offset ->
                     bgMenuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
                     showBgMenu = true
@@ -767,8 +769,7 @@ private fun NavBackgroundContextMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+        containerColor = LocalExtendedColors.current.menuBackground
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.nav_add_storage)) },
@@ -798,7 +799,7 @@ private fun NavSectionHeader(currentWidth: Dp, text: String, isMinimized: Boolea
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .fadingEdge(textAlpha),
+            .horizontalFadingEdge(textAlpha),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.Normal,
@@ -822,8 +823,7 @@ private fun NavContextMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+        containerColor = LocalExtendedColors.current.menuBackground
     ) {
         if (onNavigate != null) {
             DropdownMenuItem(
@@ -1003,7 +1003,7 @@ private fun NavItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1071,7 +1071,7 @@ private fun NavFavoriteItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1155,7 +1155,7 @@ private fun NavSafItem(
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
                         val totalFormatted = Formatter.formatFileSize(context, totalSpace)
                         val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
                             Text(
                                 text = label,
                                 fontWeight = FontWeight.Normal,
@@ -1184,7 +1184,7 @@ private fun NavSafItem(
                             )
                         }
                     } else {
-                        Text(label, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha))
+                        Text(label, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha))
                     }
                 },
                 selected = false,
@@ -1291,7 +1291,7 @@ private fun NavNetworkItem(
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
                         val totalFormatted = Formatter.formatFileSize(context, totalSpace)
                         val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
                             Text(
                                 text = connection.displayName,
                                 fontWeight = FontWeight.Normal,
@@ -1320,7 +1320,7 @@ private fun NavNetworkItem(
                             )
                         }
                     } else {
-                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha))
+                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha))
                     }
                 },
                 selected = false,
@@ -1437,7 +1437,7 @@ private fun NavStorageItem(
                     label = {
                         val usedSpace = totalSpace - freeSpace
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().fadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
                             Text(
                                 text = label,
                                 fontWeight = FontWeight.Bold,
@@ -1539,7 +1539,7 @@ private fun StorageFolderTreeItem(
 
     Column {
         NavigationDrawerItem(
-            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().fadingEdge(textAlpha)) },
+            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
             selected = false,
             onClick = {
                 appState.navigateTo(folder, null)

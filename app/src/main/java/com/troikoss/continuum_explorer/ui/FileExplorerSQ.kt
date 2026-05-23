@@ -15,11 +15,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.zIndex
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import androidx.compose.material3.DrawerValue
@@ -241,7 +255,8 @@ fun FileExplorerSQ(
             drawerContent = {
                 ModalDrawerSheet(
                     drawerShape = RectangleShape,
-                    drawerContainerColor = sidebarBg
+                    drawerContainerColor = sidebarBg,
+                    windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     NavigationContent(
                         appState = appState,
@@ -286,7 +301,11 @@ fun FileExplorerSQ(
                 }
             ) { innerPadding ->
                 ExplorerBody(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                    ),
                     appState = appState,
                     onAddStorage = { safLauncher.launch(null) },
                     onAddSdCard = { volume ->
@@ -298,6 +317,34 @@ fun FileExplorerSQ(
                     onEditNetwork = onEditNetwork
                 )
             }
+        }
+
+        val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+        val isInWindowMode = remember(configuration) {
+            val isMulti = try { (context as? android.app.Activity)?.isInMultiWindowMode == true } catch (_: Exception) { false }
+            val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+            isDeX || isMulti
+        }
+
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 32.dp else if (isInWindowMode) 32.dp else 0.dp
+
+        if (fadeHeight > 0.dp) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(fadeHeight)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                extendedColors.background.copy(alpha = 0.5f),
+                                extendedColors.background
+                            )
+                        )
+                    )
+            )
         }
     }
 }
@@ -386,6 +433,7 @@ private fun ExplorerBody(
     )
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
+    val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
     val themeTop = SettingsManager.themeTop.value
     val sidebarBg = LocalExtendedColors.current.topBarBackground
 
@@ -393,30 +441,39 @@ private fun ExplorerBody(
         Row(modifier = Modifier.weight(1f)) {
             // Navigation Pane (Side)
             if (screenSize != ScreenSize.SMALL) {
-                PermanentDrawerSheet(
-                    modifier = Modifier.width(navPaneWidth),
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    drawerShape = if (contentIsRounded) RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp) else RectangleShape,
-                    drawerContainerColor = sidebarBg
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .then(if (sidebarIsRounded) Modifier.padding(8.dp).padding(end = 8.dp) else Modifier)
+                        .navigationBarsPadding()
+                        .zIndex(2f)
                 ) {
-                    NavigationPane(
-                        appState = appState,
-                        onItemSelected = { section ->
-                            navigateToSection(
-                                appState,
-                                context,
-                                section,
-                                onAddSdCard
-                            )
-                        },
-                        onSafItemSelected = { appState.navigateTo(null, it) },
-                        onAddStorageClick = onAddStorage,
-                        onAddNetworkClick = onAddNetwork,
-                        onEditNetworkClick = onEditNetwork,
-                        currentWidth = navPaneWidth
-                    )
+                    PermanentDrawerSheet(
+                        modifier = Modifier.width(navPaneWidth).fillMaxHeight(),
+                        windowInsets = WindowInsets(0, 0, 0, 0),
+                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(16.dp) else RectangleShape,
+                        drawerContainerColor = sidebarBg
+                    ) {
+                        NavigationPane(
+                            appState = appState,
+                            onItemSelected = { section ->
+                                navigateToSection(
+                                    appState,
+                                    context,
+                                    section,
+                                    onAddSdCard
+                                )
+                            },
+                            onSafItemSelected = { appState.navigateTo(null, it) },
+                            onAddStorageClick = onAddStorage,
+                            onAddNetworkClick = onAddNetwork,
+                            onEditNetworkClick = onEditNetwork,
+                            currentWidth = navPaneWidth
+                        )
+                    }
                 }
                 VerticalResizeHandle(
+                    modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = !contentIsRounded,
                     onResize = { delta ->
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
@@ -442,6 +499,7 @@ private fun ExplorerBody(
             // Details Pane
             if (screenSize == ScreenSize.LARGE && SettingsManager.detailsMode.value == DetailsMode.PANE) {
                 VerticalResizeHandle(
+                    modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = !contentIsRounded,
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
@@ -454,6 +512,8 @@ private fun ExplorerBody(
                     modifier = Modifier
                         .width(detailsPaneWidth)
                         .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier)
+                        .navigationBarsPadding()
+                        .zIndex(2f)
                 )
             }
         }
@@ -461,7 +521,9 @@ private fun ExplorerBody(
         // Details Bar (Bottom)
         if (screenSize == ScreenSize.LARGE && SettingsManager.detailsMode.value == DetailsMode.BAR) {
             HorizontalDivider()
-            DetailsBar(appState = appState)
+            Box(modifier = Modifier.navigationBarsPadding().zIndex(2f)) {
+                DetailsBar(appState = appState)
+            }
         }
     }
 }

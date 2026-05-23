@@ -1,7 +1,6 @@
 package com.troikoss.continuum_explorer.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +44,7 @@ import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -60,6 +60,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -270,12 +272,18 @@ fun FileContentRO(appState: FileExplorerState) {
     }
 
     val fileListShape = RoundedCornerShape(16.dp)
+    val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
 
     // --- UI Layout ---
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .then( if (appState.getScreenSize() != ScreenSize.SMALL) Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground) else Modifier)
+            .then(
+                if (contentIsRounded && appState.getScreenSize() != ScreenSize.SMALL)
+                    Modifier.shadow(elevation = 8.dp, shape = fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
+                else
+                    Modifier.background(FileExplorerTheme.extendedColors.background)
+            )
             .onGloballyPositioned { containerCoordinates = it }
             .containerGestures(
                 selectionManager = selectionManager,
@@ -548,8 +556,9 @@ private fun FileGrid(
             ViewMode.GRID, ViewMode.GALLERY -> GridCells.Adaptive(minSize = appState.folderConfigs.gridItemSize.dp)
             else -> GridCells.Fixed(1)
         },
-        modifier = if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        else Modifier.fillMaxSize().padding(horizontal = 32.dp),
+        modifier = (if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
+        else Modifier.fillMaxSize().padding(horizontal = 32.dp))
+            .fadingEdge(gridState, showBottom = false),
         contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(0.dp)
         else PaddingValues(16.dp)
     ) {

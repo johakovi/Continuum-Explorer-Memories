@@ -115,8 +115,7 @@ fun ItemContextMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+        containerColor = LocalExtendedColors.current.menuBackground
     ) {
         if (onlyOneSelected) {
             val item = selectedItems.first()
@@ -398,8 +397,7 @@ fun BackgroundContextMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+        containerColor = LocalExtendedColors.current.menuBackground
     ) {
         when (currentScreen) {
             "MAIN" -> {
