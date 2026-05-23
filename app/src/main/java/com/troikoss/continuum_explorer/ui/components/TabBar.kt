@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -136,6 +137,8 @@ fun TabBar(
     val restrictedLeft = WindowManager.restrictedLeftPadding.value
     val restrictedRight = WindowManager.restrictedRightPadding.value
 
+    val isFloat = themeTop == ThemeTopMode.FLOAT
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
@@ -186,7 +189,7 @@ fun TabBar(
                 .fillMaxWidth()
                 .padding(start = finalPaddingLeft, end = adjustedPaddingRight)
                 .height(tabContentHeight),
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = if (isFloat) Alignment.CenterVertically else Alignment.Bottom
         ) {
             Row(
                 modifier = Modifier
@@ -205,7 +208,7 @@ fun TabBar(
                             }
                         }
                     },
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = if (isFloat) Alignment.CenterVertically else Alignment.Bottom
             ) {
                 tabStates.forEachIndexed { index, state ->
                     key(state) {
@@ -313,7 +316,19 @@ private fun TabItem(
     Box(
         modifier = modifier
             .width(slotWidth)
-            .padding(start = 4.dp, end = 4.dp, top = if (themeTop == ThemeTopMode.FLOAT) 0.dp else 8.dp)
+            .padding(
+                start = 4.dp,
+                end = 4.dp,
+                top = if (themeTop == ThemeTopMode.FLOAT) 6.dp else 8.dp,
+                bottom = if (themeTop == ThemeTopMode.FLOAT) 6.dp else 0.dp
+            )
+            .let {
+                if (themeTop == ThemeTopMode.FLOAT) {
+                    it.shadow(if (selected) 4.dp else 2.dp, shape)
+                } else {
+                    it
+                }
+            }
             .let {
                 if (selected && themeTop == ThemeTopMode.ATTACHED) {
                     it.drawBehind {
