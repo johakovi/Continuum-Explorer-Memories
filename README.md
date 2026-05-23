@@ -7,9 +7,12 @@ A modern, feature-rich Android application built with a focus on desktop-grade u
 
 Note: This project is forked from troikoss / Continuum Explorer
 
-<img width="1920" height="1080" alt="Screenshot_20260508_160204_Continuum Explorer" src="https://github.com/user-attachments/assets/28f8056d-ab09-4ee1-b582-536f5c3a7278" />
+<img width="1920" height="1080" alt="Screenshot_20260523_235854_Continuum Explorer" src="https://github.com/user-attachments/assets/2cba7ee0-5757-4c15-92c1-508dccff08fa" />
 
-<img width="2160" height="1686" alt="1000287942" src="https://github.com/user-attachments/assets/0334dde4-b7d7-47e4-b003-9c8344706547" />
+<img width="1920" height="1080" alt="Screenshot_20260523_235818_Continuum Explorer" src="https://github.com/user-attachments/assets/3d84a09f-118a-49e3-8204-e9e1a49a04e2" />
+
+<img width="968" height="2376" alt="Screenshot_20260524_004233_Continuum Explorer" src="https://github.com/user-attachments/assets/4f90c6a7-38dd-45d1-88eb-454c322c56ed" />
+
 
 ## Key Features:
 Dex theme integration
@@ -32,12 +35,12 @@ Network storage managment
 
 Shizuku privilege
 
+Termux privilege
+
 ## Planned Features:
 Internal PDF reader
 
 More organized theme settings.
-
-Google Drive and OneDrive optional integration
 
 ## Known issues
 The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
