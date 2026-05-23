@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -553,6 +556,10 @@ private fun FileGrid(
     isInWindowMode: Boolean = false
 ) {
     val viewMode = appState.activeViewMode
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
+    val extraHeight = if (isGestureNav) 0.dp else 20.dp
+    val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
 
     LazyVerticalGrid(
         state = gridState,
@@ -563,8 +570,8 @@ private fun FileGrid(
         modifier = (if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
         else Modifier.fillMaxSize().padding(horizontal = 32.dp))
             .fadingEdge(gridState, showBottom = isInWindowMode),
-        contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(0.dp)
-        else PaddingValues(16.dp)
+        contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(bottom = fadeHeight)
+        else PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp + fadeHeight)
     ) {
         items(
             items = appState.files,

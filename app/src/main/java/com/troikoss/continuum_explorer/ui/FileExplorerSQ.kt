@@ -329,10 +329,14 @@ fun FileExplorerSQ(
         }
 
         val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 32.dp else 0.dp
+        // Adjust fade height: 3-button nav (~48dp) gets a taller fade, gesture nav (~16-24dp) gets a shorter one.
+        val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
+        val extraHeight = if (isGestureNav) 0.dp else 10.dp
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
 
         if (fadeHeight > 0.dp) {
-            val stopPoint = (fadeHeight - 10.dp) / fadeHeight
+            val solidPart = if (isGestureNav) 0.dp else 10.dp
+            val stopPoint = (fadeHeight - solidPart).coerceAtLeast(0.dp) / fadeHeight
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

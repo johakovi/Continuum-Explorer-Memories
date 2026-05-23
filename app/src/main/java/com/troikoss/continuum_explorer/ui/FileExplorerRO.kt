@@ -329,10 +329,13 @@ fun FileExplorerRO(
         }
 
         val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 20.dp else 0.dp
+        val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
+        val extraHeight = if (isGestureNav) 0.dp else 20.dp
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
 
         if (fadeHeight > 0.dp) {
-            val stopPoint = (fadeHeight - 20.dp) / fadeHeight
+            val solidPart = if (isGestureNav) 0.dp else 20.dp
+            val stopPoint = (fadeHeight - solidPart).coerceAtLeast(0.dp) / fadeHeight
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
