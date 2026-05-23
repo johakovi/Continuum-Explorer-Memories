@@ -33,7 +33,7 @@ Network storage managment
 
 Shizuku privilege
 
-Termux privilige
+Termux privilege
 
 ## Planned Features:
 Internal PDF reader
