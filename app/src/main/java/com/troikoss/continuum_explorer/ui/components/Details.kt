@@ -74,7 +74,8 @@ private fun rememberMediaMetadata(
 @Composable
 fun DetailsPane(
     appState: FileExplorerState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isInWindowMode: Boolean = false
 ) {
     val context = LocalContext.current
     val selectedItems = appState.selectionManager.selectedItems
@@ -99,7 +100,7 @@ fun DetailsPane(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fadingEdge(scrollState, showBottom = false)
+                .fadingEdge(scrollState, showBottom = isInWindowMode)
                 .verticalScroll(scrollState)
         ) {
             Box(

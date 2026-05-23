@@ -227,6 +227,13 @@ fun FileExplorerRO(
 
     // --- Main Layout ---
     val extendedColors = LocalExtendedColors.current
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isInWindowMode = remember(configuration) {
+        val isMulti = try { (context as? android.app.Activity)?.isInMultiWindowMode == true } catch (_: Exception) { false }
+        val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+        isDeX || isMulti
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -268,7 +275,8 @@ fun FileExplorerRO(
                             }
                         },
                         onAddNetwork = onAddNetwork,
-                        onEditNetwork = onEditNetwork
+                        onEditNetwork = onEditNetwork,
+                        isInWindowMode = isInWindowMode
                     )
                 }
             }
@@ -307,6 +315,7 @@ fun FileExplorerRO(
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                     ),
                     appState = appState,
+                    isInWindowMode = isInWindowMode,
                     onAddStorage = { safLauncher.launch(null) },
                     onAddSdCard = { volume ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -320,16 +329,10 @@ fun FileExplorerRO(
         }
 
         val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-        val isInWindowMode = remember(configuration) {
-            val isMulti = try { (context as? android.app.Activity)?.isInMultiWindowMode == true } catch (_: Exception) { false }
-            val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
-            isDeX || isMulti
-        }
-
-        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 32.dp else if (isInWindowMode) 32.dp else 0.dp
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + 20.dp else 0.dp
 
         if (fadeHeight > 0.dp) {
+            val stopPoint = (fadeHeight - 20.dp) / fadeHeight
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -337,11 +340,10 @@ fun FileExplorerRO(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            listOf(
-                                Color.Transparent,
-                                extendedColors.background.copy(alpha = 0.5f),
-                                extendedColors.background
-                            )
+                            0f to Color.Transparent,
+                            0.3f to extendedColors.background.copy(alpha = 0.5f),
+                            stopPoint to extendedColors.background,
+                            1f to extendedColors.background
                         )
                     )
             )
@@ -356,7 +358,8 @@ private fun NavigationContent(
     onAddStorage: () -> Unit,
     onAddSdCard: (android.os.storage.StorageVolume) -> Unit = {},
     onAddNetwork: () -> Unit = {},
-    onEditNetwork: (NetworkConnection) -> Unit = {}
+    onEditNetwork: (NetworkConnection) -> Unit = {},
+    isInWindowMode: Boolean = false
 ) {
     val context = LocalContext.current
     NavigationPane(
@@ -373,7 +376,8 @@ private fun NavigationContent(
         onAddNetworkClick = onAddNetwork,
         onEditNetworkClick = onEditNetwork,
         onNavigate = onCloseDrawer,
-        currentWidth = appState.appConfigs.navPaneWidth // Modal drawer usually full width or fixed, but passing for consistency
+        currentWidth = appState.appConfigs.navPaneWidth, // Modal drawer usually full width or fixed, but passing for consistency
+        isInWindowMode = isInWindowMode
     )
 }
 
@@ -417,6 +421,7 @@ private fun ExplorerTopBar(
 private fun ExplorerBody(
     modifier: Modifier = Modifier,
     appState: FileExplorerState,
+    isInWindowMode: Boolean = false,
     onAddStorage: () -> Unit,
     onAddSdCard: (android.os.storage.StorageVolume) -> Unit = {},
     onAddNetwork: () -> Unit = {},
@@ -471,7 +476,8 @@ private fun ExplorerBody(
                             onAddStorageClick = onAddStorage,
                             onAddNetworkClick = onAddNetwork,
                             onEditNetworkClick = onEditNetwork,
-                            currentWidth = navPaneWidth
+                            currentWidth = navPaneWidth,
+                            isInWindowMode = isInWindowMode
                         )
                     }
                 }
@@ -496,7 +502,7 @@ private fun ExplorerBody(
                 .weight(1f)
                 .then(if (contentIsRounded) Modifier.padding(8.dp) else Modifier)
             ) {
-                FileContent(appState = appState)
+                FileContent(appState = appState, isInWindowMode = isInWindowMode)
             }
 
             // Details Pane
@@ -517,7 +523,8 @@ private fun ExplorerBody(
                         .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier.padding(start = 8.dp))
                         .fillMaxHeight()
                         .navigationBarsPadding()
-                        .zIndex(2f)
+                        .zIndex(2f),
+                    isInWindowMode = isInWindowMode
                 )
             }
         }

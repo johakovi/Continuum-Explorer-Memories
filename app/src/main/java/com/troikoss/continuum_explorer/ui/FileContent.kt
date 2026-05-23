@@ -6,10 +6,10 @@ import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 
 @Composable
-fun FileContent(appState: FileExplorerState) {
+fun FileContent(appState: FileExplorerState, isInWindowMode: Boolean = false) {
     if (SettingsManager.themeContent.value == ThemeShape.SQUARE) {
-        FileContentSQ(appState = appState)
+        FileContentSQ(appState = appState, isInWindowMode = isInWindowMode)
     } else {
-        FileContentRO(appState = appState)
+        FileContentRO(appState = appState, isInWindowMode = isInWindowMode)
     }
 }

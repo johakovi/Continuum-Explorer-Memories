@@ -78,7 +78,7 @@ import kotlinx.coroutines.launch
  * Handles layout (Grid vs List), selection marquee, and auto-scrolling.
  */
 @Composable
-fun FileContentRO(appState: FileExplorerState) {
+fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false) {
     val selectionManager = appState.selectionManager
     val focusRequester = remember { FocusRequester() }
     val density = LocalDensity.current
@@ -369,7 +369,8 @@ fun FileContentRO(appState: FileExplorerState) {
             onGridPositioned = { top, height ->
                 gridContainerTopPx = top
                 gridContainerHeightPx = height
-            }
+            },
+            isInWindowMode = isInWindowMode
         )
 
         // Floating context menu
@@ -422,7 +423,8 @@ private fun FileLayout(
     dragEnd: Offset?,
     marquee: Marquee,
     detailsContentWidthPx: Float,
-    onGridPositioned: (Float, Float) -> Unit
+    onGridPositioned: (Float, Float) -> Unit,
+    isInWindowMode: Boolean = false
 ) {
     val viewMode = appState.activeViewMode
     val hScrollState = rememberScrollState()
@@ -507,7 +509,8 @@ private fun FileLayout(
                 focusRequester = focusRequester,
                 dragActive = dragStart != null,
                 hScrollState = hScrollState,
-                detailsContentWidthPx = detailsContentWidthPx
+                detailsContentWidthPx = detailsContentWidthPx,
+                isInWindowMode = isInWindowMode
             )
 
             MarqueeRenderer(
@@ -546,7 +549,8 @@ private fun FileGrid(
     focusRequester: FocusRequester,
     dragActive: Boolean,
     hScrollState: ScrollState? = null,
-    detailsContentWidthPx: Float
+    detailsContentWidthPx: Float,
+    isInWindowMode: Boolean = false
 ) {
     val viewMode = appState.activeViewMode
 
@@ -558,7 +562,7 @@ private fun FileGrid(
         },
         modifier = (if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
         else Modifier.fillMaxSize().padding(horizontal = 32.dp))
-            .fadingEdge(gridState, showBottom = false),
+            .fadingEdge(gridState, showBottom = isInWindowMode),
         contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(0.dp)
         else PaddingValues(16.dp)
     ) {

@@ -136,7 +136,8 @@ fun NavigationPane(
     onAddNetworkClick: () -> Unit = {},
     onEditNetworkClick: (NetworkConnection) -> Unit = {},
     onNavigate: () -> Unit = {},
-    currentWidth: Dp = appState.appConfigs.navPaneWidth
+    currentWidth: Dp = appState.appConfigs.navPaneWidth,
+    isInWindowMode: Boolean = false
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -276,7 +277,7 @@ fun NavigationPane(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
-                .fadingEdge(lazyListState, showBottom = false)
+                .fadingEdge(lazyListState, showBottom = isInWindowMode)
                 .contextMenuDetector(enableLongPress = true, aggressive = false) { offset ->
                     bgMenuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
                     showBgMenu = true
