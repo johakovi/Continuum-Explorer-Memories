@@ -659,7 +659,22 @@ fun SettingsScreen(onBack: () -> Unit) {
                     onDismissRequest = { showLanguageDialog = false },
                     title = { Text(stringResource(R.string.settings_choose_language)) },
                     text = {
-                        Column {
+                        val languages = remember {
+                            listOf(
+                                "en" to R.string.settings_language_english,
+                                "fi" to R.string.settings_language_finnish,
+                                "fr" to R.string.settings_language_french,
+                                "de" to R.string.settings_language_german,
+                                "ko" to R.string.settings_language_korean,
+                                "pt" to R.string.settings_language_portuguese,
+                                "ru" to R.string.settings_language_russian,
+                                "es" to R.string.settings_language_spanish,
+                                "sv" to R.string.settings_language_swedish,
+                                "tr" to R.string.settings_language_turkish,
+                                "uk" to R.string.settings_language_ukrainian
+                            )
+                        }
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             OptionItem(
                                 label = stringResource(R.string.settings_language_system),
                                 selected = language == "system",
@@ -668,94 +683,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     showLanguageDialog = false
                                 }
                             )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_english),
-                                selected = language == "en",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "en")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_finnish),
-                                selected = language == "fi",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "fi")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_french),
-                                selected = language == "fr",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "fr")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_portuguese),
-                                selected = language == "pt",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "pt")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_spanish),
-                                selected = language == "es",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "es")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_turkish),
-                                selected = language == "tr",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "tr")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_german),
-                                selected = language == "de",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "de")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_russian),
-                                selected = language == "ru",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "ru")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_swedish),
-                                selected = language == "sv",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "sv")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_ukrainian),
-                                selected = language == "uk",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "uk")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_korean),
-                                selected = language == "ko",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "ko")
-                                    showLanguageDialog = false
-                                }
-                            )
+                            languages.forEach { (tag, resId) ->
+                                OptionItem(
+                                    label = stringResource(resId),
+                                    selected = language == tag,
+                                    onClick = {
+                                        SettingsManager.setLanguage(context, tag)
+                                        showLanguageDialog = false
+                                    }
+                                )
+                            }
                         }
                     },
                     confirmButton = {
