@@ -171,7 +171,8 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false) 
     }
 
     // Focused item auto-scroll (keyboard navigation)
-    LaunchedEffect(selectionManager.leadItem) {
+    LaunchedEffect(selectionManager.leadItem, appState.isMouseInteraction) {
+        if (appState.isMouseInteraction) return@LaunchedEffect
         val leadFile = selectionManager.leadItem ?: return@LaunchedEffect
         val index = selectionManager.allFiles.indexOf(leadFile)
         if (index != -1) {

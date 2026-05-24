@@ -259,6 +259,7 @@ fun Modifier.containerGestures(
         }
         .onKeyEvent { keyEvent ->
             if (keyEvent.type == KeyEventType.KeyDown) {
+                appState.isMouseInteraction = false
                 val shift = keyEvent.isShiftPressed
                 val ctrl = keyEvent.isCtrlPressed
 
@@ -459,8 +460,6 @@ fun Modifier.itemGestures(
     var isPrimaryClick by remember { mutableStateOf(false) }
 
     this
-        .focusRequester(focusRequester)
-        .focusable()
         .pointerInput(file, selectionManager) {
         awaitPointerEventScope {
             while (true) {
@@ -514,6 +513,7 @@ fun Modifier.itemGestures(
                         isPrimaryClick = isPrimary
 
                         if (isPrimary) {
+                            appState.isMouseInteraction = true
                             focusRequester.requestFocus()
                             if (currentTime - lastClickTime < 300) {
                                 appState.open(file)
