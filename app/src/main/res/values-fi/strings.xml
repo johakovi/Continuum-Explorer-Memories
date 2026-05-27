@@ -354,8 +354,8 @@
         <string name="msg_rename_failed">Uudelleen nimeäminen epäonnistui</string>
         <string name="msg_select_rename">Valitse tiedosto uudelleen nimeämiseksi</string>
         <string name="msg_select_one_rename">Valitse yksi tiedostoa uudelleen nimeämiseksi</string>
-        <string name="msg_failed_create_folder">Kansion luominen epäonnitui</string>
-        <string name="msg_failed_create_file">Tiedoston luominen epäonnitui</string>
+        <string name="msg_failed_create_folder">Kansion luominen epäonnistui</string>
+        <string name="msg_failed_create_file">Tiedoston luominen epäonnistui</string>
         <string name="msg_recycle_bin_empty">Roskakori on jo tyhjä</string>
         <string name="msg_select_pin">Valitse tiedosto tai kansio lisätäkseen</string>
         <string name="msg_select_one_pin">Valitse yksi tiedosto lisätäkseen</string>
