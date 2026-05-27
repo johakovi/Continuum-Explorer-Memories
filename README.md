@@ -42,7 +42,9 @@ Internal PDF reader
 
 More organized theme settings.
 
-Game save shortcut
+Game saves shortcut
+
+Game saves sync with pc (via smb or ftp in local network?)
 
 Home view (Favourite folders, games saves, recent files...etc.)(optional)
 
