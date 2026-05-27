@@ -42,6 +42,8 @@ Internal PDF reader
 
 More organized theme settings.
 
+Remote access to android
+
 Game saves shortcut
 
 Game saves sync with pc (via smb or ftp in local network?)
