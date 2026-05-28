@@ -26,6 +26,8 @@
     <string name="search">Search</string>
     <string name="search_hint">Search…</string>
     <string name="options">Options</string>
+    <string name="menu_clear_thumbnails">Clear thumbnails</string>
+    <string name="msg_thumbnails_cleared">Thumbnails cleared</string>
     <string name="off">Off</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>

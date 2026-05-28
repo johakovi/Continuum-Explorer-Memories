@@ -63,6 +63,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import com.troikoss.continuum_explorer.managers.CleanupManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.unit.dp
@@ -955,10 +956,25 @@ fun TopBar(
                             )
 
                             DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_clear_thumbnails)) },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    coroutineScope.launch {
+                                        CleanupManager.clearThumbnails(context.applicationContext)
+                                        Toast.makeText(context, context.getString(R.string.msg_thumbnails_cleared), Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                leadingIcon = { Icon(Icons.Default.DeleteSweep, null) }
+                            )
+
+                            DropdownMenuItem(
                                 text = { Text(stringResource(R.string.close)) },
                                 onClick = {
                                     optionsMenuExpanded = false
-                                    (context as? android.app.Activity)?.finish()
+                                    coroutineScope.launch {
+                                        CleanupManager.clearCache(context.applicationContext)
+                                        (context as? android.app.Activity)?.finish()
+                                    }
                                 },
                                 leadingIcon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, stringResource(R.string.close)) }
                             )

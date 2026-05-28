@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import coil.Coil
 import rikka.shizuku.Shizuku
 import com.troikoss.continuum_explorer.managers.ShizukuManager
+import com.troikoss.continuum_explorer.managers.CleanupManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -124,6 +125,11 @@ class MainActivity : AppCompatActivity() {
         SettingsManager.init(applicationContext)
         StorageProviders.init(applicationContext)
 
+        // Clear cache and temp files on startup
+        lifecycleScope.launch(Dispatchers.IO) {
+            CleanupManager.clearCache(applicationContext)
+        }
+
         val initialPath = intent.getStringExtra("path")
         val initialUri = intent.getStringExtra("uri")
         val initialArchive = run {
@@ -177,5 +183,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
+        
+        // Final cleanup on exit
+        lifecycleScope.launch(Dispatchers.IO) {
+            CleanupManager.clearCache(applicationContext)
+        }
     }
 }
