@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.ListAlt
@@ -951,6 +952,15 @@ fun TopBar(
                                     context.startActivity(intent)
                                 },
                                 leadingIcon = { Icon(Icons.Default.Settings, stringResource(R.string.settings)) }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.close)) },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    (context as? android.app.Activity)?.finish()
+                                },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, stringResource(R.string.close)) }
                             )
                         }
 
