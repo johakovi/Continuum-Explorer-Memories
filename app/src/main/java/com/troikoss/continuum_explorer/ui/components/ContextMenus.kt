@@ -40,7 +40,10 @@ import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material.icons.filled.Unarchive
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -60,6 +63,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
@@ -608,6 +612,23 @@ fun BackgroundContextMenu(
                     onClick = {
                         appState.folderConfigs.updateViewMode(ViewMode.CONTENT, appState.getCurrentStorageKey())
                         onDismiss()
+                    }
+                )
+
+                HorizontalDivider()
+
+                val showHidden = SettingsManager.showHiddenFiles.value
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.settings_show_hidden_files)) },
+                    leadingIcon = { Icon(if (showHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) },
+                    trailingIcon = {
+                        Checkbox(
+                            checked = showHidden,
+                            onCheckedChange = null
+                        )
+                    },
+                    onClick = {
+                        SettingsManager.setShowHiddenFiles(context, !showHidden)
                     }
                 )
             }

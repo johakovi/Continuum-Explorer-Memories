@@ -998,6 +998,23 @@ fun TopBar(
                                     optionsMenuExpanded = false
                                 }
                             )
+
+                            HorizontalDivider()
+
+                            val showHidden = SettingsManager.showHiddenFiles.value
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_show_hidden_files)) },
+                                leadingIcon = { Icon(if (showHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) },
+                                trailingIcon = {
+                                    Checkbox(
+                                        checked = showHidden,
+                                        onCheckedChange = null
+                                    )
+                                },
+                                onClick = {
+                                    SettingsManager.setShowHiddenFiles(context, !showHidden)
+                                }
+                            )
                         }
 
                         "SORT" -> {
