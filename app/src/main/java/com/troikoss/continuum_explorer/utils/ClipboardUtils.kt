@@ -18,6 +18,8 @@ import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.SafProvider
+import com.troikoss.continuum_explorer.providers.ShizukuProvider
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -225,6 +227,33 @@ suspend fun pasteFromClipboard(
             }
 
             try {
+                // Optimization: Use direct Move/Copy if it's local-to-local and restricted (for speed and permission support)
+                val isSourceLocal = sourceFile.provider is LocalProvider || sourceFile.provider is ShizukuProvider
+                val isDestLocal = (currentPath != null) || (destProvider is LocalProvider || destProvider is ShizukuProvider)
+
+                if (isSourceLocal && isDestLocal && !sourceFile.isDirectory) {
+                    val destPid = currentPath?.absolutePath ?: destParentId!!
+                    val provider = if (currentPath != null) LocalProvider else destProvider!!
+
+                    if (RestrictedCache.isRestrictedPath(sourceFile.providerId) || RestrictedCache.isRestrictedPath(destPid)) {
+                        val result = if (isMove) {
+                            provider.move(sourceFile.providerId, destPid, sourceFile.name)
+                        } else {
+                            provider.copy(sourceFile.providerId, destPid, sourceFile.name)
+                        }
+
+                        if (result != null) {
+                            pastedFileNames.add(sourceFile.name)
+                            pasteLog.add(sourceFile.providerId to result.providerId)
+                            globalBytesCopied += sourceFile.length
+                            withContext(Dispatchers.Main) {
+                                FileOperationsManager.itemsProcessed.intValue = i + 1
+                            }
+                            continue
+                        }
+                    }
+                }
+
                 val finalTargetName = copyRecursively(
                     context = context,
                     source = sourceFile,

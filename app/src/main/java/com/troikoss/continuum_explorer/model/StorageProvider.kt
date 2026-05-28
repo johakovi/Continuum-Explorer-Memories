@@ -50,6 +50,8 @@ interface StorageProvider {
     fun createAndOpenOutput(parentId: String, name: String): Pair<UniversalFile, OutputStream>
     fun delete(id: String): Boolean
     fun rename(id: String, newName: String): UniversalFile?
+    fun move(id: String, destParentId: String, destName: String): UniversalFile? = null
+    fun copy(id: String, destParentId: String, destName: String): UniversalFile? = null
 
     fun getDiskInfo(): Pair<Long, Long>? = null  // Pair(totalBytes, freeBytes)
 

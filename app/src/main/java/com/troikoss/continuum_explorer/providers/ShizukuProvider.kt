@@ -110,4 +110,20 @@ object ShizukuProvider : StorageProvider {
         }
         return null
     }
+
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? {
+        val destPath = if (destParentId.endsWith("/")) "$destParentId$destName" else "$destParentId/$destName"
+        if (ShizukuManager.getServiceBlocking()?.moveFile(id, destPath) == true) {
+            return findChild(destParentId, destName)
+        }
+        return null
+    }
+
+    override fun copy(id: String, destParentId: String, destName: String): UniversalFile? {
+        val destPath = if (destParentId.endsWith("/")) "$destParentId$destName" else "$destParentId/$destName"
+        if (ShizukuManager.getServiceBlocking()?.copyFile(id, destPath) == true) {
+            return findChild(destParentId, destName)
+        }
+        return null
+    }
 }

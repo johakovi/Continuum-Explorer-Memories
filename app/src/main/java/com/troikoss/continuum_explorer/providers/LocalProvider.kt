@@ -10,6 +10,7 @@ import com.troikoss.continuum_explorer.model.ProviderCapabilities
 import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -134,27 +135,36 @@ object LocalProvider : StorageProvider {
 
     override fun rename(id: String, newName: String): UniversalFile? {
         val f = File(id)
-        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+        if (RestrictedCache.isRestrictedPath(id) && ShizukuManager.hasPermission()) {
             return ShizukuProvider.rename(id, newName)
         }
         val dest = File(f.parent, newName)
         return if (f.renameTo(dest)) dest.toUniversalFile() else null
     }
 
-    private fun isRestrictedPath(path: String): Boolean {
-        val p = path.replace("//", "/").lowercase()
-        val sdcard = android.os.Environment.getExternalStorageDirectory().absolutePath.lowercase()
-        
-        // Android 11+ Restricted Folders
-        return p.contains("/android/data") || 
-               p.contains("/android/obb") || 
-               p.contains("/android/obj") ||
-               p.endsWith("/android") ||
-               p.endsWith("/android/") ||
-               p.startsWith("/data/") ||
-               p.startsWith("/data/user/") ||
-               (p.startsWith(sdcard) && p.contains("/android/"))
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? {
+        if ((RestrictedCache.isRestrictedPath(id) || RestrictedCache.isRestrictedPath(destParentId)) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.move(id, destParentId, destName)
+        }
+        val src = File(id)
+        val dest = File(destParentId, destName)
+        return if (src.renameTo(dest)) dest.toUniversalFile() else null
     }
+
+    override fun copy(id: String, destParentId: String, destName: String): UniversalFile? {
+        if ((RestrictedCache.isRestrictedPath(id) || RestrictedCache.isRestrictedPath(destParentId)) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.copy(id, destParentId, destName)
+        }
+        val src = File(id)
+        val dest = File(destParentId, destName)
+        return try {
+            if (src.isDirectory) src.copyRecursively(dest, overwrite = true)
+            else src.copyTo(dest, overwrite = true)
+            dest.toUniversalFile()
+        } catch (_: Exception) { null }
+    }
+
+    private fun isRestrictedPath(path: String): Boolean = RestrictedCache.isRestrictedPath(path)
 
     fun File.toUniversalFile(): UniversalFile = UniversalFile(
         name = this.name,

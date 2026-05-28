@@ -56,6 +56,8 @@ fun FileExplorerState.open(item: UniversalFile) {
             Toast.makeText(context, context.getString(R.string.msg_not_supported_archive), Toast.LENGTH_SHORT).show()
         } else if (item.provider.capabilities.isRemote) {
             openRemoteFile(context, scope, item)
+        } else if (RestrictedCache.isRestricted(item)) {
+            openRestrictedFile(context, scope, item)
         } else {
             openFile(context, item)
         }

@@ -55,4 +55,39 @@ class ShizukuFileService : IFileService.Stub() {
             null
         }
     }
+
+    override fun copyFile(sourcePath: String, destPath: String): Boolean {
+        return try {
+            val src = File(sourcePath)
+            val dest = File(destPath)
+            if (src.isDirectory) src.copyRecursively(dest, overwrite = true)
+            else {
+                src.copyTo(dest, overwrite = true)
+                true
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    override fun moveFile(sourcePath: String, destPath: String): Boolean {
+        return try {
+            val src = File(sourcePath)
+            val dest = File(destPath)
+            if (src.renameTo(dest)) true
+            else {
+                // Fallback for cross-volume move
+                if (src.isDirectory) {
+                    if (src.copyRecursively(dest, overwrite = true)) {
+                        src.deleteRecursively()
+                    } else false
+                } else {
+                    src.copyTo(dest, overwrite = true)
+                    src.delete()
+                }
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
 }

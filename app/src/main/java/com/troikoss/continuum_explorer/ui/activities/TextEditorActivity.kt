@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,9 +48,13 @@ class TextEditorActivity : ComponentActivity() {
     @Composable
     fun TextEditorScreen(uri: Uri, onExit: () -> Unit) {
         var text by remember { mutableStateOf("") }
+        var originalText by remember { mutableStateOf("") }
         var isLoading by remember { mutableStateOf(true) }
         var isSaving by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
+
+        val originalPath = remember { intent.getStringExtra("originalPath") }
+        val tempPath = remember { intent.getStringExtra("tempPath") }
 
         val fileName = remember(uri) {
             uri.lastPathSegment ?: "Unknown File"
@@ -61,7 +66,9 @@ class TextEditorActivity : ComponentActivity() {
                 try {
                     contentResolver.openInputStream(uri)?.use { inputStream ->
                         BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                            text = reader.readText()
+                            val content = reader.readText()
+                            text = content
+                            originalText = content
                         }
                     }
                 } catch (e: Exception) {
@@ -79,7 +86,17 @@ class TextEditorActivity : ComponentActivity() {
                 TopAppBar(
                     title = { Text(fileName, fontSize = 18.sp) },
                     navigationIcon = {
-                        IconButton(onClick = onExit) {
+                        IconButton(onClick = {
+                            if (tempPath != null && text == originalText) {
+                                // If it was a temp file and no changes, delete temp
+                                scope.launch(Dispatchers.IO) {
+                                    try {
+                                        File(tempPath).delete()
+                                    } catch (_: Exception) {}
+                                }
+                            }
+                            onExit()
+                        }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
@@ -90,13 +107,14 @@ class TextEditorActivity : ComponentActivity() {
                             IconButton(onClick = {
                                 scope.launch {
                                     isSaving = true
-                                    val success = saveFile(uri, text)
-                                    isSaving = false
+                                    val success = saveFile(uri, text, originalPath, tempPath)
                                     if (success) {
+                                        originalText = text
                                         Toast.makeText(this@TextEditorActivity, "File saved", Toast.LENGTH_SHORT).show()
                                     } else {
                                         Toast.makeText(this@TextEditorActivity, "Failed to save file", Toast.LENGTH_SHORT).show()
                                     }
+                                    isSaving = false
                                 }
                             }) {
                                 Icon(Icons.Default.Save, contentDescription = "Save")
@@ -128,15 +146,22 @@ class TextEditorActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun saveFile(uri: Uri, content: String): Boolean {
+    private suspend fun saveFile(uri: Uri, content: String, originalPath: String? = null, tempPath: String? = null): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
+                val success = contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
                     BufferedWriter(OutputStreamWriter(outputStream)).use { writer ->
                         writer.write(content)
                         true
                     }
                 } ?: false
+                
+                if (success && originalPath != null && tempPath != null) {
+                    // If it was a restricted file, push it back using Shizuku
+                    RestrictedCache.pushBack(this@TextEditorActivity, File(tempPath), originalPath)
+                } else {
+                    success
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 false

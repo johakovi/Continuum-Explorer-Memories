@@ -16,4 +16,6 @@ interface IFileService {
     boolean mkdir(String path) = 8;
     boolean createNewFile(String path) = 9;
     ParcelFileDescriptor openFile(String path, String mode) = 10;
+    boolean copyFile(String sourcePath, String destPath) = 11;
+    boolean moveFile(String sourcePath, String destPath) = 12;
 }

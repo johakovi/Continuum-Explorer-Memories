@@ -16,7 +16,9 @@ import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.UndoAction
 import com.troikoss.continuum_explorer.managers.UndoManager
+import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.LocalProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -156,11 +158,15 @@ suspend fun deleteRecursivelyWithProgress(
     }
 
     if (FileOperationsManager.isCancelled.value) return false
-    val fileRef2 = file.fileRef
     val success = try {
         when {
             file.isArchiveEntry -> false
-            fileRef2 != null -> fileRef2.delete()
+            file.provider.kind == com.troikoss.continuum_explorer.model.ProviderKind.LOCAL && 
+                    RestrictedCache.isRestricted(file) && 
+                    com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission() -> {
+                file.provider.delete(file.providerId)
+            }
+            file.fileRef != null -> file.fileRef!!.delete()
             file.documentFileRef != null -> file.documentFileRef!!.delete()
             else -> file.provider.delete(file.providerId)
         }
@@ -313,7 +319,15 @@ suspend fun moveToRecycleBin(context: Context, files: List<UniversalFile>) {
                 val wrapper = File(trashDir, uuid).apply { mkdirs() }
                 val tempTarget = File(wrapper, fileRef.name)
                 try {
-                    if (fileRef.isDirectory) {
+                    if (RestrictedCache.isRestricted(file) && com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission()) {
+                        // Use Shizuku to copy to trash
+                        file.provider.openInput(file.providerId).use { input ->
+                            FileOutputStream(tempTarget).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        file.provider.delete(file.providerId)
+                    } else if (fileRef.isDirectory) {
                         val copied = fileRef.copyRecursively(tempTarget, overwrite = false)
                         if (!copied) {
                             wrapper.deleteRecursively()
@@ -536,7 +550,38 @@ suspend fun restoreFiles(context: Context, files: List<UniversalFile>) {
 
                 target.parentFile?.mkdirs()
                 val fileRef = file.fileRef
-                if (fileRef != null && fileRef.renameTo(target)) {
+                if (RestrictedCache.isRestrictedPath(originalPath) && com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission()) {
+                    try {
+                        if (fileRef != null) {
+                            if (fileRef.isDirectory) {
+                                // For directories, we might need a more complex recursive copy via Shizuku
+                                // but for now let's handle files as requested.
+                                // Actually, restore is usually for the whole uuid dir.
+                                val success = fileRef.copyRecursively(target, overwrite = false)
+                                if (success) {
+                                    fileRef.deleteRecursively()
+                                    removeTrashMetadata(uuid)
+                                    parentDir.delete()
+                                    restoredCount++
+                                }
+                            } else {
+                                val service = com.troikoss.continuum_explorer.managers.ShizukuManager.getService()
+                                val fd = service?.openFile(target.absolutePath, "w")
+                                if (fd != null) {
+                                    fileRef.inputStream().use { input ->
+                                        android.os.ParcelFileDescriptor.AutoCloseOutputStream(fd).use { output ->
+                                            input.copyTo(output)
+                                        }
+                                    }
+                                    fileRef.delete()
+                                    removeTrashMetadata(uuid)
+                                    parentDir.delete()
+                                    restoredCount++
+                                }
+                            }
+                        }
+                    } catch (e: Exception) { e.printStackTrace() }
+                } else if (fileRef != null && fileRef.renameTo(target)) {
                     removeTrashMetadata(uuid)
                     parentDir.delete()
                     restoredCount++

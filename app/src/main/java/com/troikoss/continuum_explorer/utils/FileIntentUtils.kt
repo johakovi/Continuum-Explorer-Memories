@@ -13,6 +13,7 @@ import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.LocalProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -218,10 +219,45 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile)
 }
 
 /**
+ * Opens a restricted file (e.g. Android/data) by caching it to .temp first.
+ */
+fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalFile) {
+    scope.launch {
+        try {
+            FileOperationsManager.start()
+            withContext(Dispatchers.Main) {
+                FileOperationsManager.update(0, 1, operationType = OperationType.COPY)
+                FileOperationsManager.currentFileName.value = file.name
+            }
+            val cached = RestrictedCache.cache(context, file) { copied, total ->
+                if (total > 0) {
+                    FileOperationsManager.updateDetailed(
+                        processedBytes = copied, totalBytes = total,
+                        speed = 0L, remainingMillis = 0L, fileName = file.name
+                    )
+                }
+            }
+            withContext(Dispatchers.Main) {
+                FileOperationsManager.finish()
+                // Use a modified UniversalFile so openFile knows where the actual data is,
+                // but we pass the original providerId in the intent for saving back.
+                val tempFile = file.copy(providerId = cached.absolutePath, provider = LocalProvider)
+                openFile(context, tempFile, originalFile = file)
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                FileOperationsManager.finish()
+                Toast.makeText(context, e.message ?: "Failed to open restricted file", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+/**
  * Opens a file with the default system app.
  * Falls back to the "Open with" chooser if no default handles the type.
  */
-fun openFile(context: Context, file: UniversalFile) {
+fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile? = null) {
     if (file.provider.capabilities.isRemote) return // Must use openRemoteFile with a scope instead
 
     val uri = getUriForUniversalFile(context, file) ?: return
@@ -261,6 +297,11 @@ fun openFile(context: Context, file: UniversalFile) {
     if (textExtensions.contains(extension) || mimeType.startsWith("text/")) {
         val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.TextEditorActivity::class.java).apply {
             setData(uri)
+            if (originalFile != null) {
+                // If it's a restricted file, we have a local temp path and an original target
+                putExtra("originalPath", originalFile.providerId)
+                putExtra("tempPath", file.providerId)
+            }
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -12,6 +12,8 @@ import com.troikoss.continuum_explorer.managers.UndoAction
 import com.troikoss.continuum_explorer.managers.UndoManager
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -37,25 +39,9 @@ suspend fun calculateSizeRecursively(context: Context, file: UniversalFile): Lon
                     }
                 }
             } else {
-                val fileRef = file.fileRef
-                val docRef = file.documentFileRef
-                if (fileRef != null) {
-                    fileRef.listFiles()?.forEach {
-                        if (FileOperationsManager.isCancelled.value) return 0L
-                        size += calculateSizeRecursively(context, it.toUniversal())
-                    }
-                } else if (docRef != null) {
-                    docRef.listFiles().forEach {
-                        if (FileOperationsManager.isCancelled.value) return 0L
-                        size += calculateSizeRecursively(context, it.toUniversal())
-                    }
-                } else {
-                    try {
-                        file.provider.listChildren(file.providerId).forEach { child ->
-                            if (FileOperationsManager.isCancelled.value) return 0L
-                            size += calculateSizeRecursively(context, child)
-                        }
-                    } catch (_: Exception) {}
+                file.provider.listChildren(file.providerId).forEach { child ->
+                    if (FileOperationsManager.isCancelled.value) return 0L
+                    size += calculateSizeRecursively(context, child)
                 }
             }
         } catch (e: Exception) {
@@ -109,7 +95,7 @@ suspend fun copyRecursively(
     var targetName = source.name
 
     val alreadyExists = if (destLocal != null) {
-        File(destLocal, targetName).exists()
+        LocalProvider.exists(File(destLocal, targetName).absolutePath)
     } else if (destSaf != null) {
         destSaf.findFile(targetName) != null
     } else if (destProvider != null && destParentId != null) {
@@ -125,8 +111,8 @@ suspend fun copyRecursively(
             }
             CollisionResult.REPLACE -> {
                 if (destLocal != null) {
-                    val existing = File(destLocal, targetName)
-                    if (existing.isDirectory) existing.deleteRecursively() else existing.delete()
+                    val existingPath = File(destLocal, targetName).absolutePath
+                    LocalProvider.delete(existingPath)
                 } else if (destSaf != null) {
                     destSaf.findFile(targetName)?.delete()
                 } else if (destProvider != null && destParentId != null) {
@@ -135,7 +121,7 @@ suspend fun copyRecursively(
             }
             CollisionResult.KEEP_BOTH -> {
                 targetName = getUniqueName(targetName) { name ->
-                    if (destLocal != null) File(destLocal, name).exists()
+                    if (destLocal != null) LocalProvider.exists(File(destLocal, name).absolutePath)
                     else if (destSaf != null) destSaf.findFile(name) != null
                     else if (destProvider != null && destParentId != null) destProvider.findChild(destParentId, name) != null
                     else false
@@ -154,8 +140,10 @@ suspend fun copyRecursively(
 
         if (destLocal != null) {
             newDestLocal = File(destLocal, targetName)
-            if (!newDestLocal.exists()) {
-                if (!newDestLocal.mkdir()) return null
+            if (!LocalProvider.exists(newDestLocal.absolutePath)) {
+                try {
+                    LocalProvider.createChild(destLocal.absolutePath, targetName, isDirectory = true)
+                } catch (_: Exception) { return null }
             }
         } else if (destSaf != null) {
             newDestSaf = destSaf.findFile(targetName) ?: destSaf.createDirectory(targetName)
@@ -213,7 +201,10 @@ suspend fun copyRecursively(
         }
     } else {
         val outputStream: OutputStream? = if (destLocal != null) {
-            java.io.FileOutputStream(File(destLocal, targetName))
+            try {
+                val (_, out) = LocalProvider.createAndOpenOutput(destLocal.absolutePath, targetName)
+                out
+            } catch (_: Exception) { null }
         } else if (destSaf != null) {
             val mime = source.documentFileRef?.type
                 ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
@@ -238,7 +229,7 @@ suspend fun copyRecursively(
                 try { outputStream.close() } catch (_: Exception) {}
                 if (FileOperationsManager.isCancelled.value) {
                     if (destLocal != null) {
-                        File(destLocal, targetName).delete()
+                        LocalProvider.delete(File(destLocal, targetName).absolutePath)
                     } else if (destSaf != null) {
                         destSaf.findFile(targetName)?.delete()
                     }
@@ -327,7 +318,13 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                 }
 
                 val newFile = File(fileRef.parentFile, targetName)
-                if (fileRef.renameTo(newFile)) {
+                val success = if (RestrictedCache.isRestrictedPath(fileRef.absolutePath) && com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission()) {
+                    file.provider.rename(file.providerId, targetName) != null
+                } else {
+                    fileRef.renameTo(newFile)
+                }
+
+                if (success) {
                     UndoManager.record(UndoAction.Rename(newFile.parentFile, oldName, targetName))
                     true
                 } else false
