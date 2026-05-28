@@ -562,6 +562,15 @@ class FileExplorerState(
                 selectionManager.allFiles = files
                 isLoading = false
             }
+        } catch (e: RestrictedAccessException) {
+            withContext(Dispatchers.Main) {
+                isLoading = false
+                NotificationHelper.showErrorNotification(
+                    context,
+                    context.getString(R.string.error_restricted_access),
+                    context.getString(R.string.msg_restricted_access_shizuku)
+                )
+            }
         } catch (_: Exception) {
             withContext(Dispatchers.Main) {
                 isLoading = false

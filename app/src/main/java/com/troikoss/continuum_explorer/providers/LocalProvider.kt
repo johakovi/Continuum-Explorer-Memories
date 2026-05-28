@@ -10,6 +10,7 @@ import com.troikoss.continuum_explorer.model.ProviderCapabilities
 import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.utils.RestrictedAccessException
 import com.troikoss.continuum_explorer.utils.RestrictedCache
 import java.io.File
 import java.io.FileInputStream
@@ -56,8 +57,12 @@ object LocalProvider : StorageProvider {
 
     override suspend fun listChildren(id: String): List<UniversalFile> {
         // If we have Shizuku permission and it's a restricted path, FORCE Shizuku
-        if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
-            return ShizukuProvider.listChildren(id)
+        if (isRestrictedPath(id)) {
+            if (ShizukuManager.hasPermission()) {
+                return ShizukuProvider.listChildren(id)
+            } else {
+                throw RestrictedAccessException(id)
+            }
         }
 
         val files = File(id).listFiles()
