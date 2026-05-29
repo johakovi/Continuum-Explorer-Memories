@@ -141,16 +141,11 @@ suspend fun deleteRecursivelyWithProgress(
     if (FileOperationsManager.isCancelled.value) return false
     val length = file.length
     if (file.isDirectory) {
-        val fileRef = file.fileRef
-        val docRef = file.documentFileRef
         val children = try {
-            when {
-                file.isArchiveEntry -> emptyList()
-                fileRef != null -> fileRef.listFiles()?.map { it.toUniversal() } ?: emptyList()
-                docRef != null -> docRef.listFiles().map { it.toUniversal() }
-                else -> file.provider.listChildren(file.providerId)
-            }
+            if (file.isArchiveEntry) emptyList()
+            else file.provider.listChildren(file.providerId)
         } catch (_: Exception) { emptyList() }
+
         children.forEach { child ->
             if (FileOperationsManager.isCancelled.value) return@forEach
             deleteRecursivelyWithProgress(context, child, onProgress)
@@ -159,17 +154,8 @@ suspend fun deleteRecursivelyWithProgress(
 
     if (FileOperationsManager.isCancelled.value) return false
     val success = try {
-        when {
-            file.isArchiveEntry -> false
-            file.provider.kind == com.troikoss.continuum_explorer.model.ProviderKind.LOCAL && 
-                    RestrictedCache.isRestricted(file) && 
-                    com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission() -> {
-                file.provider.delete(file.providerId)
-            }
-            file.fileRef != null -> file.fileRef!!.delete()
-            file.documentFileRef != null -> file.documentFileRef!!.delete()
-            else -> file.provider.delete(file.providerId)
-        }
+        if (file.isArchiveEntry) false
+        else file.provider.delete(file.providerId)
     } catch (_: Exception) { false }
     if (success) onProgress(file, length)
     return success
@@ -317,38 +303,37 @@ suspend fun moveToRecycleBin(context: Context, files: List<UniversalFile>) {
             if (fileRef != null) {
                 val uuid = java.util.UUID.randomUUID().toString()
                 val wrapper = File(trashDir, uuid).apply { mkdirs() }
-                val tempTarget = File(wrapper, fileRef.name)
                 try {
-                    if (RestrictedCache.isRestricted(file) && com.troikoss.continuum_explorer.managers.ShizukuManager.hasPermission()) {
-                        // Use Shizuku to copy to trash
-                        file.provider.openInput(file.providerId).use { input ->
-                            FileOutputStream(tempTarget).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        file.provider.delete(file.providerId)
-                    } else if (fileRef.isDirectory) {
-                        val copied = fileRef.copyRecursively(tempTarget, overwrite = false)
-                        if (!copied) {
-                            wrapper.deleteRecursively()
-                            throw Exception("copyRecursively returned false for ${fileRef.absolutePath}")
-                        }
-                        fileRef.deleteRecursively()
+                    val result = file.provider.move(file.providerId, wrapper.absolutePath, fileRef.name)
+                    if (result != null) {
+                        saveTrashMetadata(uuid, fileRef.absolutePath)
+                        recycleLog.add(Triple(uuid, fileRef.absolutePath, fileRef.name))
+                        movedCount++
                     } else {
-                        if (!fileRef.renameTo(tempTarget)) {
-                            // Fallback for cross-volume moves
-                            fileRef.copyTo(tempTarget, overwrite = false)
-                            fileRef.delete()
+                        // Fallback for some cases where move might fail but copy + delete works
+                        if (file.isDirectory) {
+                             if (fileRef.copyRecursively(File(wrapper, fileRef.name), overwrite = false)) {
+                                 fileRef.deleteRecursively()
+                                 saveTrashMetadata(uuid, fileRef.absolutePath)
+                                 recycleLog.add(Triple(uuid, fileRef.absolutePath, fileRef.name))
+                                 movedCount++
+                             } else {
+                                 wrapper.deleteRecursively()
+                             }
+                        } else {
+                             fileRef.copyTo(File(wrapper, fileRef.name), overwrite = false)
+                             fileRef.delete()
+                             saveTrashMetadata(uuid, fileRef.absolutePath)
+                             recycleLog.add(Triple(uuid, fileRef.absolutePath, fileRef.name))
+                             movedCount++
                         }
                     }
-                    saveTrashMetadata(uuid, fileRef.absolutePath)
-                    recycleLog.add(Triple(uuid, fileRef.absolutePath, fileRef.name))
-                    movedCount++
                 } catch (e: Exception) {
                     e.printStackTrace()
                     wrapper.deleteRecursively()
                 }
-            } else if (documentFileRef != null) {
+            }
+else if (documentFileRef != null) {
                 val uuid = java.util.UUID.randomUUID().toString()
                 val innerName = documentFileRef.name ?: "unnamed"
                 val wrapper = File(trashDir, uuid).apply { mkdirs() }

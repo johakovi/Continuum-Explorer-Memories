@@ -29,16 +29,32 @@ class ShizukuFileService : IFileService.Stub() {
     override fun exists(path: String): Boolean = File(path).exists()
     
     override fun delete(path: String): Boolean {
-        val file = File(path)
-        return if (file.isDirectory) file.deleteRecursively() else file.delete()
+        return try {
+            val process = ProcessBuilder("rm", "-rf", path).start()
+            process.waitFor() == 0
+        } catch (_: Exception) {
+            val file = File(path)
+            if (file.isDirectory) file.deleteRecursively() else file.delete()
+        }
     }
     
     override fun rename(path: String, newName: String): Boolean {
         val file = File(path)
-        return file.renameTo(File(file.parent, newName))
+        val dest = File(file.parent, newName)
+        return try {
+            ProcessBuilder("mv", path, dest.absolutePath).start().waitFor() == 0
+        } catch (_: Exception) {
+            file.renameTo(dest)
+        }
     }
 
-    override fun mkdir(path: String): Boolean = File(path).mkdirs()
+    override fun mkdir(path: String): Boolean {
+        return try {
+            ProcessBuilder("mkdir", "-p", path).start().waitFor() == 0
+        } catch (_: Exception) {
+            File(path).mkdirs()
+        }
+    }
     override fun createNewFile(path: String): Boolean = File(path).createNewFile()
 
     override fun openFile(path: String, mode: String): ParcelFileDescriptor? {
@@ -58,36 +74,48 @@ class ShizukuFileService : IFileService.Stub() {
 
     override fun copyFile(sourcePath: String, destPath: String): Boolean {
         return try {
-            val src = File(sourcePath)
-            val dest = File(destPath)
-            if (src.isDirectory) src.copyRecursively(dest, overwrite = true)
-            else {
-                src.copyTo(dest, overwrite = true)
-                true
-            }
+            val process = ProcessBuilder("cp", "-r", sourcePath, destPath).start()
+            if (process.waitFor() == 0) true
+            else throw Exception("cp failed")
         } catch (_: Exception) {
-            false
+            try {
+                val src = File(sourcePath)
+                val dest = File(destPath)
+                if (src.isDirectory) src.copyRecursively(dest, overwrite = true)
+                else {
+                    src.copyTo(dest, overwrite = true)
+                    true
+                }
+            } catch (_: Exception) {
+                false
+            }
         }
     }
 
     override fun moveFile(sourcePath: String, destPath: String): Boolean {
         return try {
-            val src = File(sourcePath)
-            val dest = File(destPath)
-            if (src.renameTo(dest)) true
-            else {
-                // Fallback for cross-volume move
-                if (src.isDirectory) {
-                    if (src.copyRecursively(dest, overwrite = true)) {
-                        src.deleteRecursively()
-                    } else false
-                } else {
-                    src.copyTo(dest, overwrite = true)
-                    src.delete()
-                }
-            }
+            val process = ProcessBuilder("mv", sourcePath, destPath).start()
+            if (process.waitFor() == 0) true
+            else throw Exception("mv failed")
         } catch (_: Exception) {
-            false
+            try {
+                val src = File(sourcePath)
+                val dest = File(destPath)
+                if (src.renameTo(dest)) true
+                else {
+                    // Fallback for cross-volume move
+                    if (src.isDirectory) {
+                        if (src.copyRecursively(dest, overwrite = true)) {
+                            delete(sourcePath)
+                        } else false
+                    } else {
+                        src.copyTo(dest, overwrite = true)
+                        delete(sourcePath)
+                    }
+                }
+            } catch (_: Exception) {
+                false
+            }
         }
     }
 }
