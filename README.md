@@ -42,18 +42,6 @@ Internal PDF reader
 
 More organized theme settings.
 
-Remote access to android
-
-Game saves shortcut
-
-Game saves sync with pc (via smb or ftp in local network?)
-
-Home view (Favourite folders, games saves, recent files...etc.)(optional)
-
-## Known issues
-The issue with Word files is now resolved, at least for the most part. However, there may still be problems because the Microsoft Word app has an internal security policy that prevents opening read-write files from external sources. Collabora, on the other hand, handles this without any issues.
-
-For opening compressed files in the network storage doesn't work, recomended open them in internal storage
 
 ## Recommended apps and sources
 Text editor by Bill Farmer from [F-Droid](https://f-droid.org/packages/org.billthefarmer.editor)
