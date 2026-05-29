@@ -126,7 +126,7 @@ fun TopBar(
         }
     }
 
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.GameSaves)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 
@@ -615,6 +615,13 @@ fun TopBar(
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
+                        } else if (appState.libraryItem == LibraryItem.GameSaves) {
+                            Text(
+                                text = stringResource(R.string.nav_game_saves),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         } else if (appState.currentPath != null || appState.currentArchiveFile != null) {
                             visibleSegments.forEachIndexed { index, folderName ->
                                 val displayName = if (folderName == "0") stringResource(R.string.nav_internal_storage) else folderName
@@ -798,6 +805,13 @@ fun TopBar(
                         } else if (appState.libraryItem == LibraryItem.Documents) {
                             Text(
                                 text = stringResource(R.string.nav_documents),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else if (appState.libraryItem == LibraryItem.GameSaves) {
+                            Text(
+                                text = stringResource(R.string.nav_game_saves),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary

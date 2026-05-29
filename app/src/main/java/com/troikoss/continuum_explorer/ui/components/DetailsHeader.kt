@@ -90,6 +90,8 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                     onResize = { delta ->
                         val w = appState.folderConfigs.columnWidths[prevColumnType] ?: prevMinWidth
                         appState.folderConfigs.columnWidths[prevColumnType] = (w + delta).coerceIn(75.dp, 800.dp)
+                    },
+                    onResizeFinished = {
                         appState.folderConfigs.saveColumnWidths(appState.getCurrentStorageKey())
                     },
                     modifier = Modifier.height(iconSize)

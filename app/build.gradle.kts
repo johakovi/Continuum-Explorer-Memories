@@ -40,6 +40,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/LICENSE"
             excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
         }
     }
 }
@@ -74,6 +75,9 @@ dependencies {
     implementation(libs.jsch)
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+    implementation(libs.apache.ftpserver)
+    implementation(libs.slf4j.api)
+    implementation(libs.slf4j.nop)
     implementation(libs.dav4jvm) {
         exclude(group = "org.ogce", module = "xpp3")
     }

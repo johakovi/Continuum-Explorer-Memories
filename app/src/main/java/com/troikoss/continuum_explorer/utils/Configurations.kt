@@ -267,12 +267,13 @@ class FolderConfigurations(private val context: Context) {
 class AppConfigurations(private val context: Context) {
     val addedSafUris = mutableStateListOf<Uri>()
     val favoritePaths = mutableStateListOf<String>()
-    val libraryOrder = mutableStateListOf("gallery", "recent", "downloads", "documents", "trash")
+    val libraryOrder = mutableStateListOf("gallery", "recent", "downloads", "documents", "game_saves", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
     var isDownloadsVisible by mutableStateOf(true)
     var isDocumentsVisible by mutableStateOf(true)
+    var isGameSavesVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
     var isDocumentsFolderEnabled by mutableStateOf(false)
 
@@ -291,7 +292,7 @@ class AppConfigurations(private val context: Context) {
         loadNetworkConnections()
 
         // Ensure all library items are present in the order list
-        val required = listOf("gallery", "recent", "downloads", "documents", "trash")
+        val required = listOf("gallery", "recent", "downloads", "documents", "game_saves", "trash")
         required.forEach { id ->
             if (!libraryOrder.contains(id)) {
                 if (id == "downloads") {
@@ -299,6 +300,9 @@ class AppConfigurations(private val context: Context) {
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else if (id == "documents") {
                     val idx = libraryOrder.indexOf("downloads")
+                    libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
+                } else if (id == "game_saves") {
+                    val idx = libraryOrder.indexOf("documents")
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else {
                     libraryOrder.add(id)
@@ -392,10 +396,16 @@ class AppConfigurations(private val context: Context) {
             val insertIndex = libraryOrder.indexOf("recent").let { if (it != -1) it + 1 else 0 }
             libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "downloads")
         }
+        // Migrate: add game_saves if not present in saved order
+        if (!libraryOrder.contains("game_saves")) {
+            val insertIndex = libraryOrder.indexOf("documents").let { if (it != -1) it + 1 else 0 }
+            libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "game_saves")
+        }
         isRecentVisible = prefs.getBoolean("is_recent_visible", true)
         isGalleryVisible = prefs.getBoolean("is_gallery_visible", true)
         isDownloadsVisible = prefs.getBoolean("is_downloads_visible", true)
         isDocumentsVisible = prefs.getBoolean("is_documents_visible", true)
+        isGameSavesVisible = prefs.getBoolean("is_game_saves_visible", true)
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
         isDocumentsFolderEnabled = prefs.getBoolean("is_documents_folder_enabled", false)
     }
@@ -408,6 +418,7 @@ class AppConfigurations(private val context: Context) {
             putBoolean("is_gallery_visible", isGalleryVisible)
             putBoolean("is_downloads_visible", isDownloadsVisible)
             putBoolean("is_documents_visible", isDocumentsVisible)
+            putBoolean("is_game_saves_visible", isGameSavesVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
             putBoolean("is_documents_folder_enabled", isDocumentsFolderEnabled)
         }.apply()
@@ -433,6 +444,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleDocumentsVisibility() {
         isDocumentsVisible = !isDocumentsVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleGameSavesVisibility() {
+        isGameSavesVisible = !isGameSavesVisible
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

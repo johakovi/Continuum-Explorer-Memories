@@ -106,7 +106,7 @@ fun ItemContextMenu(
         }
     }
     val selectionManager = appState.selectionManager
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.GameSaves)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
     val selectedItems = selectionManager.selectedItems.toList()
@@ -387,7 +387,7 @@ fun BackgroundContextMenu(
     }
 
     var currentScreen by remember { mutableStateOf("MAIN") }
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.GameSaves)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 

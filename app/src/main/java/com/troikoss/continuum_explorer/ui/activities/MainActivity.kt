@@ -125,6 +125,10 @@ class MainActivity : AppCompatActivity() {
         SettingsManager.init(applicationContext)
         StorageProviders.init(applicationContext)
 
+        if (SettingsManager.isFtpServerEnabled.value) {
+            SettingsManager.setFtpServerEnabled(applicationContext, true)
+        }
+
         // Clear cache and temp files on startup
         lifecycleScope.launch(Dispatchers.IO) {
             CleanupManager.clearCache(applicationContext)

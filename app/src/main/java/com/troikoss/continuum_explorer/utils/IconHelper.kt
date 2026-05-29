@@ -80,6 +80,12 @@ import java.io.FileOutputStream
  */
 object IconHelper {
 
+    /**
+     * List of game folder names (or substrings) that should use the "external" game save color
+     * (like PSP) even if they are technically located in restricted Android/data paths.
+     */
+    private val EMULATOR_FOLDERS = listOf("PSP", "Dolphin", "PS2", "NetherSX2")
+
     // --- Public UI Components ---
 
     @Composable
@@ -104,33 +110,39 @@ object IconHelper {
 
         val overlayRes = getOverlayIconRes(name, path, providerId)
         Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
-            val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-            Icon(
-                painter = painterResource(id = baseFolderRes),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                tint = tint
-            )
+            val packageName = getPackageNameFromPath(providerId.ifEmpty { path })
+            if (packageName != null && iconTheme != IconTheme.MATERIAL) {
+                AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = tint)
+            } else {
+                val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                Icon(
+                    painter = painterResource(id = baseFolderRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    tint = tint
+                )
+            }
 
-                if (overlayRes != null) {
-                    val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
-                        when (overlayRes) {
-                            R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
-                            R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
-                            R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
-                            R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
-                            R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
-                            else -> overlayRes
-                        }
-                    } else overlayRes
+            if (overlayRes != null) {
+                val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
+                    when (overlayRes) {
+                        R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                        R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
+                        R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
+                        R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                        R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
+                        R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                        else -> overlayRes
+                    }
+                } else overlayRes
 
-                    Icon(
-                        painter = painterResource(id = finalOverlayRes),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
-                        tint = Color.White
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = finalOverlayRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
+                    tint = Color.White
+                )
+            }
         }
     }
 
@@ -153,7 +165,12 @@ object IconHelper {
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
+                    file.providerId == "virtual://game_saves" -> extendedColors.gameIcon
                     file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
+                    file.parentId == "virtual://game_saves" -> {
+                        val isEmulator = EMULATOR_FOLDERS.any { file.name.contains(it, ignoreCase = true) }
+                        if (isEmulator) extendedColors.recentIcon else extendedColors.gameIcon
+                    }
                     else -> extendedColors.folderIcon
                 }
             } else {
@@ -188,13 +205,20 @@ object IconHelper {
             }
 
             Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
-                val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                Icon(
-                    painter = painterResource(id = baseFolderRes),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    tint = finalTint
-                )
+                val isGameSave = file.parentId == "virtual://game_saves"
+                val packageName = if (isGameSave) null else getPackageNameFromPath(file.providerId)
+                
+                if (packageName != null && iconTheme != IconTheme.MATERIAL) {
+                    AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
+                } else {
+                    val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                    Icon(
+                        painter = painterResource(id = baseFolderRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        tint = finalTint
+                    )
+                }
 
                 if (overlayRes != null) {
                     val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
@@ -203,6 +227,7 @@ object IconHelper {
                             R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                             R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                             R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                            R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                             R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
                             else -> overlayRes
                         }
@@ -322,6 +347,7 @@ object IconHelper {
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
+                file.providerId == "virtual://game_saves" -> R.drawable.ic_nav_game
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
                 else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
@@ -360,11 +386,13 @@ object IconHelper {
         val isRoot = file.parentId == rootId || file.parentId == internalRoot ||
                 (file.providerId.startsWith("webdav://") && file.parentId != null && file.parentId!!.endsWith("//"))
         val isVirtual = file.providerId.startsWith("virtual://")
+        val isGameSaveItem = file.parentId == "virtual://game_saves"
 
         // Only show overlays if the folder is in a storage root or is a virtual library item
-        if (!isRoot && !isVirtual && !file.absolutePath.contains("/.trash")) {
+        if (!isRoot && !isVirtual && !file.absolutePath.contains("/.trash") && !isGameSaveItem) {
             return null
         }
+        if (file.providerId == "virtual://game_saves" || isGameSaveItem) return R.drawable.ic_nav_game
         return getOverlayIconRes(file.name, file.providerId, file.providerId)
     }
 
@@ -380,6 +408,7 @@ object IconHelper {
                 lPath.contains("gallery") -> R.drawable.ic_nav_gallery
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
+                lPath.contains("game_saves") -> R.drawable.ic_nav_game
                 lPath.contains("trash") || lPath.contains("recycle_bin") -> R.drawable.ic_nav_trash
                 else -> null
             }
@@ -595,6 +624,37 @@ object IconHelper {
         }
     }
 
+    @Composable
+    fun AppIcon(
+        packageName: String,
+        fallbackPainter: Painter,
+        modifier: Modifier = Modifier,
+        iconSize: Dp,
+        tint: Color
+    ) {
+        val context = LocalContext.current
+        var appIcon by remember(packageName) { mutableStateOf<Drawable?>(null) }
+
+        LaunchedEffect(packageName) {
+            withContext(Dispatchers.IO) {
+                try {
+                    val pm = context.packageManager
+                    appIcon = pm.getApplicationIcon(packageName)
+                } catch (e: Exception) { }
+            }
+        }
+
+        if (appIcon != null) {
+            androidx.compose.foundation.Image(
+                painter = coil.compose.rememberAsyncImagePainter(appIcon),
+                contentDescription = null,
+                modifier = modifier.size(iconSize)
+            )
+        } else {
+            Icon(painter = fallbackPainter, contentDescription = null, modifier = modifier.size(iconSize), tint = tint)
+        }
+    }
+
     // --- Rendering Logic ---
     private suspend fun renderPdfThumbnail(context: Context, file: UniversalFile, thumbFile: File) {
         try {
@@ -646,6 +706,19 @@ object IconHelper {
     }
 
     // --- Utilities ---
+
+    fun getPackageNameFromPath(path: String): String? {
+        val lowercasePath = path.replace("\\", "/").lowercase()
+        if (lowercasePath.contains("/android/data/")) {
+            val segments = path.replace("\\", "/").split("/")
+            val dataIndex = segments.indexOfFirst { it.equals("data", ignoreCase = true) }
+            if (dataIndex != -1 && dataIndex + 1 < segments.size) {
+                val potentialPackage = segments[dataIndex + 1]
+                if (potentialPackage.contains(".")) return potentialPackage
+            }
+        }
+        return null
+    }
 
     fun getFolderBitmap(context: Context, path: String, name: String): Bitmap {
         val iconTheme = SettingsManager.iconTheme.value

@@ -31,6 +31,7 @@ val ThemeRecent = Color(0xFF4CBEE0)
 val ThemeRecycleBin = Color(0xFF98C52F)
 val ThemeDownloads = Color(0xFF69CCB8)
 val ThemeFolders = Color(0xFF2196F3)
+val ThemeGameSaves = Color(0xFF7C4DFF)
 
 
 
@@ -55,5 +56,6 @@ val ThemeFilesDuo = Color(0xFFD7B075)
 val ThemeRecentDuo = Color(0xFF4CBEE0)
 val ThemeRecycleBinDuo = Color(0xFF98C52F)
 val ThemeDownloadsDuo = Color(0xFF69CCB8)
+val ThemeGameSavesDuo = Color(0xFF7C4DFF)
 
 

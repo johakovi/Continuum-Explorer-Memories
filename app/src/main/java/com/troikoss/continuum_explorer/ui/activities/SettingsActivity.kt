@@ -83,6 +83,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
     var showDefaultViewModeDialog by remember { mutableStateOf(false) }
+    var showFtpCredentialsDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -323,6 +324,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                         onCheckedChange = { SettingsManager.setIconTouchSelection(context, it) }
                     )
                 }
+            )
+
+            HorizontalDivider()
+
+            Text(
+                stringResource(R.string.settings_network_services),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_ftp_credentials_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_ftp_credentials_desc)) },
+                modifier = Modifier.clickable { showFtpCredentialsDialog = true }
             )
 
             HorizontalDivider()
@@ -802,6 +818,47 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+
+            if (showFtpCredentialsDialog) {
+                var tempUser by remember { mutableStateOf(SettingsManager.ftpUser.value) }
+                var tempPass by remember { mutableStateOf(SettingsManager.ftpPassword.value) }
+
+                AlertDialog(
+                    onDismissRequest = { showFtpCredentialsDialog = false },
+                    title = { Text(stringResource(R.string.settings_ftp_credentials_title)) },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = tempUser,
+                                onValueChange = { tempUser = it },
+                                label = { Text(stringResource(R.string.settings_ftp_user)) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            OutlinedTextField(
+                                value = tempPass,
+                                onValueChange = { tempPass = it },
+                                label = { Text(stringResource(R.string.settings_ftp_password)) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            SettingsManager.setFtpCredentials(context, tempUser, tempPass)
+                            showFtpCredentialsDialog = false
+                        }) {
+                            Text(stringResource(R.string.nav_network_save))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showFtpCredentialsDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
 
             if (showAboutDialog) {
                 val uriHandler = LocalUriHandler.current

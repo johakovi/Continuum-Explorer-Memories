@@ -102,25 +102,30 @@ private val MINIMIZED_SIDEBAR_WIDTH = 160.dp
 /**
  * Extension to apply a horizontal fading edge to text to prevent jitter from ellipsis
  * and provide a smooth "slide to invisible" effect.
+ * Uses a lambda for alpha to avoid recompositions during resizing.
  */
-private fun Modifier.horizontalFadingEdge(alpha: Float = 1f): Modifier = this
+private fun Modifier.horizontalFadingEdge(alphaProvider: () -> Float): Modifier = this
     .graphicsLayer {
-        this.alpha = alpha
-        this.compositingStrategy = CompositingStrategy.Offscreen
+        val a = alphaProvider()
+        this.alpha = a
+        this.compositingStrategy = if (a < 1f) CompositingStrategy.Offscreen else CompositingStrategy.Auto
     }
     .drawWithContent {
         drawContent()
-        val fadeWidth = 32.dp.toPx()
-        if (size.width > 0) {
-            val stop = ((size.width - fadeWidth) / size.width).coerceIn(0f, 1f)
-            drawRect(
-                brush = Brush.horizontalGradient(
-                    0f to Color.Black,
-                    stop to Color.Black,
-                    1f to Color.Transparent
-                ),
-                blendMode = BlendMode.DstIn
-            )
+        val alpha = alphaProvider()
+        if (alpha > 0f) {
+            val fadeWidth = 32.dp.toPx()
+            if (size.width > 0) {
+                val stop = ((size.width - fadeWidth) / size.width).coerceIn(0f, 1f)
+                drawRect(
+                    brush = Brush.horizontalGradient(
+                        0f to Color.Black,
+                        stop to Color.Black,
+                        1f to Color.Transparent
+                    ),
+                    blendMode = BlendMode.DstIn
+                )
+            }
         }
     }
 
@@ -261,15 +266,26 @@ fun NavigationPane(
     var draggingOffset by remember { mutableFloatStateOf(0f) }
     val handleWidthPx = with(density) { 48.dp.toPx() }
 
-    // Calculate visible library items directly without 'remember' based on list reference
-    val visibleLibraryItems = appState.appConfigs.libraryOrder.filter { id ->
-        when (id) {
-            "trash" -> isRecycleBinEnabled
-            "recent" -> appState.appConfigs.isRecentVisible
-            "gallery" -> appState.appConfigs.isGalleryVisible
-            "downloads" -> appState.appConfigs.isDownloadsVisible
-            "documents" -> appState.appConfigs.isDocumentsVisible
-            else -> true
+    // Calculate visible library items using remember to avoid filtering on every recomposition (like during resizing)
+    val visibleLibraryItems = remember(
+        appState.appConfigs.libraryOrder,
+        isRecycleBinEnabled,
+        appState.appConfigs.isRecentVisible,
+        appState.appConfigs.isGalleryVisible,
+        appState.appConfigs.isDownloadsVisible,
+        appState.appConfigs.isDocumentsVisible,
+        appState.appConfigs.isGameSavesVisible
+    ) {
+        appState.appConfigs.libraryOrder.filter { id ->
+            when (id) {
+                "trash" -> isRecycleBinEnabled
+                "recent" -> appState.appConfigs.isRecentVisible
+                "gallery" -> appState.appConfigs.isGalleryVisible
+                "downloads" -> appState.appConfigs.isDownloadsVisible
+                "documents" -> appState.appConfigs.isDocumentsVisible
+                "game_saves" -> appState.appConfigs.isGameSavesVisible
+                else -> true
+            }
         }
     }
 
@@ -284,7 +300,32 @@ fun NavigationPane(
                     showBgMenu = true
                 }
         ) {
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (!isMinimized) {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = {
+                        bgMenuOffset = DpOffset(0.dp, 0.dp) // Open at top
+                        showBgMenu = true
+                    }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             // Section: Favorites
             item { NavSectionHeader(currentWidth, stringResource(R.string.nav_favorites), isMinimized = isMinimized) }
@@ -545,6 +586,16 @@ fun NavigationPane(
                                 section = NavSection.Documents,
                                 isMinimized = isMinimized
                             )
+                            "game_saves" -> NavItem(
+                                label = stringResource(R.string.nav_game_saves),
+                                icon = Icons.AutoMirrored.Filled.List,
+                                customIcon = R.drawable.ic_nav_game,
+                                onClick = { onItemSelected(NavSection.GameSaves) },
+                                appState = appState,
+                                currentWidth = currentWidth,
+                                section = NavSection.GameSaves,
+                                isMinimized = isMinimized
+                            )
                         }
                     }
                 }
@@ -767,6 +818,10 @@ private fun NavBackgroundContextMenu(
     onAddStorageClick: () -> Unit,
     onAddNetworkClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val isFtpEnabled by SettingsManager.isFtpServerEnabled
+    val ftpMode by SettingsManager.ftpMode
+
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
@@ -789,6 +844,23 @@ private fun NavBackgroundContextMenu(
             },
             leadingIcon = { Icon(Icons.Default.Cloud, null) }
         )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = { 
+                val text = if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) 
+                    stringResource(R.string.nav_stop_ftp) else stringResource(R.string.nav_start_ftp)
+                Text(text)
+            },
+            onClick = {
+                onDismissRequest()
+                if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) {
+                    SettingsManager.setFtpServerEnabled(context, false)
+                } else {
+                    SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.FULL_STORAGE)
+                }
+            },
+            leadingIcon = { Icon(if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+        )
     }
 }
 
@@ -801,7 +873,7 @@ private fun NavSectionHeader(currentWidth: Dp, text: String, isMinimized: Boolea
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .horizontalFadingEdge(textAlpha),
+            .horizontalFadingEdge { textAlpha },
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.Normal,
@@ -891,6 +963,27 @@ private fun NavContextMenu(
             )
         }
 
+        if (section is NavSection.GameSaves) {
+            val isFtpEnabled by SettingsManager.isFtpServerEnabled
+            val ftpMode by SettingsManager.ftpMode
+            val context = LocalContext.current
+            
+            val isGameSavesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAME_SAVES
+
+            DropdownMenuItem(
+                text = { Text(if (isGameSavesFtpActive) "Stop FTP Game Saves Server" else "Start FTP Game Saves Server") },
+                onClick = {
+                    onDismissRequest()
+                    if (isGameSavesFtpActive) {
+                        SettingsManager.setFtpServerEnabled(context, false)
+                    } else {
+                        SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAME_SAVES)
+                    }
+                },
+                leadingIcon = { Icon(if (isGameSavesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+            )
+        }
+
         if (section is NavSection.Documents) {
             DropdownMenuItem(
                 text = {
@@ -941,7 +1034,8 @@ private fun NavItem(
     modifier: Modifier = Modifier,
     section: NavSection? = null,
     customIcon: Int? = null,
-    isMinimized: Boolean = false
+    isMinimized: Boolean = false,
+    badge: (@Composable () -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
@@ -965,6 +1059,7 @@ private fun NavItem(
             is NavSection.Downloads -> extendedColors.downloadsIcon
             is NavSection.RecycleBin -> extendedColors.recycleBinIcon
             is NavSection.Documents -> extendedColors.documentsIcon
+            is NavSection.GameSaves -> extendedColors.gameIcon
             else -> extendedColors.sidebarIcons
         }
         if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
@@ -974,6 +1069,7 @@ private fun NavItem(
                     R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                     R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                     R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                    R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                     R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
                     else -> customIcon
                 }
@@ -983,6 +1079,12 @@ private fun NavItem(
                 contentDescription = null,
                 tint = tint,
                 modifier = Modifier.size(24.dp)
+            )
+        } else if (section == NavSection.GameSaves) {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_game_material),
+                contentDescription = null,
+                tint = tint
             )
         } else {
             Icon(icon, contentDescription = null, tint = tint)
@@ -1005,12 +1107,13 @@ private fun NavItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge { textAlpha }) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
                 modifier = Modifier.height(36.dp),
-                shape = shape
+                shape = shape,
+                badge = badge
             )
         }
 
@@ -1073,7 +1176,7 @@ private fun NavFavoriteItem(
             iconContent()
         } else {
             NavigationDrawerItem(
-                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
+                label = { Text(label, fontWeight = FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge { textAlpha }) },
                 selected = false,
                 onClick = onClick,
                 icon = iconContent,
@@ -1157,7 +1260,7 @@ private fun NavSafItem(
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
                         val totalFormatted = Formatter.formatFileSize(context, totalSpace)
                         val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge { textAlpha }) {
                             Text(
                                 text = label,
                                 fontWeight = FontWeight.Normal,
@@ -1186,7 +1289,7 @@ private fun NavSafItem(
                             )
                         }
                     } else {
-                        Text(label, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha))
+                        Text(label, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge { textAlpha })
                     }
                 },
                 selected = false,
@@ -1293,7 +1396,7 @@ private fun NavNetworkItem(
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
                         val totalFormatted = Formatter.formatFileSize(context, totalSpace)
                         val freeFormatted = Formatter.formatFileSize(context, freeSpace)
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge { textAlpha }) {
                             Text(
                                 text = connection.displayName,
                                 fontWeight = FontWeight.Normal,
@@ -1322,7 +1425,7 @@ private fun NavNetworkItem(
                             )
                         }
                     } else {
-                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha))
+                        Text(connection.displayName, fontWeight = FontWeight.Normal, maxLines = 2, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge { textAlpha })
                     }
                 },
                 selected = false,
@@ -1439,7 +1542,7 @@ private fun NavStorageItem(
                     label = {
                         val usedSpace = totalSpace - freeSpace
                         val progress = if (totalSpace > 0L) usedSpace.toFloat() / totalSpace.toFloat() else 0f
-                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge(textAlpha)) {
+                        Column(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().horizontalFadingEdge { textAlpha }) {
                             Text(
                                 text = label,
                                 fontWeight = FontWeight.Bold,
@@ -1541,7 +1644,7 @@ private fun StorageFolderTreeItem(
 
     Column {
         NavigationDrawerItem(
-            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge(textAlpha)) },
+            label = { Text(folder.name, maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.fillMaxWidth().horizontalFadingEdge { textAlpha }) },
             selected = false,
             onClick = {
                 appState.navigateTo(folder, null)

@@ -1,6 +1,7 @@
 package com.troikoss.continuum_explorer.managers
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +73,17 @@ object SettingsManager {
     private const val KEY_DEFAULT_VIEW_MODE = "default_view_mode"
     private const val KEY_COLORFUL_BARS = "colorful_bars"
     private const val KEY_TERMUX_SUPPORT = "termux_support"
+    private const val KEY_FTP_SERVER_ENABLED = "ftp_server_enabled"
+    private const val KEY_FTP_USER = "ftp_user"
+    private const val KEY_FTP_PASSWORD = "ftp_password"
+    private const val KEY_GAME_SAVES_PATH = "game_saves_path"
+    private const val KEY_FTP_SHARE_GAME_SAVES = "ftp_share_game_saves"
+    private const val KEY_FTP_SERVER_MODE = "ftp_server_mode"
+
+    enum class FtpMode {
+        FULL_STORAGE,
+        GAME_SAVES
+    }
 
     private val _deleteBehavior = mutableStateOf(DeleteBehavior.ASK)
     val deleteBehavior: State<DeleteBehavior> = _deleteBehavior
@@ -117,6 +129,24 @@ object SettingsManager {
 
     private val _termuxSupport = mutableStateOf(true)
     val termuxSupport: State<Boolean> = _termuxSupport
+
+    private val _isFtpServerEnabled = mutableStateOf(false)
+    val isFtpServerEnabled: State<Boolean> = _isFtpServerEnabled
+
+    private val _ftpUser = mutableStateOf("admin")
+    val ftpUser: State<String> = _ftpUser
+
+    private val _ftpPassword = mutableStateOf("admin")
+    val ftpPassword: State<String> = _ftpPassword
+
+    private val _gameSavesPath = mutableStateOf("")
+    val gameSavesPath: State<String> = _gameSavesPath
+
+    private val _isFtpShareGameSavesEnabled = mutableStateOf(false)
+    val isFtpShareGameSavesEnabled: State<Boolean> = _isFtpShareGameSavesEnabled
+
+    private val _ftpMode = mutableStateOf(FtpMode.FULL_STORAGE)
+    val ftpMode: State<FtpMode> = _ftpMode
 
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
@@ -201,6 +231,12 @@ object SettingsManager {
 
         _isDefaultArchiveViewerEnabled.value = prefs.getBoolean(KEY_DEFAULT_ARCHIVE_VIEWER, true)
         _termuxSupport.value = prefs.getBoolean(KEY_TERMUX_SUPPORT, true)
+        _isFtpServerEnabled.value = prefs.getBoolean(KEY_FTP_SERVER_ENABLED, false)
+        _ftpUser.value = prefs.getString(KEY_FTP_USER, "admin") ?: "admin"
+        _ftpPassword.value = prefs.getString(KEY_FTP_PASSWORD, "admin") ?: "admin"
+        _gameSavesPath.value = prefs.getString(KEY_GAME_SAVES_PATH, "") ?: ""
+        _isFtpShareGameSavesEnabled.value = prefs.getBoolean(KEY_FTP_SHARE_GAME_SAVES, false)
+        _ftpMode.value = FtpMode.valueOf(prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name)
 
         val savedViewMode = prefs.getString(KEY_DEFAULT_VIEW_MODE, ViewMode.DETAILS.name)
         _defaultViewMode.value = try {
@@ -332,5 +368,102 @@ object SettingsManager {
         _defaultViewMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_DEFAULT_VIEW_MODE, mode.name).apply()
+    }
+
+    fun setFtpServerEnabled(context: Context, enabled: Boolean, mode: FtpMode = _ftpMode.value) {
+        _isFtpServerEnabled.value = enabled
+        _ftpMode.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putBoolean(KEY_FTP_SERVER_ENABLED, enabled)
+            .putString(KEY_FTP_SERVER_MODE, mode.name)
+            .apply()
+        
+        val intent = Intent(context, com.troikoss.continuum_explorer.services.FtpServerService::class.java)
+        if (enabled) {
+            intent.putExtra(com.troikoss.continuum_explorer.services.FtpServerService.EXTRA_MODE, mode.name)
+            context.startForegroundService(intent)
+        } else {
+            intent.action = com.troikoss.continuum_explorer.services.FtpServerService.ACTION_STOP
+            context.startService(intent)
+        }
+    }
+
+    fun setFtpCredentials(context: Context, user: String, pass: String) {
+        _ftpUser.value = user
+        _ftpPassword.value = pass
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_FTP_USER, user)
+            .putString(KEY_FTP_PASSWORD, pass)
+            .apply()
+        
+        // If server is running, restart it to apply changes
+        if (_isFtpServerEnabled.value) {
+            setFtpServerEnabled(context, false)
+            setFtpServerEnabled(context, true)
+        }
+    }
+
+    fun setGameSavesPath(context: Context, path: String) {
+        _gameSavesPath.value = path
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_GAME_SAVES_PATH, path).apply()
+        
+        if (_isFtpServerEnabled.value && _isFtpShareGameSavesEnabled.value) {
+            setFtpServerEnabled(context, false)
+            setFtpServerEnabled(context, true)
+        }
+    }
+
+    fun getEffectiveGameSavesPath(context: Context): String {
+        if (_gameSavesPath.value.isNotEmpty()) return _gameSavesPath.value
+
+        val storageRoot = android.os.Environment.getExternalStorageDirectory()
+        
+        // 1. Check for common folder names in internal storage
+        val commonNames = listOf("GameSaves", "Game Saves", "Saves")
+        for (name in commonNames) {
+            val folder = java.io.File(storageRoot, name)
+            if (folder.exists() && folder.isDirectory) return folder.absolutePath
+        }
+
+        // 2. Check favorites from SharedPreferences
+        val favPrefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+        val favPaths = favPrefs.getString("ordered_paths", "") ?: ""
+        if (favPaths.isNotEmpty()) {
+            val paths = favPaths.split("|")
+            for (path in paths) {
+                val file = java.io.File(path)
+                if (file.name.contains("game", ignoreCase = true) && file.name.contains("save", ignoreCase = true)) {
+                    return path
+                }
+            }
+        }
+
+        // 3. Default to Android/data (where the library gets its data)
+        return java.io.File(storageRoot, "Android/data").absolutePath
+    }
+
+    fun setFtpShareGameSavesEnabled(context: Context, enabled: Boolean) {
+        _isFtpShareGameSavesEnabled.value = enabled
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_FTP_SHARE_GAME_SAVES, enabled).apply()
+
+        // If enabling and path is empty, try to discover it
+        if (enabled && _gameSavesPath.value.isEmpty()) {
+            val discovered = getEffectiveGameSavesPath(context)
+            _gameSavesPath.value = discovered
+            prefs.edit().putString(KEY_GAME_SAVES_PATH, discovered).apply()
+        }
+
+        if (_isFtpServerEnabled.value) {
+            setFtpServerEnabled(context, false)
+            setFtpServerEnabled(context, true)
+        }
+    }
+
+    fun setFtpMode(context: Context, mode: FtpMode) {
+        setFtpServerEnabled(context, _isFtpServerEnabled.value, mode)
     }
 }

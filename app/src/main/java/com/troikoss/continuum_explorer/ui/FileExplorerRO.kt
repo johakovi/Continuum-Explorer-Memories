@@ -37,6 +37,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -117,6 +118,7 @@ fun FileExplorerRO(
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
                     item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
+                    item.absolutePath == "virtual://game_saves" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.GameSaves)
                     item.absolutePath == "virtual://recycle_bin" -> {
                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                         if (!trashDir.exists()) trashDir.mkdirs()
@@ -433,11 +435,12 @@ private fun ExplorerBody(
 ) {
     val context = LocalContext.current
     val screenSize = appState.getScreenSize()
+    var isResizingNav by remember { mutableStateOf(false) }
     val rawNavPaneWidth = appState.appConfigs.navPaneWidth
     val navPaneWidth by androidx.compose.animation.core.animateDpAsState(
         targetValue = rawNavPaneWidth,
         label = "NavPaneWidthAnimation",
-        animationSpec = androidx.compose.animation.core.spring(
+        animationSpec = if (isResizingNav) androidx.compose.animation.core.snap() else androidx.compose.animation.core.spring(
             dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
             stiffness = androidx.compose.animation.core.Spring.StiffnessLow
         )
@@ -489,9 +492,11 @@ private fun ExplorerBody(
                     modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = false,
                     onResize = { delta ->
+                        isResizingNav = true
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
                     },
                     onResizeFinished = {
+                        isResizingNav = false
                         val currentWidth = appState.appConfigs.navPaneWidth
                         if (currentWidth > 80.dp && currentWidth < 160.dp) {
                             appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
@@ -517,6 +522,8 @@ private fun ExplorerBody(
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
                             (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 300.dp)
+                    },
+                    onResizeFinished = {
                         appState.appConfigs.savePaneWidths()
                     }
                 )
@@ -560,6 +567,7 @@ private fun navigateToSection(
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
+        is NavSection.GameSaves -> appState.navigateTo(null, null, libraryItem = LibraryItem.GameSaves)
         is NavSection.Documents -> {
             if (appState.appConfigs.isDocumentsFolderEnabled) {
                 val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)

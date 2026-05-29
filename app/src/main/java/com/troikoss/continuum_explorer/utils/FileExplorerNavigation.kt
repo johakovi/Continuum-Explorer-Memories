@@ -176,6 +176,8 @@ fun FileExplorerState.getLocationName(location: NavLocation): String {
         else context.getString(R.string.nav_gallery)
     } else if (location.libraryItem == LibraryItem.Documents) {
         context.getString(R.string.nav_documents)
+    } else if (location.libraryItem == LibraryItem.GameSaves) {
+        context.getString(R.string.nav_game_saves)
     }
     else if (location.networkConnectionId != null && location.networkPath != null) {
         val conn = appConfigs.networkConnections.find { it.id == location.networkConnectionId }

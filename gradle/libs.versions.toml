@@ -28,6 +28,8 @@ zip4j = "2.11.6"
 shizuku = "13.1.5"
 commonsCompress = "1.26.1"
 xz = "1.9"
+ftpserver = "1.2.0"
+slf4j = "2.0.13"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +70,9 @@ xz = { group = "org.tukaani", name = "xz", version.ref = "xz" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+apache-ftpserver = { group = "org.apache.ftpserver", name = "ftpserver-core", version.ref = "ftpserver" }
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
+slf4j-nop = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

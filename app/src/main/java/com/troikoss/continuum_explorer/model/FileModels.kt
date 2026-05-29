@@ -11,7 +11,7 @@ import java.io.File
 /**
  * Represents a virtual/special view mode for the file list.
  */
-enum class LibraryItem { None, Recent, Gallery, Downloads, Documents, RecycleBin }
+enum class LibraryItem { None, Recent, Gallery, Downloads, Documents, RecycleBin, GameSaves }
 
 /**
  * Represents a navigation destination in the side pane.
@@ -23,6 +23,7 @@ sealed class NavSection {
     object Gallery : NavSection()
     object Downloads : NavSection()
     object Documents : NavSection()
+    object GameSaves : NavSection()
     data class RemovableVolume(val volumeIndex: Int) : NavSection()
     data class NetworkStorage(val connectionId: String) : NavSection()
 }

@@ -302,6 +302,7 @@
     <string name="nav_gallery">Gallery</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documents</string>
+    <string name="nav_game_saves">Game Saves</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_documents_folder">Folder</string>
     <string name="nav_add_storage">Add Storage</string>
@@ -337,6 +338,10 @@
     <string name="nav_network_root_url">Full URL (optional override)</string>
     <string name="nav_network_accept_untrusted">Accept self-signed certificates</string>
     <string name="nav_network_test">Test Connection</string>
+
+    <string name="nav_ftp_server">FTP Server</string>
+    <string name="nav_start_ftp">Start FTP Server</string>
+    <string name="nav_stop_ftp">Stop FTP Server</string>
 
     <!-- Item Types -->
     <string name="archive">Archive</string>
@@ -452,6 +457,17 @@
     <string name="msg_archive_remote_unsupported">Archiving is not yet supported for network locations.</string>
     <string name="msg_remote_trash_skipped">Can\'t move network files to trash. They will be deleted permanently.</string>
     <string name="settings_about">About</string>
+
+    <string name="settings_network_services">Network Services</string>
+    <string name="settings_ftp_server">FTP Server</string>
+    <string name="settings_ftp_user">FTP Username</string>
+    <string name="settings_ftp_password">FTP Password</string>
+    <string name="settings_ftp_credentials_title">FTP Server Credentials</string>
+    <string name="settings_ftp_credentials_desc">Set username and password for the built-in FTP server.</string>
+    <string name="settings_ftp_mode_title">FTP Server Mode</string>
+    <string name="settings_ftp_mode_full">Full Internal Storage</string>
+    <string name="settings_ftp_mode_game_saves">Game Saves Library (Virtual)</string>
+    <string name="settings_ftp_mode_choose">Choose FTP Mode</string>
 
     <string name="shizuku_status">Shizuku Status</string>
     <string name="shizuku_status_authorized">Authorized</string>
