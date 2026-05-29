@@ -33,6 +33,8 @@ Archive Support: Integrated .zip viewer
 
 Network storage managment
 
+Game Save Manager
+
 Shizuku privilege
 
 Termux privilege
