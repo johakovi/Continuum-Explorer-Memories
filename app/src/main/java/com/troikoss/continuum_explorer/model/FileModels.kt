@@ -50,6 +50,11 @@ enum class ViewMode { CONTENT, GRID, GALLERY, DETAILS }
 
 enum class ScreenSize { SMALL, MEDIUM, LARGE}
 
+/**
+ * Defines the overall look/device type for UI adjustments.
+ */
+enum class UIAppearance { PHONE, TABLET, WINDOWED }
+
 
 data class NavLocation(
     val path: File?,

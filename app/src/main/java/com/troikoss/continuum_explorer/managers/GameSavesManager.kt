@@ -14,6 +14,8 @@ object GameSavesManager {
             GameSaveInfo("SENTINEL519", "Android/data/com.AppyBearStudio.SENTINEL519/files/"),
             GameSaveInfo("Stardew Valley", "Android/data/com.chucklefish.stardewvalley/files/Saves"),
             GameSaveInfo("PSP (PPSSPP)", "PPSSPP/PSP/SAVEDATA"),
+            GameSaveInfo("PSP (Emulator)", "Documents/Emulator/PSP/SAVEDATA"),
+            GameSaveInfo("PSP (Data)", "Android/data/org.ppsspp.ppsspp/files/PSP/SAVEDATA"),
             GameSaveInfo("Pocket City 2", "Android/data/com.codebrewgames.pocketcity2/files/pocketcity2"),
             GameSaveInfo("Easy Delivery Co.", "Android/data/com.doghowlgames.EasyDeliveryCo/files/"),
             GameSaveInfo("Wreckfest", "Android/data/com.hg.wreckfest/files/save"),
@@ -31,6 +33,7 @@ object GameSavesManager {
             GameSaveInfo("The Were Cleaner", "Android/data/com.HowlinHugs.TheWereCleaner/files/SavesDir"),
             GameSaveInfo("PS2 (NetherSX2)", "Android/data/xyz.aethersx2.android/files"),
             GameSaveInfo("Dolphin Emulator", "Android/data/org.dolphinemu.dolphinemu/files"),
+            GameSaveInfo("The Sun Origin", "Android/data/Agaming.thesun.origin/files/"),
 
         )
 

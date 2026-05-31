@@ -681,4 +681,17 @@ class FileExplorerState(
             else -> null
         }
     }
+
+    @Composable
+    fun getUIAppearance(): UIAppearance {
+        val configuration = LocalConfiguration.current
+        val isMulti = try { (context as? android.app.Activity)?.isInMultiWindowMode == true } catch (_: Exception) { false }
+        val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+
+        return when {
+            isDeX || isMulti -> UIAppearance.WINDOWED
+            configuration.smallestScreenWidthDp >= 600 -> UIAppearance.TABLET
+            else -> UIAppearance.PHONE
+        }
+    }
 }
