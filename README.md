@@ -39,8 +39,9 @@ Shizuku privilege
 
 Termux privilege
 
-## Planned Features:
 Internal PDF reader
+
+## Planned Features:
 
 More organized theme settings.
 
