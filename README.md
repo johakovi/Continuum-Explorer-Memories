@@ -47,9 +47,6 @@ More organized theme settings.
 
 
 ## Recommended apps and sources
-Text editor by Bill Farmer from [F-Droid](https://f-droid.org/packages/org.billthefarmer.editor)
-
-PDF reader MJ PDF by Mudlej from [Gitlab](https://gitlab.com/mudlej_android/mj_pdf_reader)
 
 Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-ios/)
 
