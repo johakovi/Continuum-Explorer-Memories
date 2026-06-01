@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -65,7 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBars
+
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import com.troikoss.continuum_explorer.managers.DetailsMode
@@ -122,7 +121,7 @@ fun FileExplorerSQ(
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
                     item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
-                    item.absolutePath == "virtual://game_saves" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.GameSaves)
+                    item.absolutePath == "virtual://games_manager" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Games)
                     item.absolutePath == "virtual://recycle_bin" -> {
                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                         if (!trashDir.exists()) trashDir.mkdirs()
@@ -582,7 +581,7 @@ private fun navigateToSection(
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
-        is NavSection.GameSaves -> appState.navigateTo(null, null, libraryItem = LibraryItem.GameSaves)
+        is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)
         is NavSection.Documents -> {
             if (appState.appConfigs.isDocumentsFolderEnabled) {
                 val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)

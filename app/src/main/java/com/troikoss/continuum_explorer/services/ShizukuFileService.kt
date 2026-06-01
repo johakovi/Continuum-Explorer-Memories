@@ -12,25 +12,79 @@ class ShizukuFileService : IFileService.Stub() {
 
     override fun getDetailedList(path: String): List<ShizukuFileInfo> {
         val folder = File(path)
-        val files = folder.listFiles() ?: return emptyList()
-        return files.map { file ->
-            ShizukuFileInfo(
-                name = file.name,
-                isDirectory = file.isDirectory,
-                size = if (file.isDirectory) 0L else file.length(),
-                lastModified = file.lastModified()
-            )
+        val files = folder.listFiles()
+        if (files != null) {
+            return files.map { file ->
+                ShizukuFileInfo(
+                    name = file.name,
+                    isDirectory = file.isDirectory,
+                    size = if (file.isDirectory) 0L else file.length(),
+                    lastModified = file.lastModified()
+                )
+            }
+        }
+
+        // Fallback to shell ls if listFiles() fails (common on Android 14+ for restricted paths)
+        return try {
+            val process = ProcessBuilder("sh", "-c", "ls -F \"$path\"").start()
+            val output = process.inputStream.bufferedReader().readLines()
+            process.waitFor()
+            
+            output.mapNotNull { line ->
+                if (line.isEmpty()) return@mapNotNull null
+                val name = line.trimEnd('/', '*', '@', '=', '|')
+                val isDir = line.endsWith('/')
+                val fullChildPath = if (path.endsWith("/")) "$path$name" else "$path/$name"
+                
+                ShizukuFileInfo(
+                    name = name,
+                    isDirectory = isDir,
+                    size = if (isDir) 0L else getLength(fullChildPath),
+                    lastModified = getLastModified(fullChildPath)
+                )
+            }
+        } catch (_: Exception) {
+            emptyList()
         }
     }
 
-    override fun isDirectory(path: String): Boolean = File(path).isDirectory
-    override fun getLength(path: String): Long = File(path).length()
-    override fun getLastModified(path: String): Long = File(path).lastModified()
-    override fun exists(path: String): Boolean = File(path).exists()
+    override fun isDirectory(path: String): Boolean = try {
+        val file = File(path)
+        if (file.exists()) file.isDirectory
+        else runShell("test -d \"$path\"")
+    } catch (_: Exception) {
+        runShell("test -d \"$path\"")
+    }
+
+    override fun getLength(path: String): Long = try {
+        val file = File(path)
+        if (file.exists()) file.length()
+        else runShellOutput("stat -c %s \"$path\"").toLongOrNull() ?: 0L
+    } catch (_: Exception) {
+        runShellOutput("stat -c %s \"$path\"").toLongOrNull() ?: 0L
+    }
+
+    override fun getLastModified(path: String): Long = try {
+        val file = File(path)
+        if (file.exists()) file.lastModified()
+        else (runShellOutput("stat -c %Y \"$path\"").toLongOrNull() ?: 0L) * 1000L
+    } catch (_: Exception) {
+        (runShellOutput("stat -c %Y \"$path\"").toLongOrNull() ?: 0L) * 1000L
+    }
+
+    override fun exists(path: String): Boolean = try {
+        val file = File(path)
+        if (file.exists()) true
+        else runShell("test -e \"$path\"")
+    } catch (_: Exception) {
+        runShell("test -e \"$path\"")
+    }
     
     override fun delete(path: String): Boolean {
         return try {
-            val process = ProcessBuilder("rm", "-rf", path).start()
+            // Using sh -c with argument passing ($0) is the most robust way to execute
+            // privileged commands on restricted paths in modern Android.
+            val process = ProcessBuilder("sh", "-c", "rm -rf -- \"$0\"", path).start()
             process.waitFor() == 0
         } catch (_: Exception) {
             val file = File(path)
@@ -42,7 +96,7 @@ class ShizukuFileService : IFileService.Stub() {
         val file = File(path)
         val dest = File(file.parent, newName)
         return try {
-            ProcessBuilder("mv", path, dest.absolutePath).start().waitFor() == 0
+            ProcessBuilder("sh", "-c", "mv -- \"$0\" \"$1\"", path, dest.absolutePath).start().waitFor() == 0
         } catch (_: Exception) {
             file.renameTo(dest)
         }
@@ -50,12 +104,19 @@ class ShizukuFileService : IFileService.Stub() {
 
     override fun mkdir(path: String): Boolean {
         return try {
-            ProcessBuilder("mkdir", "-p", path).start().waitFor() == 0
+            ProcessBuilder("sh", "-c", "mkdir -p -- \"$0\"", path).start().waitFor() == 0
         } catch (_: Exception) {
             File(path).mkdirs()
         }
     }
-    override fun createNewFile(path: String): Boolean = File(path).createNewFile()
+    
+    override fun createNewFile(path: String): Boolean {
+        return try {
+            ProcessBuilder("sh", "-c", "touch -- \"$0\"", path).start().waitFor() == 0
+        } catch (_: Exception) {
+            File(path).createNewFile()
+        }
+    }
 
     override fun openFile(path: String, mode: String): ParcelFileDescriptor? {
         val flags = when(mode) {
@@ -74,7 +135,7 @@ class ShizukuFileService : IFileService.Stub() {
 
     override fun copyFile(sourcePath: String, destPath: String): Boolean {
         return try {
-            val process = ProcessBuilder("cp", "-r", sourcePath, destPath).start()
+            val process = ProcessBuilder("sh", "-c", "cp -rf -- \"$0\" \"$1\"", sourcePath, destPath).start()
             if (process.waitFor() == 0) true
             else throw Exception("cp failed")
         } catch (_: Exception) {
@@ -94,28 +155,36 @@ class ShizukuFileService : IFileService.Stub() {
 
     override fun moveFile(sourcePath: String, destPath: String): Boolean {
         return try {
-            val process = ProcessBuilder("mv", sourcePath, destPath).start()
+            val process = ProcessBuilder("sh", "-c", "mv -- \"$0\" \"$1\"", sourcePath, destPath).start()
             if (process.waitFor() == 0) true
             else throw Exception("mv failed")
         } catch (_: Exception) {
-            try {
-                val src = File(sourcePath)
-                val dest = File(destPath)
-                if (src.renameTo(dest)) true
-                else {
-                    // Fallback for cross-volume move
-                    if (src.isDirectory) {
-                        if (src.copyRecursively(dest, overwrite = true)) {
-                            delete(sourcePath)
-                        } else false
-                    } else {
-                        src.copyTo(dest, overwrite = true)
-                        delete(sourcePath)
-                    }
-                }
-            } catch (_: Exception) {
+            // Shell-based fallback for cross-volume moves (e.g., from .temp to /Android/data)
+            if (copyFile(sourcePath, destPath)) {
+                delete(sourcePath)
+            } else {
                 false
             }
+        }
+    }
+
+    private fun runShell(command: String): Boolean {
+        return try {
+            val process = ProcessBuilder("sh", "-c", command).start()
+            process.waitFor() == 0
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun runShellOutput(command: String): String {
+        return try {
+            val process = ProcessBuilder("sh", "-c", command).start()
+            val output = process.inputStream.bufferedReader().readText().trim()
+            process.waitFor()
+            output
+        } catch (_: Exception) {
+            ""
         }
     }
 }

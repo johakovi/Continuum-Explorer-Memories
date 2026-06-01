@@ -27,6 +27,8 @@
         <string name="search">Etsi</string>
         <string name="search_hint">Etsitään…</string>
         <string name="options">Asetukset</string>
+        <string name="menu_clear_thumbnails">Tyhjennä pikkukuvat</string>
+        <string name="msg_thumbnails_cleared">Pikkukuvat tyhjennetty</string>
         <string name="off">Pois</string>
         <string name="previous">Takaisin</string>
         <string name="next">Seuraava</string>
@@ -301,6 +303,7 @@
         <string name="nav_gallery">Galleria</string>
         <string name="nav_downloads">Lataukset</string>
         <string name="nav_documents">Asiakirjat</string>
+        <string name="nav_game_saves">Pelien hallinta</string>
         <string name="menu_gallery_albums">Albumit</string>
     <string name="menu_documents_folder">Kansio</string>
         <string name="nav_add_storage">Lisää tallennustila</string>
@@ -336,6 +339,10 @@
         <string name="nav_network_root_url">Täydellinen URL (valinnainen päällekirjoitus)</string>
         <string name="nav_network_accept_untrusted">Hyväksy itse allekirjoitetut varmenteet</string>
         <string name="nav_network_test">Testaa yhteyttä</string>
+
+        <string name="nav_ftp_server">FTP-palvelin</string>
+        <string name="nav_start_ftp">Käynnistä FTP-palvelin</string>
+        <string name="nav_stop_ftp">Pysäytä FTP-palvelin</string>
 
         <!-- Item Types -->
         <string name="archive">Arkisto</string>
@@ -457,5 +464,19 @@
         <string name="shizuku_status_not_authorized">Ei valtuutettu</string>
         <string name="shizuku_status_not_running">Ei käynnissä</string>
         <string name="shizuku_request_permission">Pyydä Shizuku-valtuutus</string>
+
+    <string name="settings_network_services">Verkkopalvelut</string>
+    <string name="settings_ftp_server">FTP-palvelin</string>
+    <string name="settings_ftp_user">FTP-käyttäjätunnus</string>
+    <string name="settings_ftp_password">FTP-salasana</string>
+    <string name="settings_ftp_credentials_title">FTP-palvelimen tunnistetiedot</string>
+    <string name="settings_ftp_credentials_desc">Aseta käyttäjätunnus ja salasana sisäänrakennetulle FTP-palvelimelle.</string>
+    <string name="settings_ftp_mode_title">FTP-palvelimen tila</string>
+    <string name="settings_ftp_mode_full">Täysi sisäinen tallennustila</string>
+    <string name="settings_ftp_mode_game_saves">Pelien hallintakirjasto (Virtuaalinen)</string>
+    <string name="settings_ftp_mode_choose">Valitse FTP-tila</string>
+
+    <string name="error_restricted_access">Pääsy estetty</string>
+    <string name="msg_restricted_access_shizuku">Android rajoittaa pääsyä tähän hakemistoon. Ota Shizuku käyttöön ja valtuuta se päästäksesi siihen.</string>
 </resources>
 

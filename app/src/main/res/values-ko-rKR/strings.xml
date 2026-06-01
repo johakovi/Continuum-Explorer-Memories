@@ -26,6 +26,8 @@
     <string name="search">검색</string>
     <string name="search_hint">검색…</string>
     <string name="options">옵션</string>
+    <string name="menu_clear_thumbnails">썸네일 캐시 삭제</string>
+    <string name="msg_thumbnails_cleared">썸네일 캐시가 삭제되었습니다</string>
     <string name="off">꺼짐</string>
     <string name="previous">이전</string>
     <string name="next">다음</string>
@@ -300,6 +302,7 @@
     <string name="nav_gallery">갤러리</string>
     <string name="nav_downloads">다운로드</string>
     <string name="nav_documents">문서</string>
+    <string name="nav_game_saves">게임 관리자</string>
     <string name="menu_gallery_albums">앨범</string>
     <string name="menu_documents_folder">폴더</string>
     <string name="nav_add_storage">저장소 추가</string>
@@ -335,6 +338,10 @@
     <string name="nav_network_root_url">전체 URL (선택적 재정의)</string>
     <string name="nav_network_accept_untrusted">자체 서명된 인증서 허용</string>
     <string name="nav_network_test">연결 테스트</string>
+
+    <string name="nav_ftp_server">FTP 서버</string>
+    <string name="nav_start_ftp">FTP 서버 시작</string>
+    <string name="nav_stop_ftp">FTP 서버 중지</string>
 
     <!-- Item Types -->
     <string name="archive">압축 파일</string>
@@ -455,4 +462,18 @@
     <string name="shizuku_status_not_authorized">권한 부여되지 않음</string>
     <string name="shizuku_status_not_running">실행 중이지 않음</string>
     <string name="shizuku_request_permission">Shizuku 권한 요청</string>
+
+    <string name="settings_network_services">네트워크 서비스</string>
+    <string name="settings_ftp_server">FTP 서버</string>
+    <string name="settings_ftp_user">FTP 사용자 이름</string>
+    <string name="settings_ftp_password">FTP 비밀번호</string>
+    <string name="settings_ftp_credentials_title">FTP 서버 자격 증명</string>
+    <string name="settings_ftp_credentials_desc">내장 FTP 서버의 사용자 이름과 비밀번호를 설정합니다.</string>
+    <string name="settings_ftp_mode_title">FTP 서버 모드</string>
+    <string name="settings_ftp_mode_full">전체 내부 저장소</string>
+    <string name="settings_ftp_mode_game_saves">게임 관리자 라이브러리 (가상)</string>
+    <string name="settings_ftp_mode_choose">FTP 모드 선택</string>
+
+    <string name="error_restricted_access">접근 제한됨</string>
+    <string name="msg_restricted_access_shizuku">이 디렉토리는 Android에 의해 제한되었습니다. 접근하려면 Shizuku를 활성화하고 권한을 부여하세요.</string>
 </resources>

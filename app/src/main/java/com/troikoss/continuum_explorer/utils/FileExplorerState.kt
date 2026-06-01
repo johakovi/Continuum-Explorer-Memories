@@ -17,7 +17,7 @@ import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.DocumentsManager
 import com.troikoss.continuum_explorer.managers.DownloadsManager
 import com.troikoss.continuum_explorer.managers.GalleryManager
-import com.troikoss.continuum_explorer.managers.GameSavesManager
+import com.troikoss.continuum_explorer.managers.GamesManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
 import com.troikoss.continuum_explorer.managers.SelectionManager
@@ -201,7 +201,7 @@ class FileExplorerState(
                 context.getString(R.string.nav_recent)
             } else if (libraryItem == LibraryItem.Downloads) {
                 context.getString(R.string.nav_downloads)
-            } else if (libraryItem == LibraryItem.GameSaves) {
+            } else if (libraryItem == LibraryItem.Games) {
                 context.getString(R.string.nav_game_saves)
             } else if (libraryItem == LibraryItem.Documents) {
                 context.getString(R.string.nav_documents)
@@ -302,13 +302,13 @@ class FileExplorerState(
                 providerId = "virtual://documents"
             )
 
-            libraryItem == LibraryItem.GameSaves -> UniversalFile(
+            libraryItem == LibraryItem.Games -> UniversalFile(
                 name = context.getString(R.string.nav_game_saves),
                 isDirectory = true,
                 lastModified = 0L,
                 length = 0L,
                 provider = LocalProvider,
-                providerId = "virtual://game_saves"
+                providerId = "virtual://games_manager"
             )
 
             else -> null
@@ -476,7 +476,7 @@ class FileExplorerState(
                     LibraryItem.Recent -> RecentFilesManager.getRecentFiles(context)
                     LibraryItem.Downloads -> DownloadsManager.getDownloadsFiles(context)
                     LibraryItem.Documents -> DocumentsManager.getDocumentsFiles(context)
-                    LibraryItem.GameSaves -> GameSavesManager.getGameSaves(context)
+                    LibraryItem.Games -> GamesManager.getGames(context)
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context)
@@ -569,7 +569,7 @@ class FileExplorerState(
                     LibraryItem.Gallery -> "gallery"
                     LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
-                    LibraryItem.GameSaves -> "game_saves"
+                    LibraryItem.Games -> "games_manager"
                     LibraryItem.None -> "root"
                     LibraryItem.RecycleBin -> "trash"
                 }
@@ -655,8 +655,8 @@ class FileExplorerState(
             "virtual://downloads"
         } else if (libraryItem == LibraryItem.Documents) {
             "virtual://documents"
-        } else if (libraryItem == LibraryItem.GameSaves) {
-            "virtual://game_saves"
+        } else if (libraryItem == LibraryItem.Games) {
+            "virtual://games_manager"
         } else if (libraryItem == LibraryItem.RecycleBin) {
             "virtual://recycle_bin"
         } else if (currentPath != null) {

@@ -23,6 +23,8 @@
     <string name="search">Ara</string>
     <string name="search_hint">Ara…</string>
     <string name="options">Seçenekler</string>
+    <string name="menu_clear_thumbnails">Küçük resimleri temizle</string>
+    <string name="msg_thumbnails_cleared">Küçük resimler temizlendi</string>
     <string name="properties">Özellikler</string>
     <string name="prop_name">Ad:</string>
     <string name="prop_type">Tür:</string>
@@ -273,6 +275,7 @@
     <string name="nav_gallery">Galeri</string>
     <string name="nav_downloads">İndirilenler</string>
     <string name="nav_documents">Belgeler</string>
+    <string name="nav_game_saves">Oyun Yöneticisi</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_documents_folder">Klasör</string>
     <string name="nav_add_storage">Depolama Ekle</string>
@@ -405,6 +408,10 @@
     <string name="nav_network_root_url">Tam URL (isteğe bağlı geçersiz kılma)</string>
     <string name="nav_network_accept_untrusted">Otomatik imzalı sertifikaları kabul et</string>
     <string name="nav_network_test">Bağlantıyı Test Et</string>
+
+    <string name="nav_ftp_server">FTP Sunucusu</string>
+    <string name="nav_start_ftp">FTP Sunucusunu Başlat</string>
+    <string name="nav_stop_ftp">FTP Sunucusunu Durdur</string>
     <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
     <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
     <string name="settings_icon_theme">Simge Teması</string>
@@ -422,4 +429,18 @@
     <string name="shizuku_status_not_authorized">Yetkili Değil</string>
     <string name="shizuku_status_not_running">Çalışmıyor</string>
     <string name="shizuku_request_permission">Shizuku İzni İste</string>
+
+    <string name="settings_network_services">Ağ Servisleri</string>
+    <string name="settings_ftp_server">FTP Sunucusu</string>
+    <string name="settings_ftp_user">FTP Kullanıcı Adı</string>
+    <string name="settings_ftp_password">FTP Şifresi</string>
+    <string name="settings_ftp_credentials_title">FTP Sunucusu Kimlik Bilgileri</string>
+    <string name="settings_ftp_credentials_desc">Dahili FTP sunucusu için kullanıcı adı ve şifre belirleyin.</string>
+    <string name="settings_ftp_mode_title">FTP Sunucu Modu</string>
+    <string name="settings_ftp_mode_full">Tam Dahili Depolama</string>
+    <string name="settings_ftp_mode_game_saves">Oyun Yöneticisi Kütüphanesi (Sanal)</string>
+    <string name="settings_ftp_mode_choose">FTP Modunu Seçin</string>
+
+    <string name="error_restricted_access">Erişim Kısıtlandı</string>
+    <string name="msg_restricted_access_shizuku">Bu dizin Android tarafından kısıtlanmıştır. Lütfen erişmek için Shizuku\'yu etkinleştirin ve yetkilendirin.</string>
 </resources>

@@ -7,19 +7,12 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemGestures
-import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -53,10 +46,8 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -93,7 +84,10 @@ fun TopBar(
 ) {
 
     val context = LocalContext.current
-    val resources = LocalResources.current
+    val msgThumbnailsCleared = stringResource(R.string.msg_thumbnails_cleared)
+    val msgNotDirArchive = stringResource(R.string.msg_not_dir_archive)
+    val msgFileNotFound = stringResource(R.string.msg_file_not_found)
+    val msgInvalidPath = stringResource(R.string.msg_invalid_path)
 
     var optionsMenuExpanded by remember { mutableStateOf(false) }
     var currentOptionsScreen by remember { mutableStateOf("MAIN") }
@@ -126,7 +120,7 @@ fun TopBar(
         }
     }
 
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.GameSaves)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 
@@ -615,7 +609,7 @@ fun TopBar(
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
-                        } else if (appState.libraryItem == LibraryItem.GameSaves) {
+                        } else if (appState.libraryItem == LibraryItem.Games) {
                             Text(
                                 text = stringResource(R.string.nav_game_saves),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
@@ -809,7 +803,7 @@ fun TopBar(
                                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
-                        } else if (appState.libraryItem == LibraryItem.GameSaves) {
+                        } else if (appState.libraryItem == LibraryItem.Games) {
                             Text(
                                 text = stringResource(R.string.nav_game_saves),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
@@ -865,17 +859,17 @@ fun TopBar(
                                                     addressBar = false
                                                     focusManager.clearFocus()
                                                 } else {
-                                                    Toast.makeText(context, resources.getString(R.string.msg_not_dir_archive), Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, msgNotDirArchive, Toast.LENGTH_SHORT).show()
                                                 }
                                             } else {
-                                                Toast.makeText(context, resources.getString(R.string.msg_file_not_found), Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, msgFileNotFound, Toast.LENGTH_SHORT).show()
                                             }
                                         } else {
                                             addressBar = false
                                             focusManager.clearFocus()
                                         }
                                     } else {
-                                        Toast.makeText(context, resources.getString(R.string.msg_invalid_path), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, msgInvalidPath, Toast.LENGTH_SHORT).show()
                                         textPathValue = TextFieldValue(currentPathString)
                                     }
                                 }
@@ -975,7 +969,7 @@ fun TopBar(
                                     optionsMenuExpanded = false
                                     coroutineScope.launch {
                                         CleanupManager.clearThumbnails(context.applicationContext)
-                                        Toast.makeText(context, context.getString(R.string.msg_thumbnails_cleared), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, msgThumbnailsCleared, Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 leadingIcon = { Icon(Icons.Default.DeleteSweep, null) }

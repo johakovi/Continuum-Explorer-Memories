@@ -107,9 +107,9 @@ class ShizukuFtpFile(
     }
 }
 
-class GameSavesFileSystemView(private val context: android.content.Context, private val user: User) : FileSystemView {
+class GamesFileSystemView(private val context: android.content.Context, private val user: User) : FileSystemView {
     private var currDir = "/"
-    private val games by lazy { com.troikoss.continuum_explorer.managers.GameSavesManager.getGameSaves(context) }
+    private val games by lazy { com.troikoss.continuum_explorer.managers.GamesManager.getGames(context) }
 
     override fun getHomeDirectory(): FtpFile = VirtualRootFtpFile(games, user)
     override fun getWorkingDirectory(): FtpFile = getFile(currDir)

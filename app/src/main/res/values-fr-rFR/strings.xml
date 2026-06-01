@@ -27,6 +27,8 @@
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher…</string>
     <string name="options">Options</string>
+    <string name="menu_clear_thumbnails">Effacer les miniatures</string>
+    <string name="msg_thumbnails_cleared">Miniatures effacées</string>
 
     <!-- Properties / Details -->
     <string name="properties">Propriétés</string>
@@ -292,6 +294,7 @@
     <string name="nav_gallery">Galerie</string>
     <string name="nav_downloads">Téléchargements</string>
     <string name="nav_documents">Documents</string>
+    <string name="nav_game_saves">Gestionnaire de jeux</string>
     <string name="nav_add_storage">Ajouter un stockage</string>
     <string name="nav_internal_storage">Stockage interne</string>
     <string name="nav_trash">Corbeille</string>
@@ -438,6 +441,10 @@
     <string name="nav_network_root_url">URL complète (remplacement optionnel)</string>
     <string name="nav_network_accept_untrusted">Accepter les certificats auto-signés</string>
     <string name="nav_network_test">Tester la connexion</string>
+
+    <string name="nav_ftp_server">Serveur FTP</string>
+    <string name="nav_start_ftp">Démarrer le serveur FTP</string>
+    <string name="nav_stop_ftp">Arrêter le serveur FTP</string>
     <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
     <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
     <string name="settings_icon_theme">Thème d\'icônes</string>
@@ -455,4 +462,18 @@
     <string name="shizuku_status_not_authorized">Non autorisé</string>
     <string name="shizuku_status_not_running">Pas en cours d\'exécution</string>
     <string name="shizuku_request_permission">Demander la permission Shizuku</string>
+
+    <string name="settings_network_services">Services réseau</string>
+    <string name="settings_ftp_server">Serveur FTP</string>
+    <string name="settings_ftp_user">Nom d\'utilisateur FTP</string>
+    <string name="settings_ftp_password">Mot de passe FTP</string>
+    <string name="settings_ftp_credentials_title">Identifiants du serveur FTP</string>
+    <string name="settings_ftp_credentials_desc">Définissez le nom d\'utilisateur et le mot de passe pour le serveur FTP intégré.</string>
+    <string name="settings_ftp_mode_title">Mode du serveur FTP</string>
+    <string name="settings_ftp_mode_full">Stockage interne complet</string>
+    <string name="settings_ftp_mode_game_saves">Bibliothèque du gestionnaire de jeux (Virtuelle)</string>
+    <string name="settings_ftp_mode_choose">Choisir le mode FTP</string>
+
+    <string name="error_restricted_access">Accès restreint</string>
+    <string name="msg_restricted_access_shizuku">Ce répertoire est restreint par Android. Veuillez activer et autoriser Shizuku pour y accéder.</string>
 </resources>

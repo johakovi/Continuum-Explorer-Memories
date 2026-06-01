@@ -4,10 +4,8 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
@@ -24,7 +22,6 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory
 import org.apache.ftpserver.usermanager.impl.BaseUser
 import org.apache.ftpserver.usermanager.impl.WritePermission
 import java.io.File
-import java.util.Locale
 
 class FtpServerService : Service() {
 
@@ -46,7 +43,11 @@ class FtpServerService : Service() {
 
         val modeName = intent?.getStringExtra(EXTRA_MODE)
         if (modeName != null) {
-            currentMode = SettingsManager.FtpMode.valueOf(modeName)
+            currentMode = try {
+                SettingsManager.FtpMode.valueOf(modeName)
+            } catch (_: Exception) {
+                if (modeName == "GAME_SAVES") SettingsManager.FtpMode.GAMES else SettingsManager.FtpMode.FULL_STORAGE
+            }
         } else {
             currentMode = SettingsManager.ftpMode.value
         }
@@ -89,7 +90,7 @@ class FtpServerService : Service() {
             user.name = ftpUser
             user.password = ftpPass
             
-            val isGameSaves = currentMode == SettingsManager.FtpMode.GAME_SAVES
+            val isGameSaves = currentMode == SettingsManager.FtpMode.GAMES
             
             user.homeDirectory = if (isGameSaves) "/" else Environment.getExternalStorageDirectory().absolutePath
             val authorities = mutableListOf<Authority>()
@@ -102,7 +103,7 @@ class FtpServerService : Service() {
             serverFactory.fileSystem = object : FileSystemFactory {
                 override fun createFileSystemView(user: User): FileSystemView {
                     return if (isGameSaves) {
-                        GameSavesFileSystemView(applicationContext, user)
+                        GamesFileSystemView(applicationContext, user)
                     } else {
                         ShizukuFileSystemView(user, user.homeDirectory)
                     }
@@ -145,7 +146,7 @@ class FtpServerService : Service() {
         val ftpUser = SettingsManager.ftpUser.value
         val ftpPass = SettingsManager.ftpPassword.value
         
-        val modeTitle = if (currentMode == SettingsManager.FtpMode.GAME_SAVES) 
+        val modeTitle = if (currentMode == SettingsManager.FtpMode.GAMES)
             "FTP Game Saves Server Running" else "FTP Server Running"
 
         return NotificationCompat.Builder(this, CHANNEL_ID)

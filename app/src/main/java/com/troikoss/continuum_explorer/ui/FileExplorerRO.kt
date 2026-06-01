@@ -48,7 +48,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -56,17 +55,14 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBars
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.model.UIAppearance
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -123,7 +119,7 @@ fun FileExplorerRO(
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
                     item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
-                    item.absolutePath == "virtual://game_saves" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.GameSaves)
+                    item.absolutePath == "virtual://games_manager" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Games)
                     item.absolutePath == "virtual://recycle_bin" -> {
                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                         if (!trashDir.exists()) trashDir.mkdirs()
@@ -582,7 +578,7 @@ private fun navigateToSection(
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
-        is NavSection.GameSaves -> appState.navigateTo(null, null, libraryItem = LibraryItem.GameSaves)
+        is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)
         is NavSection.Documents -> {
             if (appState.appConfigs.isDocumentsFolderEnabled) {
                 val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)

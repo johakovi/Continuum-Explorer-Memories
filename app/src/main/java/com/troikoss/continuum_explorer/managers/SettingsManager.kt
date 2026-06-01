@@ -82,7 +82,7 @@ object SettingsManager {
 
     enum class FtpMode {
         FULL_STORAGE,
-        GAME_SAVES
+        GAMES
     }
 
     private val _deleteBehavior = mutableStateOf(DeleteBehavior.ASK)
@@ -139,11 +139,11 @@ object SettingsManager {
     private val _ftpPassword = mutableStateOf("admin")
     val ftpPassword: State<String> = _ftpPassword
 
-    private val _gameSavesPath = mutableStateOf("")
-    val gameSavesPath: State<String> = _gameSavesPath
+    private val _gamesPath = mutableStateOf("")
+    val gamesPath: State<String> = _gamesPath
 
-    private val _isFtpShareGameSavesEnabled = mutableStateOf(false)
-    val isFtpShareGameSavesEnabled: State<Boolean> = _isFtpShareGameSavesEnabled
+    private val _isFtpShareGamesEnabled = mutableStateOf(false)
+    val isFtpShareGamesEnabled: State<Boolean> = _isFtpShareGamesEnabled
 
     private val _ftpMode = mutableStateOf(FtpMode.FULL_STORAGE)
     val ftpMode: State<FtpMode> = _ftpMode
@@ -234,9 +234,15 @@ object SettingsManager {
         _isFtpServerEnabled.value = prefs.getBoolean(KEY_FTP_SERVER_ENABLED, false)
         _ftpUser.value = prefs.getString(KEY_FTP_USER, "admin") ?: "admin"
         _ftpPassword.value = prefs.getString(KEY_FTP_PASSWORD, "admin") ?: "admin"
-        _gameSavesPath.value = prefs.getString(KEY_GAME_SAVES_PATH, "") ?: ""
-        _isFtpShareGameSavesEnabled.value = prefs.getBoolean(KEY_FTP_SHARE_GAME_SAVES, false)
-        _ftpMode.value = FtpMode.valueOf(prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name)
+        _gamesPath.value = prefs.getString(KEY_GAME_SAVES_PATH, "") ?: ""
+        _isFtpShareGamesEnabled.value = prefs.getBoolean(KEY_FTP_SHARE_GAME_SAVES, false)
+        
+        val savedFtpMode = prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name
+        _ftpMode.value = try {
+            FtpMode.valueOf(savedFtpMode)
+        } catch (_: Exception) {
+            if (savedFtpMode == "GAME_SAVES") FtpMode.GAMES else FtpMode.FULL_STORAGE
+        }
 
         val savedViewMode = prefs.getString(KEY_DEFAULT_VIEW_MODE, ViewMode.DETAILS.name)
         _defaultViewMode.value = try {
@@ -405,24 +411,24 @@ object SettingsManager {
         }
     }
 
-    fun setGameSavesPath(context: Context, path: String) {
-        _gameSavesPath.value = path
+    fun setGamesPath(context: Context, path: String) {
+        _gamesPath.value = path
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_GAME_SAVES_PATH, path).apply()
         
-        if (_isFtpServerEnabled.value && _isFtpShareGameSavesEnabled.value) {
+        if (_isFtpServerEnabled.value && _isFtpShareGamesEnabled.value) {
             setFtpServerEnabled(context, false)
             setFtpServerEnabled(context, true)
         }
     }
 
-    fun getEffectiveGameSavesPath(context: Context): String {
-        if (_gameSavesPath.value.isNotEmpty()) return _gameSavesPath.value
+    fun getEffectiveGamesPath(context: Context): String {
+        if (_gamesPath.value.isNotEmpty()) return _gamesPath.value
 
         val storageRoot = android.os.Environment.getExternalStorageDirectory()
         
         // 1. Check for common folder names in internal storage
-        val commonNames = listOf("GameSaves", "Game Saves", "Saves")
+        val commonNames = listOf("Games", "Game Manager", "Saves")
         for (name in commonNames) {
             val folder = java.io.File(storageRoot, name)
             if (folder.exists() && folder.isDirectory) return folder.absolutePath
@@ -445,15 +451,15 @@ object SettingsManager {
         return java.io.File(storageRoot, "Android/data").absolutePath
     }
 
-    fun setFtpShareGameSavesEnabled(context: Context, enabled: Boolean) {
-        _isFtpShareGameSavesEnabled.value = enabled
+    fun setFtpShareGamesEnabled(context: Context, enabled: Boolean) {
+        _isFtpShareGamesEnabled.value = enabled
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_FTP_SHARE_GAME_SAVES, enabled).apply()
 
         // If enabling and path is empty, try to discover it
-        if (enabled && _gameSavesPath.value.isEmpty()) {
-            val discovered = getEffectiveGameSavesPath(context)
-            _gameSavesPath.value = discovered
+        if (enabled && _gamesPath.value.isEmpty()) {
+            val discovered = getEffectiveGamesPath(context)
+            _gamesPath.value = discovered
             prefs.edit().putString(KEY_GAME_SAVES_PATH, discovered).apply()
         }
 

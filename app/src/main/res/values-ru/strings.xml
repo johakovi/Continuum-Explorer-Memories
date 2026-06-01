@@ -26,6 +26,8 @@
     <string name="search">Поиск</string>
     <string name="search_hint">Поиск…</string>
     <string name="options">Параметры</string>
+    <string name="menu_clear_thumbnails">Очистить эскизы</string>
+    <string name="msg_thumbnails_cleared">Эскизы очищены</string>
     <string name="off">Выкл</string>
     <string name="previous">Назад</string>
     <string name="next">Вперед</string>
@@ -300,6 +302,7 @@
     <string name="nav_gallery">Галерея</string>
     <string name="nav_downloads">Загрузки</string>
     <string name="nav_documents">Документы</string>
+    <string name="nav_game_saves">Диспетчер игр</string>
     <string name="menu_gallery_albums">Альбомы</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="nav_add_storage">Добавить хранилище</string>
@@ -335,6 +338,10 @@
     <string name="nav_network_root_url">Полный URL (опционально)</string>
     <string name="nav_network_accept_untrusted">Принимать самоподписанные сертификаты</string>
     <string name="nav_network_test">Проверить подключение</string>
+
+    <string name="nav_ftp_server">FTP-сервер</string>
+    <string name="nav_start_ftp">Запустить FTP-сервер</string>
+    <string name="nav_stop_ftp">Остановить FTP-сервер</string>
 
     <!-- Item Types -->
     <string name="archive">Архив</string>
@@ -455,4 +462,18 @@
     <string name="shizuku_status_not_authorized">Не авторизовано</string>
     <string name="shizuku_status_not_running">Не запущено</string>
     <string name="shizuku_request_permission">Запросить разрешение Shizuku</string>
+
+    <string name="settings_network_services">Сетевые службы</string>
+    <string name="settings_ftp_server">FTP-сервер</string>
+    <string name="settings_ftp_user">Имя пользователя FTP</string>
+    <string name="settings_ftp_password">Пароль FTP</string>
+    <string name="settings_ftp_credentials_title">Учетные данные FTP-сервера</string>
+    <string name="settings_ftp_credentials_desc">Установите имя пользователя и пароль для встроенного FTP-сервера.</string>
+    <string name="settings_ftp_mode_title">Режим FTP-сервера</string>
+    <string name="settings_ftp_mode_full">Вся внутренняя память</string>
+    <string name="settings_ftp_mode_game_saves">Библиотека диспетчера игр (Виртуальная)</string>
+    <string name="settings_ftp_mode_choose">Выберите режим FTP</string>
+
+    <string name="error_restricted_access">Доступ ограничен</string>
+    <string name="msg_restricted_access_shizuku">Этот каталог ограничен Android. Пожалуйста, включите и авторизуйте Shizuku для доступа к нему.</string>
 </resources>

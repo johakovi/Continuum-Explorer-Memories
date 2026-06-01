@@ -26,6 +26,8 @@
     <string name="search">Sök</string>
     <string name="search_hint">Sök…</string>
     <string name="options">Alternativ</string>
+    <string name="menu_clear_thumbnails">Rensa miniatyrer</string>
+    <string name="msg_thumbnails_cleared">Miniatyrer rensade</string>
     <string name="off">Av</string>
     <string name="previous">Föregående</string>
     <string name="next">Nästa</string>
@@ -300,6 +302,7 @@
     <string name="nav_gallery">Galleri</string>
     <string name="nav_downloads">Hämtningar</string>
     <string name="nav_documents">Dokument</string>
+    <string name="nav_game_saves">Spelhanterare</string>
     <string name="menu_gallery_albums">Album</string>
     <string name="menu_documents_folder">Mapp</string>
     <string name="nav_add_storage">Lägg till lagring</string>
@@ -335,6 +338,10 @@
     <string name="nav_network_root_url">Fullständig URL (valfri)</string>
     <string name="nav_network_accept_untrusted">Acceptera självsignerade certifikat</string>
     <string name="nav_network_test">Testa anslutning</string>
+
+    <string name="nav_ftp_server">FTP-server</string>
+    <string name="nav_start_ftp">Starta FTP-server</string>
+    <string name="nav_stop_ftp">Stoppa FTP-server</string>
 
     <!-- Item Types -->
     <string name="archive">Arkiv</string>
@@ -456,4 +463,18 @@
     <string name="shizuku_status_not_authorized">Inte auktoriserad</string>
     <string name="shizuku_status_not_running">Körs inte</string>
     <string name="shizuku_request_permission">Begär Shizuku-behörighet</string>
+
+    <string name="settings_network_services">Nätverkstjänster</string>
+    <string name="settings_ftp_server">FTP-server</string>
+    <string name="settings_ftp_user">FTP-användarnamn</string>
+    <string name="settings_ftp_password">FTP-lösenord</string>
+    <string name="settings_ftp_credentials_title">Inloggningsuppgifter för FTP-server</string>
+    <string name="settings_ftp_credentials_desc">Ange användarnamn och lösenord för den inbyggda FTP-servern.</string>
+    <string name="settings_ftp_mode_title">FTP-serverläge</string>
+    <string name="settings_ftp_mode_full">Fullständig intern lagring</string>
+    <string name="settings_ftp_mode_game_saves">Spelhanterarbibliotek (Virtuellt)</string>
+    <string name="settings_ftp_mode_choose">Välj FTP-läge</string>
+
+    <string name="error_restricted_access">Åtkomst begränsad</string>
+    <string name="msg_restricted_access_shizuku">Denna mapp är begränsad av Android. Aktivera och auktorisera Shizuku för att få åtkomst.</string>
 </resources>

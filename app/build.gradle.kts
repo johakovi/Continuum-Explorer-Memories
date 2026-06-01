@@ -12,7 +12,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 40
-        versionName = "Memories M4.1"
+        versionName = "Memories M5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,6 +34,7 @@ android {
     buildFeatures {
         compose = true
         aidl = true
+        viewBinding = true
     }
     packaging {
         resources {
@@ -70,6 +71,9 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.google.material)
+    implementation(libs.androidx.pdf.viewer)
     implementation(libs.androidx.security.crypto)
     implementation(libs.commons.net)
     implementation(libs.jsch)

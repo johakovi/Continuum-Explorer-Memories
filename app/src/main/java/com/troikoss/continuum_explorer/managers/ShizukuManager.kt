@@ -79,7 +79,7 @@ object ShizukuManager {
         // Re-create args to ensure tag is set correctly
         val args = Shizuku.UserServiceArgs(ComponentName(packageName, ShizukuFileService::class.java.name))
             .daemon(false)
-            .processNameSuffix("fileService") 
+            .processNameSuffix("fileService")
             .tag("fileService")
 
         return withTimeoutOrNull(10000) {

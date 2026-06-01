@@ -41,7 +41,7 @@ object RestrictedCache {
         
         // Also check for trailing /android or /android/ which can be restricted on some versions
         if (p.endsWith("/android") || p.endsWith("/android/")) return true
-        
+
         return false
     }
 
@@ -57,7 +57,7 @@ object RestrictedCache {
     ): File = withContext(Dispatchers.IO) {
         val target = getCachedFile(file)
         
-        // If it's already cached and has same size/mtime, maybe skip? 
+        // If it's already cached and has same size/mtime, maybe skip?
         // But for restricted files, we might always want to refresh if we suspect changes.
         // For now, let's just copy if it doesn't exist or size differs.
         if (target.exists() && target.length() == file.length) return@withContext target
@@ -89,14 +89,9 @@ object RestrictedCache {
         
         try {
             val service = ShizukuManager.getService() ?: return@withContext false
-            val fd = service.openFile(originalPath, "w") ?: return@withContext false
-            
-            tempFile.inputStream().use { input ->
-                android.os.ParcelFileDescriptor.AutoCloseOutputStream(fd).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            true
+            // Use shell copy/move via Shizuku service, which bypasses mount-masking issues
+            // that affect direct FileDescriptor writing on newer Android versions.
+            service.copyFile(tempFile.absolutePath, originalPath)
         } catch (e: Exception) {
             e.printStackTrace()
             false

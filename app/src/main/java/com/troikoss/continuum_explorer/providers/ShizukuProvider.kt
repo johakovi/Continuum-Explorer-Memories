@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.model.*
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.File
@@ -88,6 +89,25 @@ object ShizukuProvider : StorageProvider {
     override fun createChild(parentId: String, name: String, isDirectory: Boolean): UniversalFile {
         val path = if (parentId.endsWith("/")) "$parentId$name" else "$parentId/$name"
         val service = ShizukuManager.getServiceBlocking() ?: throw java.io.IOException("Shizuku service unavailable")
+        
+        if (RestrictedCache.isRestrictedPath(path)) {
+            // Create in .temp first and move via Shizuku shell to bypass Android 14+ direct creation restrictions
+            val tempDir = RestrictedCache.getTempDir()
+            val tempPath = File(tempDir, "new_${System.currentTimeMillis()}_$name")
+
+            try {
+                if (isDirectory) tempPath.mkdirs() else tempPath.createNewFile()
+
+                if (service.moveFile(tempPath.absolutePath, path)) {
+                    return findChild(parentId, name) ?: throw java.io.IOException("Failed to locate child after creation")
+                } else {
+                    throw java.io.IOException("Failed to move created item from .temp to restricted path")
+                }
+            } finally {
+                if (tempPath.exists()) tempPath.delete()
+            }
+        }
+
         if (isDirectory) service.mkdir(path) else service.createNewFile(path)
         return findChild(parentId, name) ?: throw java.io.IOException("Failed to create $path")
     }
@@ -95,6 +115,37 @@ object ShizukuProvider : StorageProvider {
     override fun createAndOpenOutput(parentId: String, name: String): Pair<UniversalFile, OutputStream> {
         val path = if (parentId.endsWith("/")) "$parentId$name" else "$parentId/$name"
         val service = ShizukuManager.getServiceBlocking() ?: throw java.io.IOException("Shizuku service unavailable")
+
+        if (RestrictedCache.isRestrictedPath(path)) {
+            // For restricted paths, write to a temp file first, then move it via Shizuku shell.
+            // Direct ParcelFileDescriptor.open(..., MODE_WRITE) often fails on Android 14+ for /Android/data.
+            val tempFile = File(RestrictedCache.getTempDir(), "new_${System.currentTimeMillis()}_$name")
+            val outputStream = object : java.io.FileOutputStream(tempFile) {
+                override fun close() {
+                    try {
+                        super.close()
+                        service.moveFile(tempFile.absolutePath, path)
+                    } catch (e: Exception) {
+                        tempFile.delete()
+                        throw e
+                    }
+                }
+            }
+            
+            // Try to create the empty file at destination so findChild succeeds
+            service.createNewFile(path)
+            val virtualFile = findChild(parentId, name) ?: UniversalFile(
+                name = name,
+                isDirectory = false,
+                lastModified = System.currentTimeMillis(),
+                length = 0,
+                provider = this,
+                providerId = path,
+                parentId = parentId
+            )
+            return virtualFile to outputStream
+        }
+
         service.createNewFile(path)
         val fd = service.openFile(path, "w") ?: throw java.io.IOException("Failed to open $path for writing")
         return findChild(parentId, name)!! to ParcelFileDescriptor.AutoCloseOutputStream(fd)

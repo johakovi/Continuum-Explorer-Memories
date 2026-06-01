@@ -10,7 +10,6 @@ import android.os.Environment
 import android.os.storage.StorageManager
 import android.text.format.Formatter
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -80,7 +79,6 @@ import com.troikoss.continuum_explorer.utils.openInNewWindow
 import com.troikoss.continuum_explorer.utils.showProperties
 import com.troikoss.continuum_explorer.utils.toUniversal
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.roundToInt
 /**
@@ -274,7 +272,7 @@ fun NavigationPane(
         appState.appConfigs.isGalleryVisible,
         appState.appConfigs.isDownloadsVisible,
         appState.appConfigs.isDocumentsVisible,
-        appState.appConfigs.isGameSavesVisible
+        appState.appConfigs.isGamesVisible
     ) {
         appState.appConfigs.libraryOrder.filter { id ->
             when (id) {
@@ -283,7 +281,7 @@ fun NavigationPane(
                 "gallery" -> appState.appConfigs.isGalleryVisible
                 "downloads" -> appState.appConfigs.isDownloadsVisible
                 "documents" -> appState.appConfigs.isDocumentsVisible
-                "game_saves" -> appState.appConfigs.isGameSavesVisible
+                "games_manager" -> appState.appConfigs.isGamesVisible
                 else -> true
             }
         }
@@ -586,14 +584,14 @@ fun NavigationPane(
                                 section = NavSection.Documents,
                                 isMinimized = isMinimized
                             )
-                            "game_saves" -> NavItem(
+                            "games_manager" -> NavItem(
                                 label = stringResource(R.string.nav_game_saves),
                                 icon = Icons.AutoMirrored.Filled.List,
                                 customIcon = R.drawable.ic_nav_game,
-                                onClick = { onItemSelected(NavSection.GameSaves) },
+                                onClick = { onItemSelected(NavSection.Games) },
                                 appState = appState,
                                 currentWidth = currentWidth,
-                                section = NavSection.GameSaves,
+                                section = NavSection.Games,
                                 isMinimized = isMinimized
                             )
                         }
@@ -963,24 +961,24 @@ private fun NavContextMenu(
             )
         }
 
-        if (section is NavSection.GameSaves) {
+        if (section is NavSection.Games) {
             val isFtpEnabled by SettingsManager.isFtpServerEnabled
             val ftpMode by SettingsManager.ftpMode
             val context = LocalContext.current
             
-            val isGameSavesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAME_SAVES
+            val isGamesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAMES
 
             DropdownMenuItem(
-                text = { Text(if (isGameSavesFtpActive) "Stop FTP Game Saves Server" else "Start FTP Game Saves Server") },
+                text = { Text(if (isGamesFtpActive) "Stop FTP Game Manager Server" else "Start FTP Game Manager Server") },
                 onClick = {
                     onDismissRequest()
-                    if (isGameSavesFtpActive) {
+                    if (isGamesFtpActive) {
                         SettingsManager.setFtpServerEnabled(context, false)
                     } else {
-                        SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAME_SAVES)
+                        SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAMES)
                     }
                 },
-                leadingIcon = { Icon(if (isGameSavesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+                leadingIcon = { Icon(if (isGamesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
             )
         }
 
@@ -1059,7 +1057,7 @@ private fun NavItem(
             is NavSection.Downloads -> extendedColors.downloadsIcon
             is NavSection.RecycleBin -> extendedColors.recycleBinIcon
             is NavSection.Documents -> extendedColors.documentsIcon
-            is NavSection.GameSaves -> extendedColors.gameIcon
+            is NavSection.Games -> extendedColors.gameIcon
             else -> extendedColors.sidebarIcons
         }
         if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
@@ -1080,7 +1078,7 @@ private fun NavItem(
                 tint = tint,
                 modifier = Modifier.size(24.dp)
             )
-        } else if (section == NavSection.GameSaves) {
+        } else if (section == NavSection.Games) {
             Icon(
                 painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_game_material),
                 contentDescription = null,

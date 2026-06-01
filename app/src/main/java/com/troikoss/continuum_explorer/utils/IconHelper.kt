@@ -84,16 +84,16 @@ object IconHelper {
      * List of game folder names (or substrings) that should use the "external" game save color
      * (like PSP) even if they are technically located in restricted Android/data paths.
      */
-    private val EMULATOR_FOLDERS = listOf("PSP", "Dolphin", "PS2", "NetherSX2")
+    private val EMULATOR_FOLDERS = listOf("PSP", "Dolphin", "PS2", "NetherSX2", "NDS", "PSVita")
 
     // --- Public UI Components ---
 
     @Composable
     fun FolderIcon(
+        modifier: Modifier = Modifier,
         name: String,
         path: String,
         providerId: String = "",
-        modifier: Modifier = Modifier,
         iconSize: Dp = 24.dp,
         tint: Color = LocalExtendedColors.current.folderIcon
     ) {
@@ -165,9 +165,9 @@ object IconHelper {
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
-                    file.providerId == "virtual://game_saves" -> extendedColors.gameIcon
+                    file.providerId == "virtual://games_manager" -> extendedColors.gameIcon
                     file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
-                    file.parentId == "virtual://game_saves" -> {
+                    file.parentId == "virtual://games_manager" -> {
                         val isEmulator = EMULATOR_FOLDERS.any { file.name.contains(it, ignoreCase = true) }
                         if (isEmulator) extendedColors.recentIcon else extendedColors.gameIcon
                     }
@@ -205,7 +205,7 @@ object IconHelper {
             }
 
             Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
-                val isGameSave = file.parentId == "virtual://game_saves"
+                val isGameSave = file.parentId == "virtual://games_manager"
                 val packageName = if (isGameSave) null else getPackageNameFromPath(file.providerId)
                 
                 if (packageName != null && iconTheme != IconTheme.MATERIAL) {
@@ -347,7 +347,7 @@ object IconHelper {
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
-                file.providerId == "virtual://game_saves" -> R.drawable.ic_nav_game
+                file.providerId == "virtual://games_manager" -> R.drawable.ic_nav_game
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
                 else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
@@ -386,13 +386,13 @@ object IconHelper {
         val isRoot = file.parentId == rootId || file.parentId == internalRoot ||
                 (file.providerId.startsWith("webdav://") && file.parentId != null && file.parentId!!.endsWith("//"))
         val isVirtual = file.providerId.startsWith("virtual://")
-        val isGameSaveItem = file.parentId == "virtual://game_saves"
+        val isGameSaveItem = file.parentId == "virtual://games_manager"
 
         // Only show overlays if the folder is in a storage root or is a virtual library item
         if (!isRoot && !isVirtual && !file.absolutePath.contains("/.trash") && !isGameSaveItem) {
             return null
         }
-        if (file.providerId == "virtual://game_saves" || isGameSaveItem) return R.drawable.ic_nav_game
+        if (file.providerId == "virtual://games_manager" || isGameSaveItem) return R.drawable.ic_nav_game
         return getOverlayIconRes(file.name, file.providerId, file.providerId)
     }
 
@@ -408,7 +408,7 @@ object IconHelper {
                 lPath.contains("gallery") -> R.drawable.ic_nav_gallery
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
-                lPath.contains("game_saves") -> R.drawable.ic_nav_game
+                lPath.contains("games_manager") -> R.drawable.ic_nav_game
                 lPath.contains("trash") || lPath.contains("recycle_bin") -> R.drawable.ic_nav_trash
                 else -> null
             }
