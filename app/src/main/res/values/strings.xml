@@ -476,5 +476,12 @@
     <string name="shizuku_request_permission">Request Shizuku Permission</string>
     <string name="error_restricted_access">Access Restricted</string>
     <string name="msg_restricted_access_shizuku">This directory is restricted by Android. Please enable and authorize Shizuku to access it.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">System &amp; Battery</string>
+    <string name="settings_ftp_inactivity_timeout">FTP Inactivity Timeout</string>
+    <string name="settings_app_inactivity_timeout">App Inactivity Timeout</string>
+    <string name="settings_timeout_minutes">%1$d minutes</string>
+    <string name="settings_timeout_disabled">Never</string>
 </resources>
 

@@ -13,6 +13,9 @@ object GlobalEvents {
     private val _configChangeEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val configChangeEvent = _configChangeEvent.asSharedFlow()
 
+    private val _activityEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val activityEvent = _activityEvent.asSharedFlow()
+
     /**
      * Triggers a refresh across all active file explorer windows for file contents.
      */
@@ -25,5 +28,12 @@ object GlobalEvents {
      */
     fun triggerConfigUpdate() {
         _configChangeEvent.tryEmit(Unit)
+    }
+
+    /**
+     * Notifies that a user activity or operation has occurred.
+     */
+    fun triggerActivity() {
+        _activityEvent.tryEmit(Unit)
     }
 }

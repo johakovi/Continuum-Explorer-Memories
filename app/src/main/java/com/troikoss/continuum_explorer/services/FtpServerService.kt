@@ -11,12 +11,13 @@ import android.os.Environment
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.utils.GlobalEvents
+import android.os.Handler
+import android.os.Looper
+import kotlinx.coroutines.*
 import org.apache.ftpserver.FtpServer
 import org.apache.ftpserver.FtpServerFactory
-import org.apache.ftpserver.ftplet.Authority
-import org.apache.ftpserver.ftplet.FileSystemFactory
-import org.apache.ftpserver.ftplet.FileSystemView
-import org.apache.ftpserver.ftplet.User
+import org.apache.ftpserver.ftplet.*
 import org.apache.ftpserver.listener.ListenerFactory
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory
 import org.apache.ftpserver.usermanager.impl.BaseUser
@@ -28,9 +29,31 @@ class FtpServerService : Service() {
     private var server: FtpServer? = null
     private var currentMode = SettingsManager.FtpMode.FULL_STORAGE
 
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val handler = Handler(Looper.getMainLooper())
+    private val stopRunnable = Runnable {
+        android.util.Log.d("FtpServerService", "Inactivity timeout reached, stopping FTP server")
+        SettingsManager.setFtpServerEnabled(applicationContext, false)
+    }
+
+    private fun resetTimer() {
+        handler.removeCallbacks(stopRunnable)
+        val timeoutMinutes = SettingsManager.ftpInactivityTimeout.value
+        if (timeoutMinutes > 0) {
+            handler.postDelayed(stopRunnable, timeoutMinutes.toLong() * 60 * 1000)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        SettingsManager.init(applicationContext)
+        com.troikoss.continuum_explorer.providers.StorageProviders.init(applicationContext)
         createNotificationChannel()
+        serviceScope.launch {
+            GlobalEvents.activityEvent.collect {
+                resetTimer()
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,7 +69,7 @@ class FtpServerService : Service() {
             currentMode = try {
                 SettingsManager.FtpMode.valueOf(modeName)
             } catch (_: Exception) {
-                if (modeName == "GAME_SAVES") SettingsManager.FtpMode.GAMES else SettingsManager.FtpMode.FULL_STORAGE
+                if (modeName == "GAME_SAVES" || modeName == "GAMES") SettingsManager.FtpMode.GAMES else SettingsManager.FtpMode.FULL_STORAGE
             }
         } else {
             currentMode = SettingsManager.ftpMode.value
@@ -71,6 +94,21 @@ class FtpServerService : Service() {
 
         try {
             val serverFactory = FtpServerFactory()
+            
+            val ftplets = mutableMapOf<String, Ftplet>()
+            ftplets["activityTracker"] = object : DefaultFtplet() {
+                override fun beforeCommand(session: FtpSession?, request: FtpRequest?): FtpletResult {
+                    resetTimer()
+                    return FtpletResult.DEFAULT
+                }
+
+                override fun onConnect(session: FtpSession?): FtpletResult {
+                    resetTimer()
+                    return FtpletResult.DEFAULT
+                }
+            }
+            serverFactory.ftplets = ftplets
+
             val listenerFactory = ListenerFactory()
             listenerFactory.port = PORT
             serverFactory.addListener("default", listenerFactory.createListener())
@@ -112,6 +150,7 @@ class FtpServerService : Service() {
 
             server = serverFactory.createServer()
             server?.start()
+            resetTimer()
         } catch (e: Exception) {
             e.printStackTrace()
             stopSelf()
@@ -119,12 +158,14 @@ class FtpServerService : Service() {
     }
 
     private fun stopServer() {
+        handler.removeCallbacks(stopRunnable)
         server?.stop()
         server = null
     }
 
     override fun onDestroy() {
         stopServer()
+        serviceScope.cancel()
         super.onDestroy()
     }
 

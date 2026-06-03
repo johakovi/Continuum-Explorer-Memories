@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.os.LocaleListCompat
 import com.troikoss.continuum_explorer.model.ViewMode
@@ -79,6 +80,8 @@ object SettingsManager {
     private const val KEY_GAME_SAVES_PATH = "game_saves_path"
     private const val KEY_FTP_SHARE_GAME_SAVES = "ftp_share_game_saves"
     private const val KEY_FTP_SERVER_MODE = "ftp_server_mode"
+    private const val KEY_FTP_INACTIVITY_TIMEOUT = "ftp_inactivity_timeout"
+    private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
 
     enum class FtpMode {
         FULL_STORAGE,
@@ -147,6 +150,12 @@ object SettingsManager {
 
     private val _ftpMode = mutableStateOf(FtpMode.FULL_STORAGE)
     val ftpMode: State<FtpMode> = _ftpMode
+
+    private val _ftpInactivityTimeout = mutableIntStateOf(5)
+    val ftpInactivityTimeout: State<Int> = _ftpInactivityTimeout
+
+    private val _appInactivityTimeout = mutableIntStateOf(5)
+    val appInactivityTimeout: State<Int> = _appInactivityTimeout
 
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
@@ -237,6 +246,9 @@ object SettingsManager {
         _gamesPath.value = prefs.getString(KEY_GAME_SAVES_PATH, "") ?: ""
         _isFtpShareGamesEnabled.value = prefs.getBoolean(KEY_FTP_SHARE_GAME_SAVES, false)
         
+        _ftpInactivityTimeout.intValue = prefs.getInt(KEY_FTP_INACTIVITY_TIMEOUT, 5)
+        _appInactivityTimeout.intValue = prefs.getInt(KEY_APP_INACTIVITY_TIMEOUT, 5)
+
         val savedFtpMode = prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name
         _ftpMode.value = try {
             FtpMode.valueOf(savedFtpMode)
@@ -471,5 +483,19 @@ object SettingsManager {
 
     fun setFtpMode(context: Context, mode: FtpMode) {
         setFtpServerEnabled(context, _isFtpServerEnabled.value, mode)
+    }
+
+    fun setFtpInactivityTimeout(context: Context, minutes: Int) {
+        _ftpInactivityTimeout.intValue = minutes
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_FTP_INACTIVITY_TIMEOUT, minutes).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setAppInactivityTimeout(context: Context, minutes: Int) {
+        _appInactivityTimeout.intValue = minutes
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_APP_INACTIVITY_TIMEOUT, minutes).apply()
+        GlobalEvents.triggerConfigUpdate()
     }
 }

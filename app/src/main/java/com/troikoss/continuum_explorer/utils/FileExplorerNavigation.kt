@@ -25,6 +25,7 @@ fun FileExplorerState.navigateTo(
     networkConnectionId: String? = null,
 ) {
     val targetArchivePath = archivePath ?: ""
+    GlobalEvents.triggerActivity()
 
     // Network navigation shortcut — skip equality check, always navigate
     if (networkProvider != null && networkId != null) {

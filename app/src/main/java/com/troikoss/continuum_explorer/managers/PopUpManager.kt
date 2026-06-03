@@ -15,6 +15,7 @@ import com.troikoss.continuum_explorer.providers.SmbProvider
 import com.troikoss.continuum_explorer.providers.WebDavProvider
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.utils.NotificationHelper
+import com.troikoss.continuum_explorer.utils.GlobalEvents
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -246,6 +247,7 @@ object FileOperationsManager {
             // Context not available yet or other issue
         }
 
+        GlobalEvents.triggerActivity()
         notifyListeners()
     }
 
@@ -485,6 +487,7 @@ object FileOperationsManager {
         currentOperationType.value = if (operationType != OperationType.NONE) operationType else currentOperationType.value
         currentFileName.value = fileName ?: currentFileName.value
         itemsProcessed.intValue = current
+        GlobalEvents.triggerActivity()
         notifyListeners()
     }
 
@@ -504,6 +507,7 @@ object FileOperationsManager {
         if (totalBytes > 0) {
             progress.floatValue = processedBytes.toFloat() / totalBytes.toFloat()
         }
+        GlobalEvents.triggerActivity()
         notifyListeners()
     }
 

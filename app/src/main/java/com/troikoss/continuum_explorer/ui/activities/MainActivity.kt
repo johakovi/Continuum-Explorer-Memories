@@ -30,8 +30,25 @@ import coil.Coil
 import rikka.shizuku.Shizuku
 import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.managers.CleanupManager
+import android.os.Handler
+import android.os.Looper
+import com.troikoss.continuum_explorer.utils.GlobalEvents
 
 open class MainActivity : AppCompatActivity() {
+
+    private val inactivityHandler = Handler(Looper.getMainLooper())
+    private val sleepRunnable = Runnable {
+        android.util.Log.d("MainActivity", "Inactivity timeout reached, closing app")
+        finishAffinity()
+    }
+
+    private fun resetInactivityTimer() {
+        inactivityHandler.removeCallbacks(sleepRunnable)
+        val timeoutMinutes = SettingsManager.appInactivityTimeout.value
+        if (timeoutMinutes > 0) {
+            inactivityHandler.postDelayed(sleepRunnable, timeoutMinutes.toLong() * 60 * 1000)
+        }
+    }
 
     private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         if (grantResult == PackageManager.PERMISSION_GRANTED) {
@@ -125,6 +142,13 @@ open class MainActivity : AppCompatActivity() {
         SettingsManager.init(applicationContext)
         StorageProviders.init(applicationContext)
 
+        resetInactivityTimer()
+        lifecycleScope.launch {
+            GlobalEvents.activityEvent.collect {
+                resetInactivityTimer()
+            }
+        }
+
         if (SettingsManager.isFtpServerEnabled.value) {
             SettingsManager.setFtpServerEnabled(applicationContext, true)
         }
@@ -184,8 +208,14 @@ open class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
     }
 
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        resetInactivityTimer()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        inactivityHandler.removeCallbacks(sleepRunnable)
         Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
         
         // Final cleanup on exit

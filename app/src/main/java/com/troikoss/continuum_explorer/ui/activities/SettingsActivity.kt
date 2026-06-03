@@ -71,6 +71,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
     val termuxSupport = SettingsManager.termuxSupport.value
     val iconTheme = SettingsManager.iconTheme.value
+    val ftpInactivityTimeout = SettingsManager.ftpInactivityTimeout.value
+    val appInactivityTimeout = SettingsManager.appInactivityTimeout.value
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTouchDragDialog by remember { mutableStateOf(false) }
@@ -84,6 +86,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showDetailsDialog by remember { mutableStateOf(false) }
     var showDefaultViewModeDialog by remember { mutableStateOf(false) }
     var showFtpCredentialsDialog by remember { mutableStateOf(false) }
+    var showFtpTimeoutDialog by remember { mutableStateOf(false) }
+    var showAppTimeoutDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -371,6 +375,37 @@ fun SettingsScreen(onBack: () -> Unit) {
                         }
                     }
                 }
+            )
+
+            HorizontalDivider()
+
+            Text(
+                stringResource(R.string.settings_system),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_ftp_inactivity_timeout)) },
+                supportingContent = { 
+                    val text = if (ftpInactivityTimeout > 0) 
+                        stringResource(R.string.settings_timeout_minutes, ftpInactivityTimeout)
+                    else stringResource(R.string.settings_timeout_disabled)
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showFtpTimeoutDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_app_inactivity_timeout)) },
+                supportingContent = { 
+                    val text = if (appInactivityTimeout > 0) 
+                        stringResource(R.string.settings_timeout_minutes, appInactivityTimeout)
+                    else stringResource(R.string.settings_timeout_disabled)
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showAppTimeoutDialog = true }
             )
 
             HorizontalDivider()
@@ -860,6 +895,30 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
+            if (showFtpTimeoutDialog) {
+                TimeoutDialog(
+                    title = stringResource(R.string.settings_ftp_inactivity_timeout),
+                    currentValue = ftpInactivityTimeout,
+                    onDismiss = { showFtpTimeoutDialog = false },
+                    onConfirm = { 
+                        SettingsManager.setFtpInactivityTimeout(context, it)
+                        showFtpTimeoutDialog = false
+                    }
+                )
+            }
+
+            if (showAppTimeoutDialog) {
+                TimeoutDialog(
+                    title = stringResource(R.string.settings_app_inactivity_timeout),
+                    currentValue = appInactivityTimeout,
+                    onDismiss = { showAppTimeoutDialog = false },
+                    onConfirm = { 
+                        SettingsManager.setAppInactivityTimeout(context, it)
+                        showAppTimeoutDialog = false
+                    }
+                )
+            }
+
             if (showAboutDialog) {
                 val uriHandler = LocalUriHandler.current
 
@@ -995,6 +1054,38 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun TimeoutDialog(
+    title: String,
+    currentValue: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    val options = listOf(0, 1, 2, 5, 10, 30, 60)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column {
+                options.forEach { minutes ->
+                    val label = if (minutes == 0) stringResource(R.string.settings_timeout_disabled)
+                                else stringResource(R.string.settings_timeout_minutes, minutes)
+                    OptionItem(
+                        label = label,
+                        selected = currentValue == minutes,
+                        onClick = { onConfirm(minutes) }
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable

@@ -17,10 +17,10 @@ object GamesManager {
         GameSaveInfo("Endling", "Android/data/com.hg.endling/files/UE4Game/Endling/Endling/Saved/SaveGames"),
         GameSaveInfo("SENTINEL519", "Android/data/com.AppyBearStudio.SENTINEL519/files/"),
         GameSaveInfo("Stardew Valley", "Android/data/com.chucklefish.stardewvalley/files/Saves"),
-        GameSaveInfo("PSP (savedata:PPSSPP)", "PPSSPP/PSP/SAVEDATA"),
+        GameSaveInfo("PSP (savedata:)", "PPSSPP/PSP/SAVEDATA"),
         GameSaveInfo("PSP (savedata:PSP)", "PSP/PSP/SAVEDATA"),
-        GameSaveInfo("PSP (savedata:Emulator/PSP)", "Documents/Emulator/PSP/SAVEDATA"),
-        GameSaveInfo("PSP (data:Emulator/PSP)", "Documents/Emulator/PSP"),
+        GameSaveInfo("PSP (savedata:Emulator)", "Documents/Emulator/PSP/SAVEDATA"),
+        GameSaveInfo("PSP (data:Emulator)", "Documents/Emulator/PSP"),
         GameSaveInfo("PSP (data:PSP)", "PSP/PSP"),
         GameSaveInfo("PSP (data:PPSSPP)", "PPSSPP/PSP"),
         GameSaveInfo("Pocket City 2", "Android/data/com.codebrewgames.pocketcity2/files/pocketcity2"),
@@ -38,13 +38,13 @@ object GamesManager {
         GameSaveInfo("KOTOR", "Android/data/com.aspyr.swkotor/files/saves/"),
         GameSaveInfo("Grand Theft Auto: San Andreas", "Android/data/com.rockstargames.gtasa/files/"),
         GameSaveInfo("The Were Cleaner", "Android/data/com.HowlinHugs.TheWereCleaner/files/SavesDir"),
-        GameSaveInfo("PS2 (NetherSX2)", "Android/data/xyz.aethersx2.android/files"),
+        GameSaveInfo("PS2: NetherSX2", "Android/data/xyz.aethersx2.android/files"),
         GameSaveInfo("Dolphin Emulator", "Android/data/org.dolphinemu.dolphinemu/files"),
         GameSaveInfo("The Sun Origin", "Android/data/Agaming.thesun.origin/files/"),
         GameSaveInfo("PSVita (Vita3k:SaveData)", "Android/data/org.vita3k.emulator/files/vita/ux0/user/00/savedata"),
-        GameSaveInfo("PSVita (Vita3k:data)", "Android/data/org.vita3k.emulator/files"),
-        GameSaveInfo("NDS (primary:Emulator/DS)", "Documents/Emulator/DS"),
-        GameSaveInfo("NDS (primary:Emulator/NDS)", "Documents/Emulator/NDS"),
+        GameSaveInfo("PSVita (Vita3k:Data)", "Android/data/org.vita3k.emulator/files"),
+        GameSaveInfo("NDS (primary:EmulatorDS)", "Documents/Emulator/DS"),
+        GameSaveInfo("NDS (primary:EmulatorNDS)", "Documents/Emulator/NDS"),
         GameSaveInfo("NDS (primary:DS)", "DS"),
         GameSaveInfo("NDS (primary:NDS)", "NDS"),
         GameSaveInfo("NDS (primary:MelonDS)", "MelonDS"),
@@ -76,9 +76,35 @@ object GamesManager {
         val storageRoot = Environment.getExternalStorageDirectory()
         val results = mutableListOf<UniversalFile>()
 
+        // 1. Add folders from effective games path
+        val effectivePath = SettingsManager.getEffectiveGamesPath(context)
+        if (effectivePath.isNotEmpty()) {
+            val gamesDir = File(effectivePath)
+            if (gamesDir.exists() && gamesDir.isDirectory) {
+                val children = gamesDir.listFiles()
+                children?.filter { it.isDirectory && !it.name.startsWith(".") }?.forEach { dir ->
+                    results.add(
+                        UniversalFile(
+                            name = dir.name,
+                            isDirectory = true,
+                            lastModified = dir.lastModified(),
+                            length = 0L,
+                            provider = LocalProvider,
+                            providerId = dir.absolutePath,
+                            parentId = "virtual://games_manager"
+                        )
+                    )
+                }
+            }
+        }
+
+        // 2. Add folders from hardcoded list
         for (game in games) {
             if (game.displayName.isEmpty()) continue
             val fullPath = File(storageRoot, game.relativePath)
+            
+            // Skip if already added from custom path
+            if (results.any { it.name == game.displayName || (it.providerId == fullPath.absolutePath) }) continue
             
             val isRestricted = fullPath.absolutePath.lowercase().contains("/android/data")
             
