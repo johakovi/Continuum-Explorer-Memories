@@ -212,10 +212,11 @@ object IconHelper {
 
             Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
                 val isGameSave = file.parentId == "virtual://games_manager"
-                val packageName = if (isGameSave) null else getPackageNameFromPath(file.providerId)
+                val packageName = getPackageNameFromPath(file.providerId, strict = !isGameSave)
+                val isShowingAppIcon = packageName != null && iconTheme != IconTheme.MATERIAL
                 
-                if (packageName != null && iconTheme != IconTheme.MATERIAL) {
-                    AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
+                if (isShowingAppIcon) {
+                    AppIcon(packageName!!, fallbackPainter = painterResource(id = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
                 } else {
                     val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
                     Icon(
@@ -226,7 +227,7 @@ object IconHelper {
                     )
                 }
 
-                if (overlayRes != null) {
+                if (overlayRes != null && !isShowingAppIcon) {
                     val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
                         when (overlayRes) {
                             R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
@@ -715,12 +716,15 @@ object IconHelper {
 
     // --- Utilities ---
 
-    fun getPackageNameFromPath(path: String): String? {
+    fun getPackageNameFromPath(path: String, strict: Boolean = true): String? {
         val normalizedPath = path.replace("\\", "/").lowercase()
         if (normalizedPath.contains("android/data/") || normalizedPath.contains("android/obb/")) {
-            val segments = normalizedPath.split("/")
+            val segments = normalizedPath.split("/").filter { it.isNotEmpty() }
             val dataIndex = segments.indexOfFirst { it == "data" || it == "obb" }
             if (dataIndex != -1 && dataIndex + 1 < segments.size) {
+                if (strict && dataIndex + 1 != segments.size - 1) {
+                    return null
+                }
                 val potentialPackage = segments[dataIndex + 1]
                 // Package names usually have at least one dot and don't start with it
                 if (potentialPackage.contains(".") && !potentialPackage.startsWith(".")) {

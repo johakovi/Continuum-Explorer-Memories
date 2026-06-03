@@ -17,7 +17,7 @@ object GamesManager {
         GameSaveInfo("Endling", "Android/data/com.hg.endling/files/UE4Game/Endling/Endling/Saved/SaveGames"),
         GameSaveInfo("SENTINEL519", "Android/data/com.AppyBearStudio.SENTINEL519/files/"),
         GameSaveInfo("Stardew Valley", "Android/data/com.chucklefish.stardewvalley/files/Saves"),
-        GameSaveInfo("PSP (savedata:)", "PPSSPP/PSP/SAVEDATA"),
+        GameSaveInfo("PSP (savedata:PPSSPP)", "PPSSPP/PSP/SAVEDATA"),
         GameSaveInfo("PSP (savedata:PSP)", "PSP/PSP/SAVEDATA"),
         GameSaveInfo("PSP (savedata:Emulator)", "Documents/Emulator/PSP/SAVEDATA"),
         GameSaveInfo("PSP (data:Emulator)", "Documents/Emulator/PSP"),
@@ -107,7 +107,7 @@ object GamesManager {
             if (results.any { it.name == game.displayName || (it.providerId == fullPath.absolutePath) }) continue
             
             val isRestricted = fullPath.absolutePath.lowercase().contains("/android/data")
-            
+
             if (isRestricted) {
                 if (ShizukuManager.hasPermission()) {
                     if (ShizukuProvider.exists(fullPath.absolutePath)) {
@@ -161,7 +161,7 @@ object GamesManager {
                 val doc = DocumentFile.fromTreeUri(context, uri)
                 if (doc != null && doc.exists()) {
                     val decodedUri = Uri.decode(uri.toString())
-                    val packageName = IconHelper.getPackageNameFromPath(decodedUri)
+                    val packageName = IconHelper.getPackageNameFromPath(decodedUri, strict = false)
                     val appName = packageName?.let { IconHelper.getAppName(context, it) }
                     
                     results.add(
