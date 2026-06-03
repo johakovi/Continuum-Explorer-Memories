@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.utils
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
 import com.troikoss.continuum_explorer.R
@@ -11,6 +12,7 @@ import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.UndoManager
 import com.troikoss.continuum_explorer.ui.activities.MainActivity
+import com.troikoss.continuum_explorer.ui.activities.NewWindowActivity
 import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -72,10 +74,7 @@ fun FileExplorerState.openInNewTab(items: List<UniversalFile>) {
 
 fun FileExplorerState.openInNewWindow(items: List<UniversalFile>) {
     if (items.isEmpty()) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+        val intent = Intent(context, NewWindowActivity::class.java).apply {
             when {
                 libraryItem == LibraryItem.Recent -> putExtra("isRecent", true)
                 libraryItem == LibraryItem.Gallery -> putExtra("isGallery", true)
@@ -89,10 +88,7 @@ fun FileExplorerState.openInNewWindow(items: List<UniversalFile>) {
         items.filter { it.isDirectory || (ZipUtils.isArchive(it) && it.fileRef != null && SettingsManager.isDefaultArchiveViewerEnabled.value) }.forEach { item ->
             val itemFileRef = item.fileRef
             val itemDocRef = item.documentFileRef
-            val intent = Intent(context, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+            val intent = Intent(context, NewWindowActivity::class.java).apply {
                 if (ZipUtils.isArchive(item) && SettingsManager.isDefaultArchiveViewerEnabled.value) {
                     if (itemFileRef != null) {
                         putExtra("archivePath", itemFileRef.absolutePath)

@@ -43,6 +43,11 @@ object GamesManager {
         GameSaveInfo("NDS (primary:DS)", "DS"),
         GameSaveInfo("NDS (primary:NDS)", "NDS"),
         GameSaveInfo("NDS (primary:MelonDS)", "MelonDS"),
+        GameSaveInfo("Zalith Launcher (Minecraft)", "Android/data/com.movtery.zalithlauncher.v2/files/.minecraft"),
+        GameSaveInfo("DuckStation", "Android/data/com.github.stenzek.duckstation/files"),
+        GameSaveInfo("Bomb Squad", "Android/data/net.froemling.bombsquad/files/mods"),
+        GameSaveInfo("Neverless to Everless (Selfie)", "Android/data/com.hottagames.nte/files/Selfie"),
+
     )
 
     fun hasAnyGame(context: Context): Boolean {

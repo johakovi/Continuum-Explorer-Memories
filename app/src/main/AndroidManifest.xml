@@ -32,20 +32,28 @@
         <activity
             android:name=".ui.activities.MainActivity"
             android:exported="true"
-            android:launchMode="standard"
-            android:documentLaunchMode="always"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
             android:theme="@style/Theme.FileExplorer2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <activity
+            android:name=".ui.activities.NewWindowActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:documentLaunchMode="always"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
+            android:theme="@style/Theme.FileExplorer2">
             <intent-filter>
                 <action android:name="com.troikoss.continuum_explorer.OPEN_NEW_WINDOW" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
 
         <activity

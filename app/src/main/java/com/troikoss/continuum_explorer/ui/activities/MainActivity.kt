@@ -31,7 +31,7 @@ import rikka.shizuku.Shizuku
 import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.managers.CleanupManager
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
 
     private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         if (grantResult == PackageManager.PERMISSION_GRANTED) {
