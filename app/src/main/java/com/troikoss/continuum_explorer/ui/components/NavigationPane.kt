@@ -592,7 +592,8 @@ fun NavigationPane(
                                 appState = appState,
                                 currentWidth = currentWidth,
                                 section = NavSection.Games,
-                                isMinimized = isMinimized
+                                isMinimized = isMinimized,
+                                onAddStorageClick = onAddStorageClick
                             )
                         }
                     }
@@ -889,7 +890,8 @@ private fun NavContextMenu(
     section: NavSection? = null,
     onRemove: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
-    onNavigate: (() -> Unit)? = null
+    onNavigate: (() -> Unit)? = null,
+    onAddStorageClick: (() -> Unit)? = null
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -897,6 +899,21 @@ private fun NavContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
+        if (section == NavSection.Games) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.nav_add_storage)) },
+                onClick = {
+                    onDismissRequest()
+                    if (onAddStorageClick != null) {
+                        appState.isAddingGameShortcut = true
+                        onAddStorageClick()
+                    }
+                },
+                leadingIcon = { Icon(Icons.Default.Add, null) }
+            )
+            HorizontalDivider()
+        }
+
         if (onNavigate != null) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.menu_open)) },
@@ -1033,7 +1050,8 @@ private fun NavItem(
     section: NavSection? = null,
     customIcon: Int? = null,
     isMinimized: Boolean = false,
-    badge: (@Composable () -> Unit)? = null
+    badge: (@Composable () -> Unit)? = null,
+    onAddStorageClick: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero)}
@@ -1121,7 +1139,8 @@ private fun NavItem(
                 onDismissRequest = { expanded = false },
                 appState = appState,
                 section = section,
-                onNavigate = onClick
+                onNavigate = onClick,
+                onAddStorageClick = onAddStorageClick
             )
         }
     }

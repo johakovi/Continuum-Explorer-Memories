@@ -36,6 +36,7 @@ data class ExtendedColors(
     val filesIcon: Color,
     val documentsIcon: Color,
     val gameIcon: Color,
+    val gameShortcutIcon: Color,
     val recycleBinIcon: Color,
     val downloadsIcon: Color,
     val zipIcon: Color,
@@ -49,6 +50,7 @@ data class ExtendedColors(
     val recentIconDuo: Color,
     val documentsIconDuo: Color,
     val gameIconDuo: Color,
+    val gameShortcutIconDuo: Color,
     val galleryIconDuo: Color,
     val recycleBinIconDuo: Color,
     val downloadsIconDuo: Color,
@@ -226,6 +228,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
                     else -> VeryDarkIcons
                 },
+                gameShortcutIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> VeryDarkIcons
+                },
                 recycleBinIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeRecycleBin
                     IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
@@ -279,6 +286,7 @@ fun FileExplorerTheme(
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryDarkIcons,
                 documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryDarkIcons,
                 gameIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else VeryDarkIcons,
+                gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryDarkIcons,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryDarkIcons,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryDarkIcons,
@@ -328,6 +336,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
                     else -> VeryLightIcons
                 },
+                gameShortcutIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> VeryLightIcons
+                },
                 recycleBinIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeRecycleBin
                     IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
@@ -375,6 +388,7 @@ fun FileExplorerTheme(
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryLightIcons,
                 documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryLightIcons,
                 gameIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else VeryLightIcons,
+                gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryLightIcons,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryLightIcons,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryLightIcons,
@@ -440,6 +454,11 @@ fun FileExplorerTheme(
                     IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
                     else -> primary
                 },
+                gameShortcutIcon = when (iconTheme) {
+                    IconTheme.COLOURFUL -> ThemeXls
+                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
+                    else -> primary
+                },
                 recycleBinIcon = when (iconTheme) {
                     IconTheme.COLOURFUL -> ThemeRecycleBin
                     IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
@@ -490,6 +509,7 @@ fun FileExplorerTheme(
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
                 documentsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else primary,
                 gameIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else primary,
+                gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else primary,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else primary,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else primary,

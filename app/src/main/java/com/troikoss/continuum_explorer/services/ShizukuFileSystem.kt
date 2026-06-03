@@ -109,7 +109,10 @@ class ShizukuFtpFile(
 
 class GamesFileSystemView(private val context: android.content.Context, private val user: User) : FileSystemView {
     private var currDir = "/"
-    private val games by lazy { com.troikoss.continuum_explorer.managers.GamesManager.getGames(context) }
+    private val games by lazy {
+        val appConfigs = com.troikoss.continuum_explorer.utils.AppConfigurations(context)
+        com.troikoss.continuum_explorer.managers.GamesManager.getGames(context, appConfigs)
+    }
 
     override fun getHomeDirectory(): FtpFile = VirtualRootFtpFile(games, user)
     override fun getWorkingDirectory(): FtpFile = getFile(currDir)
@@ -179,7 +182,7 @@ class VirtualRootFtpFile(private val games: List<com.troikoss.continuum_explorer
     override fun createInputStream(offset: Long): InputStream = throw java.io.IOException("Is directory")
 }
 
-class VirtualGameFolderFile(private val virtualPath: String, private val realPath: String, private val user: User) : FtpFile {
+class VirtualGameFolderFile(private val virtualPath: String, realPath: String, private val user: User) : FtpFile {
     private val wrapped = ShizukuFtpFile(realPath, virtualPath, user)
 
     override fun getAbsolutePath(): String = virtualPath

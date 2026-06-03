@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
  * Handles layout (Grid vs List), selection marquee, and auto-scrolling.
  */
 @Composable
-fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false) {
+fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, onAddStorage: (() -> Unit)? = null) {
     val selectionManager = appState.selectionManager
     val focusRequester = remember { FocusRequester() }
     val density = LocalDensity.current
@@ -382,7 +382,8 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false) 
             BackgroundContextMenu(
                 expanded = showMenu,
                 onDismiss = { showMenu = false },
-                appState = appState
+                appState = appState,
+                onAddStorage = onAddStorage
             )
         }
     }

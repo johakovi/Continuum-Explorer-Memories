@@ -2,6 +2,7 @@ package com.troikoss.continuum_explorer.ui.components
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.net.Uri
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -120,6 +121,22 @@ fun ItemContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
+        if (onlyOneSelected && appState.libraryItem == LibraryItem.Games) {
+            val item = selectedItems.first()
+            if (item.providerId.startsWith("content://")) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_remove)) },
+                    onClick = {
+                        onDismiss()
+                        appState.appConfigs.removeGameSafUri(Uri.parse(item.providerId))
+                        appState.refresh()
+                    },
+                    leadingIcon = { Icon(Icons.Default.Delete, null) }
+                )
+                HorizontalDivider()
+            }
+        }
+
         if (onlyOneSelected) {
             val item = selectedItems.first()
             DropdownMenuItem(
@@ -373,7 +390,8 @@ fun ItemContextMenu(
 fun BackgroundContextMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    appState: FileExplorerState
+    appState: FileExplorerState,
+    onAddStorage: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -404,6 +422,21 @@ fun BackgroundContextMenu(
     ) {
         when (currentScreen) {
             "MAIN" -> {
+                if (appState.libraryItem == LibraryItem.Games) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.nav_add_storage)) },
+                        leadingIcon = { Icon(Icons.Default.Add, null) },
+                        onClick = {
+                            onDismiss()
+                            if (onAddStorage != null) {
+                                appState.isAddingGameShortcut = true
+                                onAddStorage()
+                            }
+                        }
+                    )
+                    HorizontalDivider()
+                }
+
                 if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_new)) },

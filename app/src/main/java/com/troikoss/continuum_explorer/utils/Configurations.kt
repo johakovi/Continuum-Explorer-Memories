@@ -266,6 +266,7 @@ class FolderConfigurations(private val context: Context) {
  */
 class AppConfigurations(private val context: Context) {
     val addedSafUris = mutableStateListOf<Uri>()
+    val gameSafShortcuts = mutableStateListOf<GameShortcut>()
     val favoritePaths = mutableStateListOf<String>()
     val libraryOrder = mutableStateListOf("gallery", "recent", "downloads", "documents", "games_manager", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
@@ -286,6 +287,7 @@ class AppConfigurations(private val context: Context) {
 
     fun reload() {
         loadAddedSafUris()
+        loadGameSafUris()
         loadFavorites()
         loadLibrarySettings()
         loadPaneWidths()
@@ -344,6 +346,67 @@ class AppConfigurations(private val context: Context) {
     fun saveAddedSafUris() {
         val prefs = context.getSharedPreferences("saf_storage", Context.MODE_PRIVATE)
         prefs.edit().putString("ordered_uris", addedSafUris.joinToString("|") { it.toString() }).apply()
+    }
+
+    private fun loadGameSafUris() {
+        val prefs = context.getSharedPreferences("game_saf_storage", Context.MODE_PRIVATE)
+        gameSafShortcuts.clear()
+        val jsonStr = prefs.getString("shortcuts_json", null)
+        if (jsonStr != null && jsonStr.isNotEmpty()) {
+            try {
+                val arr = JSONArray(jsonStr)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    gameSafShortcuts.add(GameShortcut(
+                        uri = Uri.parse(obj.getString("uri")),
+                        name = if (obj.has("name")) obj.getString("name") else null
+                    ))
+                }
+            } catch (_: Exception) {}
+        } else {
+            // Migration from simple URI list
+            val ordered = prefs.getString("ordered_uris", null)
+            if (ordered != null && ordered.isNotEmpty()) {
+                ordered.split("|").forEach { gameSafShortcuts.add(GameShortcut(Uri.parse(it))) }
+                saveGameSafUris()
+            }
+        }
+    }
+
+    fun saveGameSafUris() {
+        val prefs = context.getSharedPreferences("game_saf_storage", Context.MODE_PRIVATE)
+        val arr = JSONArray()
+        gameSafShortcuts.forEach { shortcut ->
+            val obj = JSONObject()
+            obj.put("uri", shortcut.uri.toString())
+            shortcut.name?.let { obj.put("name", it) }
+            arr.put(obj)
+        }
+        prefs.edit().putString("shortcuts_json", arr.toString()).apply()
+    }
+
+    fun addGameSafUri(uri: Uri, name: String? = null) {
+        if (gameSafShortcuts.none { it.uri == uri }) {
+            gameSafShortcuts.add(GameShortcut(uri, name))
+            saveGameSafUris()
+            GlobalEvents.triggerConfigUpdate()
+        }
+    }
+
+    fun removeGameSafUri(uri: Uri) {
+        if (gameSafShortcuts.removeAll { it.uri == uri }) {
+            saveGameSafUris()
+            GlobalEvents.triggerConfigUpdate()
+        }
+    }
+
+    fun renameGameShortcut(uri: Uri, newName: String) {
+        val index = gameSafShortcuts.indexOfFirst { it.uri == uri }
+        if (index != -1) {
+            gameSafShortcuts[index] = gameSafShortcuts[index].copy(name = newName)
+            saveGameSafUris()
+            GlobalEvents.triggerConfigUpdate()
+        }
     }
 
     fun moveSafUri(fromIndex: Int, toIndex: Int) {

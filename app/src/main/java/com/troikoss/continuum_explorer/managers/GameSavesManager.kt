@@ -1,10 +1,15 @@
 package com.troikoss.continuum_explorer.managers
 
 import android.content.Context
+import android.net.Uri
 import android.os.Environment
+import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.providers.SafProvider
 import com.troikoss.continuum_explorer.providers.ShizukuProvider
+import com.troikoss.continuum_explorer.utils.AppConfigurations
+import com.troikoss.continuum_explorer.utils.IconHelper
 import java.io.File
 
 object GamesManager {
@@ -67,7 +72,7 @@ object GamesManager {
         return false
     }
 
-    fun getGames(context: Context): List<UniversalFile> {
+    fun getGames(context: Context, appConfigs: AppConfigurations): List<UniversalFile> {
         val storageRoot = Environment.getExternalStorageDirectory()
         val results = mutableListOf<UniversalFile>()
 
@@ -122,6 +127,34 @@ object GamesManager {
                 )
             }
         }
+
+        // Add SAF shortcuts
+        for (shortcut in appConfigs.gameSafShortcuts) {
+            val uri = shortcut.uri
+            try {
+                val doc = DocumentFile.fromTreeUri(context, uri)
+                if (doc != null && doc.exists()) {
+                    val decodedUri = Uri.decode(uri.toString())
+                    val packageName = IconHelper.getPackageNameFromPath(decodedUri)
+                    val appName = packageName?.let { IconHelper.getAppName(context, it) }
+                    
+                    results.add(
+                        UniversalFile(
+                            name = shortcut.name ?: appName ?: doc.name ?: uri.toString(),
+                            isDirectory = true,
+                            lastModified = doc.lastModified(),
+                            length = 0L,
+                            provider = SafProvider,
+                            providerId = uri.toString(),
+                            parentId = "virtual://games_manager"
+                        )
+                    )
+                }
+            } catch (_: Exception) {
+                // Ignore
+            }
+        }
+
         return results
     }
 

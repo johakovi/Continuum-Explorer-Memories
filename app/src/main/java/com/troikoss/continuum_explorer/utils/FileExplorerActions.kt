@@ -283,6 +283,13 @@ fun FileExplorerState.renameSelection() {
 }
 
 fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
+    if (target.parentId == "virtual://games_manager" && target.providerId.startsWith("content://")) {
+        appConfigs.renameGameShortcut(Uri.parse(target.providerId), newName)
+        refresh()
+        selectionManager.clear()
+        return
+    }
+
     FileOperationsManager.start()
     FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
     FileOperationsManager.currentFileName.value = target.name

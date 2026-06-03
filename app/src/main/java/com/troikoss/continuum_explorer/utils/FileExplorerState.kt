@@ -98,6 +98,9 @@ class FileExplorerState(
     // Flag indicating if a system drag is currently active.
     val isSystemDragActive = mutableStateOf(false)
 
+    // Flag for adding game shortcuts
+    var isAddingGameShortcut by mutableStateOf(false)
+
     // Centralized selection manager
     val selectionManager = SelectionManager()
 
@@ -409,13 +412,24 @@ class FileExplorerState(
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
 
-            if (!appConfigs.addedSafUris.contains(uri)) {
-                appConfigs.addedSafUris.add(uri)
-                appConfigs.saveAddedSafUris()
-            }
+            if (isAddingGameShortcut) {
+                val decodedUri = Uri.decode(uri.toString())
+                val packageName = IconHelper.getPackageNameFromPath(decodedUri)
+                val appName = packageName?.let { IconHelper.getAppName(context, it) }
+                appConfigs.addGameSafUri(uri, appName)
+                isAddingGameShortcut = false
+                refresh()
+            } else {
+                if (!appConfigs.addedSafUris.contains(uri)) {
+                    appConfigs.addedSafUris.add(uri)
+                    appConfigs.saveAddedSafUris()
+                }
 
-            safStack.clear()
-            navigateTo(null, uri)
+                safStack.clear()
+                navigateTo(null, uri)
+            }
+        } else {
+            isAddingGameShortcut = false
         }
     }
 
@@ -476,7 +490,7 @@ class FileExplorerState(
                     LibraryItem.Recent -> RecentFilesManager.getRecentFiles(context)
                     LibraryItem.Downloads -> DownloadsManager.getDownloadsFiles(context)
                     LibraryItem.Documents -> DocumentsManager.getDocumentsFiles(context)
-                    LibraryItem.Games -> GamesManager.getGames(context)
+                    LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context)

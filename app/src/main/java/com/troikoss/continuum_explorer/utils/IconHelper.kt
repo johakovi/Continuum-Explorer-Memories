@@ -8,7 +8,9 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfRenderer
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -169,7 +171,11 @@ object IconHelper {
                     file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
                     file.parentId == "virtual://games_manager" -> {
                         val isEmulator = EMULATOR_FOLDERS.any { file.name.contains(it, ignoreCase = true) }
-                        if (isEmulator) extendedColors.recentIcon else extendedColors.gameIcon
+                        when {
+                            file.provider == com.troikoss.continuum_explorer.providers.SafProvider -> extendedColors.gameShortcutIcon
+                            isEmulator -> extendedColors.recentIcon
+                            else -> extendedColors.gameIcon
+                        }
                     }
                     else -> extendedColors.folderIcon
                 }
@@ -293,6 +299,7 @@ object IconHelper {
                 file.providerId == "virtual://documents" -> Icons.Default.Description
                 file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> Icons.Default.Collections
                 file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> Icons.Default.Delete
+                file.parentId == "virtual://games_manager" -> Icons.AutoMirrored.Filled.ListAlt
                 else -> Icons.Default.Folder
             }
         }
@@ -348,6 +355,7 @@ object IconHelper {
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
                 file.providerId == "virtual://games_manager" -> R.drawable.ic_nav_game
+                file.parentId == "virtual://games_manager" -> R.drawable.ic_nav_game
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
                 else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
@@ -708,16 +716,33 @@ object IconHelper {
     // --- Utilities ---
 
     fun getPackageNameFromPath(path: String): String? {
-        val lowercasePath = path.replace("\\", "/").lowercase()
-        if (lowercasePath.contains("/android/data/")) {
-            val segments = path.replace("\\", "/").split("/")
-            val dataIndex = segments.indexOfFirst { it.equals("data", ignoreCase = true) }
+        val normalizedPath = path.replace("\\", "/").lowercase()
+        if (normalizedPath.contains("android/data/") || normalizedPath.contains("android/obb/")) {
+            val segments = normalizedPath.split("/")
+            val dataIndex = segments.indexOfFirst { it == "data" || it == "obb" }
             if (dataIndex != -1 && dataIndex + 1 < segments.size) {
                 val potentialPackage = segments[dataIndex + 1]
-                if (potentialPackage.contains(".")) return potentialPackage
+                // Package names usually have at least one dot and don't start with it
+                if (potentialPackage.contains(".") && !potentialPackage.startsWith(".")) {
+                    return potentialPackage
+                }
             }
         }
         return null
+    }
+
+    fun getAppName(context: Context, packageName: String): String? {
+        return try {
+            val pm = context.packageManager
+            val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(0))
+            } else {
+                pm.getApplicationInfo(packageName, 0)
+            }
+            pm.getApplicationLabel(info).toString()
+        } catch (_: Exception) {
+            null
+        }
     }
 
     fun getFolderBitmap(context: Context, path: String, name: String): Bitmap {

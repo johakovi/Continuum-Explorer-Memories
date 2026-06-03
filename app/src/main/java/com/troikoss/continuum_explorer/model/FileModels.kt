@@ -151,3 +151,5 @@ data class NetworkConnection(
     val sftpPrivateKeyPassphrase: String = "",
     val sftpPrivateKey: String = "",
 )
+
+data class GameShortcut(val uri: Uri, val name: String? = null)

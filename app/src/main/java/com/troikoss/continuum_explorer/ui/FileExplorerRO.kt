@@ -522,7 +522,7 @@ private fun ExplorerBody(
                 .padding(top = 2.dp)
                 .then(if (contentIsRounded) Modifier.padding(8.dp) else Modifier)
             ) {
-                FileContent(appState = appState, isInWindowMode = isInWindowMode)
+                FileContent(appState = appState, isInWindowMode = isInWindowMode, onAddStorage = onAddStorage)
             }
 
             // Details Pane
