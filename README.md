@@ -50,6 +50,8 @@ More organized theme settings.
 
 ## Recommended apps and sources
 
+Advanced System Monitor [Pensum](https://github.com/troikoss/Pensum) by troikoss
+
 Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-ios/)
 
 List of other FOSS [apps](https://github.com/offa/android-foss#-document--pdf-viewer)
