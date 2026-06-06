@@ -66,3 +66,7 @@ then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-M
 Let me know if there is something you want to this app!
 Like example theme integration for other android dekstop interfaces or other useful integrated apps/operations!
 
+
+[<img width="250" height="115" alt="ResizedImage_2026-06-06_21-34-05_9458" src="https://github.com/user-attachments/assets/ac4a76a6-62e8-447a-a89d-3842c5a97e8b" />](https://ko-fi.com/johakovi/tip)
+
+
