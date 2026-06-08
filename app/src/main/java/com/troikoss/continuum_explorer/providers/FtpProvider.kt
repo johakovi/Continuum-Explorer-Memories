@@ -322,6 +322,29 @@ class FtpProvider(
         }
     }
 
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
+        mutex.withLock {
+            val c = ensureConnected()
+            val oldPath = pathOf(id)
+            val newPath = joinPath(pathOf(destParentId), destName)
+            
+            // Determine if it's a directory before moving
+            val isDir = try {
+                val current = c.printWorkingDirectory()
+                val changed = c.changeWorkingDirectory(oldPath)
+                if (changed) c.changeWorkingDirectory(current)
+                changed
+            } catch (_: Exception) { false }
+
+            if (!c.rename(oldPath, newPath)) return@withLock null
+            UniversalFile(
+                name = destName, isDirectory = isDir,
+                lastModified = System.currentTimeMillis(), length = 0,
+                provider = this@FtpProvider, providerId = makeId(newPath), parentId = destParentId
+            )
+        }
+    }
+
     override fun rename(id: String, newName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
         mutex.withLock {
             val c = ensureConnected()

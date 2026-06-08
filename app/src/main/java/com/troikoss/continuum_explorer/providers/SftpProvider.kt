@@ -390,6 +390,26 @@ class SftpProvider(
         }
     }
 
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
+        mutex.withLock {
+            val oldPath = pathOf(id)
+            val newPath = joinPath(pathOf(destParentId), destName)
+            val wasDir = runCatching { withSftpConnection { c -> c.lstat(oldPath).isDir } }.getOrDefault(false)
+            try {
+                withSftpConnection { c -> c.rename(oldPath, newPath) }
+                UniversalFile(
+                    name = destName,
+                    isDirectory = wasDir,
+                    lastModified = System.currentTimeMillis(),
+                    length = 0,
+                    provider = this@SftpProvider,
+                    providerId = makeId(newPath),
+                    parentId = destParentId,
+                )
+            } catch (_: Exception) { null }
+        }
+    }
+
     override fun rename(id: String, newName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
         mutex.withLock {
             val oldPath = pathOf(id)

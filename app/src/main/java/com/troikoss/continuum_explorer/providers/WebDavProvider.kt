@@ -235,6 +235,21 @@ class WebDavProvider(
         } catch (_: Exception) { false }
     }
 
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
+        try {
+            val oldUrl = urlOf(id)
+            val isDir = id.endsWith("/")
+            val newPath = "${pathOf(destParentId).trimEnd('/')}/$destName${if (isDir) "/" else ""}"
+            val destUrl = urlOf(makeId(newPath))
+            DavResource(httpClient, oldUrl).move(destUrl, true) {}
+            UniversalFile(
+                name = destName, isDirectory = isDir,
+                lastModified = System.currentTimeMillis(), length = 0,
+                provider = this@WebDavProvider, providerId = makeId(newPath), parentId = destParentId
+            )
+        } catch (_: Exception) { null }
+    }
+
     override fun rename(id: String, newName: String): UniversalFile? = runBlocking(Dispatchers.IO) {
         try {
             val oldUrl = urlOf(id)

@@ -304,6 +304,44 @@ class SmbProvider(
         } catch (_: Exception) { false }
     }
 
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? {
+        return try {
+            val share = ensureShare()
+            val oldPath = idToPath(id).replace('/', '\\')
+            val destParentPath = idToPath(destParentId).replace('/', '\\')
+            val newPath = if (destParentPath.isEmpty()) destName else "$destParentPath\\$destName"
+            val isDir = share.folderExists(oldPath)
+            
+            val accessMask = if (isDir) {
+                EnumSet.of(AccessMask.GENERIC_ALL)
+            } else {
+                EnumSet.of(AccessMask.GENERIC_READ, AccessMask.GENERIC_WRITE, AccessMask.DELETE)
+            }
+            val createOpts = if (isDir) EnumSet.of(SMB2CreateOptions.FILE_DIRECTORY_FILE) else null
+            
+            share.openFile(
+                oldPath,
+                accessMask,
+                null,
+                EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ, SMB2ShareAccess.FILE_SHARE_WRITE, SMB2ShareAccess.FILE_SHARE_DELETE),
+                SMB2CreateDisposition.FILE_OPEN,
+                createOpts
+            ).use { it.rename(newPath) }
+
+            UniversalFile(
+                name = destName,
+                isDirectory = isDir,
+                lastModified = System.currentTimeMillis(),
+                length = 0L,
+                provider = this,
+                providerId = pathToId(newPath.replace('\\', '/')),
+                parentId = destParentId,
+            )
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     override fun rename(id: String, newName: String): UniversalFile? {
         return try {
             val share = ensureShare()

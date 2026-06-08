@@ -95,6 +95,30 @@ object SafProvider : StorageProvider {
         return if (doc.renameTo(newName)) docFromId(id)?.toUniversalFile() else null
     }
 
+    override fun move(id: String, destParentId: String, destName: String): UniversalFile? {
+        val sourceDoc = docFromId(id) ?: return null
+        val sourceParentUri = sourceDoc.parentFile?.uri ?: Uri.parse(parentId(id) ?: return null)
+        val destParentDoc = docFromId(destParentId) ?: return null
+
+        return try {
+            val resultUri = android.provider.DocumentsContract.moveDocument(
+                appContext.contentResolver,
+                sourceDoc.uri,
+                sourceParentUri,
+                destParentDoc.uri
+            )
+            if (resultUri != null) {
+                val finalDoc = DocumentFile.fromSingleUri(appContext, resultUri)
+                if (finalDoc?.name != destName) {
+                    finalDoc?.renameTo(destName)
+                }
+                docFromId(resultUri.toString())?.toUniversalFile()
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun getDiskInfo(uri: Uri): Pair<Long, Long>? {
         return try {
             val authority = uri.authority ?: return null

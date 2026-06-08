@@ -105,6 +105,7 @@ suspend fun pasteFromClipboard(
     val clipData = preloadedClipData ?: clipboard.primaryClip
     val pastedFileNames = mutableListOf<String>()
     val pasteLog = mutableListOf<Pair<String, String>>() // For Undo: Source to Dest
+    val movedPaths = mutableSetOf<String>() // Track which files were moved vs copied
 
     if (clipData == null || clipData.itemCount == 0) {
         withContext(Dispatchers.Main) {
@@ -227,25 +228,66 @@ suspend fun pasteFromClipboard(
             }
 
             try {
-                // Optimization: Use direct Move/Copy if it's local-to-local and restricted (for speed and permission support)
+                // Determine destination provider and parent ID for comparison
+                val finalDestProvider = when {
+                    currentPath != null -> LocalProvider
+                    currentSafUri != null -> SafProvider
+                    destProvider != null -> destProvider
+                    else -> null
+                }
+                val finalDestParentId = when {
+                    currentPath != null -> currentPath.absolutePath
+                    currentSafUri != null -> currentSafUri.toString()
+                    destProvider != null -> destParentId
+                    else -> null
+                }
+
+                // Optimization 1: Use direct Move/Copy if it's the SAME connection/provider instance
+                val isSameProvider = finalDestProvider != null &&
+                    (sourceFile.provider === finalDestProvider ||
+                     (sourceFile.provider.kind == finalDestProvider.kind &&
+                      sourceFile.provider.connectionId == finalDestProvider.connectionId))
+
+                if (isSameProvider && finalDestParentId != null) {
+                    val result = if (isMove) {
+                        finalDestProvider.move(sourceFile.providerId, finalDestParentId, sourceFile.name)
+                    } else if (!sourceFile.isDirectory) {
+                        // Only auto-copy files if the provider supports it; otherwise fall through to copyRecursively
+                        finalDestProvider.copy(sourceFile.providerId, finalDestParentId, sourceFile.name)
+                    } else null
+
+                    if (result != null) {
+                        pastedFileNames.add(sourceFile.name)
+                        pasteLog.add(sourceFile.providerId to result.providerId)
+                        if (isMove) movedPaths.add(sourceFile.providerId)
+                        if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
+                        withContext(Dispatchers.Main) {
+                            FileOperationsManager.itemsProcessed.intValue = i + 1
+                        }
+                        continue
+                    }
+                }
+
+                // Optimization 2: Use direct Move/Copy if it's local-to-local and restricted (for speed and permission support)
                 val isSourceLocal = sourceFile.provider is LocalProvider || sourceFile.provider is ShizukuProvider
                 val isDestLocal = (currentPath != null) || (destProvider is LocalProvider || destProvider is ShizukuProvider)
 
-                if (isSourceLocal && isDestLocal && !sourceFile.isDirectory) {
+                if (isSourceLocal && isDestLocal) {
                     val destPid = currentPath?.absolutePath ?: destParentId!!
                     val provider = if (currentPath != null) LocalProvider else destProvider!!
 
                     if (RestrictedCache.isRestrictedPath(sourceFile.providerId) || RestrictedCache.isRestrictedPath(destPid)) {
                         val result = if (isMove) {
                             provider.move(sourceFile.providerId, destPid, sourceFile.name)
-                        } else {
+                        } else if (!sourceFile.isDirectory) {
                             provider.copy(sourceFile.providerId, destPid, sourceFile.name)
-                        }
+                        } else null
 
                         if (result != null) {
                             pastedFileNames.add(sourceFile.name)
                             pasteLog.add(sourceFile.providerId to result.providerId)
-                            globalBytesCopied += sourceFile.length
+                            if (isMove) movedPaths.add(sourceFile.providerId)
+                            if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
                             withContext(Dispatchers.Main) {
                                 FileOperationsManager.itemsProcessed.intValue = i + 1
                             }
@@ -340,7 +382,7 @@ suspend fun pasteFromClipboard(
         if (isMove && pastedFileNames.isNotEmpty() && !FileOperationsManager.isCancelled.value) {
             val successfullyCopiedPaths = pasteLog.map { it.first }.toSet()
             PendingCut.files
-                .filter { it.absolutePath in successfullyCopiedPaths }
+                .filter { it.absolutePath in successfullyCopiedPaths && it.absolutePath !in movedPaths }
                 .forEach { file ->
                     try { file.provider.delete(file.providerId) } catch (_: Exception) {}
                 }
