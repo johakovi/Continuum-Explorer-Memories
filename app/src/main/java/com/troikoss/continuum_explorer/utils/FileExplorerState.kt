@@ -332,6 +332,12 @@ class FileExplorerState(
             false
         }
 
+    val canGoBack: Boolean
+        get() = backStack.isNotEmpty()
+
+    val canGoForward: Boolean
+        get() = forwardStack.isNotEmpty()
+
     fun onScrollToItemCompleted() {
         scrollToItemIndex = null
     }

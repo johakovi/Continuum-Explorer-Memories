@@ -231,24 +231,24 @@ fun TopBar(
                     if (!isSmall || !searchBar) Row(verticalAlignment = CenterVertically) {
                         IconButton(
                             onClick = { appState.goBack() },
-                            enabled = appState.backStack.isNotEmpty()
+                            enabled = appState.canGoBack
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.back),
-                                tint = if (appState.backStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                tint = if (appState.canGoBack) MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             )
                         }
 
                         IconButton(
                             onClick = { appState.goForward() },
-                            enabled = appState.forwardStack.isNotEmpty()
+                            enabled = appState.canGoForward
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = stringResource(R.string.forward),
-                                tint = if (appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                tint = if (appState.canGoForward) MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             )
                         }

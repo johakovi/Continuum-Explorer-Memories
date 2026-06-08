@@ -226,10 +226,12 @@ fun FileExplorerSQ(
         appState.triggerLoad()
     }
 
-    BackHandler(enabled = appState.canGoUp || appState.selectionManager.selectedItems.isNotEmpty()) {
+    BackHandler(enabled = appState.canGoBack || appState.selectionManager.selectedItems.isNotEmpty()) {
         if (appState.selectionManager.selectedItems.isNotEmpty()) {
             appState.selectionManager.clear()
-        } else appState.goUp()
+        } else {
+            appState.goBack()
+        }
     }
 
     // --- Main Layout ---
