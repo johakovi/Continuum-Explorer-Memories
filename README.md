@@ -7,6 +7,8 @@ A modern, feature-rich Android application built with a focus on desktop-grade u
 
 Note: This project is forked from troikoss / Continuum Explorer
 
+[**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
+
 <img width="1920" height="1080" alt="Screenshot_20260523_235854_Continuum Explorer" src="https://github.com/user-attachments/assets/2cba7ee0-5757-4c15-92c1-508dccff08fa" />
 
 <img width="1920" height="1080" alt="Screenshot_20260523_235818_Continuum Explorer" src="https://github.com/user-attachments/assets/3d84a09f-118a-49e3-8204-e9e1a49a04e2" />
@@ -48,6 +50,8 @@ More organized theme settings.
 
 ## Recommended apps and sources
 
+Advanced System Monitor [Pensum](https://github.com/troikoss/Pensum) by troikoss
+
 Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-ios/)
 
 List of other FOSS [apps](https://github.com/offa/android-foss#-document--pdf-viewer)
@@ -61,4 +65,8 @@ then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-M
  ## More features?
 Let me know if there is something you want to this app!
 Like example theme integration for other android dekstop interfaces or other useful integrated apps/operations!
+
+
+[<img width="250" height="115" alt="ResizedImage_2026-06-06_21-34-05_9458" src="https://github.com/user-attachments/assets/ac4a76a6-62e8-447a-a89d-3842c5a97e8b" />](https://ko-fi.com/johakovi/tip)
+
 
