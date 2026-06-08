@@ -51,6 +51,8 @@ class PdfViewerActivity : AppCompatActivity() {
         val root = findViewById<ViewGroup>(R.id.main_root)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         val fab = findViewById<FloatingActionButton>(R.id.fab_search)
+        val fabBack = findViewById<FloatingActionButton>(R.id.fab_back)
+        val fabContents = findViewById<FloatingActionButton>(R.id.fab_contents)
         val container = findViewById<ViewGroup>(R.id.pdf_container)
 
         setSupportActionBar(toolbar)
@@ -63,7 +65,20 @@ class PdfViewerActivity : AppCompatActivity() {
                 bottomMargin = systemBars.bottom + (16 * resources.displayMetrics.density).toInt()
                 rightMargin = systemBars.right + (16 * resources.displayMetrics.density).toInt()
             }
-            container.updatePadding(bottom = systemBars.bottom)
+            fabBack.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = systemBars.top + (16 * resources.displayMetrics.density).toInt()
+                leftMargin = systemBars.left + (16 * resources.displayMetrics.density).toInt()
+            }
+            fabContents.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = systemBars.bottom + (16 * resources.displayMetrics.density).toInt()
+                leftMargin = systemBars.left + (16 * resources.displayMetrics.density).toInt()
+            }
+            container.updatePadding(
+                left = systemBars.left,
+                top = systemBars.top,
+                right = systemBars.right,
+                bottom = systemBars.bottom
+            )
             windowInsets
         }
 
@@ -110,6 +125,39 @@ class PdfViewerActivity : AppCompatActivity() {
         fab.setOnClickListener {
             updateSearchUi(true)
         }
+        fabBack.setOnClickListener {
+            finish()
+        }
+        fabContents.setOnClickListener {
+            showPageSelector()
+        }
+    }
+
+    private fun showPageSelector() {
+        val fragment = pdfViewerFragment ?: return
+        val uri = intent.data ?: return
+        
+        // Toggle the fragment's built-in toolbox (navigation/thumbnails)
+        fragment.isToolboxVisible = !fragment.isToolboxVisible
+
+        // Show a popup with document details (Pages etc.)
+        val fileName = uri.lastPathSegment ?: "Unknown"
+        var pageCountText = "Unknown"
+        try {
+            contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+                val renderer = android.graphics.pdf.PdfRenderer(pfd)
+                pageCountText = renderer.pageCount.toString()
+                renderer.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.pdf_contents)
+            .setMessage("File: $fileName\nPages: $pageCountText")
+            .setPositiveButton(R.string.ok, null)
+            .show()
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -183,17 +231,23 @@ class PdfViewerActivity : AppCompatActivity() {
         }
         
         val fab = findViewById<FloatingActionButton>(R.id.fab_search)
+        val fabBack = findViewById<FloatingActionButton>(R.id.fab_back)
+        val fabContents = findViewById<FloatingActionButton>(R.id.fab_contents)
         val appBar = findViewById<AppBarLayout>(R.id.app_bar)
         
         if (active) {
             fab.hide()
+            fabBack.hide()
+            fabContents.hide()
             appBar.visibility = View.GONE
             // Start polling to detect if the user closes search via library UI
             handler.removeCallbacks(searchSyncRunnable)
             handler.postDelayed(searchSyncRunnable, 500)
         } else {
             fab.show()
-            appBar.visibility = View.VISIBLE
+            fabBack.show()
+            fabContents.show()
+            appBar.visibility = View.GONE
             handler.removeCallbacks(searchSyncRunnable)
         }
         

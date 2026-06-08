@@ -12,6 +12,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="back">Back</string>
+    <string name="pdf_contents">Contents</string>
     <string name="done">Done</string>
     <string name="loading">Loading…</string>
     <string name="calculating">Calculating…</string>

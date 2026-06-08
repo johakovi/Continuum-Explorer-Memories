@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:background="#212121"
         android:fitsSystemWindows="true"
+        android:visibility="gone"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -28,8 +29,27 @@
         android:id="@+id/pdf_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#212121"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:background="#212121" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/back"
+        app:srcCompat="?attr/homeAsUpIndicator" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_contents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/pdf_contents"
+        app:srcCompat="@drawable/ic_nav_documents" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_search"
