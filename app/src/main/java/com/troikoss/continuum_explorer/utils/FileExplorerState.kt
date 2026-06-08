@@ -100,6 +100,7 @@ class FileExplorerState(
 
     // Flag for adding game shortcuts
     var isAddingGameShortcut by mutableStateOf(false)
+    var isConfiguringGalleryFolders by mutableStateOf(false)
 
     // Centralized selection manager
     val selectionManager = SelectionManager()
@@ -425,6 +426,15 @@ class FileExplorerState(
                 appConfigs.addGameSafUri(uri, appName)
                 isAddingGameShortcut = false
                 refresh()
+            } else if (isConfiguringGalleryFolders) {
+                val path = SafUtils.getRawPathFromUri(context, uri)
+                if (path != null) {
+                    val currentFolders = SettingsManager.galleryFolders.value.toMutableSet()
+                    currentFolders.add(path)
+                    SettingsManager.setGalleryFolders(context, currentFolders)
+                }
+                isConfiguringGalleryFolders = false
+                refresh()
             } else {
                 if (!appConfigs.addedSafUris.contains(uri)) {
                     appConfigs.addedSafUris.add(uri)
@@ -499,8 +509,8 @@ class FileExplorerState(
                     LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
-                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context)
-                        else -> GalleryManager.getGalleryFiles(context)
+                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
+                        else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
                     }
                     LibraryItem.RecycleBin -> if (currentPath != null) {
                         val trashRoot = File(Environment.getExternalStorageDirectory(), ".Trash")

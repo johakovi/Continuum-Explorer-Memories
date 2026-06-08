@@ -12,6 +12,7 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="back">Назад</string>
+    <string name="pdf_contents">Содержание</string>
     <string name="done">Готово</string>
     <string name="loading">Загрузка…</string>
     <string name="calculating">Вычисление…</string>
@@ -304,6 +305,8 @@
     <string name="nav_documents">Документы</string>
     <string name="nav_game_saves">Диспетчер игр</string>
     <string name="menu_gallery_albums">Альбомы</string>
+    <string name="menu_gallery_folders">Папки галереи</string>
+    <string name="menu_gallery_show_all">Показать все медиа</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="nav_add_storage">Добавить хранилище</string>
     <string name="nav_internal_storage">Внутренняя память</string>
@@ -476,4 +479,11 @@
 
     <string name="error_restricted_access">Доступ ограничен</string>
     <string name="msg_restricted_access_shizuku">Этот каталог ограничен Android. Пожалуйста, включите и авторизуйте Shizuku для доступа к нему.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">Система и батарея</string>
+    <string name="settings_ftp_inactivity_timeout">Тайм-аут бездействия FTP</string>
+    <string name="settings_app_inactivity_timeout">Тайм-аут бездействия приложения</string>
+    <string name="settings_timeout_minutes">%1$d минут</string>
+    <string name="settings_timeout_disabled">Никогда</string>
 </resources>

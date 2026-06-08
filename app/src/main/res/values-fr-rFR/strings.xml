@@ -13,6 +13,7 @@
     <string name="yes">Oui</string>
     <string name="no">Non</string>
     <string name="back">Retour</string>
+    <string name="pdf_contents">Sommaire</string>
     <string name="done">Terminé</string>
     <string name="loading">Chargement…</string>
     <string name="calculating">Calcul…</string>
@@ -295,7 +296,10 @@
     <string name="nav_downloads">Téléchargements</string>
     <string name="nav_documents">Documents</string>
     <string name="nav_game_saves">Gestionnaire de jeux</string>
-    <string name="nav_add_storage">Ajouter un stockage</string>
+    <string name="menu_gallery_albums">Albums</string>
+    <string name="menu_gallery_folders">Dossiers de la galerie</string>
+    <string name="menu_gallery_show_all">Afficher tous les médias</string>
+    <string name="menu_documents_folder">Dossier</string>    <string name="nav_add_storage">Ajouter un stockage</string>
     <string name="nav_internal_storage">Stockage interne</string>
     <string name="nav_trash">Corbeille</string>
     <string name="nav_external_drive">Lecteur externe</string>
@@ -420,8 +424,6 @@
     <string name="settings_touch_drag_move">Toujours déplacer</string>
     <string name="msg_cancelled_deletion">Suppression annulée</string>
     <string name="msg_deletion">%1$d fichiers supprimés</string>
-    <string name="menu_gallery_albums">Albums</string>
-    <string name="menu_documents_folder">Dossier</string>
     <string name="details_header_type">Type</string>
     <string name="menu_by_type">Par type</string>
     <string name="nav_network">Réseau</string>
@@ -476,4 +478,11 @@
 
     <string name="error_restricted_access">Accès restreint</string>
     <string name="msg_restricted_access_shizuku">Ce répertoire est restreint par Android. Veuillez activer et autoriser Shizuku pour y accéder.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">Système et batterie</string>
+    <string name="settings_ftp_inactivity_timeout">Délai d\'inactivité FTP</string>
+    <string name="settings_app_inactivity_timeout">Délai d\'inactivité de l\'application</string>
+    <string name="settings_timeout_minutes">%1$d minutes</string>
+    <string name="settings_timeout_disabled">Jamais</string>
 </resources>

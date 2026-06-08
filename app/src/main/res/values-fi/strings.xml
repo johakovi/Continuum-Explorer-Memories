@@ -13,6 +13,7 @@
         <string name="yes">Kyllä</string>
         <string name="no">Ei</string>
         <string name="back">Takaisin</string>
+        <string name="pdf_contents">Sisältö</string>
         <string name="done">Valmis</string>
         <string name="loading">Lataa…</string>
         <string name="calculating">Lasketaan…</string>
@@ -305,7 +306,9 @@
         <string name="nav_documents">Asiakirjat</string>
         <string name="nav_game_saves">Pelien hallinta</string>
         <string name="menu_gallery_albums">Albumit</string>
-    <string name="menu_documents_folder">Kansio</string>
+        <string name="menu_gallery_folders">Gallerian kansiot</string>
+        <string name="menu_gallery_show_all">Näytä kaikki mediatiedostot</string>
+        <string name="menu_documents_folder">Kansio</string>
         <string name="nav_add_storage">Lisää tallennustila</string>
         <string name="nav_internal_storage">Sisäinen tallennustila</string>
         <string name="nav_trash">Roskakori</string>
@@ -478,5 +481,12 @@
 
     <string name="error_restricted_access">Pääsy estetty</string>
     <string name="msg_restricted_access_shizuku">Android rajoittaa pääsyä tähän hakemistoon. Ota Shizuku käyttöön ja valtuuta se päästäksesi siihen.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">Järjestelmä &amp; Akku</string>
+    <string name="settings_ftp_inactivity_timeout">FTP:n aikakatkaisu</string>
+    <string name="settings_app_inactivity_timeout">Sovelluksen aikakatkaisu</string>
+    <string name="settings_timeout_minutes">%1$d minuuttia</string>
+    <string name="settings_timeout_disabled">Ei koskaan</string>
 </resources>
 

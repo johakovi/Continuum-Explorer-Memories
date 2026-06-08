@@ -12,6 +12,7 @@
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
     <string name="back">Bakåt</string>
+    <string name="pdf_contents">Innehåll</string>
     <string name="done">Klar</string>
     <string name="loading">Laddar…</string>
     <string name="calculating">Beräknar…</string>
@@ -304,6 +305,8 @@
     <string name="nav_documents">Dokument</string>
     <string name="nav_game_saves">Spelhanterare</string>
     <string name="menu_gallery_albums">Album</string>
+    <string name="menu_gallery_folders">Gallerimappar</string>
+    <string name="menu_gallery_show_all">Visa alla media</string>
     <string name="menu_documents_folder">Mapp</string>
     <string name="nav_add_storage">Lägg till lagring</string>
     <string name="nav_internal_storage">Intern lagring</string>
@@ -477,4 +480,11 @@
 
     <string name="error_restricted_access">Åtkomst begränsad</string>
     <string name="msg_restricted_access_shizuku">Denna mapp är begränsad av Android. Aktivera och auktorisera Shizuku för att få åtkomst.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">System &amp; Batteri</string>
+    <string name="settings_ftp_inactivity_timeout">FTP Inaktivitetstimeout</string>
+    <string name="settings_app_inactivity_timeout">App Inaktivitetstimeout</string>
+    <string name="settings_timeout_minutes">%1$d minuter</string>
+    <string name="settings_timeout_disabled">Aldrig</string>
 </resources>

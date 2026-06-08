@@ -538,7 +538,8 @@ fun NavigationPane(
                                 appState = appState,
                                 currentWidth = currentWidth,
                                 section = NavSection.Gallery,
-                                isMinimized = isMinimized
+                                isMinimized = isMinimized,
+                                onAddStorageClick = onAddStorageClick
                             )
                             "recent" -> NavItem(
                                 label = stringResource(R.string.nav_recent),
@@ -808,6 +809,97 @@ fun NavigationPane(
             )
         }
     }
+
+    if (appState.isConfiguringGalleryFolders) {
+        GalleryFoldersDialog(appState, onAddStorageClick)
+    }
+}
+
+@Composable
+fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
+    val context = LocalContext.current
+    val folders by SettingsManager.galleryFolders
+    val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
+
+    AlertDialog(
+        onDismissRequest = { appState.isConfiguringGalleryFolders = false },
+        title = { Text(stringResource(R.string.menu_gallery_folders)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+                if (!isFilterEnabled) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                    ) {
+                        Text(
+                            "Filtering is currently OFF. Showing all media.",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(8.dp),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+
+                if (folders.isEmpty()) {
+                    Text(
+                        "No folders added. Standard media locations will be used if filtering is enabled.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                } else {
+                    Text(
+                        "Managed Folders:",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                        itemsIndexed(folders.toList()) { _, path ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Folder, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = path,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.weight(1f),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                IconButton(onClick = {
+                                    val newSet = folders.toMutableSet()
+                                    newSet.remove(path)
+                                    SettingsManager.setGalleryFolders(context, newSet)
+                                    appState.refresh()
+                                }) {
+                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(20.dp))
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Button(
+                    onClick = {
+                        onAddFolder()
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Add Folder")
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { appState.isConfiguringGalleryFolders = false }) {
+                Text(stringResource(R.string.done))
+            }
+        }
+    )
 }
 
 @Composable
@@ -910,6 +1002,53 @@ private fun NavContextMenu(
                     }
                 },
                 leadingIcon = { Icon(Icons.Default.Add, null) }
+            )
+            HorizontalDivider()
+        }
+
+        if (section is NavSection.Gallery) {
+            val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
+            val context = LocalContext.current
+
+            DropdownMenuItem(
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.menu_gallery_show_all))
+                        if (!isFilterEnabled) {
+                            Spacer(Modifier.weight(1f))
+                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                },
+                onClick = {
+                    onDismissRequest()
+                    if (isFilterEnabled) {
+                        SettingsManager.setGalleryFilterEnabled(context, false)
+                        appState.refresh()
+                    }
+                },
+                leadingIcon = { Icon(Icons.Default.Collections, null) }
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.menu_gallery_folders))
+                        if (isFilterEnabled) {
+                            Spacer(Modifier.weight(1f))
+                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                },
+                onClick = {
+                    onDismissRequest()
+                    if (!isFilterEnabled) {
+                        SettingsManager.setGalleryFilterEnabled(context, true)
+                        appState.refresh()
+                    }
+                    appState.isConfiguringGalleryFolders = true
+                },
+                leadingIcon = { Icon(Icons.Default.Folder, null) }
             )
             HorizontalDivider()
         }

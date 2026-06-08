@@ -66,7 +66,7 @@ object GalleryManager {
         return mediaFiles
     }
 
-    fun getGalleryFiles(context: Context): List<UniversalFile> {
+    fun getGalleryFiles(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
         val files = mutableListOf<UniversalFile>()
 
         val projection = arrayOf(
@@ -77,23 +77,29 @@ object GalleryManager {
             MediaStore.Files.FileColumns.MIME_TYPE
         )
 
-        val selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ?) AND " +
+        var selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ?) AND " +
                 "${MediaStore.Files.FileColumns.DATA} NOT LIKE ? AND " +
                 "${MediaStore.Files.FileColumns.DATA} NOT LIKE ?"
 
-        val selectionArgs = arrayOf(
+        val baseArgs = mutableListOf(
             "image/%",
             "video/%",
             "%/Android/%",
             "%/.%"
         )
 
+        if (allowedFolders.isNotEmpty()) {
+            val folderPlaceholders = allowedFolders.joinToString(" OR ") { "${MediaStore.Files.FileColumns.DATA} LIKE ?" }
+            selection += " AND ($folderPlaceholders)"
+            allowedFolders.forEach { baseArgs.add("$it%") }
+        }
+
         try {
             val queryUri = MediaStore.Files.getContentUri("external")
 
             val queryArgs = Bundle().apply {
                 putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
-                putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+                putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, baseArgs.toTypedArray())
                 putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC")
             }
 
@@ -128,7 +134,7 @@ object GalleryManager {
         return files
     }
 
-    fun getGalleryAlbums(context: Context): List<UniversalFile> {
+    fun getGalleryAlbums(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
         // Flat list of all folders containing media, keyed by bucket name.
         val albums = linkedMapOf<String, File>()
 
@@ -137,17 +143,23 @@ object GalleryManager {
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
         )
 
-        val selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ?) AND " +
+        var selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ?) AND " +
                 "${MediaStore.Files.FileColumns.DATA} NOT LIKE ? AND " +
                 "${MediaStore.Files.FileColumns.DATA} NOT LIKE ?"
 
-        val selectionArgs = arrayOf("image/%", "video/%", "%/Android/%", "%/.%")
+        val baseArgs = mutableListOf("image/%", "video/%", "%/Android/%", "%/.%")
+
+        if (allowedFolders.isNotEmpty()) {
+            val folderPlaceholders = allowedFolders.joinToString(" OR ") { "${MediaStore.Files.FileColumns.DATA} LIKE ?" }
+            selection += " AND ($folderPlaceholders)"
+            allowedFolders.forEach { baseArgs.add("$it%") }
+        }
 
         try {
             val queryUri = MediaStore.Files.getContentUri("external")
             val queryArgs = Bundle().apply {
                 putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
-                putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+                putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, baseArgs.toTypedArray())
             }
 
             context.contentResolver.query(queryUri, projection, queryArgs, null)?.use { c ->

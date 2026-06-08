@@ -82,6 +82,8 @@ object SettingsManager {
     private const val KEY_FTP_SERVER_MODE = "ftp_server_mode"
     private const val KEY_FTP_INACTIVITY_TIMEOUT = "ftp_inactivity_timeout"
     private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
+    private const val KEY_GALLERY_FOLDERS = "gallery_folders"
+    private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
 
     enum class FtpMode {
         FULL_STORAGE,
@@ -156,6 +158,12 @@ object SettingsManager {
 
     private val _appInactivityTimeout = mutableIntStateOf(5)
     val appInactivityTimeout: State<Int> = _appInactivityTimeout
+
+    private val _galleryFolders = mutableStateOf(setOf<String>())
+    val galleryFolders: State<Set<String>> = _galleryFolders
+
+    private val _isGalleryFilterEnabled = mutableStateOf(false)
+    val isGalleryFilterEnabled: State<Boolean> = _isGalleryFilterEnabled
 
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
@@ -248,6 +256,9 @@ object SettingsManager {
         
         _ftpInactivityTimeout.intValue = prefs.getInt(KEY_FTP_INACTIVITY_TIMEOUT, 5)
         _appInactivityTimeout.intValue = prefs.getInt(KEY_APP_INACTIVITY_TIMEOUT, 5)
+
+        _galleryFolders.value = prefs.getStringSet(KEY_GALLERY_FOLDERS, emptySet()) ?: emptySet()
+        _isGalleryFilterEnabled.value = prefs.getBoolean(KEY_GALLERY_FILTER_ENABLED, false)
 
         val savedFtpMode = prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name
         _ftpMode.value = try {
@@ -496,6 +507,20 @@ object SettingsManager {
         _appInactivityTimeout.intValue = minutes
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putInt(KEY_APP_INACTIVITY_TIMEOUT, minutes).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setGalleryFolders(context: Context, folders: Set<String>) {
+        _galleryFolders.value = folders
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putStringSet(KEY_GALLERY_FOLDERS, folders).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setGalleryFilterEnabled(context: Context, enabled: Boolean) {
+        _isGalleryFilterEnabled.value = enabled
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_GALLERY_FILTER_ENABLED, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 }

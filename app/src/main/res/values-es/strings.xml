@@ -13,6 +13,7 @@
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="back">Atrás</string>
+    <string name="pdf_contents">Contenido</string>
     <string name="done">Hecho</string>
     <string name="loading">Cargando…</string>
     <string name="calculating">Calculando…</string>
@@ -298,7 +299,10 @@
     <string name="nav_downloads">Descargas</string>
     <string name="nav_documents">Documentos</string>
     <string name="nav_game_saves">Gestor de juegos</string>
-    <string name="nav_add_storage">Añadir almacenamiento</string>
+    <string name="menu_gallery_albums">Álbumes</string>
+    <string name="menu_gallery_folders">Carpetas de la galería</string>
+    <string name="menu_gallery_show_all">Mostrar todos los medios</string>
+    <string name="menu_documents_folder">Carpeta</string>    <string name="nav_add_storage">Añadir almacenamiento</string>
     <string name="nav_internal_storage">Almacenamiento interno</string>
     <string name="nav_trash">Papelera</string>
     <string name="nav_external_drive">Unidad externa</string>
@@ -418,8 +422,6 @@
     <string name="settings_touch_drag_move">Siempre mover</string>
     <string name="msg_cancelled_deletion">Eliminación cancelada</string>
     <string name="msg_deletion">Se han eliminado %1$d archivos</string>
-    <string name="menu_gallery_albums">Álbumes</string>
-    <string name="menu_documents_folder">Carpeta</string>
     <string name="details_header_type">Tipo</string>
     <string name="menu_by_type">Por tipo</string>
     <string name="nav_network">Red</string>
@@ -474,4 +476,11 @@
 
     <string name="error_restricted_access">Acceso restringido</string>
     <string name="msg_restricted_access_shizuku">Este directorio está restringido por Android. Por favor, active y autorice Shizuku para acceder a él.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">Sistema y batería</string>
+    <string name="settings_ftp_inactivity_timeout">Tiempo de inactividad de FTP</string>
+    <string name="settings_app_inactivity_timeout">Tiempo de inactividad de la aplicación</string>
+    <string name="settings_timeout_minutes">%1$d minutos</string>
+    <string name="settings_timeout_disabled">Nunca</string>
 </resources>

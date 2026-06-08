@@ -9,6 +9,7 @@
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
     <string name="back">Geri</string>
+    <string name="pdf_contents">İçerik</string>
     <string name="done">Tamamlandı</string>
     <string name="loading">Yükleniyor…</string>
     <string name="calculating">Hesaplanıyor…</string>
@@ -277,6 +278,8 @@
     <string name="nav_documents">Belgeler</string>
     <string name="nav_game_saves">Oyun Yöneticisi</string>
     <string name="menu_gallery_albums">Albümler</string>
+    <string name="menu_gallery_folders">Galeri Klasörleri</string>
+    <string name="menu_gallery_show_all">Tüm Medyayı Göster</string>
     <string name="menu_documents_folder">Klasör</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
@@ -443,4 +446,11 @@
 
     <string name="error_restricted_access">Erişim Kısıtlandı</string>
     <string name="msg_restricted_access_shizuku">Bu dizin Android tarafından kısıtlanmıştır. Lütfen erişmek için Shizuku\'yu etkinleştirin ve yetkilendirin.</string>
+
+    <!-- Inactivity Settings -->
+    <string name="settings_system">Sistem ve Pil</string>
+    <string name="settings_ftp_inactivity_timeout">FTP Zaman Aşımı</string>
+    <string name="settings_app_inactivity_timeout">Uygulama Zaman Aşımı</string>
+    <string name="settings_timeout_minutes">%1$d dakika</string>
+    <string name="settings_timeout_disabled">Asla</string>
 </resources>
