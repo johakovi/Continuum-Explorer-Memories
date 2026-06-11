@@ -1,9 +1,9 @@
 
-## Continuum Explorer (Memories)
+# Continuum Explorer (Memories)
 <img width="72" height="72" alt="ic_launcher" src="https://github.com/user-attachments/assets/4da8432b-f41d-443b-af68-88bec19c9cd7" />
  
 
-A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows.
+A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows. 
 
 Note: This project is forked from troikoss / Continuum Explorer
 
@@ -17,35 +17,29 @@ Note: This project is forked from troikoss / Continuum Explorer
 
 
 ## Key Features:
-Dex theme integration
 
-Tabs & Multi-Window: Support for advanced multitasking.
+- Internal PDF reader
+- Internal text editor
+- Dex theme integration
 
-Recycle Bin: File recovery with undo/redo capabilities.
+- Tabs & Multi-Window: Support for advanced multitasking.
 
-Drag-and-Drop: Seamlessly move data between apps and windows.
+- Drag-and-Drop: Seamlessly move data between apps and windows.
 
-Details Pane: Previews for media files.
+- Full Peripheral Support: Native mouse support (including right-click context menus) and standard Windows-style keyboard shortcuts.
 
-Full Peripheral Support: Native mouse support (including right-click context menus) and standard Windows-style keyboard shortcuts.
+- Responsive Design: A UI that dynamically adapts to any screen or window dimensions.
 
-Responsive Design: A UI that dynamically adapts to any screen or window dimensions.
+- Archive Support: Integrated .zip viewer
 
-Archive Support: Integrated .zip viewer
+- Network storage managment
 
-Network storage managment
+- Game Save Manager
 
-Game Save Manager
+- Shizuku privilege
 
-Shizuku privilege
+- Termux privilege
 
-Termux privilege
-
-Internal PDF reader
-
-## Planned Features:
-
-More organized theme settings.
 
 
 ## Recommended apps and sources
