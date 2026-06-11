@@ -72,6 +72,21 @@ val LocalExtendedColors = staticCompositionLocalOf<ExtendedColors> {
     error("No ExtendedColors provided")
 }
 
+object ThemeFolderColors {
+    val defaultOptions = listOf(
+        0xFF2196F3, // Blue
+        0xFFF44336, // Red
+        0xFF4CAF50, // Green
+        0xFFFFEB3B, // Yellow
+        0xFFFF9800, // Orange
+        0xFF9C27B0, // Purple
+        0xFFE91E63, // Pink
+        0xFF795548, // Brown
+        0xFF9E9E9E, // Grey
+        0xFF00BCD4  // Cyan
+    )
+}
+
 object FileExplorerTheme {
     val extendedColors: ExtendedColors
         @Composable

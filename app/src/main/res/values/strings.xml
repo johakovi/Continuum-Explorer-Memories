@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">Fullscreen</string>
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
+    <string name="menu_folder_color">Folder colour</string>
+    <string name="menu_select_folder_color">Select folder colour</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Library items</string>

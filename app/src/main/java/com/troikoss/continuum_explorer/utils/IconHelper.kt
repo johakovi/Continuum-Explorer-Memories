@@ -99,13 +99,16 @@ object IconHelper {
         iconSize: Dp = 24.dp,
         tint: Color = LocalExtendedColors.current.folderIcon
     ) {
+        val customColor = SettingsManager.getFolderColor(providerId.ifEmpty { path })
+        val finalTint = if (customColor != null) Color(customColor) else tint
+
         val iconTheme = SettingsManager.iconTheme.value
         if (iconTheme == IconTheme.MATERIAL) {
             Icon(
                 imageVector = Icons.Default.Folder,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
-                tint = tint
+                tint = finalTint
             )
             return
         }
@@ -114,14 +117,14 @@ object IconHelper {
         Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
             val packageName = getPackageNameFromPath(providerId.ifEmpty { path })
             if (packageName != null && iconTheme != IconTheme.MATERIAL) {
-                AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = tint)
+                AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
             } else {
                 val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
                 Icon(
                     painter = painterResource(id = baseFolderRes),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    tint = tint
+                    tint = finalTint
                 )
             }
 
@@ -174,10 +177,16 @@ object IconHelper {
                         when {
                             file.provider == com.troikoss.continuum_explorer.providers.SafProvider -> extendedColors.gameShortcutIcon
                             isEmulator -> extendedColors.recentIcon
-                            else -> extendedColors.gameIcon
+                            else -> {
+                                val customColor = SettingsManager.getFolderColor(file.providerId)
+                                if (customColor != null) Color(customColor) else extendedColors.folderIcon
+                            }
                         }
                     }
-                    else -> extendedColors.folderIcon
+                    else -> {
+                        val customColor = SettingsManager.getFolderColor(file.providerId)
+                        if (customColor != null) Color(customColor) else extendedColors.folderIcon
+                    }
                 }
             } else {
                 val name = file.name.lowercase()

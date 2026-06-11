@@ -3,9 +3,8 @@ package com.troikoss.continuum_explorer.managers
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.core.os.LocaleListCompat
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.utils.GlobalEvents
@@ -84,6 +83,7 @@ object SettingsManager {
     private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
     private const val KEY_GALLERY_FOLDERS = "gallery_folders"
     private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
+    private const val PREFS_FOLDER_COLORS = "folder_colors"
 
     enum class FtpMode {
         FULL_STORAGE,
@@ -164,6 +164,9 @@ object SettingsManager {
 
     private val _isGalleryFilterEnabled = mutableStateOf(false)
     val isGalleryFilterEnabled: State<Boolean> = _isGalleryFilterEnabled
+
+    private val _folderColors = mutableStateMapOf<String, Long>()
+    val folderColors: Map<String, Long> = _folderColors
 
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
@@ -259,6 +262,13 @@ object SettingsManager {
 
         _galleryFolders.value = prefs.getStringSet(KEY_GALLERY_FOLDERS, emptySet()) ?: emptySet()
         _isGalleryFilterEnabled.value = prefs.getBoolean(KEY_GALLERY_FILTER_ENABLED, false)
+
+        val colorPrefs = context.getSharedPreferences(PREFS_FOLDER_COLORS, Context.MODE_PRIVATE)
+        _folderColors.clear()
+        colorPrefs.all.forEach { (key, value) ->
+            if (value is Long) _folderColors[key] = value
+            else if (value is Int) _folderColors[key] = value.toLong()
+        }
 
         val savedFtpMode = prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name
         _ftpMode.value = try {
@@ -522,5 +532,21 @@ object SettingsManager {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_GALLERY_FILTER_ENABLED, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setFolderColor(context: Context, providerId: String, color: Long?) {
+        val prefs = context.getSharedPreferences(PREFS_FOLDER_COLORS, Context.MODE_PRIVATE)
+        if (color == null) {
+            _folderColors.remove(providerId)
+            prefs.edit().remove(providerId).apply()
+        } else {
+            _folderColors[providerId] = color
+            prefs.edit().putLong(providerId, color).apply()
+        }
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun getFolderColor(providerId: String): Long? {
+        return _folderColors[providerId]
     }
 }
