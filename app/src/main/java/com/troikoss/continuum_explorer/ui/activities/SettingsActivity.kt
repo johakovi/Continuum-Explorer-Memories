@@ -78,6 +78,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
     val termuxSupport = SettingsManager.termuxSupport.value
     val iconTheme = SettingsManager.iconTheme.value
+    val customThemeMode = SettingsManager.customThemeMode.value
     val ftpInactivityTimeout = SettingsManager.ftpInactivityTimeout.value
     val appInactivityTimeout = SettingsManager.appInactivityTimeout.value
     val currentThemePack = ThemePackManager.currentPack.value
@@ -108,6 +109,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showThemeContentDialog by remember { mutableStateOf(false) }
     var showThemeTopDialog by remember { mutableStateOf(false) }
     var showIconThemeDialog by remember { mutableStateOf(false) }
+    var showCustomThemeModeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
@@ -269,7 +271,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
 
             ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_theme)) },
+                headlineContent = { 
+                    Text(
+                        stringResource(R.string.settings_theme),
+                        color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
+                    ) 
+                },
                 supportingContent = {
                     val text = when (themeMode) {
                         ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
@@ -279,22 +286,55 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ThemeMode.VERY_LIGHT -> stringResource(R.string.settings_theme_very_light)
                         ThemeMode.ENHANCED_SYSTEM -> stringResource(R.string.settings_theme_enhanced_system)
                     }
-                    Text(text)
+                    Text(
+                        text,
+                        color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
-                modifier = Modifier.clickable { showThemeDialog = true }
+                modifier = Modifier.clickable(enabled = currentThemePack == null) { showThemeDialog = true }
             )
 
             ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_icon_theme)) },
+                headlineContent = { 
+                    Text(
+                        stringResource(R.string.settings_icon_theme),
+                        color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
+                    )
+                },
                 supportingContent = {
                     val text = when (iconTheme) {
                         IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
                         IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
                         IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
                     }
-                    Text(text)
+                    Text(
+                        text,
+                        color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
-                modifier = Modifier.clickable { showIconThemeDialog = true }
+                modifier = Modifier.clickable(enabled = currentThemePack == null) { showIconThemeDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { 
+                    Text(
+                        "Custom Theme Mode",
+                        color = if (currentThemePack == null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                supportingContent = {
+                    val text = when (customThemeMode) {
+                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                        else -> stringResource(R.string.settings_theme_system)
+                    }
+                    Text(
+                        text,
+                        color = if (currentThemePack == null) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                modifier = Modifier.clickable(enabled = currentThemePack != null) { showCustomThemeModeDialog = true }
             )
 
             ListItem(
@@ -688,6 +728,46 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showIconThemeDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showCustomThemeModeDialog) {
+                AlertDialog(
+                    onDismissRequest = { showCustomThemeModeDialog = false },
+                    title = { Text("Custom Theme Mode") },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_system),
+                                selected = customThemeMode == ThemeMode.SYSTEM,
+                                onClick = {
+                                    SettingsManager.setCustomThemeMode(context, ThemeMode.SYSTEM)
+                                    showCustomThemeModeDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_light),
+                                selected = customThemeMode == ThemeMode.LIGHT,
+                                onClick = {
+                                    SettingsManager.setCustomThemeMode(context, ThemeMode.LIGHT)
+                                    showCustomThemeModeDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_theme_dark),
+                                selected = customThemeMode == ThemeMode.DARK,
+                                onClick = {
+                                    SettingsManager.setCustomThemeMode(context, ThemeMode.DARK)
+                                    showCustomThemeModeDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showCustomThemeModeDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }

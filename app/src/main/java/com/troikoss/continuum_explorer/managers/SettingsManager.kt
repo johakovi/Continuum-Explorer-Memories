@@ -63,6 +63,7 @@ object SettingsManager {
     private const val KEY_THEME_CONTENT = "theme_content"
     private const val KEY_THEME_TOP = "theme_top"
     private const val KEY_ICON_THEME = "icon_theme"
+    private const val KEY_CUSTOM_THEME_MODE = "custom_theme_mode"
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
@@ -110,6 +111,9 @@ object SettingsManager {
 
     private val _iconTheme = mutableStateOf(IconTheme.COLOURFUL)
     val iconTheme: State<IconTheme> = _iconTheme
+
+    private val _customThemeMode = mutableStateOf(ThemeMode.SYSTEM)
+    val customThemeMode: State<ThemeMode> = _customThemeMode
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
@@ -231,6 +235,13 @@ object SettingsManager {
             IconTheme.valueOf(savedIconTheme ?: IconTheme.COLOURFUL.name)
         } catch (_: Exception) {
             IconTheme.COLOURFUL
+        }
+
+        val savedCustomTheme = prefs.getString(KEY_CUSTOM_THEME_MODE, ThemeMode.SYSTEM.name)
+        _customThemeMode.value = try {
+            ThemeMode.valueOf(savedCustomTheme ?: ThemeMode.SYSTEM.name)
+        } catch (_: Exception) {
+            ThemeMode.SYSTEM
         }
 
         val savedLanguage = prefs.getString(KEY_LANGUAGE, "system") ?: "system"
@@ -388,6 +399,13 @@ object SettingsManager {
         _iconTheme.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_ICON_THEME, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setCustomThemeMode(context: Context, mode: ThemeMode) {
+        _customThemeMode.value = mode
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_CUSTOM_THEME_MODE, mode.name).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

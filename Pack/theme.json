@@ -10,7 +10,23 @@
     "folderIcon": "#2196F3",
     "sidebarBackground": "#EAE9E9",
     "topBarBackground": "#F1F1F1",
-    "sidebarIcons": "#2196F3"
+    "sidebarIcons": "#2196F3",
+    "imageIcon": "#E15D82",
+    "videoIcon": "#FF9800",
+    "audioIcon": "#E91E63",
+    "musicIcon": "#E91E63",
+    "galleryIcon": "#E15D82",
+    "recentIcon": "#4CBEE0",
+    "downloadsIcon": "#69CCB8",
+    "documentsIcon": "#D7B075",
+    "gameIcon": "#7C4DFF",
+    "recycleBinIcon": "#98C52F",
+    "zipIcon": "#E99C47",
+    "pdfIcon": "#D32F2F",
+    "xlsIcon": "#43A047",
+    "docxIcon": "#1E88E5",
+    "txtIcon": "#78909C",
+    "terminalIcon": "#424242"
   },
   "dark": {
     "tabActiveBackground": "#000000",
@@ -22,6 +38,22 @@
     "folderIcon": "#2196F3",
     "sidebarBackground": "#171719",
     "topBarBackground": "#000000",
-    "sidebarIcons": "#2196F3"
+    "sidebarIcons": "#2196F3",
+    "imageIcon": "#E15D82",
+    "videoIcon": "#FF9800",
+    "audioIcon": "#E91E63",
+    "musicIcon": "#E91E63",
+    "galleryIcon": "#E15D82",
+    "recentIcon": "#4CBEE0",
+    "downloadsIcon": "#69CCB8",
+    "documentsIcon": "#D7B075",
+    "gameIcon": "#7C4DFF",
+    "recycleBinIcon": "#98C52F",
+    "zipIcon": "#E99C47",
+    "pdfIcon": "#D32F2F",
+    "xlsIcon": "#43A047",
+    "docxIcon": "#1E88E5",
+    "txtIcon": "#78909C",
+    "terminalIcon": "#424242"
   }
 }

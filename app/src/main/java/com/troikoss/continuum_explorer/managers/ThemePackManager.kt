@@ -34,6 +34,33 @@ data class CustomThemeColors(
     val docxIcon: Color? = null,
     val txtIcon: Color? = null,
     val terminalIcon: Color? = null,
+    val imageIcon: Color? = null,
+    val videoIcon: Color? = null,
+    val audioIcon: Color? = null,
+    val musicIcon: Color? = null,
+    val dcimIcon: Color? = null,
+    val picturesIcon: Color? = null,
+    val folderIconDuo: Color? = null,
+    val galleryIconDuo: Color? = null,
+    val recentIconDuo: Color? = null,
+    val filesIconDuo: Color? = null,
+    val documentsIconDuo: Color? = null,
+    val gameIconDuo: Color? = null,
+    val gameShortcutIconDuo: Color? = null,
+    val recycleBinIconDuo: Color? = null,
+    val downloadsIconDuo: Color? = null,
+    val zipIconDuo: Color? = null,
+    val pdfIconDuo: Color? = null,
+    val xlsIconDuo: Color? = null,
+    val docxIconDuo: Color? = null,
+    val txtIconDuo: Color? = null,
+    val terminalIconDuo: Color? = null,
+    val imageIconDuo: Color? = null,
+    val videoIconDuo: Color? = null,
+    val audioIconDuo: Color? = null,
+    val musicIconDuo: Color? = null,
+    val dcimIconDuo: Color? = null,
+    val picturesIconDuo: Color? = null,
     val tabActiveBackground: Color? = null,
     val textColor: Color? = null,
     val menuBackground: Color? = null,
@@ -46,7 +73,8 @@ data class ThemePack(
     val name: String,
     val lightColors: CustomThemeColors,
     val darkColors: CustomThemeColors,
-    val iconDir: File?
+    val iconDir: File?,
+    val themeRoot: File? = null
 )
 
 object ThemePackManager {
@@ -122,6 +150,33 @@ object ThemePackManager {
                     docxIcon = getC("docxIcon"),
                     txtIcon = getC("txtIcon"),
                     terminalIcon = getC("terminalIcon"),
+                    imageIcon = getC("imageIcon"),
+                    videoIcon = getC("videoIcon"),
+                    audioIcon = getC("audioIcon"),
+                    musicIcon = getC("musicIcon"),
+                    dcimIcon = getC("dcimIcon"),
+                    picturesIcon = getC("picturesIcon"),
+                    folderIconDuo = getC("folderIconDuo"),
+                    galleryIconDuo = getC("galleryIconDuo"),
+                    recentIconDuo = getC("recentIconDuo"),
+                    filesIconDuo = getC("filesIconDuo"),
+                    documentsIconDuo = getC("documentsIconDuo"),
+                    gameIconDuo = getC("gameIconDuo"),
+                    gameShortcutIconDuo = getC("gameShortcutIconDuo"),
+                    recycleBinIconDuo = getC("recycleBinIconDuo"),
+                    downloadsIconDuo = getC("downloadsIconDuo"),
+                    zipIconDuo = getC("zipIconDuo"),
+                    pdfIconDuo = getC("pdfIconDuo"),
+                    xlsIconDuo = getC("xlsIconDuo"),
+                    docxIconDuo = getC("docxIconDuo"),
+                    txtIconDuo = getC("txtIconDuo"),
+                    terminalIconDuo = getC("terminalIconDuo"),
+                    imageIconDuo = getC("imageIconDuo"),
+                    videoIconDuo = getC("videoIconDuo"),
+                    audioIconDuo = getC("audioIconDuo"),
+                    musicIconDuo = getC("musicIconDuo"),
+                    dcimIconDuo = getC("dcimIconDuo"),
+                    picturesIconDuo = getC("picturesIconDuo"),
                     tabActiveBackground = getC("tabActiveBackground"),
                     textColor = getC("textColor"),
                     menuBackground = getC("menuBackground"),
@@ -135,7 +190,7 @@ object ThemePackManager {
             val darkColors = parseColors(json.optJSONObject("dark"))
             val iconDir = File(themeRoot, "icons").let { if (it.exists()) it else File(themeRoot, "Icons") }
 
-            _currentPack.value = ThemePack(name, lightColors, darkColors, if (iconDir.exists()) iconDir else null)
+            _currentPack.value = ThemePack(name, lightColors, darkColors, if (iconDir.exists()) iconDir else null, themeRoot)
             iconCache.clear()
             
             context.getSharedPreferences("explorer_settings", Context.MODE_PRIVATE)
@@ -171,7 +226,7 @@ object ThemePackManager {
 
     fun getCustomIcon(name: String): Bitmap? {
         val pack = _currentPack.value ?: return null
-        val iconDir = pack.iconDir ?: return null
+        val iconDir = pack.iconDir ?: pack.themeRoot ?: return null
         
         if (iconCache.containsKey(name)) return iconCache[name]
 
