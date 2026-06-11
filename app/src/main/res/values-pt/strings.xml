@@ -290,6 +290,8 @@
     <string name="menu_fullscreen">Tela Cheia</string>
     <string name="menu_undo">Desfazer</string>
     <string name="menu_redo">Refazer</string>
+    <string name="menu_folder_color">Cor da pasta</string>
+    <string name="menu_select_folder_color">Selecionar cor da pasta</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Itens da biblioteca</string>
@@ -486,4 +488,9 @@
     <string name="settings_app_inactivity_timeout">Tempo de Inatividade do App</string>
     <string name="settings_timeout_minutes">%1$d minutos</string>
     <string name="settings_timeout_disabled">Nunca</string>
+    <string name="settings_custom_theme">Personalização do tema</string>
+    <string name="settings_load_theme_pack">Carregar pacote de tema (.zip)</string>
+    <string name="settings_clear_theme_pack">Limpar tema personalizado</string>
+    <string name="msg_theme_pack_loaded">Pacote de tema \"%1$s\" carregado</string>
+    <string name="msg_theme_pack_failed">Falha ao carregar o pacote de tema</string>
 </resources>

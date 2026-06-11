@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">Полноэкранный режим</string>
     <string name="menu_undo">Отменить</string>
     <string name="menu_redo">Вернуть</string>
+    <string name="menu_folder_color">Цвет папки</string>
+    <string name="menu_select_folder_color">Выбрать цвет папки</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Элементы библиотеки</string>
@@ -486,4 +488,9 @@
     <string name="settings_app_inactivity_timeout">Тайм-аут бездействия приложения</string>
     <string name="settings_timeout_minutes">%1$d минут</string>
     <string name="settings_timeout_disabled">Никогда</string>
+    <string name="settings_custom_theme">Настройка темы</string>
+    <string name="settings_load_theme_pack">Загрузить пакет темы (.zip)</string>
+    <string name="settings_clear_theme_pack">Очистить пользовательскую тему</string>
+    <string name="msg_theme_pack_loaded">Пакет темы \"%1$s\" загружен</string>
+    <string name="msg_theme_pack_failed">Не удалось загрузить пакет темы</string>
 </resources>

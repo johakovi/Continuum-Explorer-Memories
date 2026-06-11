@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">Helskärm</string>
     <string name="menu_undo">Ångra</string>
     <string name="menu_redo">Gör om</string>
+    <string name="menu_folder_color">Mappfärg</string>
+    <string name="menu_select_folder_color">Välj mappfärg</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Biblioteksobjekt</string>
@@ -487,4 +489,9 @@
     <string name="settings_app_inactivity_timeout">App Inaktivitetstimeout</string>
     <string name="settings_timeout_minutes">%1$d minuter</string>
     <string name="settings_timeout_disabled">Aldrig</string>
+    <string name="settings_custom_theme">Temanpassning</string>
+    <string name="settings_load_theme_pack">Ladda temapaket (.zip)</string>
+    <string name="settings_clear_theme_pack">Rensa anpassat tema</string>
+    <string name="msg_theme_pack_loaded">Temapaket \"%1$s\" har laddats</string>
+    <string name="msg_theme_pack_failed">Misslyckades med att ladda temapaket</string>
 </resources>

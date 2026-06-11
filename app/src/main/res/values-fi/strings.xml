@@ -297,6 +297,8 @@
         <string name="menu_fullscreen">Koko ruudulle</string>
         <string name="menu_undo">Peruuta</string>
         <string name="menu_redo">Kumoa</string>
+        <string name="menu_folder_color">Kansion väri</string>
+        <string name="menu_select_folder_color">Valitse kansion väri</string>
 
         <!-- Navigation -->
         <string name="nav_library_items">Tiedosto kirjasto</string>
@@ -488,5 +490,10 @@
     <string name="settings_app_inactivity_timeout">Sovelluksen aikakatkaisu</string>
     <string name="settings_timeout_minutes">%1$d minuuttia</string>
     <string name="settings_timeout_disabled">Ei koskaan</string>
+    <string name="settings_custom_theme">Teeman mukauttaminen</string>
+    <string name="settings_load_theme_pack">Lataa teemapaketti (.zip)</string>
+    <string name="settings_clear_theme_pack">Tyhjennä mukautettu teema</string>
+    <string name="msg_theme_pack_loaded">Teemapaketti \"%1$s\" ladattu</string>
+    <string name="msg_theme_pack_failed">Teemapaketin lataaminen epäonnistui</string>
 </resources>
 

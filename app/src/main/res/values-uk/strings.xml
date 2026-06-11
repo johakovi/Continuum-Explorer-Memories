@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">Повноекранний режим</string>
     <string name="menu_undo">Скасувати</string>
     <string name="menu_redo">Повернути</string>
+    <string name="menu_folder_color">Колір папки</string>
+    <string name="menu_select_folder_color">Вибрати колір папки</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Елементи бібліотеки</string>
@@ -486,4 +488,9 @@
     <string name="settings_app_inactivity_timeout">Таймаут бездіяльності програми</string>
     <string name="settings_timeout_minutes">%1$d хвилин</string>
     <string name="settings_timeout_disabled">Ніколи</string>
+    <string name="settings_custom_theme">Налаштування теми</string>
+    <string name="settings_load_theme_pack">Завантажити пакет теми (.zip)</string>
+    <string name="settings_clear_theme_pack">Очистити користувацьку тему</string>
+    <string name="msg_theme_pack_loaded">Пакет теми \"%1$s\" завантажено</string>
+    <string name="msg_theme_pack_failed">Не вдалося завантажити пакет теми</string>
 </resources>

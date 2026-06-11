@@ -271,6 +271,8 @@
     <string name="menu_fullscreen">Tam Ekran</string>
     <string name="menu_undo">Geri Al</string>
     <string name="menu_redo">Yinele</string>
+    <string name="menu_folder_color">Klasör rengi</string>
+    <string name="menu_select_folder_color">Klasör rengini seç</string>
     <string name="nav_library_items">Kütüphane öğeleri</string>
     <string name="nav_recent">Son Kullanılanlar</string>
     <string name="nav_gallery">Galeri</string>
@@ -453,4 +455,9 @@
     <string name="settings_app_inactivity_timeout">Uygulama Zaman Aşımı</string>
     <string name="settings_timeout_minutes">%1$d dakika</string>
     <string name="settings_timeout_disabled">Asla</string>
+    <string name="settings_custom_theme">Tema Özelleştirme</string>
+    <string name="settings_load_theme_pack">Tema Paketi Yükle (.zip)</string>
+    <string name="settings_clear_theme_pack">Özel Temayı Temizle</string>
+    <string name="msg_theme_pack_loaded">Tema paketi \"%1$s\" yüklendi</string>
+    <string name="msg_theme_pack_failed">Tema paketi yüklenemedi</string>
 </resources>

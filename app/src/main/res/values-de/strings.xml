@@ -67,7 +67,7 @@
     <string name="shortcuts_nav_selection">Navigation &amp; Auswahl</string>
     <string name="shortcuts_arrow_keys">Pfeiltasten</string>
     <string name="shortcuts_arrow_keys_desc">Auswahl verschieben</string>
-    <string name="shortcuts_home_end">Pos1 / Ende</string>
+    <string name="shortcuts_home_end">Pos / Ende</string>
     <string name="shortcuts_home_end_desc">Zum Anfang / Ende der Liste springen</string>
     <string name="shortcuts_page_up_down">Bild auf / ab</string>
     <string name="shortcuts_page_up_down_desc">Seite nach oben / unten scrollen</string>
@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">Vollbild</string>
     <string name="menu_undo">Rückgängig</string>
     <string name="menu_redo">Wiederholen</string>
+    <string name="menu_folder_color">Ordnerfarbe</string>
+    <string name="menu_select_folder_color">Ordnerfarbe auswählen</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Bibliothekselemente</string>
@@ -486,4 +488,9 @@
     <string name="settings_app_inactivity_timeout">App-Inaktivitäts-Timeout</string>
     <string name="settings_timeout_minutes">%1$d Minuten</string>
     <string name="settings_timeout_disabled">Nie</string>
+    <string name="settings_custom_theme">Design-Anpassung</string>
+    <string name="settings_load_theme_pack">Design-Paket laden (.zip)</string>
+    <string name="settings_clear_theme_pack">Benutzerdefiniertes Design löschen</string>
+    <string name="msg_theme_pack_loaded">Design-Paket \"%1$s\" geladen</string>
+    <string name="msg_theme_pack_failed">Fehler beim Laden des Design-Pakets</string>
 </resources>

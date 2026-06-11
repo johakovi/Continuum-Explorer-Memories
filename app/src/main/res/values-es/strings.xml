@@ -289,6 +289,8 @@
     <string name="menu_fullscreen">Pantalla completa</string>
     <string name="menu_undo">Deshacer</string>
     <string name="menu_redo">Rehacer</string>
+    <string name="menu_folder_color">Color de la carpeta</string>
+    <string name="menu_select_folder_color">Seleccionar color de la carpeta</string>
     <string name="menu_set_wallpaper_failed">Error al establecer fondo</string>
     <string name="media_share_image_failed">Error al compartir imagen</string>
 
@@ -483,4 +485,9 @@
     <string name="settings_app_inactivity_timeout">Tiempo de inactividad de la aplicación</string>
     <string name="settings_timeout_minutes">%1$d minutos</string>
     <string name="settings_timeout_disabled">Nunca</string>
+    <string name="settings_custom_theme">Personalización del tema</string>
+    <string name="settings_load_theme_pack">Cargar paquete de temas (.zip)</string>
+    <string name="settings_clear_theme_pack">Borrar tema personalizado</string>
+    <string name="msg_theme_pack_loaded">Paquete de temas \"%1$s\" cargado</string>
+    <string name="msg_theme_pack_failed">Error al cargar el paquete de temas</string>
 </resources>

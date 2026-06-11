@@ -296,6 +296,8 @@
     <string name="menu_fullscreen">전체 화면</string>
     <string name="menu_undo">실행 취소</string>
     <string name="menu_redo">다시 실행</string>
+    <string name="menu_folder_color">폴더 색상</string>
+    <string name="menu_select_folder_color">폴더 색상 선택</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">라이브러리 항목</string>
@@ -486,4 +488,9 @@
     <string name="settings_app_inactivity_timeout">앱 비활성 시간 제한</string>
     <string name="settings_timeout_minutes">%1$d분</string>
     <string name="settings_timeout_disabled">사용 안 함</string>
+    <string name="settings_custom_theme">테마 사용자 지정</string>
+    <string name="settings_load_theme_pack">테마 팩 불러오기 (.zip)</string>
+    <string name="settings_clear_theme_pack">맞춤 테마 지우기</string>
+    <string name="msg_theme_pack_loaded">테마 팩 \"%1$s\" 불러옴</string>
+    <string name="msg_theme_pack_failed">테마 팩을 불러오지 못했습니다.</string>
 </resources>

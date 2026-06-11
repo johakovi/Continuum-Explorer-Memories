@@ -288,6 +288,8 @@
     <string name="menu_fullscreen">Plein écran</string>
     <string name="menu_undo">Annuler</string>
     <string name="menu_redo">Rétablir</string>
+    <string name="menu_folder_color">Couleur du dossier</string>
+    <string name="menu_select_folder_color">Sélectionner la couleur du dossier</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Éléments de la bibliothèque</string>
@@ -485,4 +487,9 @@
     <string name="settings_app_inactivity_timeout">Délai d\'inactivité de l\'application</string>
     <string name="settings_timeout_minutes">%1$d minutes</string>
     <string name="settings_timeout_disabled">Jamais</string>
+    <string name="settings_custom_theme">Personnalisation du thème</string>
+    <string name="settings_load_theme_pack">Charger un pack de thèmes (.zip)</string>
+    <string name="settings_clear_theme_pack">Effacer le thème personnalisé</string>
+    <string name="msg_theme_pack_loaded">Pack de thèmes \"%1$s\" chargé</string>
+    <string name="msg_theme_pack_failed">Échec du chargement du pack de thèmes</string>
 </resources>
