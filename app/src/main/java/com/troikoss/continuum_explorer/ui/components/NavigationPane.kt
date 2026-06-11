@@ -66,6 +66,8 @@ import com.troikoss.continuum_explorer.model.NetworkProtocol
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.ShizukuManager
+import com.troikoss.continuum_explorer.managers.GamesManager
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
@@ -266,7 +268,7 @@ fun NavigationPane(
 
     // Calculate visible library items using remember to avoid filtering on every recomposition (like during resizing)
     val visibleLibraryItems = remember(
-        appState.appConfigs.libraryOrder,
+        appState.appConfigs.libraryOrder.toList(),
         isRecycleBinEnabled,
         appState.appConfigs.isRecentVisible,
         appState.appConfigs.isGalleryVisible,

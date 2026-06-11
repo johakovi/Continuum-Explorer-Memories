@@ -52,7 +52,7 @@ object GamesManager {
         GameSaveInfo("DuckStation", "Android/data/com.github.stenzek.duckstation/files"),
         GameSaveInfo("Bomb Squad", "Android/data/net.froemling.bombsquad/files/mods"),
         GameSaveInfo("Neverless to Everless (Selfie)", "Android/data/com.hottagames.nte/files/Selfie"),
-
+        GameSaveInfo("Wytchwood", "Android/data/com.Alientrap.Wytchwood"),
     )
 
     fun hasAnyGame(context: Context): Boolean {
@@ -109,29 +109,13 @@ object GamesManager {
             val isRestricted = fullPath.absolutePath.lowercase().contains("/android/data")
 
             if (isRestricted) {
-                if (ShizukuManager.hasPermission()) {
-                    if (ShizukuProvider.exists(fullPath.absolutePath)) {
-                        val meta = ShizukuProvider.getMetadata(fullPath.absolutePath)
-                        results.add(
-                            UniversalFile(
-                                name = game.displayName,
-                                isDirectory = true,
-                                lastModified = meta.lastModified,
-                                length = 0L,
-                                provider = ShizukuProvider,
-                                providerId = fullPath.absolutePath,
-                                parentId = "virtual://games_manager"
-                            )
-                        )
-                    }
-                } else {
-                    // If restricted but no permission, we still add it so the user can see it 
-                    // and clicking it will trigger the Shizuku permission prompt.
+                if (ShizukuManager.hasPermission() && ShizukuProvider.exists(fullPath.absolutePath)) {
+                    val meta = ShizukuProvider.getMetadata(fullPath.absolutePath)
                     results.add(
                         UniversalFile(
                             name = game.displayName,
                             isDirectory = true,
-                            lastModified = 0L,
+                            lastModified = meta.lastModified,
                             length = 0L,
                             provider = ShizukuProvider,
                             providerId = fullPath.absolutePath,
