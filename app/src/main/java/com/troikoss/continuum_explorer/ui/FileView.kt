@@ -204,6 +204,7 @@ private fun FileGalleryView(
             FileThumbnail(
                 file = file,
                 modifier = Modifier.fillMaxSize(),
+                selected = isSelected,
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                 iconSize = contentSize,
                 contentScale = ContentScale.Crop
@@ -276,6 +277,7 @@ private fun FileGridView(
             FileThumbnail(
                 file = file,
                 modifier = Modifier.size((appState.folderConfigs.gridItemSize * 0.6f).dp),
+                selected = isSelected,
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                 iconSize = contentSize
             )
@@ -339,6 +341,7 @@ private fun FileContentView(
                 }
                 FileThumbnail(
                     file = file,
+                    selected = isSelected,
                     tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                     modifier = iconModifier,
                     iconSize = itemSize
@@ -441,6 +444,7 @@ private fun FileDetailsView(
                     FileThumbnail(
                         file = file,
                         modifier = iconModifier,
+                        selected = isSelected,
                         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                         iconSize = itemSize
                     )

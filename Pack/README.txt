@@ -62,6 +62,33 @@ theme.json Supported Color Keys:
    - commandPanelBackground
    - selectionBackground
    - sidebarIcons
+   - primary
+   - onPrimary
+   - primaryContainer
+   - onPrimaryContainer
+   - secondary
+   - onSecondary
+   - secondaryContainer
+   - onSecondaryContainer
+   - tertiary
+   - onTertiary
+   - tertiaryContainer
+   - onTertiaryContainer
+   - backgroundM3
+   - onBackground
+   - surface
+   - onSurface
+   - surfaceVariant
+   - onSurfaceVariant
+   - surfaceContainer
+   - surfaceContainerLow
+   - surfaceContainerHigh
+   - surfaceContainerHighest
+   - surfaceContainerLowest
+   - outline
+   - outlineVariant
+   - statusBarColor
+   - navigationBarColor
 
    Library/File Icons (Standard & Duo variants):
    - folderIcon, folderIconDuo

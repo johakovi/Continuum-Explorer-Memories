@@ -119,6 +119,7 @@ object IconHelper {
             when (iconName) {
                 "ic_documents_folder" -> extendedColors.documentsIconDuo
                 "ic_download_folder" -> extendedColors.downloadsIconDuo
+                "ic_android_folder" -> extendedColors.androidIconDuo
                 "ic_dcim_folder" -> extendedColors.dcimIconDuo
                 "ic_pictures_folder" -> extendedColors.picturesIconDuo
                 "ic_music_folder" -> extendedColors.musicIconDuo
@@ -129,6 +130,7 @@ object IconHelper {
             when (iconName) {
                 "ic_documents_folder" -> extendedColors.documentsIcon
                 "ic_download_folder" -> extendedColors.downloadsIcon
+                "ic_android_folder" -> extendedColors.androidIcon
                 "ic_dcim_folder" -> extendedColors.dcimIcon
                 "ic_pictures_folder" -> extendedColors.picturesIcon
                 "ic_music_folder" -> extendedColors.musicIcon
@@ -233,6 +235,7 @@ object IconHelper {
         file: UniversalFile,
         modifier: Modifier = Modifier,
         iconSize: Dp = 24.dp,
+        selected: Boolean = false,
         tint: Color = MaterialTheme.colorScheme.secondary,
         isDetailView: Boolean = false,
         contentScale: ContentScale = ContentScale.Fit
@@ -240,13 +243,12 @@ object IconHelper {
         val pack by ThemePackManager.currentPack
         val isCustomPack = pack != null
         val extendedColors = LocalExtendedColors.current
-        val isSelected = tint == MaterialTheme.colorScheme.primary
         val iconTheme = SettingsManager.iconTheme.value
         val effectiveIconTheme = if (isCustomPack) {
             if (iconTheme == IconTheme.COLOURFULDUO) IconTheme.COLOURFULDUO else IconTheme.COLOURFUL
         } else iconTheme
 
-        val finalTint = if (!isSelected) {
+        val finalTint = if (!selected) {
             if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
@@ -276,12 +278,12 @@ object IconHelper {
                 when {
                     name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
                     name.endsWith(".tar") || name.endsWith(".gz") -> extendedColors.zipIcon
-                    name.endsWith(".pdf") -> if (effectiveIconTheme == IconTheme.COLOURFULDUO) Color.Unspecified else extendedColors.pdfIcon
+                    name.endsWith(".pdf") -> extendedColors.pdfIcon
                     name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") ||
                     name.endsWith(".csv") -> extendedColors.xlsIcon
                     name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> extendedColors.docxIcon
                     name.endsWith(".txt") -> extendedColors.txtIcon
-                    name.endsWith(".sh") -> Color.Unspecified
+                    name.endsWith(".sh") || name.endsWith(".bash") || name.endsWith(".zsh") -> extendedColors.terminalIcon
                     name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
                     name.endsWith(".m4a") || name.endsWith(".flac") -> extendedColors.musicIcon
                     name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
@@ -599,6 +601,7 @@ object IconHelper {
         return when {
             lName == "documents" || lPath.endsWith("/documents") -> "ic_documents_folder"
             lName == "download" || lName == "downloads" || lPath.endsWith("/download") || lPath.endsWith("/downloads") -> "ic_download_folder"
+            lName == "android" || lPath.endsWith("/android") -> "ic_android_folder"
             lName == "dcim" || lPath.endsWith("/dcim") || lName == "camera" || lPath.endsWith("/camera") -> "ic_dcim_folder"
             lName == "pictures" || lPath.endsWith("/pictures") || lName == "photos" || lPath.endsWith("/photos") || lName == "screenshots" || lPath.endsWith("/screenshots") -> "ic_pictures_folder"
             lName == "music" || lPath.endsWith("/music") -> "ic_music_folder"

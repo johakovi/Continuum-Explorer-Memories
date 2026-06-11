@@ -41,6 +41,7 @@ data class ExtendedColors(
     val gameShortcutIcon: Color,
     val recycleBinIcon: Color,
     val downloadsIcon: Color,
+    val androidIcon: Color,
     val zipIcon: Color,
     val pdfIcon: Color,
     val xlsIcon: Color,
@@ -62,6 +63,7 @@ data class ExtendedColors(
     val galleryIconDuo: Color,
     val recycleBinIconDuo: Color,
     val downloadsIconDuo: Color,
+    val androidIconDuo: Color,
     val zipIconDuo: Color,
     val pdfIconDuo: Color,
     val xlsIconDuo: Color,
@@ -79,7 +81,11 @@ data class ExtendedColors(
     val menuBackground: Color,
     val fileViewBackground: Color,
     val background: Color,
-    val commandPanelBackground: Color
+    val commandPanelBackground: Color,
+    val statusBarColor: Color,
+    val navigationBarColor: Color,
+    val outline: Color,
+    val outlineVariant: Color
 )
 
 fun ExtendedColors.withCustomColors(custom: CustomThemeColors): ExtendedColors {
@@ -100,6 +106,7 @@ fun ExtendedColors.withCustomColors(custom: CustomThemeColors): ExtendedColors {
         gameShortcutIcon = custom.gameShortcutIcon ?: gameShortcutIcon,
         recycleBinIcon = custom.recycleBinIcon ?: recycleBinIcon,
         downloadsIcon = custom.downloadsIcon ?: downloadsIcon,
+        androidIcon = custom.androidIcon ?: androidIcon,
         zipIcon = custom.zipIcon ?: zipIcon,
         pdfIcon = custom.pdfIcon ?: pdfIcon,
         xlsIcon = custom.xlsIcon ?: xlsIcon,
@@ -121,6 +128,7 @@ fun ExtendedColors.withCustomColors(custom: CustomThemeColors): ExtendedColors {
         galleryIconDuo = custom.galleryIconDuo ?: custom.galleryIcon ?: galleryIconDuo,
         recycleBinIconDuo = custom.recycleBinIconDuo ?: custom.recycleBinIcon ?: recycleBinIconDuo,
         downloadsIconDuo = custom.downloadsIconDuo ?: custom.downloadsIcon ?: downloadsIconDuo,
+        androidIconDuo = custom.androidIconDuo ?: custom.androidIcon ?: androidIconDuo,
         zipIconDuo = custom.zipIconDuo ?: custom.zipIcon ?: zipIconDuo,
         pdfIconDuo = custom.pdfIconDuo ?: custom.pdfIcon ?: pdfIconDuo,
         xlsIconDuo = custom.xlsIconDuo ?: custom.xlsIcon ?: xlsIconDuo,
@@ -138,7 +146,41 @@ fun ExtendedColors.withCustomColors(custom: CustomThemeColors): ExtendedColors {
         menuBackground = custom.menuBackground ?: menuBackground,
         fileViewBackground = custom.fileViewBackground ?: fileViewBackground,
         background = custom.background ?: background,
-        commandPanelBackground = custom.commandPanelBackground ?: commandPanelBackground
+        commandPanelBackground = custom.commandPanelBackground ?: commandPanelBackground,
+        statusBarColor = custom.statusBarColor ?: statusBarColor,
+        navigationBarColor = custom.navigationBarColor ?: navigationBarColor,
+        outline = custom.outline ?: outline,
+        outlineVariant = custom.outlineVariant ?: outlineVariant
+    )
+}
+
+private fun androidx.compose.material3.ColorScheme.withCustomColors(custom: CustomThemeColors): androidx.compose.material3.ColorScheme {
+    return this.copy(
+        primary = custom.primary ?: custom.sidebarIcons ?: primary,
+        onPrimary = custom.onPrimary ?: custom.textColor ?: onPrimary,
+        primaryContainer = custom.primaryContainer ?: custom.selectionBackground ?: primaryContainer,
+        onPrimaryContainer = custom.onPrimaryContainer ?: custom.onPrimary ?: custom.textColor ?: onPrimaryContainer,
+        secondary = custom.secondary ?: custom.sidebarIcons ?: secondary,
+        onSecondary = custom.onSecondary ?: custom.textColor ?: onSecondary,
+        secondaryContainer = custom.secondaryContainer ?: custom.selectionBackground ?: secondaryContainer,
+        onSecondaryContainer = custom.onSecondaryContainer ?: custom.onSecondary ?: custom.textColor ?: onSecondaryContainer,
+        tertiary = custom.tertiary ?: custom.sidebarIcons ?: tertiary,
+        onTertiary = custom.onTertiary ?: custom.textColor ?: onTertiary,
+        tertiaryContainer = custom.tertiaryContainer ?: tertiaryContainer,
+        onTertiaryContainer = custom.onTertiaryContainer ?: onTertiaryContainer,
+        background = custom.backgroundM3 ?: custom.background ?: background,
+        onBackground = custom.onBackground ?: custom.textColor ?: onBackground,
+        surface = custom.surface ?: custom.topBarBackground ?: custom.background ?: surface,
+        onSurface = custom.onSurface ?: custom.textColor ?: onSurface,
+        surfaceVariant = custom.surfaceVariant ?: custom.searchBoxBackground ?: custom.background ?: surfaceVariant,
+        onSurfaceVariant = custom.onSurfaceVariant ?: custom.onSurface ?: custom.textColor ?: onSurfaceVariant,
+        surfaceContainer = custom.surfaceContainer ?: custom.topBarBackground ?: custom.background ?: surface,
+        surfaceContainerLow = custom.surfaceContainerLow ?: custom.sidebarBackground ?: custom.background ?: surface,
+        surfaceContainerHigh = custom.surfaceContainerHigh ?: custom.sidebarBackground ?: custom.background ?: surface,
+        surfaceContainerHighest = custom.surfaceContainerHighest ?: custom.tabBarBackground ?: custom.background ?: surface,
+        surfaceContainerLowest = custom.surfaceContainerLowest ?: custom.fileViewBackground ?: custom.background ?: surface,
+        outline = custom.outline ?: custom.sidebarIcons ?: outline,
+        outlineVariant = custom.outlineVariant ?: outlineVariant
     )
 }
 
@@ -244,53 +286,45 @@ fun FileExplorerTheme(
         }
     } else {
         when (themeMode) {
-            ThemeMode.SYSTEM -> isSystemDark
-            ThemeMode.ENHANCED_SYSTEM -> isSystemDark
-            ThemeMode.DARK -> true
-            ThemeMode.LIGHT -> false
-            ThemeMode.VERY_DARK -> true
-            ThemeMode.VERY_LIGHT -> false
+            ThemeMode.SYSTEM, ThemeMode.ENHANCED_SYSTEM -> isSystemDark
+            ThemeMode.DARK, ThemeMode.VERY_DARK -> true
+            ThemeMode.LIGHT, ThemeMode.VERY_LIGHT -> false
         }
     }
-    val dynamicScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+
+    val isVeryDark = currentPack == null && (themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark))
+    val isVeryLight = currentPack == null && (themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark))
+
+    val dynamicScheme = if (dynamicColor && currentPack == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     } else null
 
-    val colorScheme = when {
-        // 2. Use .copy() to override your primary with the system primary
-        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
-            if (dynamicScheme != null) {
-                VeryDarkColorScheme.copy(
-                    primary = dynamicScheme.primary,
-                    secondary = dynamicScheme.secondary,
-                    tertiary = dynamicScheme.tertiary,
-                    // Optional: you can also copy containers if you want
-                    primaryContainer = dynamicScheme.primaryContainer
-                )
-            } else {
-                VeryDarkColorScheme
-            }
-        }
-
-        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
-            if (dynamicScheme != null) {
-                VeryLightColorScheme.copy(
-                    primary = dynamicScheme.primary,
-                    secondary = dynamicScheme.secondary
-                )
-            } else {
-                VeryLightColorScheme
-            }
-        }
-
-        else -> dynamicScheme ?: if (darkTheme) darkColorScheme() else lightColorScheme()
+    var colorScheme = when {
+        isVeryDark -> VeryDarkColorScheme
+        isVeryLight -> VeryLightColorScheme
+        darkTheme -> darkColorScheme()
+        else -> lightColorScheme()
     }
 
+    if (dynamicScheme != null) {
+        colorScheme = colorScheme.copy(
+            primary = dynamicScheme.primary,
+            secondary = dynamicScheme.secondary,
+            tertiary = dynamicScheme.tertiary,
+            primaryContainer = dynamicScheme.primaryContainer,
+            secondaryContainer = dynamicScheme.secondaryContainer,
+            tertiaryContainer = dynamicScheme.tertiaryContainer
+        )
+    }
 
+    val finalColorScheme = currentPack?.let { pack ->
+        if (darkTheme) colorScheme.withCustomColors(pack.darkColors)
+        else colorScheme.withCustomColors(pack.lightColors)
+    } ?: colorScheme
 
-    val extendedColors = when {
-        themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark) -> {
+    val baseExtendedColors = when {
+        isVeryDark -> {
             ExtendedColors(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
@@ -299,118 +333,28 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFF2D2D2F),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
-                folderIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFolders
-                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
-                    else -> VeryDarkIcons
-                },
-                galleryIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryDarkIcons
-                },
-                recentIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecent
-                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
-                    else -> VeryDarkIcons
-                },
-                filesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFile
-                    IconTheme.COLOURFULDUO -> ThemeFileDuo
-                    else -> VeryDarkIcons
-                },
-                documentsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFiles
-                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
-                    else -> VeryDarkIcons
-                },
-                gameIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGameSaves
-                    IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
-                    else -> VeryDarkIcons
-                },
-                gameShortcutIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> VeryDarkIcons
-                },
-                recycleBinIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecycleBin
-                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
-                    else -> VeryDarkIcons
-                },
-                downloadsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDownloads
-                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
-                    else -> VeryDarkIcons
-                },
-                zipIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeZip
-                    IconTheme.COLOURFULDUO -> ThemeZipDuo
-                    else -> VeryDarkIcons
-                },
-                pdfIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemePdf
-                    IconTheme.COLOURFULDUO -> ThemePdfDuo
-                    else -> VeryDarkIcons
-                },
-                xlsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> VeryDarkIcons
-                },
-                docxIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDocx
-                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
-                    else -> VeryDarkIcons
-                },
-                txtIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTxt
-                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
-                    else -> VeryDarkIcons
-                },
-                terminalIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTerminal
-                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
-                    else -> VeryDarkIcons
-                },
-                imageIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeImage
-                    IconTheme.COLOURFULDUO -> ThemeImageDuo
-                    else -> VeryDarkIcons
-                },
-                videoIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeVideo
-                    IconTheme.COLOURFULDUO -> ThemeVideoDuo
-                    else -> VeryDarkIcons
-                },
-                audioIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> VeryDarkIcons
-                },
-                musicIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> VeryDarkIcons
-                },
-                dcimIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryDarkIcons
-                },
-                picturesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryDarkIcons
-                },
-
-                tabActiveBackground = Color(0xFF000000),
-                textColor = VeryDarkText,
-                menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
-                fileViewBackground = Color(0xFF0F0F11),
-                background = Color(0xFF000000),
-                commandPanelBackground = VeryDarkTopBar,
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
+                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
+                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryDarkIcons,
+                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
+                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryDarkIcons,
+                gameIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGameSaves else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else VeryDarkIcons,
+                gameShortcutIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
+                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryDarkIcons,
+                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryDarkIcons,
+                androidIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAndroid else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else VeryDarkIcons,
+                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryDarkIcons,
+                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryDarkIcons,
+                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
+                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryDarkIcons,
+                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryDarkIcons,
+                terminalIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTerminal else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else VeryDarkIcons,
+                imageIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeImage else if (iconTheme == IconTheme.COLOURFULDUO) ThemeImageDuo else VeryDarkIcons,
+                videoIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeVideo else if (iconTheme == IconTheme.COLOURFULDUO) ThemeVideoDuo else VeryDarkIcons,
+                audioIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryDarkIcons,
+                musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryDarkIcons,
+                dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
+                picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
@@ -420,6 +364,7 @@ fun FileExplorerTheme(
                 gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryDarkIcons,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryDarkIcons,
+                androidIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else VeryDarkIcons,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryDarkIcons,
                 pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryDarkIcons,
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryDarkIcons,
@@ -432,9 +377,19 @@ fun FileExplorerTheme(
                 musicIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryDarkIcons,
                 dcimIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
                 picturesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
+                tabActiveBackground = Color(0xFF000000),
+                textColor = VeryDarkText,
+                menuBackground = Color(0xFF1C1C1C).copy(alpha = 0.98f),
+                fileViewBackground = Color(0xFF0F0F11),
+                background = Color(0xFF000000),
+                commandPanelBackground = VeryDarkTopBar,
+                statusBarColor = Color.Transparent,
+                navigationBarColor = Color.Transparent,
+                outline = Color(0xFF444446),
+                outlineVariant = Color(0xFF353537)
             )
         }
-        themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark) -> {
+        isVeryLight -> {
             ExtendedColors(
                 sidebarBackground = VeryLightSidebar,
                 topBarBackground = VeryLightTopBar,
@@ -443,112 +398,28 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFFfcfcfe),
                 selectionBackground = LightPrimarySelection,
                 sidebarIcons = VeryLightIcons,
-                folderIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFolders
-                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
-                    else -> VeryLightIcons
-                },
-                galleryIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryLightIcons
-                },
-                recentIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecent
-                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
-                    else -> VeryLightIcons
-                },
-                filesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFile
-                    IconTheme.COLOURFULDUO -> ThemeFileDuo
-                    else -> VeryLightIcons
-                },
-                documentsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFiles
-                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
-                    else -> VeryLightIcons
-                },
-                gameIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGameSaves
-                    IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
-                    else -> VeryLightIcons
-                },
-                gameShortcutIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> VeryLightIcons
-                },
-                recycleBinIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecycleBin
-                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
-                    else -> VeryLightIcons
-                },
-                downloadsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDownloads
-                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
-                    else -> VeryLightIcons
-                },
-                zipIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeZip
-                    IconTheme.COLOURFULDUO -> ThemeZipDuo
-                    else -> VeryLightIcons
-                },
-                pdfIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemePdf
-                    IconTheme.COLOURFULDUO -> ThemePdfDuo
-                    else -> VeryLightIcons
-                },
-                xlsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> VeryLightIcons
-                },
-                docxIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDocx
-                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
-                    else -> VeryLightIcons
-                },
-                txtIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTxt
-                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
-                    else -> VeryLightIcons
-                },
-                terminalIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTerminal
-                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
-                    else -> VeryLightIcons
-                },
-                imageIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeImage
-                    IconTheme.COLOURFULDUO -> ThemeImageDuo
-                    else -> VeryLightIcons
-                },
-                videoIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeVideo
-                    IconTheme.COLOURFULDUO -> ThemeVideoDuo
-                    else -> VeryLightIcons
-                },
-                audioIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> VeryLightIcons
-                },
-                musicIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> VeryLightIcons
-                },
-                dcimIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryLightIcons
-                },
-                picturesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> VeryLightIcons
-                },
-
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
+                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
+                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryLightIcons,
+                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
+                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else VeryLightIcons,
+                gameIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGameSaves else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else VeryLightIcons,
+                gameShortcutIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
+                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryLightIcons,
+                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryLightIcons,
+                androidIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAndroid else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else VeryLightIcons,
+                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryLightIcons,
+                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryLightIcons,
+                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
+                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else VeryLightIcons,
+                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else VeryLightIcons,
+                terminalIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTerminal else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else VeryLightIcons,
+                imageIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeImage else if (iconTheme == IconTheme.COLOURFULDUO) ThemeImageDuo else VeryLightIcons,
+                videoIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeVideo else if (iconTheme == IconTheme.COLOURFULDUO) ThemeVideoDuo else VeryLightIcons,
+                audioIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryLightIcons,
+                musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryLightIcons,
+                dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
+                picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
@@ -558,6 +429,7 @@ fun FileExplorerTheme(
                 gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else VeryLightIcons,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else VeryLightIcons,
+                androidIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else VeryLightIcons,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else VeryLightIcons,
                 pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else VeryLightIcons,
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else VeryLightIcons,
@@ -575,14 +447,15 @@ fun FileExplorerTheme(
                 menuBackground = Color.White.copy(alpha = 0.98f),
                 fileViewBackground = Color(0xFFFFFFFF),
                 background = Color(0xFFF1F1F1),
-                commandPanelBackground = VeryLightTopBar
+                commandPanelBackground = VeryLightTopBar,
+                statusBarColor = Color.Transparent,
+                navigationBarColor = Color.Transparent,
+                outline = Color(0xFFA2A2A2),
+                outlineVariant = Color(0xFFA2A2A2)
             )
         }
         else -> {
-
             val primary = colorScheme.primary
-            val secondary = colorScheme.secondary
-            val tertiary = colorScheme.tertiary
             val onSurface = colorScheme.onSurface
             val surfaceLow = colorScheme.surfaceContainerLow
             ExtendedColors(
@@ -591,121 +464,30 @@ fun FileExplorerTheme(
                 navButtonBackground = surfaceLow,
                 searchBoxBackground = colorScheme.surfaceContainerHigh,
                 tabBarBackground = colorScheme.surfaceContainerHighest,
-                fileViewBackground = colorScheme.surfaceContainerLowest,
-                background = surfaceLow,
-                tabActiveBackground = surfaceLow,
-
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
-                folderIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFolders
-                    IconTheme.COLOURFULDUO -> ThemeFoldersDuo
-                    else -> primary
-                },
-                galleryIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> primary
-                },
-                recentIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecent
-                    IconTheme.COLOURFULDUO -> ThemeRecentDuo
-                    else -> primary
-                },
-                filesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFile
-                    IconTheme.COLOURFULDUO -> ThemeFileDuo
-                    else -> primary
-                },
-                documentsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeFiles
-                    IconTheme.COLOURFULDUO -> ThemeFilesDuo
-                    else -> primary
-                },
-                gameIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGameSaves
-                    IconTheme.COLOURFULDUO -> ThemeGameSavesDuo
-                    else -> primary
-                },
-                gameShortcutIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> primary
-                },
-                recycleBinIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeRecycleBin
-                    IconTheme.COLOURFULDUO -> ThemeRecycleBinDuo
-                    else -> primary
-                },
-                downloadsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDownloads
-                    IconTheme.COLOURFULDUO -> ThemeDownloadsDuo
-                    else -> primary
-                },
-                zipIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeZip
-                    IconTheme.COLOURFULDUO -> ThemeZipDuo
-                    else ->  Color(0xFF6E6E6E)
-                },
-                pdfIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemePdf
-                    IconTheme.COLOURFULDUO -> ThemePdfDuo
-                    else -> ThemePdf
-                },
-                xlsIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeXls
-                    IconTheme.COLOURFULDUO -> ThemeXlsDuo
-                    else -> ThemeXls
-                },
-                docxIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeDocx
-                    IconTheme.COLOURFULDUO -> ThemeDocxDuo
-                    else -> ThemeDocx
-                },
-                txtIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTxt
-                    IconTheme.COLOURFULDUO -> ThemeTxtDuo
-                    else -> ThemeTxt
-                },
-                terminalIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeTerminal
-                    IconTheme.COLOURFULDUO -> ThemeTerminalDuo
-                    else -> ThemeTerminal
-                },
-                imageIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeImage
-                    IconTheme.COLOURFULDUO -> ThemeImageDuo
-                    else -> primary
-                },
-                videoIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeVideo
-                    IconTheme.COLOURFULDUO -> ThemeVideoDuo
-                    else -> primary
-                },
-                audioIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> primary
-                },
-                musicIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeAudio
-                    IconTheme.COLOURFULDUO -> ThemeAudioDuo
-                    else -> primary
-                },
-                dcimIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> primary
-                },
-                picturesIcon = when (iconTheme) {
-                    IconTheme.COLOURFUL -> ThemeGallery
-                    IconTheme.COLOURFULDUO -> ThemeGalleryDuo
-                    else -> primary
-                },
-
-
-                textColor = onSurface,
-                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
+                galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
+                recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
+                filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
+                documentsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFiles else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else primary,
+                gameIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGameSaves else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else primary,
+                gameShortcutIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
+                recycleBinIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecycleBin else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else primary,
+                downloadsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDownloads else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else primary,
+                androidIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAndroid else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else primary,
+                zipIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeZip else if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else Color(0xFF6E6E6E),
+                pdfIcon = if (iconTheme == IconTheme.COLOURFUL) ThemePdf else if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else ThemePdf,
+                xlsIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeXls else if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else ThemeXls,
+                docxIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeDocx else if (iconTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else ThemeDocx,
+                txtIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTxt else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else ThemeTxt,
+                terminalIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeTerminal else if (iconTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else ThemeTerminal,
+                imageIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeImage else if (iconTheme == IconTheme.COLOURFULDUO) ThemeImageDuo else primary,
+                videoIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeVideo else if (iconTheme == IconTheme.COLOURFULDUO) ThemeVideoDuo else primary,
+                audioIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else primary,
+                musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else primary,
+                dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
+                picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
                 folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
@@ -715,6 +497,7 @@ fun FileExplorerTheme(
                 gameShortcutIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
                 recycleBinIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else primary,
                 downloadsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else primary,
+                androidIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else primary,
                 zipIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else primary,
                 pdfIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else primary,
                 xlsIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
@@ -727,25 +510,42 @@ fun FileExplorerTheme(
                 musicIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else primary,
                 dcimIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
                 picturesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
-                commandPanelBackground = surfaceLow
+                tabActiveBackground = surfaceLow,
+                textColor = onSurface,
+                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
+                fileViewBackground = colorScheme.surfaceContainerLowest,
+                background = surfaceLow,
+                commandPanelBackground = surfaceLow,
+                statusBarColor = Color.Transparent,
+                navigationBarColor = Color.Transparent,
+                outline = colorScheme.outline,
+                outlineVariant = colorScheme.outlineVariant
             )
         }
     }
 
+    val finalExtendedColors = currentPack?.let { pack ->
+        if (darkTheme) baseExtendedColors.withCustomColors(pack.darkColors)
+        else baseExtendedColors.withCustomColors(pack.lightColors)
+    } ?: baseExtendedColors
+
     val context = LocalContext.current
     val themeTop = SettingsManager.themeTop.value
-    DisposableEffect(darkTheme, themeTop) {
+    DisposableEffect(darkTheme, themeTop, finalExtendedColors.statusBarColor, finalExtendedColors.navigationBarColor) {
         if (context is ComponentActivity) {
+            val statusColor = finalExtendedColors.statusBarColor.toArgb()
+            val navColor = finalExtendedColors.navigationBarColor.toArgb()
+            
             context.enableEdgeToEdge(
                 statusBarStyle = if (darkTheme) {
-                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.dark(statusColor)
                 } else {
-                    SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.light(statusColor, statusColor)
                 },
                 navigationBarStyle = if (darkTheme) {
-                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.dark(navColor)
                 } else {
-                    SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+                    SystemBarStyle.light(navColor, navColor)
                 }
             )
             
@@ -762,16 +562,18 @@ fun FileExplorerTheme(
         onDispose {}
     }
 
-    val finalExtendedColors = currentPack?.let { pack ->
-        if (darkTheme) extendedColors.withCustomColors(pack.darkColors)
-        else extendedColors.withCustomColors(pack.lightColors)
-    } ?: extendedColors
-
     CompositionLocalProvider(LocalExtendedColors provides finalExtendedColors) {
         MaterialTheme(
-            colorScheme = colorScheme,
+            colorScheme = finalColorScheme,
             typography = Typography,
             content = content
         )
     }
+}
+
+private fun Color.toArgb(): Int {
+    return (this.alpha * 255.0f + 0.5f).toInt() shl 24 or
+            ((this.red * 255.0f + 0.5f).toInt() shl 16) or
+            ((this.green * 255.0f + 0.5f).toInt() shl 8) or
+            (this.blue * 255.0f + 0.5f).toInt()
 }
