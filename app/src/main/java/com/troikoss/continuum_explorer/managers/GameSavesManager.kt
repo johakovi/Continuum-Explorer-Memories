@@ -52,6 +52,8 @@ object GamesManager {
         GameSaveInfo("DuckStation", "Android/data/com.github.stenzek.duckstation/files"),
         GameSaveInfo("Bomb Squad", "Android/data/net.froemling.bombsquad/files/mods"),
         GameSaveInfo("Neverless to Everless (Selfie)", "Android/data/com.hottagames.nte/files/Selfie"),
+        GameSaveInfo("Wytchwood", "Android/data/com.Alientrap.Wytchwood"),
+
 
     )
 
