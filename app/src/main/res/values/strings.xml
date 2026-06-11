@@ -488,5 +488,11 @@
     <string name="settings_app_inactivity_timeout">App Inactivity Timeout</string>
     <string name="settings_timeout_minutes">%1$d minutes</string>
     <string name="settings_timeout_disabled">Never</string>
+
+    <string name="settings_custom_theme">Theme Customization</string>
+    <string name="settings_load_theme_pack">Load Theme Pack (.zip)</string>
+    <string name="settings_clear_theme_pack">Clear Custom Theme</string>
+    <string name="msg_theme_pack_loaded">Theme pack \"%1$s\" loaded</string>
+    <string name="msg_theme_pack_failed">Failed to load theme pack</string>
 </resources>
 

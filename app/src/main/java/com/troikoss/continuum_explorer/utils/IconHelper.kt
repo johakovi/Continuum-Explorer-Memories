@@ -48,6 +48,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import com.troikoss.continuum_explorer.managers.ThemePackManager
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -81,6 +84,25 @@ import java.io.FileOutputStream
  * Helper to determine the appropriate icon and handle thumbnails for files and folders.
  */
 object IconHelper {
+
+    @Composable
+    fun rememberThemePainter(resId: Int): Painter {
+        val context = LocalContext.current
+        val name = remember(resId) { context.resources.getResourceEntryName(resId) }
+        
+        var customBitmap = ThemePackManager.getCustomIcon(name)
+        
+        // Fallback: if we are looking for a "_duo" icon but only have the base one
+        if (customBitmap == null && name.endsWith("_duo")) {
+            customBitmap = ThemePackManager.getCustomIcon(name.removeSuffix("_duo"))
+        }
+
+        return if (customBitmap != null) {
+            remember(customBitmap) { BitmapPainter(customBitmap.asImageBitmap()) }
+        } else {
+            painterResource(id = resId)
+        }
+    }
 
     /**
      * List of game folder names (or substrings) that should use the "external" game save color
@@ -117,11 +139,11 @@ object IconHelper {
         Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
             val packageName = getPackageNameFromPath(providerId.ifEmpty { path })
             if (packageName != null && iconTheme != IconTheme.MATERIAL) {
-                AppIcon(packageName, fallbackPainter = painterResource(id = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
+                AppIcon(packageName, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
             } else {
                 val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
                 Icon(
-                    painter = painterResource(id = baseFolderRes),
+                    painter = rememberThemePainter(resId = baseFolderRes),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     tint = finalTint
@@ -142,7 +164,7 @@ object IconHelper {
                 } else overlayRes
 
                 Icon(
-                    painter = painterResource(id = finalOverlayRes),
+                    painter = rememberThemePainter(resId = finalOverlayRes),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
                     tint = Color.White
@@ -225,11 +247,11 @@ object IconHelper {
                 val isShowingAppIcon = packageName != null && iconTheme != IconTheme.MATERIAL
                 
                 if (isShowingAppIcon) {
-                    AppIcon(packageName!!, fallbackPainter = painterResource(id = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
+                    AppIcon(packageName!!, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
                 } else {
                     val baseFolderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
                     Icon(
-                        painter = painterResource(id = baseFolderRes),
+                        painter = rememberThemePainter(resId = baseFolderRes),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         tint = finalTint
@@ -250,7 +272,7 @@ object IconHelper {
                     } else overlayRes
 
                     Icon(
-                        painter = painterResource(id = finalOverlayRes),
+                        painter = rememberThemePainter(resId = finalOverlayRes),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
                         tint = Color.White.copy(alpha = 1f)
@@ -261,7 +283,7 @@ object IconHelper {
         }
 
         val fallbackPainter = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
-            painterResource(id = getDrawableForItem(file, iconTheme))
+            rememberThemePainter(resId = getDrawableForItem(file, iconTheme))
         } else {
             rememberVectorPainter(getIconForItem(file))
         }

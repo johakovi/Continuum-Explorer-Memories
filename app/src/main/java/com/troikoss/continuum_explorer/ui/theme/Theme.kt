@@ -21,6 +21,8 @@ import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
+import com.troikoss.continuum_explorer.managers.ThemePackManager
+import com.troikoss.continuum_explorer.managers.CustomThemeColors
 
 data class ExtendedColors(
     val sidebarBackground: Color,
@@ -67,6 +69,39 @@ data class ExtendedColors(
     val background: Color,
     val commandPanelBackground: Color
 )
+
+fun ExtendedColors.withCustomColors(custom: CustomThemeColors): ExtendedColors {
+    return this.copy(
+        sidebarBackground = custom.sidebarBackground ?: sidebarBackground,
+        topBarBackground = custom.topBarBackground ?: topBarBackground,
+        navButtonBackground = custom.navButtonBackground ?: navButtonBackground,
+        searchBoxBackground = custom.searchBoxBackground ?: searchBoxBackground,
+        tabBarBackground = custom.tabBarBackground ?: tabBarBackground,
+        selectionBackground = custom.selectionBackground ?: selectionBackground,
+        sidebarIcons = custom.sidebarIcons ?: sidebarIcons,
+        folderIcon = custom.folderIcon ?: folderIcon,
+        galleryIcon = custom.galleryIcon ?: galleryIcon,
+        recentIcon = custom.recentIcon ?: recentIcon,
+        filesIcon = custom.filesIcon ?: filesIcon,
+        documentsIcon = custom.documentsIcon ?: documentsIcon,
+        gameIcon = custom.gameIcon ?: gameIcon,
+        gameShortcutIcon = custom.gameShortcutIcon ?: gameShortcutIcon,
+        recycleBinIcon = custom.recycleBinIcon ?: recycleBinIcon,
+        downloadsIcon = custom.downloadsIcon ?: downloadsIcon,
+        zipIcon = custom.zipIcon ?: zipIcon,
+        pdfIcon = custom.pdfIcon ?: pdfIcon,
+        xlsIcon = custom.xlsIcon ?: xlsIcon,
+        docxIcon = custom.docxIcon ?: docxIcon,
+        txtIcon = custom.txtIcon ?: txtIcon,
+        terminalIcon = custom.terminalIcon ?: terminalIcon,
+        tabActiveBackground = custom.tabActiveBackground ?: tabActiveBackground,
+        textColor = custom.textColor ?: textColor,
+        menuBackground = custom.menuBackground ?: menuBackground,
+        fileViewBackground = custom.fileViewBackground ?: fileViewBackground,
+        background = custom.background ?: background,
+        commandPanelBackground = custom.commandPanelBackground ?: commandPanelBackground
+    )
+}
 
 val LocalExtendedColors = staticCompositionLocalOf<ExtendedColors> {
     error("No ExtendedColors provided")
@@ -568,7 +603,12 @@ fun FileExplorerTheme(
         onDispose {}
     }
 
-    CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
+    val finalExtendedColors = ThemePackManager.currentPack.value?.let { pack ->
+        if (darkTheme) extendedColors.withCustomColors(pack.darkColors)
+        else extendedColors.withCustomColors(pack.lightColors)
+    } ?: extendedColors
+
+    CompositionLocalProvider(LocalExtendedColors provides finalExtendedColors) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

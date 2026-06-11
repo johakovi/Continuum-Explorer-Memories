@@ -1,0 +1,27 @@
+{
+  "name": "Example Pack",
+  "light": {
+    "tabActiveBackground": "#F1F1F1",
+    "textColor": "#090909",
+    "menuBackground": "#FAFFFFFF",
+    "fileViewBackground": "#FFFFFF",
+    "background": "#F1F1F1",
+    "commandPanelBackground": "#F1F1F1",
+    "folderIcon": "#2196F3",
+    "sidebarBackground": "#EAE9E9",
+    "topBarBackground": "#F1F1F1",
+    "sidebarIcons": "#2196F3"
+  },
+  "dark": {
+    "tabActiveBackground": "#000000",
+    "textColor": "#F3F3F3",
+    "menuBackground": "#FA1C1C1C",
+    "fileViewBackground": "#0F0F11",
+    "background": "#000000",
+    "commandPanelBackground": "#000000",
+    "folderIcon": "#2196F3",
+    "sidebarBackground": "#171719",
+    "topBarBackground": "#000000",
+    "sidebarIcons": "#2196F3"
+  }
+}

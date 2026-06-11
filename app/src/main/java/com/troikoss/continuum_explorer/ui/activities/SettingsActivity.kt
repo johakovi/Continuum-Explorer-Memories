@@ -1,7 +1,14 @@
 package com.troikoss.continuum_explorer.ui.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.troikoss.continuum_explorer.managers.ThemePackManager
+import com.troikoss.continuum_explorer.utils.GlobalEvents
+import java.io.File
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -73,6 +80,26 @@ fun SettingsScreen(onBack: () -> Unit) {
     val iconTheme = SettingsManager.iconTheme.value
     val ftpInactivityTimeout = SettingsManager.ftpInactivityTimeout.value
     val appInactivityTimeout = SettingsManager.appInactivityTimeout.value
+    val currentThemePack = ThemePackManager.currentPack.value
+
+    val themePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val file = File(context.cacheDir, "temp_theme.zip")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            if (ThemePackManager.loadPack(context, file)) {
+                Toast.makeText(context, context.getString(R.string.msg_theme_pack_loaded, ThemePackManager.currentPack.value?.name), Toast.LENGTH_SHORT).show()
+                GlobalEvents.triggerConfigUpdate()
+            } else {
+                Toast.makeText(context, R.string.msg_theme_pack_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showTouchDragDialog by remember { mutableStateOf(false) }
@@ -113,22 +140,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(16.dp)
-            )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_theme)) },
-                supportingContent = {
-                    val text = when (themeMode) {
-                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
-                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
-                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
-                        ThemeMode.VERY_DARK -> stringResource(R.string.settings_theme_very_dark)
-                        ThemeMode.VERY_LIGHT -> stringResource(R.string.settings_theme_very_light)
-                        ThemeMode.ENHANCED_SYSTEM -> stringResource(R.string.settings_theme_enhanced_system)
-                    }
-                    Text(text)
-                },
-                modifier = Modifier.clickable { showThemeDialog = true }
             )
 
             ListItem(
@@ -177,20 +188,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                 }
             )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_icon_theme)) },
-                supportingContent = {
-                    val text = when (iconTheme) {
-                        IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
-                        IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
-                        IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
-                    }
-                    Text(text)
-                },
-                modifier = Modifier.clickable { showIconThemeDialog = true }
-            )
-
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_language)) },
@@ -261,6 +258,62 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                 }
             )
+
+            HorizontalDivider()
+
+            Text(
+                stringResource(R.string.settings_custom_theme),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_theme)) },
+                supportingContent = {
+                    val text = when (themeMode) {
+                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                        ThemeMode.VERY_DARK -> stringResource(R.string.settings_theme_very_dark)
+                        ThemeMode.VERY_LIGHT -> stringResource(R.string.settings_theme_very_light)
+                        ThemeMode.ENHANCED_SYSTEM -> stringResource(R.string.settings_theme_enhanced_system)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showThemeDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_icon_theme)) },
+                supportingContent = {
+                    val text = when (iconTheme) {
+                        IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                        IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showIconThemeDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_load_theme_pack)) },
+                supportingContent = { currentThemePack?.let { Text(it.name) } },
+                modifier = Modifier.clickable { themePickerLauncher.launch("application/zip") }
+            )
+
+            if (currentThemePack != null) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_clear_theme_pack)) },
+                    modifier = Modifier.clickable {
+                        ThemePackManager.clearPack(context)
+                        GlobalEvents.triggerConfigUpdate()
+                    }
+                )
+            }
+
+            HorizontalDivider()
 
             HorizontalDivider()
 

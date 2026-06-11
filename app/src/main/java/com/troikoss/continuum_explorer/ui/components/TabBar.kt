@@ -216,8 +216,8 @@ fun TabBar(
                         val iconTheme = SettingsManager.iconTheme.value
 
                         val painter = if (universalFile != null) {
-                            if (iconTheme == IconTheme.COLOURFUL) {
-                                androidx.compose.ui.res.painterResource(id = IconHelper.getDrawableForItem(universalFile))
+                            if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
+                                IconHelper.rememberThemePainter(resId = IconHelper.getDrawableForItem(universalFile, iconTheme))
                             } else {
                                 rememberVectorPainter(IconHelper.getIconForItem(universalFile))
                             }

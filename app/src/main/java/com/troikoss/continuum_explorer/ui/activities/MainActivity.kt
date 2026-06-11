@@ -140,6 +140,7 @@ open class MainActivity : AppCompatActivity() {
 
         // Initialize settings and storage providers
         SettingsManager.init(applicationContext)
+        com.troikoss.continuum_explorer.managers.ThemePackManager.init(applicationContext)
         StorageProviders.init(applicationContext)
 
         resetInactivityTimer()

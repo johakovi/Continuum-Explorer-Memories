@@ -655,6 +655,14 @@ fun TopBar(
                                     modifier = if (targetFile.isDirectory) Modifier.fileDropTarget(appState, destPath = targetFile) else Modifier
                                 ) {
                                     val isLast = index == visibleSegments.size - 1
+                                    if (index == 0) {
+                                        Icon(
+                                            painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_folder),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp).padding(end = 4.dp),
+                                            tint = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
                                     Text(
                                         text = displayName,
                                         style = MaterialTheme.typography.bodyMedium.copy(

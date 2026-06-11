@@ -1232,14 +1232,14 @@ private fun NavItem(
                 }
             } else customIcon
             Icon(
-                painter = androidx.compose.ui.res.painterResource(id = finalIcon),
+                painter = IconHelper.rememberThemePainter(resId = finalIcon),
                 contentDescription = null,
                 tint = tint,
                 modifier = Modifier.size(24.dp)
             )
         } else if (section == NavSection.Games) {
             Icon(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_nav_game_material),
+                painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_nav_game_material),
                 contentDescription = null,
                 tint = tint
             )
@@ -1521,7 +1521,7 @@ private fun NavNetworkItem(
         if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
             val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_network_duo else R.drawable.ic_network
             Icon(
-                painter = androidx.compose.ui.res.painterResource(id = drawableId),
+                painter = IconHelper.rememberThemePainter(resId = drawableId),
                 contentDescription = null,
                 tint = LocalExtendedColors.current.sidebarIcons,
                 modifier = Modifier.size(24.dp)
@@ -1670,7 +1670,7 @@ private fun NavStorageItem(
                 }
             } else customIcon
             Icon(
-                painter = androidx.compose.ui.res.painterResource(id = finalIcon),
+                painter = IconHelper.rememberThemePainter(resId = finalIcon),
                 contentDescription = null,
                 tint = LocalExtendedColors.current.sidebarIcons,
                 modifier = Modifier.size(24.dp)
