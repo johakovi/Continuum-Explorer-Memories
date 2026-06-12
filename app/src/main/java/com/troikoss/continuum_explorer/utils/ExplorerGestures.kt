@@ -748,7 +748,7 @@ fun Modifier.fileDropTarget(
                         if (isTrash && PendingCut.files.isNotEmpty()) {
                             // OPTIMIZATION: Use direct Move to Trash logic for internal drags
                             moveToRecycleBin(context, PendingCut.files)
-                            appState.refresh()
+                            appState.refresh()?.join()
                             GlobalEvents.triggerRefresh()
                             return@launch
                         }
@@ -808,11 +808,13 @@ fun Modifier.fileDropTarget(
                             destParentId = actualNetworkId,
                             preloadedClipData = clipData
                         )
-                        appState.refresh()
+                        appState.refresh()?.join()
 
-                        // If it was a Move operation, notify other windows (like the source) to refresh
-                        if (isMove) {
+                        if (isMove || pastedNames.isNotEmpty()) {
                             GlobalEvents.triggerRefresh()
+                        }
+
+                        if (isMove) {
                             appState.selectionManager.clear()
                             PendingCut.files = emptyList()
                             PendingCut.isActive = false

@@ -69,13 +69,13 @@ class WebDavProvider(
     }
 
     private val httpClient: OkHttpClient = OkHttpClient.Builder().apply {
-        if (connection.username.isNotEmpty()) {
-            addInterceptor { chain ->
-                val req = chain.request().newBuilder()
-                    .header("Authorization", Credentials.basic(connection.username, connection.password))
-                    .build()
-                chain.proceed(req)
+        addInterceptor { chain ->
+            val builder = chain.request().newBuilder()
+                .header("Cache-Control", "no-cache")
+            if (connection.username.isNotEmpty()) {
+                builder.header("Authorization", Credentials.basic(connection.username, connection.password))
             }
+            chain.proceed(builder.build())
         }
         if (connection.acceptUntrustedCerts && connection.useTls) {
             val trustAll = object : X509TrustManager {

@@ -343,11 +343,11 @@ class FileExplorerState(
         scrollToItemIndex = null
     }
 
-    fun refresh() {
+    fun refresh(): Job? {
         if (isSearchMode) {
             isSearchMode = false
         }
-        triggerLoad(forceRefresh = true)
+        return triggerLoad(forceRefresh = true)
     }
 
     fun performSearch(query: String, searchSubfolders: Boolean) {
@@ -466,12 +466,14 @@ class FileExplorerState(
         }
     }
 
-    fun triggerLoad(forceRefresh: Boolean = false) {
-        if (isSearchMode) return
+    fun triggerLoad(forceRefresh: Boolean = false): Job? {
+        if (isSearchMode) return null
         loadingJob?.cancel()
-        loadingJob = scope.launch {
+        val job = scope.launch {
             loadFiles(forceRefresh)
         }
+        loadingJob = job
+        return job
     }
 
     fun cancelLoading() {

@@ -118,6 +118,7 @@ fun FileExplorerState.cutSelection() {
 fun FileExplorerState.paste() {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clipData = clipboard.primaryClip
+    val isMove = PendingCut.isActive
 
     FileOperationsManager.start()
     val intent = Intent(context, PopUpActivity::class.java).apply {
@@ -127,7 +128,7 @@ fun FileExplorerState.paste() {
 
     scope.launch {
         val pastedNames = pasteFromClipboard(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, clipData)
-        refresh()
+        refresh()?.join()
         if (pastedNames.isNotEmpty()) {
             val pastedFiles = files.filter { pastedNames.contains(it.name) }
             if (pastedFiles.isNotEmpty()) {
@@ -135,7 +136,7 @@ fun FileExplorerState.paste() {
                 pastedFiles.forEach { selectionManager.select(it) }
             }
         }
-        if (PendingCut.isActive) GlobalEvents.triggerRefresh()
+        if (isMove || pastedNames.isNotEmpty()) GlobalEvents.triggerRefresh()
     }
 }
 
@@ -148,7 +149,7 @@ fun FileExplorerState.deleteSelection(forcePermanent: Boolean = false) {
 
     scope.launch {
         deleteFiles(context, selectionManager.selectedItems.toList(), forcePermanent)
-        refresh()
+        refresh()?.join()
         selectionManager.clear()
         GlobalEvents.triggerRefresh()
     }
@@ -163,7 +164,7 @@ fun FileExplorerState.restoreSelection() {
 
     scope.launch {
         restoreFiles(context, selectionManager.selectedItems.toList())
-        refresh()
+        refresh()?.join()
         selectionManager.clear()
         GlobalEvents.triggerRefresh()
     }
@@ -178,7 +179,7 @@ fun FileExplorerState.undo() {
 
     scope.launch {
         UndoManager.undo(context)
-        refresh()
+        refresh()?.join()
         GlobalEvents.triggerRefresh()
         FileOperationsManager.finish()
     }
@@ -193,7 +194,7 @@ fun FileExplorerState.redo() {
 
     scope.launch {
         UndoManager.redo(context)
-        refresh()
+        refresh()?.join()
         GlobalEvents.triggerRefresh()
         FileOperationsManager.finish()
     }
@@ -226,7 +227,7 @@ fun FileExplorerState.extractSelection() {
         if (settings.deleteSource) {
             deleteFiles(context, selectedArchives, forcePermanent = true, silent = true)
         }
-        refresh()
+        refresh()?.join()
         GlobalEvents.triggerRefresh()
     }
 }
@@ -259,7 +260,7 @@ fun FileExplorerState.compressSelection() {
         if (settings.deleteSource) {
             deleteFiles(context, selected, forcePermanent = true, silent = true)
         }
-        refresh()
+        refresh()?.join()
         GlobalEvents.triggerRefresh()
     }
 }
@@ -300,7 +301,7 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
         val success = renameFile(target, newName, context)
         withContext(Dispatchers.Main) {
             if (success) {
-                refresh()
+                refresh()?.join()
                 selectionManager.clear()
                 val newFile = files.find { it.name == newName }
                 if (newFile != null) selectionManager.select(newFile)
@@ -319,7 +320,7 @@ fun FileExplorerState.createNewFolder() {
             val success = createDirectory(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
-                    refresh()
+                    refresh()?.join()
                     val newFile = files.find { it.name == name }
                     if (newFile != null) selectionManager.select(newFile)
                     GlobalEvents.triggerRefresh()
@@ -341,7 +342,7 @@ fun FileExplorerState.createNewFile() {
             val success = createFile(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
-                    refresh()
+                    refresh()?.join()
                     val newFile = files.find { it.name == name }
                     if (newFile != null) {
                         selectionManager.select(newFile)
@@ -390,7 +391,7 @@ fun FileExplorerState.emptyRecycleBin() {
             deleteFiles(context, filesToDelete, forcePermanent = true)
             val metaFile = File(trashDir, ".metadata")
             if (metaFile.exists()) metaFile.delete()
-            refresh()
+            refresh()?.join()
             GlobalEvents.triggerRefresh()
         } else {
             Toast.makeText(context, context.getString(R.string.msg_recycle_bin_empty), Toast.LENGTH_SHORT).show()
