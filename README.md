@@ -9,9 +9,9 @@ Note: This project is forked from troikoss / Continuum Explorer
 
 [**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
 
-<img width="1920" height="1080" alt="Screenshot_20260523_235854_Continuum Explorer" src="https://github.com/user-attachments/assets/2cba7ee0-5757-4c15-92c1-508dccff08fa" />
+<img width="600" height="543" alt="Screenshot_20260613_003403_Continuum Explorer" src="https://github.com/user-attachments/assets/7790a4c2-e4ce-4cef-a5fc-9f7fbb0af785" />
+<img width="600" height="543" alt="Screenshot_20260613_003331_Continuum Explorer" src="https://github.com/user-attachments/assets/005f6640-50ae-4176-ae59-02fe869b9ac3" />
 
-<img width="1920" height="1080" alt="Screenshot_20260523_235818_Continuum Explorer" src="https://github.com/user-attachments/assets/3d84a09f-118a-49e3-8204-e9e1a49a04e2" />
 
 <img width="306" height="751" alt="Screenshot_20260524_004233_Continuum Explorer" src="https://github.com/user-attachments/assets/4f90c6a7-38dd-45d1-88eb-454c322c56ed" />
 
