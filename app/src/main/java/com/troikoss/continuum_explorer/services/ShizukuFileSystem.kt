@@ -44,9 +44,20 @@ class ShizukuFileSystemView(private val user: User, private val homeDir: String)
         val segments = virtualPath.split("/").filter { it.isNotEmpty() }
         var currentUf = rootUf
         
-        for (segment in segments) {
-            currentUf = currentUf.provider.findChild(currentUf.providerId, segment) 
-                ?: return NonExistentFtpFile(virtualPath)
+        for (i in segments.indices) {
+            val segment = segments[i]
+            val child = try {
+                currentUf.provider.findChild(currentUf.providerId, segment)
+            } catch (_: Exception) { null }
+            
+            if (child == null) {
+                return if (i == segments.size - 1) {
+                    NonExistentFtpFile(virtualPath, currentUf, segment)
+                } else {
+                    NonExistentFtpFile(virtualPath)
+                }
+            }
+            currentUf = child
         }
         
         return UniversalFtpFile(currentUf, virtualPath, user)
@@ -114,8 +125,19 @@ class GamesFileSystemView(private val context: android.content.Context, private 
         
         var currentUf = game
         for (i in 1 until segments.size) {
-            currentUf = currentUf.provider.findChild(currentUf.providerId, segments[i])
-                ?: return NonExistentFtpFile(virtualPath)
+            val segment = segments[i]
+            val child = try {
+                currentUf.provider.findChild(currentUf.providerId, segment)
+            } catch (_: Exception) { null }
+            
+            if (child == null) {
+                return if (i == segments.size - 1) {
+                    NonExistentFtpFile(virtualPath, currentUf, segment)
+                } else {
+                    NonExistentFtpFile(virtualPath)
+                }
+            }
+            currentUf = child
         }
         
         return UniversalFtpFile(currentUf, effectiveVirtualPath, user)
@@ -155,8 +177,8 @@ class UniversalFtpFile(
     override fun isFile(): Boolean = !universalFile.isDirectory
     override fun doesExist(): Boolean = true
     override fun isReadable(): Boolean = true
-    override fun isWritable(): Boolean = true
-    override fun isRemovable(): Boolean = false
+    override fun isWritable(): Boolean = universalFile.provider.capabilities.canWrite
+    override fun isRemovable(): Boolean = universalFile.provider.capabilities.canDelete
     override fun getOwnerName(): String = "admin"
     override fun getGroupName(): String = "admin"
     override fun getLinkCount(): Int = if (isDirectory) 3 else 1
@@ -166,9 +188,9 @@ class UniversalFtpFile(
     override fun getPhysicalFile(): Any? = null
 
     override fun mkdir(): Boolean = try {
-        val parentId = universalFile.provider.parentId(universalFile.providerId)
-        if (parentId != null) {
-            universalFile.provider.createChild(parentId, getName(), true)
+        val pId = universalFile.parentId ?: universalFile.provider.parentId(universalFile.providerId)
+        if (pId != null) {
+            universalFile.provider.createChild(pId, getName(), true)
             true
         } else false
     } catch (_: Exception) { false }
@@ -188,8 +210,9 @@ class UniversalFtpFile(
     }
 
     override fun createOutputStream(offset: Long): OutputStream {
-        val parentId = universalFile.provider.parentId(universalFile.providerId) ?: throw java.io.IOException("No parent")
-        val (_, stream) = universalFile.provider.createAndOpenOutput(parentId, getName())
+        val pId = universalFile.parentId ?: universalFile.provider.parentId(universalFile.providerId) 
+            ?: throw java.io.IOException("No parent")
+        val (_, stream) = universalFile.provider.createAndOpenOutput(pId, getName())
         return stream
     }
 
@@ -225,15 +248,19 @@ class VirtualRootFtpFile(private val games: List<UniversalFile>, private val use
     override fun createInputStream(offset: Long): InputStream = throw java.io.IOException("Is directory")
 }
 
-class NonExistentFtpFile(private val virtualPath: String) : FtpFile {
+class NonExistentFtpFile(
+    private val virtualPath: String,
+    private val parentUf: UniversalFile? = null,
+    private val fileName: String? = null
+) : FtpFile {
     override fun getAbsolutePath(): String = virtualPath
-    override fun getName(): String = virtualPath.substringAfterLast('/')
-    override fun isHidden(): Boolean = false
+    override fun getName(): String = fileName ?: virtualPath.substringAfterLast('/')
+    override fun isHidden(): Boolean = getName().startsWith(".")
     override fun isDirectory(): Boolean = false
     override fun isFile(): Boolean = false
     override fun doesExist(): Boolean = false
     override fun isReadable(): Boolean = false
-    override fun isWritable(): Boolean = false
+    override fun isWritable(): Boolean = parentUf?.provider?.capabilities?.canWrite ?: false
     override fun isRemovable(): Boolean = false
     override fun getOwnerName(): String = ""
     override fun getGroupName(): String = ""
@@ -242,10 +269,24 @@ class NonExistentFtpFile(private val virtualPath: String) : FtpFile {
     override fun setLastModified(time: Long): Boolean = false
     override fun getSize(): Long = 0L
     override fun getPhysicalFile(): Any? = null
-    override fun mkdir(): Boolean = false
+    
+    override fun mkdir(): Boolean = try {
+        if (parentUf != null && fileName != null) {
+            parentUf.provider.createChild(parentUf.providerId, fileName, true)
+            true
+        } else false
+    } catch (_: Exception) { false }
+
     override fun delete(): Boolean = false
     override fun move(destination: FtpFile): Boolean = false
     override fun listFiles(): List<FtpFile> = emptyList()
-    override fun createOutputStream(offset: Long): OutputStream = throw java.io.IOException("Not found")
+
+    override fun createOutputStream(offset: Long): OutputStream {
+        val pUf = parentUf ?: throw java.io.IOException("No parent")
+        val name = fileName ?: throw java.io.IOException("No name")
+        val (_, stream) = pUf.provider.createAndOpenOutput(pUf.providerId, name)
+        return stream
+    }
+
     override fun createInputStream(offset: Long): InputStream = throw java.io.IOException("Not found")
 }
