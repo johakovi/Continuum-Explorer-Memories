@@ -39,6 +39,7 @@ Note: This project is forked from troikoss / Continuum Explorer
 - Shizuku privilege
 
 - Termux privilege
+- Custom theme packs
 
 
 
