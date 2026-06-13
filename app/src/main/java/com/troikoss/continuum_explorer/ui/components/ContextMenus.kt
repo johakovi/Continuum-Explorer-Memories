@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Star
@@ -342,6 +343,16 @@ fun ItemContextMenu(
 
                 HorizontalDivider()
 
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
+                    onClick = {
+                        appState.selectionManager.selectAll()
+                        onDismiss()
+                    },
+                    leadingIcon = { Icon(Icons.Default.SelectAll, null) },
+                    trailingIcon = { CtrlShortcut("A") }
+                )
+
                 if (!isInRecycleBin) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_rename)) },
@@ -544,6 +555,16 @@ fun BackgroundContextMenu(
                     leadingIcon = { Icon(Icons.Default.ViewModule, null) },
                     trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                     onClick = { currentScreen = "VIEW" }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
+                    leadingIcon = { Icon(Icons.Default.SelectAll, null) },
+                    onClick = {
+                        appState.selectionManager.selectAll()
+                        onDismiss()
+                    },
+                    trailingIcon = { CtrlShortcut("A") }
                 )
 
                 if (appState.currentPath != null && isTermuxInstalled(context)) {

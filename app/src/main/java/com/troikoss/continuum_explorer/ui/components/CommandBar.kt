@@ -293,7 +293,7 @@ fun CommandBar(
                     if (!allSelected) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
-                            leadingIcon = { Icon(Icons.Default.Deselect, null) },
+                            leadingIcon = { Icon(Icons.Default.SelectAll, null) },
                             onClick = { selectionManager.selectAll(); onDismiss() }
                         )
                     }
