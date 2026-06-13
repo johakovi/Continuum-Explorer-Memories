@@ -112,6 +112,22 @@ object IconHelper {
      */
     private val EMULATOR_FOLDERS = listOf("PSP", "Dolphin", "PS2", "NetherSX2", "NDS", "PSVita")
 
+    /**
+     * Mapping of emulator folder names/substrings to their respective package names.
+     */
+    private val EMULATOR_PACKAGE_MAPPING = mapOf(
+        "PSP" to "org.ppsspp.ppsspp",
+        "PPSSPP" to "org.ppsspp.ppsspp",
+        "Dolphin" to "org.dolphinemu.dolphinemu",
+        "NetherSX2" to "xyz.aethersx2.android",
+        "AetherSX2" to "xyz.aethersx2.android",
+        "Vita3K" to "org.vita3k.emulator",
+        "DraStic" to "com.dsemu.drastic",
+        "DuckStation" to "com.github.stenzek.duckstation",
+        "Citra" to "org.citra.citra_emu",
+        "Yuzu" to "org.yuzu.yuzu_emu"
+    )
+
     // --- Public UI Components ---
 
     private fun getRootFolderColor(iconName: String, extendedColors: ExtendedColors, isDuo: Boolean): Color {
@@ -183,7 +199,17 @@ object IconHelper {
         } else null
 
         Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
-            val packageName = getPackageNameFromPath(providerId.ifEmpty { path })
+            var packageName = getPackageNameFromPath(providerId.ifEmpty { path })
+
+            // Fallback for emulators in sidebar or other places where name might be descriptive
+            if (packageName == null) {
+                val lowerName = name.lowercase()
+                val lowerPath = (providerId.ifEmpty { path }).lowercase()
+                packageName = EMULATOR_PACKAGE_MAPPING.entries.find {
+                    lowerName.contains(it.key.lowercase()) || lowerPath.contains("/${it.key.lowercase()}/")
+                }?.value
+            }
+
             val extendedColors = LocalExtendedColors.current
             val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
             
@@ -324,7 +350,16 @@ object IconHelper {
 
             Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
                 val isGameSave = file.parentId == "virtual://games_manager"
-                val packageName = getPackageNameFromPath(file.providerId, strict = !isGameSave)
+                var packageName = getPackageNameFromPath(file.providerId, strict = !isGameSave)
+
+                if (packageName == null && isGameSave) {
+                    val lowerName = file.name.lowercase()
+                    val lowerPath = file.providerId.lowercase()
+                    packageName = EMULATOR_PACKAGE_MAPPING.entries.find {
+                        lowerName.contains(it.key.lowercase()) || lowerPath.contains("/${it.key.lowercase()}/")
+                    }?.value
+                }
+
                 val isShowingAppIcon = packageName != null && effectiveIconTheme != IconTheme.MATERIAL
                 
                 if (rootCustomIcon != null) {
@@ -861,19 +896,29 @@ object IconHelper {
     // --- Utilities ---
 
     fun getPackageNameFromPath(path: String, strict: Boolean = true): String? {
-        val normalizedPath = path.replace("\\", "/").lowercase()
-        if (normalizedPath.contains("android/data/") || normalizedPath.contains("android/obb/")) {
-            val segments = normalizedPath.split("/").filter { it.isNotEmpty() }
-            val dataIndex = segments.indexOfFirst { it == "data" || it == "obb" }
-            if (dataIndex != -1 && dataIndex + 1 < segments.size) {
-                if (strict && dataIndex + 1 != segments.size - 1) {
-                    return null
+        val separators = charArrayOf('/', '\\')
+        val segments = path.split(*separators).filter { it.isNotEmpty() }
+
+        var dataIndex = -1
+        for (i in 1 until segments.size) {
+            val segment = segments[i]
+            if (segment.equals("data", ignoreCase = true) || segment.equals("obb", ignoreCase = true)) {
+                val prev = segments[i - 1]
+                // Handle both standard paths and SAF URIs (which might have primary:Android)
+                if (prev.equals("android", ignoreCase = true) || prev.endsWith(":android", ignoreCase = true)) {
+                    dataIndex = i
                 }
-                val potentialPackage = segments[dataIndex + 1]
-                // Package names usually have at least one dot and don't start with it
-                if (potentialPackage.contains(".") && !potentialPackage.startsWith(".")) {
-                    return potentialPackage
-                }
+            }
+        }
+
+        if (dataIndex != -1 && dataIndex + 1 < segments.size) {
+            if (strict && dataIndex + 1 != segments.size - 1) {
+                return null
+            }
+            val potentialPackage = segments[dataIndex + 1]
+            // Package names usually have at least one dot and don't start with it
+            if (potentialPackage.contains(".") && !potentialPackage.startsWith(".")) {
+                return potentialPackage
             }
         }
         return null
