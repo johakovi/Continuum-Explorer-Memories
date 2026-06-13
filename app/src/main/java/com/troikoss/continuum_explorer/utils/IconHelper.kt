@@ -619,6 +619,8 @@ object IconHelper {
             lName == "download" || lName == "downloads" || lPath.endsWith("/download") || lPath.endsWith("/downloads") -> R.drawable.ic_download_logo
             lName == "dcim" || lPath.endsWith("/dcim") || lName == "camera" || lPath.endsWith("/camera") -> R.drawable.ic_camera_logo
             lName == "pictures" || lPath.endsWith("/pictures") || lName == "photos" || lPath.endsWith("/photos") || lName == "screenshots" || lPath.endsWith("/screenshots") -> R.drawable.ic_gallery_logo
+            lName == "music" || lPath.endsWith("/music") -> R.drawable.ic_music_logo
+            lName == "android" || lPath.endsWith("/android") -> R.drawable.ic_android_logo
             else -> null
         }
     }
