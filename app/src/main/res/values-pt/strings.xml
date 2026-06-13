@@ -278,6 +278,7 @@
     <string name="menu_aspect_ratio">Proporção</string>
     <string name="menu_open_with_no_dots">Abrir Com</string>
     <string name="menu_select">Selecionar</string>
+    <string name="menu_select_all">Selecionar tudo</string>
     <string name="menu_clear_selection">Limpar Seleção</string>
     <string name="menu_select_inverse">Inverter Seleção</string>
     <string name="menu_remove">Remover</string>

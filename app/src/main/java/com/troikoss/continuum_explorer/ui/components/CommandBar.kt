@@ -168,7 +168,7 @@ fun CommandBar(
                 VerticalDivider()
 
                 CommandButton(
-                    text = stringResource(R.string.shortcuts_ctrl_a_desc),
+                    text = stringResource(R.string.menu_select_all),
                     icon = Icons.Default.SelectAll,
                     onClick = { selectionManager.selectAll() },
                 )
@@ -292,7 +292,7 @@ fun CommandBar(
 
                     if (!allSelected) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
+                            text = { Text(stringResource(R.string.menu_select_all)) },
                             leadingIcon = { Icon(Icons.Default.SelectAll, null) },
                             onClick = { selectionManager.selectAll(); onDismiss() }
                         )

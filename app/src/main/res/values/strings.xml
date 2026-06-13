@@ -285,6 +285,7 @@
     <string name="menu_aspect_ratio">Aspect Ratio</string>
     <string name="menu_open_with_no_dots">Open With</string>
     <string name="menu_select">Select</string>
+    <string name="menu_select_all">Select All</string>
     <string name="menu_clear_selection">Clear Selection</string>
     <string name="menu_select_inverse">Select Inverse</string>
     <string name="menu_remove">Remove</string>

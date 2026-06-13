@@ -285,6 +285,7 @@
     <string name="menu_aspect_ratio">Bildförhållande</string>
     <string name="menu_open_with_no_dots">Öppna med</string>
     <string name="menu_select">Markera</string>
+    <string name="menu_select_all">Markera alla</string>
     <string name="menu_clear_selection">Rensa markering</string>
     <string name="menu_select_inverse">Invertera markering</string>
     <string name="menu_remove">Ta bort</string>

@@ -344,7 +344,7 @@ fun ItemContextMenu(
                 HorizontalDivider()
 
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
+                    text = { Text(stringResource(R.string.menu_select_all)) },
                     onClick = {
                         appState.selectionManager.selectAll()
                         onDismiss()
@@ -558,7 +558,7 @@ fun BackgroundContextMenu(
                 )
 
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.shortcuts_ctrl_a_desc)) },
+                    text = { Text(stringResource(R.string.menu_select_all)) },
                     leadingIcon = { Icon(Icons.Default.SelectAll, null) },
                     onClick = {
                         appState.selectionManager.selectAll()

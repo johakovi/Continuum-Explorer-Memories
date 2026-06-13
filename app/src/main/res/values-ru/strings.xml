@@ -285,6 +285,7 @@
     <string name="menu_aspect_ratio">Соотношение сторон</string>
     <string name="menu_open_with_no_dots">Открыть с помощью</string>
     <string name="menu_select">Выбрать</string>
+    <string name="menu_select_all">Выбрать все</string>
     <string name="menu_clear_selection">Очистить выбор</string>
     <string name="menu_select_inverse">Инвертировать выбор</string>
     <string name="menu_remove">Удалить</string>
