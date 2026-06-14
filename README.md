@@ -49,7 +49,7 @@ Advanced System Monitor [Pensum](https://github.com/troikoss/Pensum) by troikoss
 
 Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-ios/)
 
-List of other FOSS [apps](https://github.com/offa/android-foss#-document--pdf-viewer)
+List of other FOSS [apps](https://github.com/offa/android-foss)
 
 For automatic updates, I recommend to use [Obtanium](https://github.com/ImranR98/Obtainium) and add app source URL: https://github.com/johakovi/Continuum-Explorer-Memories/tree/master
 
