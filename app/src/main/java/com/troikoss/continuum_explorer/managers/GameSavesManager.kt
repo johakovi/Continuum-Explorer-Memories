@@ -53,6 +53,8 @@ object GamesManager {
         GameSaveInfo("Bomb Squad", "Android/data/net.froemling.bombsquad/files/mods"),
         GameSaveInfo("Neverless to Everless (Selfie)", "Android/data/com.hottagames.nte/files/Selfie"),
         GameSaveInfo("Wytchwood", "Android/data/com.Alientrap.Wytchwood"),
+        GameSaveInfo("NS (Suyu)", "Android/data/org.suyu.suyu_emu/files"),
+        GameSaveInfo("The Wreck", "Android/data/com.ThePixelHunt.TheWreck"),
     )
 
     fun hasAnyGame(context: Context): Boolean {
