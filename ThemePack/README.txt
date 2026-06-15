@@ -74,7 +74,7 @@ theme.json Supported Colour Keys:
    - statusBarColor
    - navigationBarColor
 
-   Library/File Icons (Standard & Duo variants):
+   Library/File Icons:
    - folderIcon
    - galleryIcon
    - recentIcon
