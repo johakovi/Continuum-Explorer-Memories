@@ -461,4 +461,9 @@
     <string name="settings_clear_theme_pack">Özel Temayı Temizle</string>
     <string name="msg_theme_pack_loaded">Tema paketi \"%1$s\" yüklendi</string>
     <string name="msg_theme_pack_failed">Tema paketi yüklenemedi</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">Sunucu Yanıt Vermiyor</string>
+    <string name="dialog_unresponsive_server_message">\"%1$s\" sunucusunun yanıt vermesi uzun sürüyor. Beklemeye devam mı etmek istersiniz yoksa işlemi iptal mi etmek istersiniz?</string>
+    <string name="dialog_wait">Bekle</string>
 </resources>

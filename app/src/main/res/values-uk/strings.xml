@@ -494,4 +494,9 @@
     <string name="settings_clear_theme_pack">Очистити користувацьку тему</string>
     <string name="msg_theme_pack_loaded">Пакет теми \"%1$s\" завантажено</string>
     <string name="msg_theme_pack_failed">Не вдалося завантажити пакет теми</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">Сервер не відповідає</string>
+    <string name="dialog_unresponsive_server_message">Сервер «%1$s» занадто довго не відповідає. Бажаєте продовжити очікування чи скасувати операцію?</string>
+    <string name="dialog_wait">Зачекати</string>
 </resources>
