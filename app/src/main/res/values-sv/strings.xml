@@ -495,4 +495,9 @@
     <string name="settings_clear_theme_pack">Rensa anpassat tema</string>
     <string name="msg_theme_pack_loaded">Temapaket \"%1$s\" har laddats</string>
     <string name="msg_theme_pack_failed">Misslyckades med att ladda temapaket</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">Servern svarar inte</string>
+    <string name="dialog_unresponsive_server_message">Servern \"%1$s\" tar lång tid på sig att svara. Vill du fortsätta vänta eller avbryta åtgärden?</string>
+    <string name="dialog_wait">Vänta</string>
 </resources>

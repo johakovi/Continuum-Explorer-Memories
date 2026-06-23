@@ -248,7 +248,7 @@
     <string name="menu_remove_favorites">Retirer des favoris</string>
     <string name="menu_add_favorites">Ajouter aux favoris</string>
     <string name="menu_add_home">Ajouter à l\'accueil</string>
-    <string name="menu_extract">Extraer…</string>
+    <string name="menu_extract">Extraire…</string>
     <string name="menu_compress">Compresser…</string>
     <string name="menu_cut">Couper</string>
     <string name="menu_copy">Copier</string>
@@ -493,4 +493,9 @@
     <string name="settings_clear_theme_pack">Effacer le thème personnalisé</string>
     <string name="msg_theme_pack_loaded">Pack de thèmes \"%1$s\" chargé</string>
     <string name="msg_theme_pack_failed">Échec du chargement du pack de thèmes</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">Le serveur ne répond pas</string>
+    <string name="dialog_unresponsive_server_message">Le serveur \"%1$s\" met beaucoup de temps à répondre. Voulez-vous continuer à attendre ou annuler l\'opération ?</string>
+    <string name="dialog_wait">Attendre</string>
 </resources>

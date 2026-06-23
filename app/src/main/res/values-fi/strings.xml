@@ -496,5 +496,10 @@
     <string name="settings_clear_theme_pack">Tyhjennä mukautettu teema</string>
     <string name="msg_theme_pack_loaded">Teemapaketti \"%1$s\" ladattu</string>
     <string name="msg_theme_pack_failed">Teemapaketin lataaminen epäonnistui</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">Palvelin ei vastaa</string>
+    <string name="dialog_unresponsive_server_message">Palvelimelta \"%1$s\" kestää kauan vastata. Haluatko jatkaa odottamista vai peruuttaa toiminnon?</string>
+    <string name="dialog_wait">Odota</string>
 </resources>
 

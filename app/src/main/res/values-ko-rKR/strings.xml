@@ -494,4 +494,9 @@
     <string name="settings_clear_theme_pack">맞춤 테마 지우기</string>
     <string name="msg_theme_pack_loaded">테마 팩 \"%1$s\" 불러옴</string>
     <string name="msg_theme_pack_failed">테마 팩을 불러오지 못했습니다.</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">서버 응답 없음</string>
+    <string name="dialog_unresponsive_server_message">\"%1$s\" 서버가 응답하는 데 시간이 오래 걸립니다. 계속 기다리시겠습니까, 아니면 작업을 취소하시겠습니까?</string>
+    <string name="dialog_wait">기다리기</string>
 </resources>

@@ -491,4 +491,9 @@
     <string name="settings_clear_theme_pack">Borrar tema personalizado</string>
     <string name="msg_theme_pack_loaded">Paquete de temas \"%1$s\" cargado</string>
     <string name="msg_theme_pack_failed">Error al cargar el paquete de temas</string>
+
+    <!-- Unresponsive Server -->
+    <string name="dialog_unresponsive_server_title">El servidor no responde</string>
+    <string name="dialog_unresponsive_server_message">El servidor \"%1$s\" está tardando mucho en responder. ¿Desea seguir esperando o cancelar la operación?</string>
+    <string name="dialog_wait">Esperar</string>
 </resources>

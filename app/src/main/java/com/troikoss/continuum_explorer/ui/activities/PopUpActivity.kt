@@ -7,9 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,20 +81,18 @@ class PopUpActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            window.setRestrictedCaptionAreaListener { rect ->
-                val density = resources.displayMetrics.density
-                val screenWidth = resources.displayMetrics.widthPixels
-                if (rect.width() > 0) {
-                    val rightPadding = if (rect.left > screenWidth / 2) rect.width() else 0
-                    val leftPadding = if (rect.right < screenWidth / 2) rect.width() else 0
-                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(
-                        (leftPadding / density).dp,
-                        (rightPadding / density).dp
-                    )
-                } else {
-                    com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(0.dp, 0.dp)
-                }
+        window.setRestrictedCaptionAreaListener { rect ->
+            val density = resources.displayMetrics.density
+            val screenWidth = resources.displayMetrics.widthPixels
+            if (rect.width() > 0) {
+                val rightPadding = if (rect.left > screenWidth / 2) rect.width() else 0
+                val leftPadding = if (rect.right < screenWidth / 2) rect.width() else 0
+                com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(
+                    (leftPadding / density).dp,
+                    (rightPadding / density).dp
+                )
+            } else {
+                com.troikoss.continuum_explorer.managers.WindowManager.updateRestrictedArea(0.dp, 0.dp)
             }
         }
 
@@ -120,20 +116,20 @@ class PopUpActivity : ComponentActivity() {
                         
                         Box {
                             when (popupType) {
-                                PopupType.INPUT_TEXT -> InputContent(onClose = { finish() })
+                                PopupType.INPUT_TEXT -> InputContent { finish() }
                                 PopupType.COLLISION -> CollisionContent()
-                                PopupType.MOVE_COPY_CHOICE -> MoveCopyContent(onClose = { finish() })
-                                PopupType.DELETE_CONFIRM -> DeleteConfirmContent(onClose = { finish() })
-                                PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent(onClose = { finish() })
-                                PopupType.PASSWORD_INPUT -> PasswordInputContent(onClose = { finish() })
-                                PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent(onClose = { finish() })
-                                PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent(onClose = { finish() })
-                                PopupType.SHORTCUTS -> ShortcutsContent(onClose = { finish() })
-                                PopupType.PROPERTIES -> PropertiesContent(onClose = { finish() })
-                                PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
-                                PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
-                                PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent(onClose = { finish() })
-                                else -> ProgressContent(onClose = { finish() })
+                                PopupType.MOVE_COPY_CHOICE -> MoveCopyContent { finish() }
+                                PopupType.DELETE_CONFIRM -> DeleteConfirmContent { finish() }
+                                PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent { finish() }
+                                PopupType.PASSWORD_INPUT -> PasswordInputContent { finish() }
+                                PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent { finish() }
+                                PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent { finish() }
+                                PopupType.SHORTCUTS -> ShortcutsContent { finish() }
+                                PopupType.PROPERTIES -> PropertiesContent { finish() }
+                                PopupType.NETWORK_CONNECTION -> NetworkConnectionContent { finish() }
+                                PopupType.TERMINAL_DEBUG -> TerminalDebugContent { finish() }
+                                PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent { finish() }
+                                else -> ProgressContent { finish() }
                             }
                         }
                     }
@@ -158,13 +154,13 @@ fun UnresponsiveServerContent(onClose: () -> Unit) {
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = stringResource(R.string.unresponsive_server_title),
+            text = stringResource(R.string.dialog_unresponsive_server_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = stringResource(R.string.unresponsive_server_message, serverName),
+            text = stringResource(R.string.dialog_unresponsive_server_message, serverName),
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -188,7 +184,7 @@ fun UnresponsiveServerContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.wait))
+                Text(stringResource(R.string.dialog_wait))
             }
         }
     }
@@ -268,7 +264,8 @@ fun PropertiesContent(onClose: () -> Unit) {
                     calculatedSizeOnDisk = ((file.length + 4095L) / 4096L) * 4096L
                 }
 
-                if (fileType == resources.getString(R.string.image)) {
+            when (fileType) {
+                resources.getString(R.string.image) -> {
                     isLoadingExtra = true
                     withContext(Dispatchers.IO) {
                         val res = getImageResolution(context, file)
@@ -277,7 +274,8 @@ fun PropertiesContent(onClose: () -> Unit) {
                             isLoadingExtra = false
                         }
                     }
-                } else if (fileType == resources.getString(R.string.video)) {
+                }
+                resources.getString(R.string.video) -> {
                     isLoadingExtra = true
                     withContext(Dispatchers.IO) {
                         val res = getVideoResolution(context, file)
@@ -288,7 +286,8 @@ fun PropertiesContent(onClose: () -> Unit) {
                             isLoadingExtra = false
                         }
                     }
-                } else if (fileType == resources.getString(R.string.audio)) {
+                }
+                resources.getString(R.string.audio) -> {
                      isLoadingExtra = true
                      withContext(Dispatchers.IO) {
                          val duration = getMediaDuration(context, file)
@@ -299,12 +298,12 @@ fun PropertiesContent(onClose: () -> Unit) {
                      }
                 }
             }
+            }
 
             PropertyRow(stringResource(R.string.prop_name), file.name)
             PropertyRow(stringResource(R.string.prop_type), fileType)
             if (file.isDirectory) {
-                val childCount = remember(file) { file.fileRef?.listFiles()?.size }
-                if (childCount != null) {
+                remember(file) { file.fileRef?.listFiles()?.size }?.let { childCount ->
                     PropertyRow(
                         stringResource(R.string.prop_items),
                         if (childCount == 1) stringResource(R.string.details_item_count_singular)
@@ -1214,24 +1213,37 @@ fun ProgressContent (onClose: () -> Unit) {
     LaunchedEffect(isRunning) { 
         if (!isRunning) { 
             focusRequester.requestFocus()
-            delay(500)
-            onClose() 
         } 
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = FileOperationsManager.getTitleText(context), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        Box(modifier = Modifier.fillMaxWidth().height(18.dp).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))) {
-            Box(modifier = Modifier.fillMaxWidth(progress).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
+
+        if (isRunning) {
+            Box(modifier = Modifier.fillMaxWidth().height(18.dp).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))) {
+                Box(modifier = Modifier.fillMaxWidth(progress).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailRow(label = stringResource(R.string.prop_name), value = currentFileName)
+            DetailRow(label = stringResource(R.string.op_time_remaining), value = timeString)
+            DetailRow(label = stringResource(R.string.op_items_remaining), value = "$itemsRemaining ($sizeRemainingString)")
+            DetailRow(label = stringResource(R.string.op_speed), value = "${Formatter.formatFileSize(context, speedBytesPerSec)}/${resources.getString(R.string.op_sec)}")
+        } else {
+            val isCancelled = FileOperationsManager.isCancelled.value
+            Text(
+                text = if (isCancelled) stringResource(R.string.msg_operation_cancelled) else stringResource(R.string.msg_op_completed),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (!isCancelled) {
+                DetailRow(label = stringResource(R.string.prop_items), value = itemsProcessed.toString())
+                DetailRow(label = stringResource(R.string.prop_total_size), value = Formatter.formatFileSize(context, processedSize))
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(8.dp))
-        DetailRow(label = stringResource(R.string.prop_name), value = currentFileName)
-        DetailRow(label = stringResource(R.string.op_time_remaining), value = timeString)
-        DetailRow(label = stringResource(R.string.op_items_remaining), value = "$itemsRemaining ($sizeRemainingString)")
-        DetailRow(label = stringResource(R.string.op_speed), value = "${Formatter.formatFileSize(context, speedBytesPerSec)}/${resources.getString(R.string.op_sec)}")
+
         Spacer(modifier = Modifier.height(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             if (!isRunning) {
@@ -1242,7 +1254,7 @@ fun ProgressContent (onClose: () -> Unit) {
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
-                ) { Text(stringResource(R.string.close)) }
+                ) { Text(stringResource(R.string.ok)) }
             } else {
                 TextButton(onClick = { onClose() }) { Text(stringResource(R.string.op_background)) }
                 Spacer(modifier = Modifier.width(8.dp))

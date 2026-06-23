@@ -115,25 +115,28 @@ object NotificationHelper {
         if (!isRunning) {
             // Success or Cancelled - show final notification then stop service
             val isCancelled = FileOperationsManager.isCancelled.value
+            val intent = Intent(context, PopUpActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            
+            val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+
             if (!isCancelled) {
-                val intent = Intent(context, PopUpActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                }
-                val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                
-                val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                builder.setSmallIcon(android.R.drawable.stat_sys_download_done)
                     .setContentTitle(context.getString(R.string.op_finished))
                     .setContentText(context.getString(R.string.msg_op_completed))
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true)
-
-                NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
-                stop(cancelNotification = false)
             } else {
-                stop(cancelNotification = true)
+                builder.setSmallIcon(android.R.drawable.stat_notify_error)
+                    .setContentTitle(context.getString(R.string.msg_cancelled))
+                    .setContentText(context.getString(R.string.msg_operation_cancelled))
             }
+
+            NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+            stop(cancelNotification = false)
             return
         }
 
@@ -170,15 +173,18 @@ object NotificationHelper {
         val progressInt = (progress * 100).toInt()
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setSmallIcon(if (isCancelled) android.R.drawable.stat_notify_error else android.R.drawable.stat_sys_download)
             .setContentTitle(title)
-            .setSubText(contentText)
-            .setStyle(NotificationCompat.BigTextStyle().bigText("$contentText\n$fileName"))
+            .setSubText(if (isCancelled) "" else contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(if (isCancelled) fileName else "$contentText\n$fileName"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
-            .setProgress(100, progressInt, false)
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
+            
+        if (!isCancelled) {
+            builder.setProgress(100, progressInt, false)
+        }
             
         if (!isCancelled) {
             builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel), cancelPendingIntent)
