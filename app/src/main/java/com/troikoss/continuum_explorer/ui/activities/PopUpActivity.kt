@@ -132,6 +132,7 @@ class PopUpActivity : ComponentActivity() {
                                 PopupType.PROPERTIES -> PropertiesContent(onClose = { finish() })
                                 PopupType.NETWORK_CONNECTION -> NetworkConnectionContent(onClose = { finish() })
                                 PopupType.TERMINAL_DEBUG -> TerminalDebugContent(onClose = { finish() })
+                                PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent(onClose = { finish() })
                                 else -> ProgressContent(onClose = { finish() })
                             }
                         }
@@ -143,6 +144,53 @@ class PopUpActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
+    }
+}
+
+@Composable
+fun UnresponsiveServerContent(onClose: () -> Unit) {
+    val serverName = FileOperationsManager.dialogTitle.value
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = stringResource(R.string.unresponsive_server_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.unresponsive_server_message, serverName),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+        ) {
+            TextButton(onClick = {
+                FileOperationsManager.onWaitChoice(com.troikoss.continuum_explorer.managers.WaitResult.CANCEL)
+                onClose()
+            }) {
+                Text(stringResource(R.string.cancel))
+            }
+            Button(
+                onClick = {
+                    FileOperationsManager.onWaitChoice(com.troikoss.continuum_explorer.managers.WaitResult.WAIT)
+                },
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(stringResource(R.string.wait))
+            }
+        }
     }
 }
 

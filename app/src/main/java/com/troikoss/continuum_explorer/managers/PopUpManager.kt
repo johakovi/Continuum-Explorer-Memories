@@ -38,7 +38,13 @@ enum class PopupType {
     PROPERTIES,
     MOVE_COPY_CHOICE,
     NETWORK_CONNECTION,
-    TERMINAL_DEBUG
+    TERMINAL_DEBUG,
+    UNRESPONSIVE_SERVER
+}
+
+enum class WaitResult {
+    WAIT,
+    CANCEL
 }
 
 enum class CollisionResult {
@@ -155,6 +161,9 @@ object FileOperationsManager {
 
     // Terminal Debug State
     var terminalOutput = mutableStateOf("")
+
+    // Unresponsive Server State
+    private var waitDeferred: CompletableDeferred<WaitResult>? = null
 
     // List of listeners to be notified on updates
     private val listeners = mutableListOf<() -> Unit>()
@@ -437,6 +446,25 @@ object FileOperationsManager {
         notifyListeners()
     }
 
+    suspend fun requestWaitOrCancel(serverName: String): WaitResult {
+        dialogTitle.value = serverName
+        popupType.value = PopupType.UNRESPONSIVE_SERVER
+        
+        val deferred = CompletableDeferred<WaitResult>()
+        waitDeferred = deferred
+        notifyListeners()
+        
+        val result = deferred.await()
+        popupType.value = PopupType.PROGRESS
+        notifyListeners()
+        return result
+    }
+
+    fun onWaitChoice(result: WaitResult) {
+        waitDeferred?.complete(result)
+        waitDeferred = null
+    }
+
     fun openRename(file: UniversalFile, context: Context, onConfirm: (String) -> Unit) {
         openInput(
             title = context.getString(R.string.menu_rename),
@@ -479,6 +507,7 @@ object FileOperationsManager {
         extractDeferred?.complete(ExtractSettings(false, false, true))
         archiveDeferred?.complete(ArchiveSettings("", CompressionMethod.STORE, CompressionLevel.NORMAL, EncryptionMethod.NONE, null, false, true))
         networkConnectionDeferred?.complete(null)
+        waitDeferred?.complete(WaitResult.CANCEL)
         notifyListeners()
     }
 

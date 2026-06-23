@@ -495,5 +495,10 @@
     <string name="settings_clear_theme_pack">Clear Custom Theme</string>
     <string name="msg_theme_pack_loaded">Theme pack \"%1$s\" loaded</string>
     <string name="msg_theme_pack_failed">Failed to load theme pack</string>
+
+    <!-- Unresponsive Server -->
+    <string name="unresponsive_server_title">Unresponsive Server</string>
+    <string name="unresponsive_server_message">The server \"%1$s\" is taking a long time to respond. Would you like to keep waiting or cancel the operation?</string>
+    <string name="wait">Wait</string>
 </resources>
 

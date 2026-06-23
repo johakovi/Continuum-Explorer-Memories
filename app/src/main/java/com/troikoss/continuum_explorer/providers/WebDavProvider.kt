@@ -40,6 +40,12 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLException
 import javax.net.ssl.X509TrustManager
 import okio.BufferedSink
+import com.troikoss.continuum_explorer.managers.FileOperationsManager
+import com.troikoss.continuum_explorer.managers.WaitResult
+import okhttp3.Call
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 
 class WebDavProvider(
     private val connection: NetworkConnection,
@@ -96,6 +102,56 @@ class WebDavProvider(
         writeTimeout(60, TimeUnit.SECONDS)
     }.build()
 
+    private fun <T> executeWithWatchdog(call: Call, block: (Call) -> T): T {
+        var currentCall = call
+        while (true) {
+            try {
+                // We use a shorter timeout internally for the watchdog
+                // but OkHttp doesn't allow changing timeout on a per-call basis easily after it's created
+                // without using a builder.
+                return block(currentCall)
+            } catch (e: SocketTimeoutException) {
+                val result = runBlocking(Dispatchers.Main) {
+                    FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                }
+                if (result == WaitResult.CANCEL) {
+                    currentCall.cancel()
+                    throw e
+                }
+                // If WAIT, we retry the block if it's safe, or we just let it loop.
+                // But for execute(), we have to recreate the call.
+                currentCall = currentCall.clone()
+            }
+        }
+    }
+
+    private inner class WatchdogInputStream(private val wrapped: InputStream) : InputStream() {
+        override fun read(): Int = readWithWatchdog { wrapped.read() }
+        override fun read(b: ByteArray): Int = readWithWatchdog { wrapped.read(b) }
+        override fun read(b: ByteArray, off: Int, len: Int): Int = readWithWatchdog { wrapped.read(b, off, len) }
+        
+        private fun <T> readWithWatchdog(block: () -> T): T {
+            while (true) {
+                try {
+                    return block()
+                } catch (e: SocketTimeoutException) {
+                    val result = runBlocking(Dispatchers.Main) {
+                        FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                    }
+                    if (result == WaitResult.CANCEL) throw e
+                    // If WAIT, just try reading again.
+                }
+            }
+        }
+
+        override fun close() { wrapped.close() }
+        override fun available(): Int = wrapped.available()
+        override fun skip(n: Long): Long = wrapped.skip(n)
+        override fun mark(readlimit: Int) = wrapped.mark(readlimit)
+        override fun reset() = wrapped.reset()
+        override fun markSupported(): Boolean = wrapped.markSupported()
+    }
+
     override fun rootId(): String = "webdav://${connection.id}/"
 
     override fun parentId(childId: String): String? {
@@ -115,7 +171,7 @@ class WebDavProvider(
         try {
             val req = Request.Builder().url(urlOf(id)).method("PROPFIND", null)
                 .header("Depth", "0").build()
-            val code = httpClient.newCall(req).execute().use { it.code }
+            val code = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }.use { it.code }
             code in 200..299 || code == 207
         } catch (_: Exception) { false }
     }
@@ -123,12 +179,24 @@ class WebDavProvider(
     override suspend fun listChildren(id: String): List<UniversalFile> = withContext(Dispatchers.IO) {
         val out = mutableListOf<UniversalFile>()
         try {
-            DavCollection(httpClient, urlOf(id)).propfind(
-                1,
-                DisplayName.NAME, ResourceType.NAME, GetContentLength.NAME, GetLastModified.NAME, GetContentType.NAME
-            ) { response, relation ->
-                if (relation != Response.HrefRelation.SELF) {
-                    out.add(response.toUniversalFile(id))
+            // DavCollection doesn't expose the Call, so we might need a different approach or wrap the whole thing
+            // For now, let's wrap it in a try-catch that handles timeout
+            while (true) {
+                try {
+                    DavCollection(httpClient, urlOf(id)).propfind(
+                        1,
+                        DisplayName.NAME, ResourceType.NAME, GetContentLength.NAME, GetLastModified.NAME, GetContentType.NAME
+                    ) { response, relation ->
+                        if (relation != Response.HrefRelation.SELF) {
+                            out.add(response.toUniversalFile(id))
+                        }
+                    }
+                    break
+                } catch (e: SocketTimeoutException) {
+                    val result = withContext(Dispatchers.Main) {
+                        FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                    }
+                    if (result == WaitResult.CANCEL) throw e
                 }
             }
         } catch (e: HttpException) {
@@ -148,11 +216,21 @@ class WebDavProvider(
 
     override fun getMetadata(id: String): FileMetadata = runBlocking(Dispatchers.IO) {
         var meta: FileMetadata? = null
-        DavResource(httpClient, urlOf(id)).propfind(
-            0,
-            GetContentLength.NAME, GetLastModified.NAME, ResourceType.NAME, GetContentType.NAME
-        ) { response, _ ->
-            if (meta == null) meta = response.toFileMetadata()
+        while (true) {
+            try {
+                DavResource(httpClient, urlOf(id)).propfind(
+                    0,
+                    GetContentLength.NAME, GetLastModified.NAME, ResourceType.NAME, GetContentType.NAME
+                ) { response, _ ->
+                    if (meta == null) meta = response.toFileMetadata()
+                }
+                break
+            } catch (e: SocketTimeoutException) {
+                val result = runBlocking(Dispatchers.Main) {
+                    FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                }
+                if (result == WaitResult.CANCEL) throw e
+            }
         }
         meta ?: throw NetworkProviderException("Metadata not found for $id")
     }
@@ -165,19 +243,21 @@ class WebDavProvider(
 
     override fun openInput(id: String): InputStream = runBlocking(Dispatchers.IO) {
         val req = Request.Builder().url(urlOf(id)).get().build()
-        val resp = httpClient.newCall(req).execute()
+        val resp = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }
         if (!resp.isSuccessful) throw NetworkProviderException("GET failed: ${resp.code}")
-        resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
+        val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
+        WatchdogInputStream(stream)
     }
 
     fun openRangeInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
         val req = Request.Builder().url(urlOf(id))
             .header("Range", "bytes=$offset-").get().build()
-        val resp = httpClient.newCall(req).execute()
+        val resp = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }
         if (resp.code != 206 && !resp.isSuccessful) {
             throw NetworkProviderException("Range GET failed: ${resp.code}")
         }
-        resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
+        val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
+        WatchdogInputStream(stream)
     }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? = null
@@ -185,12 +265,22 @@ class WebDavProvider(
 
     override fun createChild(parentId: String, name: String, isDirectory: Boolean): UniversalFile = runBlocking(Dispatchers.IO) {
         val url = urlOf(makeId(pathOf(parentId).trimEnd('/') + "/$name" + if (isDirectory) "/" else ""))
-        if (isDirectory) {
-            DavCollection(httpClient, url).mkCol(null) {}
-        } else {
-            val req = Request.Builder().url(url)
-                .put(ByteArray(0).toRequestBody(null)).build()
-            httpClient.newCall(req).execute().close()
+        while (true) {
+            try {
+                if (isDirectory) {
+                    DavCollection(httpClient, url).mkCol(null) {}
+                } else {
+                    val req = Request.Builder().url(url)
+                        .put(ByteArray(0).toRequestBody(null)).build()
+                    executeWithWatchdog(httpClient.newCall(req)) { it.execute() }.close()
+                }
+                break
+            } catch (e: SocketTimeoutException) {
+                val result = runBlocking(Dispatchers.Main) {
+                    FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                }
+                if (result == WaitResult.CANCEL) throw e
+            }
         }
         UniversalFile(
             name = name, isDirectory = isDirectory,
@@ -212,11 +302,16 @@ class WebDavProvider(
                 override fun writeTo(sink: BufferedSink) {
                     val buf = ByteArray(32 * 1024)
                     var n = pipedIn.read(buf)
-                    while (n > 0) { sink.write(buf, 0, n); n = pipedIn.read(buf) }
+                    while (n > 0) {
+                        sink.write(buf, 0, n)
+                        n = pipedIn.read(buf)
+                    }
                 }
             }
             val req = Request.Builder().url(url).put(body).build()
-            httpClient.newCall(req).execute().close()
+            try {
+                executeWithWatchdog(httpClient.newCall(req)) { it.execute() }.close()
+            } catch (_: Exception) {}
         }
         val uf = UniversalFile(
             name = name, isDirectory = false,
@@ -230,7 +325,17 @@ class WebDavProvider(
 
     override fun delete(id: String): Boolean = runBlocking(Dispatchers.IO) {
         try {
-            DavResource(httpClient, urlOf(id)).delete(null, null) {}
+            while (true) {
+                try {
+                    DavResource(httpClient, urlOf(id)).delete(null, null) {}
+                    break
+                } catch (e: SocketTimeoutException) {
+                    val result = withContext(Dispatchers.Main) {
+                        FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                    }
+                    if (result == WaitResult.CANCEL) throw e
+                }
+            }
             true
         } catch (_: Exception) { false }
     }
@@ -241,7 +346,17 @@ class WebDavProvider(
             val isDir = id.endsWith("/")
             val newPath = "${pathOf(destParentId).trimEnd('/')}/$destName${if (isDir) "/" else ""}"
             val destUrl = urlOf(makeId(newPath))
-            DavResource(httpClient, oldUrl).move(destUrl, true) {}
+            while (true) {
+                try {
+                    DavResource(httpClient, oldUrl).move(destUrl, true) {}
+                    break
+                } catch (e: SocketTimeoutException) {
+                    val result = withContext(Dispatchers.Main) {
+                        FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                    }
+                    if (result == WaitResult.CANCEL) throw e
+                }
+            }
             UniversalFile(
                 name = destName, isDirectory = isDir,
                 lastModified = System.currentTimeMillis(), length = 0,
@@ -256,7 +371,17 @@ class WebDavProvider(
             val parentPath = pathOf(id).trimEnd('/').substringBeforeLast('/')
             val newPath = "$parentPath/$newName"
             val destUrl = urlOf(makeId(newPath))
-            DavResource(httpClient, oldUrl).move(destUrl, true) {}
+            while (true) {
+                try {
+                    DavResource(httpClient, oldUrl).move(destUrl, true) {}
+                    break
+                } catch (e: SocketTimeoutException) {
+                    val result = withContext(Dispatchers.Main) {
+                        FileOperationsManager.requestWaitOrCancel(connection.displayName)
+                    }
+                    if (result == WaitResult.CANCEL) throw e
+                }
+            }
             val pid = parentId(id)
             UniversalFile(
                 name = newName, isDirectory = false,
