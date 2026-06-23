@@ -183,7 +183,7 @@ class UniversalFtpFile(
     override fun getGroupName(): String = "admin"
     override fun getLinkCount(): Int = if (isDirectory) 3 else 1
     override fun getLastModified(): Long = universalFile.lastModified
-    override fun setLastModified(time: Long): Boolean = false
+    override fun setLastModified(time: Long): Boolean = universalFile.provider.setLastModified(universalFile.providerId, time)
     override fun getSize(): Long = universalFile.length
     override fun getPhysicalFile(): Any? = null
 
@@ -195,8 +195,35 @@ class UniversalFtpFile(
         } else false
     } catch (_: Exception) { false }
 
-    override fun delete(): Boolean = try { universalFile.provider.delete(universalFile.providerId) } catch (_: Exception) { false }
-    override fun move(destination: FtpFile): Boolean = false
+    override fun delete(): Boolean = try { 
+        val success = universalFile.provider.delete(universalFile.providerId)
+        // If the file still exists after a successful delete call, something is wrong
+        // but we return the provider's result.
+        success
+    } catch (_: Exception) { false }
+    override fun move(destination: FtpFile): Boolean {
+        val destParentId: String
+        val destName: String
+        
+        when (destination) {
+            is UniversalFtpFile -> {
+                destName = destination.universalFile.name
+                destParentId = destination.universalFile.parentId ?: destination.universalFile.provider.parentId(destination.universalFile.providerId) ?: return false
+            }
+            is NonExistentFtpFile -> {
+                destName = destination.fileName ?: return false
+                destParentId = destination.parentUf?.providerId ?: return false
+            }
+            else -> return false
+        }
+        
+        val currentParentId = universalFile.parentId ?: universalFile.provider.parentId(universalFile.providerId)
+        if (destParentId == currentParentId) {
+            return universalFile.provider.rename(universalFile.providerId, destName) != null
+        }
+        
+        return universalFile.provider.move(universalFile.providerId, destParentId, destName) != null
+    }
 
     override fun listFiles(): List<FtpFile> {
         if (!isDirectory) return emptyList()
@@ -250,8 +277,8 @@ class VirtualRootFtpFile(private val games: List<UniversalFile>, private val use
 
 class NonExistentFtpFile(
     private val virtualPath: String,
-    private val parentUf: UniversalFile? = null,
-    private val fileName: String? = null
+    val parentUf: UniversalFile? = null,
+    val fileName: String? = null
 ) : FtpFile {
     override fun getAbsolutePath(): String = virtualPath
     override fun getName(): String = fileName ?: virtualPath.substringAfterLast('/')

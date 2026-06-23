@@ -177,4 +177,8 @@ object ShizukuProvider : StorageProvider {
         }
         return null
     }
+
+    override fun setLastModified(id: String, time: Long): Boolean {
+        return ShizukuManager.getServiceBlocking()?.setLastModified(id, time) ?: false
+    }
 }

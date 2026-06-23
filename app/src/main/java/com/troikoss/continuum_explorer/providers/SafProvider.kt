@@ -77,14 +77,25 @@ object SafProvider : StorageProvider {
 
     override fun createChild(parentId: String, name: String, isDirectory: Boolean): UniversalFile {
         val parent = docFromId(parentId)!!
+        val existing = parent.findFile(name)
+        if (existing != null) {
+            if (existing.isDirectory == isDirectory) return existing.toUniversalFile()
+            // If type mismatch, we let createFile/createDirectory handle it (which will probably create a suffixed one)
+            // but ideally we should have deleted it. FTP clients usually delete before creating if they want to replace.
+        }
         val doc = if (isDirectory) parent.createDirectory(name)!! else parent.createFile("application/octet-stream", name)!!
         return doc.toUniversalFile()
     }
 
     override fun createAndOpenOutput(parentId: String, name: String): Pair<UniversalFile, OutputStream> {
         val parent = docFromId(parentId)!!
-        val doc = parent.createFile("application/octet-stream", name)!!
-        val stream = appContext.contentResolver.openOutputStream(doc.uri)!!
+        val existing = parent.findFile(name)
+        val doc = if (existing != null && existing.isFile) {
+            existing
+        } else {
+            parent.createFile("application/octet-stream", name)!!
+        }
+        val stream = appContext.contentResolver.openOutputStream(doc.uri, "wt")!!
         return doc.toUniversalFile() to stream
     }
 

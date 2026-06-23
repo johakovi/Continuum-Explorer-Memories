@@ -169,6 +169,13 @@ object LocalProvider : StorageProvider {
         } catch (_: Exception) { null }
     }
 
+    override fun setLastModified(id: String, time: Long): Boolean {
+        if (RestrictedCache.isRestrictedPath(id) && ShizukuManager.hasPermission()) {
+            return ShizukuProvider.setLastModified(id, time)
+        }
+        return File(id).setLastModified(time)
+    }
+
     private fun isRestrictedPath(path: String): Boolean = RestrictedCache.isRestrictedPath(path)
 
     fun File.toUniversalFile(): UniversalFile = UniversalFile(
