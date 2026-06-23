@@ -65,6 +65,7 @@ import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
+import com.troikoss.continuum_explorer.utils.GlobalEvents
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ShizukuManager
 import com.troikoss.continuum_explorer.managers.GamesManager
@@ -219,6 +220,9 @@ fun NavigationPane(
 
     LaunchedEffect(Unit) {
         refreshVolumes()
+        GlobalEvents.refreshEvent.collect {
+            refreshVolumes()
+        }
     }
 
     DisposableEffect(context) {
