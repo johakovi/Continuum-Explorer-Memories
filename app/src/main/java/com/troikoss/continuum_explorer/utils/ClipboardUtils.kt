@@ -311,7 +311,7 @@ suspend fun pasteFromClipboard(
                             val archiveSource: Any = if (rootId.startsWith("/")) File(rootId) else Uri.parse(rootId)
                             ZipUtils.getArchiveInputStream(context, archiveSource, src.archivePath ?: "")
                         } else null
-                    } else if (src.fileRef != null) {
+                    } else if (src.fileRef != null && !RestrictedCache.isRestrictedPath(src.providerId)) {
                         src.fileRef!!.inputStream()
                     } else if (src.documentFileRef != null) {
                         context.contentResolver.openInputStream(src.documentFileRef!!.uri)

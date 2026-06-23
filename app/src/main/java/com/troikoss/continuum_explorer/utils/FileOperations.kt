@@ -172,7 +172,7 @@ suspend fun copyRecursively(
         } else {
             val fileRef = source.fileRef
             val docRef = source.documentFileRef
-            if (fileRef != null) {
+            if (fileRef != null && !RestrictedCache.isRestrictedPath(source.providerId)) {
                 fileRef.listFiles()?.forEach { child ->
                     if (FileOperationsManager.isCancelled.value) return@forEach
                     copyRecursively(context, child.toUniversal(), newDestLocal, newDestSaf, destProvider, newDestParentId, onCopyFile)
