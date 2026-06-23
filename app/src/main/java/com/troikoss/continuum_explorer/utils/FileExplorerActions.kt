@@ -57,11 +57,21 @@ fun FileExplorerState.open(item: UniversalFile) {
         } else if (item.isArchiveEntry) {
             Toast.makeText(context, context.getString(R.string.msg_not_supported_archive), Toast.LENGTH_SHORT).show()
         } else if (item.provider.capabilities.isRemote) {
-            openRemoteFile(context, scope, item)
+            val extension = item.name.substringAfterLast('.', "").lowercase()
+            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+            val siblings = if (imageExtensions.contains(extension)) {
+                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
+            } else emptyList()
+            openRemoteFile(context, scope, item, siblings)
         } else if (RestrictedCache.isRestricted(item)) {
             openRestrictedFile(context, scope, item)
         } else {
-            openFile(context, item)
+            val extension = item.name.substringAfterLast('.', "").lowercase()
+            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+            val siblings = if (imageExtensions.contains(extension)) {
+                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
+            } else emptyList()
+            openFile(context, item, siblings = siblings)
         }
     }
 }

@@ -172,12 +172,29 @@ private fun launchOpenWithIntent(context: Context, uri: Uri, fileName: String? =
 /**
  * Opens a remote file by caching it locally first, then launching the appropriate viewer.
  */
-fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile) {
+fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
     val mime = MimeTypeMap.getSingleton()
         .getMimeTypeFromExtension(file.name.substringAfterLast('.', "").lowercase())
 
+    val isImage = mime?.startsWith("image/") == true
+
     scope.launch {
         try {
+            if (isImage) {
+                val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.ImageViewerActivity::class.java).apply {
+                    putExtra("IMAGE_URI", file.providerId)
+                    putExtra("PROVIDER_KIND", file.provider.kind.name)
+                    putExtra("CONNECTION_ID", file.provider.connectionId)
+                    putExtra("CURRENT_ID", file.providerId)
+                    if (siblings.isNotEmpty()) {
+                        putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+                    }
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+                return@launch
+            }
+
             FileOperationsManager.start()
             NotificationHelper.start(context)
             withContext(Dispatchers.Main) {
@@ -257,12 +274,34 @@ fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalF
  * Opens a file with the default system app.
  * Falls back to the "Open with" chooser if no default handles the type.
  */
-fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile? = null) {
+fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile? = null, siblings: List<UniversalFile> = emptyList()) {
     if (file.provider.capabilities.isRemote) return // Must use openRemoteFile with a scope instead
 
     val uri = getUriForUniversalFile(context, file) ?: return
 
     val extension = file.name.substringAfterLast('.', "").lowercase()
+
+    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        ?: context.contentResolver.getType(uri)
+        ?: "*/*"
+
+    // Use internal Image Viewer for images to support swiping/gallery features
+    val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+    if (imageExtensions.contains(extension) || mimeType.startsWith("image/")) {
+        val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.ImageViewerActivity::class.java).apply {
+            setData(uri)
+            putExtra("PROVIDER_KIND", file.provider.kind.name)
+            putExtra("CONNECTION_ID", file.provider.connectionId)
+            putExtra("CURRENT_ID", file.providerId)
+            if (siblings.isNotEmpty()) {
+                putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+            }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+        return
+    }
 
     if (extension == "sh" && SettingsManager.termuxSupport.value) {
         if (isTermuxInstalled(context)) {
@@ -287,10 +326,6 @@ fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile?
             }
         }
     }
-
-    val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-        ?: context.contentResolver.getType(uri)
-        ?: "*/*"
 
     // Use internal Text Editor for text files
     val textExtensions = setOf("txt", "log", "cfg", "ini", "md", "xml", "json", "sh", "py", "js", "html", "css")

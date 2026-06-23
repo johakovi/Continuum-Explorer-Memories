@@ -12,8 +12,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -42,7 +46,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,10 +76,9 @@ import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.ContentScale
 import android.content.ClipboardManager
-import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.ui.platform.LocalConfiguration
@@ -88,6 +90,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.troikoss.continuum_explorer.model.ProviderKind
+import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.StorageProviders
+import com.troikoss.continuum_explorer.utils.AppConfigurations
+import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
 import coil.compose.AsyncImage
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -146,8 +153,10 @@ fun ImageViewerScreen(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var imageSize by remember { mutableStateOf(Size.Zero) }
 
-    var currentUri by remember { mutableStateOf(initialImageUri) }
-    var siblingImages by remember { mutableStateOf<List<String>>(emptyList()) }
+    var currentUri by remember { mutableStateOf<Any?>(initialImageUri) }
+    var siblingImages by remember { mutableStateOf<List<Any>>(emptyList()) }
+
+    val pagerState = rememberPagerState(pageCount = { siblingImages.size })
 
     var showMenu by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(Offset.Zero) }
@@ -155,6 +164,46 @@ fun ImageViewerScreen(
     LaunchedEffect(initialImageUri) {
         if (initialImageUri != null) {
             withContext(Dispatchers.IO) {
+                val intent = activity?.intent
+                val providerKind = intent?.getStringExtra("PROVIDER_KIND")
+                val connectionId = intent?.getStringExtra("CONNECTION_ID")
+                val siblingIds = intent?.getStringArrayListExtra("SIBLING_IDS")
+
+                if (providerKind != null && siblingIds != null) {
+                    val kind = try { ProviderKind.valueOf(providerKind) } catch (_: Exception) { null }
+                    val provider = if (kind != null) {
+                        try {
+                            if (kind.name.startsWith("NETWORK_")) {
+                                val configs = AppConfigurations(context)
+                                val conn = configs.networkConnections.find { it.id == connectionId }
+                                if (conn != null) StorageProviders.network(conn) else null
+                            } else {
+                                StorageProviders.providerFor(kind)
+                            }
+                        } catch (_: Exception) { null }
+                    } else null
+
+                    if (provider != null) {
+                        val images = siblingIds.map { id ->
+                            UniversalFile(
+                                name = id.substringAfterLast('/'),
+                                isDirectory = false,
+                                lastModified = 0L,
+                                length = 0L,
+                                provider = provider,
+                                providerId = id,
+                                mimeType = null
+                            )
+                        }
+                        withContext(Dispatchers.Main) {
+                            siblingImages = images
+                            val currentId = intent.getStringExtra("CURRENT_ID") ?: initialImageUri
+                            currentUri = images.find { it.providerId == currentId } ?: images.firstOrNull() ?: initialImageUri
+                        }
+                        return@withContext
+                    }
+                }
+
                 val extensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
                 val images = getSiblingFiles(context, initialImageUri, extensions)
                 withContext(Dispatchers.Main) {
@@ -167,6 +216,22 @@ fun ImageViewerScreen(
                         currentUri = images.first()
                     }
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(currentUri, siblingImages) {
+        val index = siblingImages.indexOf(currentUri)
+        if (index >= 0 && pagerState.currentPage != index) {
+            pagerState.scrollToPage(index)
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (siblingImages.isNotEmpty() && pagerState.currentPage in siblingImages.indices) {
+            val newUri = siblingImages[pagerState.currentPage]
+            if (currentUri != newUri) {
+                currentUri = newUri
             }
         }
     }
@@ -246,208 +311,138 @@ fun ImageViewerScreen(
                 return Pair(maxX, maxY)
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onDoubleTap = {
-                                onToggleFullscreen()  // \u003c-- call the lambda here
-                            }
-                        )
-                    }
-                    .contextMenuDetector { clickOffset ->
-                        menuOffset = clickOffset
-                        showMenu = true
-                    }
-                    .pointerInput(screenWidthPx, screenHeightPx) {
-                        awaitPointerEventScope {
+            Box(modifier = Modifier.fillMaxSize()) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    userScrollEnabled = scale == 1f,
+                    beyondViewportPageCount = 1
+                ) { page ->
+                    val item = siblingImages[page]
+                    val isCurrent = item == currentUri
 
-                            while (true) {
-                                val event = awaitPointerEvent()
-
-                                if (event.type == PointerEventType.Release) {
-                                    // When finger is lifted, check how far we dragged the image
-                                    if (scale == 1f && offset.x != 0f) {
-                                        val swipeThreshold = screenWidthPx * 0.2f // 20% of screen
-                                        val idx = siblingImages.indexOf(currentUri)
-
-                                        coroutineScope.launch {
-                                            if (offset.x > swipeThreshold && idx > 0) {
-                                                // 1. Dragged right -> Animate it sliding fully to the right
-                                                animate(
-                                                    initialValue = offset.x,
-                                                    targetValue = screenWidthPx,
-                                                    animationSpec = tween(
-                                                        300
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .then(if (isCurrent) {
+                                Modifier
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(onDoubleTap = { onToggleFullscreen() })
+                                    }
+                                    .contextMenuDetector { clickOffset ->
+                                        menuOffset = clickOffset
+                                        showMenu = true
+                                    }
+                                    .pointerInput(screenWidthPx, screenHeightPx) {
+                                        awaitPointerEventScope {
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                
+                                                // 1. Handle Tertiary Click (Mouse Wheel Click) to close
+                                                if (event.type == PointerEventType.Press && event.buttons.isTertiaryPressed) {
+                                                    activity?.finish()
+                                                }
+                                                
+                                                // 2. Handle Ctrl + Scroll to Zoom
+                                                if (event.type == PointerEventType.Scroll && event.keyboardModifiers.isCtrlPressed) {
+                                                    val change = event.changes.first()
+                                                    val delta = change.scrollDelta.y
+                                                    val oldScale = scale
+                                                    val zoomFactor = if (delta < 0) 1.1f else 0.9f
+                                                    scale = (scale * zoomFactor).coerceIn(1f, 10f)
+                                                    val zoomRatio = scale / oldScale
+                                                    val focalPoint = change.position - screenCenter
+                                                    val newOffset = offset * zoomRatio + focalPoint * (1f - zoomRatio)
+                                                    val (maxX, maxY) = calculatePanLimits()
+                                                    offset = Offset(
+                                                        x = newOffset.x.coerceIn(-maxX, maxX),
+                                                        y = newOffset.y.coerceIn(-maxY, maxY)
                                                     )
-                                                ) { value, _ -> offset = Offset(value, offset.y) }
-
-                                                // 2. Secretly swap to the previous image
-                                                currentUri = siblingImages[idx - 1]
-                                                // 3. Reset the position invisibly
-                                                offset = Offset.Zero
-                                            } else if (offset.x < -swipeThreshold && idx < siblingImages.size - 1) {
-                                                // 1. Dragged left -> Animate it sliding fully to the left
-                                                animate(
-                                                    initialValue = offset.x,
-                                                    targetValue = -screenWidthPx,
-                                                    animationSpec = tween(
-                                                        300
+                                                }
+                                                
+                                                // 3. Handle Scroll to Navigate
+                                                if (event.type == PointerEventType.Scroll && !event.keyboardModifiers.isCtrlPressed) {
+                                                    val change = event.changes.first()
+                                                    val direction = change.scrollDelta.y
+                                                    val idx = siblingImages.indexOf(currentUri)
+                                                    if (idx > 0 && direction < 0f) {
+                                                        currentUri = siblingImages[idx - 1]
+                                                    }
+                                                    if (idx >= 0 && idx < siblingImages.size - 1 && direction > 0f) {
+                                                        currentUri = siblingImages[idx + 1]
+                                                    }
+                                                }
+                                                
+                                                // 4. Handle Mouse Pan (Ctrl + Primary) or Touch Pan/Zoom
+                                                val isCtrlPan = event.type == PointerEventType.Move &&
+                                                                event.keyboardModifiers.isCtrlPressed &&
+                                                                event.buttons.isPrimaryPressed
+                                                
+                                                if (isCtrlPan) {
+                                                    val change = event.changes.first()
+                                                    val mousePan = change.position - change.previousPosition
+                                                    val (maxX, maxY) = calculatePanLimits()
+                                                    offset = Offset(
+                                                        x = (offset.x + mousePan.x).coerceIn(-maxX, maxX),
+                                                        y = (offset.y + mousePan.y).coerceIn(-maxY, maxY)
                                                     )
-                                                ) { value, _ -> offset = Offset(value, offset.y) }
+                                                    event.changes.forEach { it.consume() }
+                                                } else if (event.type == PointerEventType.Move) {
+                                                    val zoom = event.calculateZoom()
+                                                    val pan = event.calculatePan()
+                                                    val centroid = event.calculateCentroid(useCurrent = false)
+                                                    val isActuallyZoomed = scale > 1f || zoom != 1f
 
-                                                // 2. Secretly swap to the next image
-                                                currentUri = siblingImages[idx + 1]
-                                                // 3. Reset the position invisibly
-                                                offset = Offset.Zero
-                                            } else {
-                                                // Didn't drag far enough. Rubber-band snap back to the center!
-                                                animate(
-                                                    initialValue = offset.x,
-                                                    targetValue = 0f,
-                                                    animationSpec = tween(
-                                                        300
-                                                    )
-                                                ) { value, _ -> offset = Offset(value, offset.y) }
+                                                    if (isActuallyZoomed && centroid != Offset.Unspecified) {
+                                                        val oldScale = scale
+                                                        scale = (scale * zoom).coerceIn(1f, 10f)
+                                                        if (abs(scale - 1f) < 0.01f) scale = 1f
+                                                        
+                                                        val zoomRatio = scale / oldScale
+                                                        val focalPoint = centroid - screenCenter
+                                                        val targetOffset = if (scale > 1f) {
+                                                            (offset + pan) * zoomRatio + focalPoint * (1f - zoomRatio)
+                                                        } else {
+                                                            Offset.Zero
+                                                        }
+                                                        
+                                                        val (maxX, maxY) = calculatePanLimits()
+                                                        offset = Offset(
+                                                            x = targetOffset.x.coerceIn(-maxX, maxX),
+                                                            y = targetOffset.y.coerceIn(-maxY, maxY)
+                                                        )
+                                                        
+                                                        if (zoom != 1f || scale > 1f) {
+                                                            event.changes.forEach { if (it.positionChanged()) it.consume() }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
-
-                                if (event.type == PointerEventType.Press && event.buttons.isTertiaryPressed) {
-                                    activity?.finish()
-                                }
-                                if (event.type == PointerEventType.Scroll && event.keyboardModifiers.isCtrlPressed) {
-                                    val change = event.changes.first()
-                                    val delta = change.scrollDelta.y
-
-                                    val oldScale = scale
-
-                                    val zoomFactor = if (delta < 0) 1.1f else 0.9f
-                                    scale = (scale * zoomFactor).coerceIn(1f, 10f)
-
-                                    val zoomRatio = scale / oldScale
-                                    val focalPoint = change.position - screenCenter
-                                    val newOffset =
-                                        offset * zoomRatio + focalPoint * (1f - zoomRatio)
-
-                                    val (maxX, maxY) = calculatePanLimits()
-                                    offset = Offset(
-                                        x = newOffset.x.coerceIn(-maxX, maxX),
-                                        y = newOffset.y.coerceIn(-maxY, maxY)
-                                    )
-                                }
-                                if (event.type == PointerEventType.Scroll && !event.keyboardModifiers.isCtrlPressed) {
-                                    val change = event.changes.first()
-                                    var direction = change.scrollDelta.y
-
-                                    val idx = siblingImages.indexOf(currentUri)
-                                    if (idx > 0 && direction < 0f) {
-                                        currentUri = siblingImages[idx - 1]
-                                        direction = 0f
-                                    }
-                                    if (idx >= 0 && idx < siblingImages.size - 1 && direction > 0f) {
-                                        currentUri = siblingImages[idx + 1]
-                                        direction = 0f
-                                    }
-                                }
-                                if (event.type == PointerEventType.Move &&
-                                    event.keyboardModifiers.isCtrlPressed &&
-                                    event.buttons.isPrimaryPressed
-                                ) {
-                                    val change = event.changes.first()
-                                    val pan = change.position - change.previousPosition
-                                    val (maxX, maxY) = calculatePanLimits()
-                                    offset = Offset(
-                                        x = (offset.x + pan.x).coerceIn(-maxX, maxX),
-                                        y = (offset.y + pan.y).coerceIn(-maxY, maxY)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    .pointerInput(screenWidthPx, screenHeightPx) {
-                        detectTransformGestures { centroid, pan, zoomMultiplier, _ ->
-                            val oldScale = scale
-                            scale = (scale * zoomMultiplier).coerceIn(1f, 10f)
-
-                            val zoomRatio = scale / oldScale
-                            val focalPoint = centroid - screenCenter
-                            val newOffset =
-                                (offset + pan) * zoomRatio + focalPoint * (1f - zoomRatio)
-
-                            val (maxX, maxY) = calculatePanLimits()
-
-                            if (scale == 1f) {
-                                // When fully zoomed out, remove the left/right walls!
-                                // This allows the image to follow your finger as you swipe.
-                                offset = Offset(
-                                    x = newOffset.x,
-                                    y = newOffset.y.coerceIn(-maxY, maxY)
+                            } else Modifier),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = item,
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            onSuccess = { if (isCurrent) imageSize = it.painter.intrinsicSize },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer(
+                                    scaleX = if (isCurrent) scale else 1f,
+                                    scaleY = if (isCurrent) scale else 1f,
+                                    translationX = if (isCurrent) offset.x else 0f,
+                                    translationY = if (isCurrent) offset.y else 0f
                                 )
-                            } else {
-                                // When zoomed in, strictly lock the image inside its borders
-                                offset = Offset(
-                                    x = newOffset.x.coerceIn(-maxX, maxX),
-                                    y = newOffset.y.coerceIn(-maxY, maxY)
-                                )
-                            }
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                val currentIndex = siblingImages.indexOf(currentUri)
-
-                // 1. The Previous Image (Hidden just off-screen to the left)
-                if (currentIndex > 0 && scale == 1f) {
-                    AsyncImage(
-                        model = siblingImages[currentIndex - 1],
-                        contentDescription = stringResource(R.string.previous),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer(
-                                translationX = offset.x - screenWidthPx, // Pushed left by 1 full screen
-                                translationY = offset.y
-                            )
-                    )
-                }
-
-                // 2. The Current Image (Center)
-                AsyncImage(
-                    model = currentUri,
-                    contentDescription = stringResource(R.string.media_viewed),
-                    contentScale = ContentScale.Fit,
-                    onSuccess = { state -> imageSize = state.painter.intrinsicSize },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                            translationX = offset.x,
-                            translationY = offset.y
                         )
-                )
-
-                // 3. The Next Image (Hidden just off-screen to the right)
-                if (currentIndex < siblingImages.size - 1 && scale == 1f) {
-                    AsyncImage(
-                        model = siblingImages[currentIndex + 1],
-                        contentDescription = stringResource(R.string.next),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer(
-                                translationX = offset.x + screenWidthPx, // Pushed right by 1 full screen
-                                translationY = offset.y
-                            )
-                    )
+                    }
                 }
 
                 DropdownMenu(
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }, // Close when clicking outside
+                    onDismissRequest = { showMenu = false },
                     offset = DpOffset(
                         x = with(LocalDensity.current) { menuOffset.x.toDp() },
                         y = with(LocalDensity.current) { menuOffset.y.toDp() }
@@ -461,26 +456,23 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.menu_open_with)) },
                         onClick = {
                             showMenu = false
-                            currentUri?.let { uriString ->
+                            currentUri?.let { data ->
                                 try {
-                                    // 1. Use your new helper function!
-                                    val contentUri = getSecureContentUri(context, uriString)
-
-                                    // 2. Do the action
+                                    val contentUri = getSecureContentUri(context, data)
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         setDataAndType(contentUri, "image/*")
                                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                         addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                                     }
                                     context.startActivity(Intent.createChooser(intent, resources.getString(R.string.menu_open_with)))
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     Toast.makeText(context, resources.getString(R.string.msg_failed_open_image), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
                     )
 
-                    HorizontalDivider() // A visual line separating the groups
+                    HorizontalDivider()
 
                     // --- GROUP 2: Zoom Controls ---
                     DropdownMenuItem(
@@ -508,9 +500,7 @@ fun ImageViewerScreen(
                         onClick = {
                             showMenu = false
                             scale = (scale / 1.5f).coerceIn(1f, 10f)
-                            if (scale == 1f) {
-                                offset = Offset.Zero // Snap back to center if fully zoomed out
-                            }
+                            if (scale == 1f) offset = Offset.Zero
                         }
                     )
 
@@ -522,28 +512,12 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Image, contentDescription = stringResource(R.string.menu_copy_image)) },
                         onClick = {
                             showMenu = false
-                            currentUri?.let { uriString ->
+                            currentUri?.let { data ->
                                 try {
-                                    val uri = Uri.parse(uriString)
-
-                                    // Android needs a secure "content://" link to share images.
-                                    // If your image is a standard file, we convert it securely here:
-                                    val contentUri: Uri = if (uri.scheme == "file" || uri.scheme == null) {
-                                        val file = File(uri.path ?: uriString)
-                                        FileProvider.getUriForFile(
-                                            context,
-                                            "${context.packageName}.provider",
-                                            file
-                                        )
-                                    } else {
-                                        uri
-                                    }
-
-                                    // Give this secure link to the Android Clipboard
+                                    val contentUri = getSecureContentUri(context, data)
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                     val clip = ClipData.newUri(context.contentResolver, "Copied Image", contentUri)
                                     clipboard.setPrimaryClip(clip)
-
                                     Toast.makeText(context, resources.getString(R.string.menu_copy_image), Toast.LENGTH_SHORT).show()
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -558,18 +532,16 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Wallpaper, contentDescription = stringResource(R.string.menu_set_wallpaper)) },
                         onClick = {
                             showMenu = false
-                            currentUri?.let { uriString ->
+                            currentUri?.let { data ->
                                 try {
-                                    val contentUri = getSecureContentUri(context, uriString)
-
-                                    // ACTION_ATTACH_DATA is Android's built-in way to say "Use this file for something"
+                                    val contentUri = getSecureContentUri(context, data)
                                     val wallpaperIntent = Intent(Intent.ACTION_ATTACH_DATA).apply {
                                         setDataAndType(contentUri, "image/*")
                                         putExtra("mimeType", "image/*")
                                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                                     }
                                     context.startActivity(Intent.createChooser(wallpaperIntent, resources.getString(R.string.menu_set_wallpaper)))
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     Toast.makeText(context, resources.getString(R.string.menu_set_wallpaper_failed), Toast.LENGTH_SHORT).show()
                                 }
                             }
@@ -581,17 +553,16 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Share, contentDescription = stringResource(R.string.menu_share)) },
                         onClick = {
                             showMenu = false
-                            currentUri?.let { uriString ->
+                            currentUri?.let { data ->
                                 try {
-                                    val contentUri = getSecureContentUri(context, uriString)
-
+                                    val contentUri = getSecureContentUri(context, data)
                                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                         type = "image/*"
                                         putExtra(Intent.EXTRA_STREAM, contentUri)
                                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                                     }
                                     context.startActivity(Intent.createChooser(shareIntent, resources.getString(R.string.msg_share_image_via)))
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     Toast.makeText(context, resources.getString(R.string.media_share_image_failed), Toast.LENGTH_SHORT).show()
                                 }
                             }
@@ -609,9 +580,7 @@ fun ImageViewerScreen(
                                     FileOperationsManager.start()
                                     FileOperationsManager.update(0, 1, operationType= OperationType.RENAME)
                                     FileOperationsManager.currentFileName.value = target.name
-
                                     startPopUpActivity(context)
-
                                     coroutineScope.launch {
                                         val success = renameFile(target, newName)
                                         if (success) {
@@ -642,10 +611,8 @@ fun ImageViewerScreen(
                             withImageFile(currentUri) { file ->
                                 FileOperationsManager.start()
                                 startPopUpActivity(context)
-
                                 coroutineScope.launch {
                                     deleteFiles(context, listOf(file.toUniversal()))
-
                                     if (!file.exists()) {
                                         val index = siblingImages.indexOf(currentUri)
                                         val newList = siblingImages.filter { it != currentUri }
@@ -676,7 +643,6 @@ fun ImageViewerScreen(
 
                     HorizontalDivider()
 
-                    // --- GROUP 4: Window Controls ---
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_fullscreen)) },
                         leadingIcon = { Icon(Icons.Default.Fullscreen, contentDescription = stringResource(R.string.menu_fullscreen)) },
@@ -695,98 +661,71 @@ fun ImageViewerScreen(
                         }
                     )
                 }
-            }
 
-            // When the viewed image changes (e.g. via keyboard keys), scroll the filmstrip to it
-            LaunchedEffect(currentUri) {
-                val index = siblingImages.indexOf(currentUri)
-                if (index >= 0 && !listState.isScrollInProgress) {
-                    // Use scrollToItem instead of animateScrollToItem for instant speed!
-                    listState.scrollToItem(index)
-                }
-            }
+                // Filmstrip overlay at the bottom
+                if (siblingImages.size > 1 && !isFullscreen) {
+                    val configuration = LocalConfiguration.current
+                    val screenWidthDp = configuration.screenWidthDp.dp
+                    val itemSizeDp = 64.dp
+                    val horizontalPadding = (screenWidthDp - 32.dp - itemSizeDp) / 2
 
-            // Filmstrip overlay at the bottom
-            if (siblingImages.size > 1 && !isFullscreen) {
-
-                // Calculate padding to center the focused thumbnail
-                val configuration = LocalConfiguration.current
-                val screenWidthDp = configuration.screenWidthDp.dp
-                val itemSizeDp = 64.dp
-                // Subtracting 32.dp to account for the start/end margins on the background box
-                val horizontalPadding = (screenWidthDp - 32.dp - itemSizeDp) / 2
-
-                // Keep the centered item synced with the currently viewed image
-                LaunchedEffect(listState) {
-                    snapshotFlow {
-                        val layoutInfo = listState.layoutInfo
-                        if (layoutInfo.visibleItemsInfo.isEmpty()) return@snapshotFlow -1
-
-                        val viewportStart = layoutInfo.viewportStartOffset
-                        val viewportEnd = layoutInfo.viewportEndOffset
-                        val centerOffset = viewportStart + (viewportEnd - viewportStart) / 2
-
-                        var closestIndex = -1
-                        var minDistance = Int.MAX_VALUE
-
-                        // Find which thumbnail is physically closest to the center
-                        for (item in layoutInfo.visibleItemsInfo) {
-                            val itemCenter = item.offset + item.size / 2
-                            val distance = abs(itemCenter - centerOffset)
-                            if (distance < minDistance) {
-                                minDistance = distance
-                                closestIndex = item.index
+                    LaunchedEffect(listState) {
+                        snapshotFlow {
+                            val layoutInfo = listState.layoutInfo
+                            if (layoutInfo.visibleItemsInfo.isEmpty()) return@snapshotFlow -1
+                            val centerOffset = layoutInfo.viewportStartOffset + (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
+                            var closestIndex = -1
+                            var minDistance = Int.MAX_VALUE
+                            for (item in layoutInfo.visibleItemsInfo) {
+                                val distance = abs(item.offset + item.size / 2 - centerOffset)
+                                if (distance < minDistance) {
+                                    minDistance = distance
+                                    closestIndex = item.index
+                                }
                             }
-                        }
-                        closestIndex
-                    }.collect { index ->
-                        if (index in siblingImages.indices) {
-                            val newUri = siblingImages[index]
-                            if (currentUri != newUri) {
-                                currentUri = newUri // Update the main image
+                            closestIndex
+                        }.collect { index ->
+                            if (index in siblingImages.indices) {
+                                val newUri = siblingImages[index]
+                                if (currentUri != newUri) {
+                                    currentUri = newUri
+                                }
                             }
                         }
                     }
-                }
 
-                LazyRow(
-                    state = listState,
-                    // Automatically snap to the nearest thumbnail when scrolling stops
-                    flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
-                    // Apply our calculated padding so items align in the center
-                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .background(
-                            Color.Black.copy(alpha = 0.6f),
-                        )
-                        .padding(vertical = 8.dp), // Inner padding
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    items(siblingImages) { imgUri ->
-                        val isSelected = imgUri == currentUri
-                        AsyncImage(
-                            model = imgUri,
-                            contentDescription = stringResource(R.string.media_thumbnail),
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size (itemSizeDp)
-                                .border(
-                                    width = if (isSelected) 1.dp else 0.dp,
-                                    color = if (isSelected) Color.White else Color.Transparent
-                                )
-                                .clickable {
-                                    // Clicking a thumbnail gently scrolls it to the center
-                                    coroutineScope.launch {
-                                        val idx = siblingImages.indexOf(imgUri)
-                                        if (idx >= 0) {
-                                            listState.animateScrollToItem(idx)
+                    LazyRow(
+                        state = listState,
+                        flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
+                        contentPadding = PaddingValues(horizontal = horizontalPadding),
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .background(Color.Black.copy(alpha = 0.6f))
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(siblingImages) { imgUri ->
+                            val isSelected = imgUri == currentUri
+                            AsyncImage(
+                                model = imgUri,
+                                contentDescription = stringResource(R.string.media_thumbnail),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(itemSizeDp)
+                                    .border(
+                                        width = if (isSelected) 1.dp else 0.dp,
+                                        color = if (isSelected) Color.White else Color.Transparent
+                                    )
+                                    .clickable {
+                                        coroutineScope.launch {
+                                            val idx = siblingImages.indexOf(imgUri)
+                                            if (idx >= 0) listState.animateScrollToItem(idx)
                                         }
                                     }
-                                }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -794,7 +733,12 @@ fun ImageViewerScreen(
     }
 }
 
-private fun withImageFile(uriString: String?, action: (File) -> Unit) {
+private fun withImageFile(data: Any?, action: (File) -> Unit) {
+    if (data is UniversalFile) {
+        data.fileRef?.let { if (it.exists()) action(it) }
+        return
+    }
+    val uriString = data as? String
     uriString?.let {
         val uri = Uri.parse(it)
         val path = if (uri.scheme == "file" || uri.scheme == null) uri.path ?: it else null
@@ -814,19 +758,13 @@ private fun startPopUpActivity(context: Context) {
     context.startActivity(intent)
 }
 
-fun getSecureContentUri(context: Context, uriString: String): Uri {
-    val uri = Uri.parse(uriString)
-
-    // If it's already a secure content:// link, just return it
-    if (uri.scheme == "content") {
-        return uri
+fun getSecureContentUri(context: Context, data: Any): Uri {
+    if (data is UniversalFile) {
+        return getUriForUniversalFile(context, data) ?: Uri.parse(data.providerId)
     }
-
-    // Otherwise, it's a raw file, so convert it securely
+    val uriString = data.toString()
+    val uri = Uri.parse(uriString)
+    if (uri.scheme == "content") return uri
     val file = File(uri.path ?: uriString)
-    return FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        file
-    )
+    return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 }
