@@ -324,7 +324,11 @@ fun NavigationPane(
                         bgMenuOffset = DpOffset(0.dp, 0.dp) // Open at top
                         showBgMenu = true
                     }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.menu),
+                            tint = LocalExtendedColors.current.sidebarIcons
+                        )
                     }
                 }
             }
