@@ -13,14 +13,18 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -28,13 +32,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.ui.theme.ThemeFolderColors
 import com.troikoss.continuum_explorer.managers.DeleteBehavior
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -58,7 +65,7 @@ class SettingsActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
@@ -81,6 +88,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val customThemeMode = SettingsManager.customThemeMode.value
     val ftpInactivityTimeout = SettingsManager.ftpInactivityTimeout.value
     val appInactivityTimeout = SettingsManager.appInactivityTimeout.value
+    val defaultFolderColor = SettingsManager.defaultFolderColor.value
     val currentThemePack = ThemePackManager.currentPack.value
 
     val themePickerLauncher = rememberLauncherForActivityResult(
@@ -111,6 +119,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showIconThemeDialog by remember { mutableStateOf(false) }
     var showCustomThemeModeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showDefaultFolderColorDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
     var showDefaultViewModeDialog by remember { mutableStateOf(false) }
@@ -314,6 +323,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                 },
                 modifier = Modifier.clickable(enabled = currentThemePack == null) { showIconThemeDialog = true }
             )
+
+            if (currentThemePack == null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_default_folder_color)) },
+                    trailingContent = {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(Color(defaultFolderColor))
+                        )
+                    },
+                    modifier = Modifier.clickable { showDefaultFolderColorDialog = true }
+                )
+            }
 
             ListItem(
                 headlineContent = { 
@@ -881,6 +905,53 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showLanguageDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showDefaultFolderColorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDefaultFolderColorDialog = false },
+                    title = { Text(stringResource(R.string.settings_default_folder_color)) },
+                    text = {
+                        Column {
+                            FlowRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                ThemeFolderColors.defaultOptions.forEach { colorLong ->
+                                    val color = Color(colorLong)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape)
+                                            .background(color)
+                                            .clickable {
+                                                SettingsManager.setDefaultFolderColor(context, colorLong)
+                                                showDefaultFolderColorDialog = false
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (defaultFolderColor == colorLong) {
+                                            Icon(
+                                                Icons.Default.Done,
+                                                contentDescription = null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showDefaultFolderColorDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }

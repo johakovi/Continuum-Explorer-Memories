@@ -81,7 +81,7 @@ open class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             window.setRestrictedCaptionAreaListener { rect ->
                 val density = resources.displayMetrics.density

@@ -946,8 +946,7 @@ object IconHelper {
         val overlayRes = getOverlayIconRes(name, path, "")
 
         val folderColor = when (iconTheme) {
-            IconTheme.COLOURFUL -> 0xFF2196F3.toInt() // ThemeFolders
-            IconTheme.COLOURFULDUO -> 0xFFFFC107.toInt() // ThemeFoldersDuo
+            IconTheme.COLOURFUL, IconTheme.COLOURFULDUO -> SettingsManager.defaultFolderColor.value.toInt()
             else -> android.graphics.Color.DKGRAY
         }
 

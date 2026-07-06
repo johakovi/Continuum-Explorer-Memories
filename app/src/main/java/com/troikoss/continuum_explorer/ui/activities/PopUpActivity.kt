@@ -79,7 +79,7 @@ class PopUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
+
         window.setRestrictedCaptionAreaListener { rect ->
             val density = resources.displayMetrics.density
             val screenWidth = resources.displayMetrics.widthPixels

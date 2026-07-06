@@ -85,6 +85,7 @@ object SettingsManager {
     private const val KEY_GALLERY_FOLDERS = "gallery_folders"
     private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
     private const val PREFS_FOLDER_COLORS = "folder_colors"
+    private const val KEY_DEFAULT_FOLDER_COLOR = "default_folder_color"
 
     enum class FtpMode {
         FULL_STORAGE,
@@ -171,6 +172,9 @@ object SettingsManager {
 
     private val _folderColors = mutableStateMapOf<String, Long>()
     val folderColors: Map<String, Long> = _folderColors
+
+    private val _defaultFolderColor = mutableLongStateOf(0xFF2196F3)
+    val defaultFolderColor: State<Long> = _defaultFolderColor
 
     private val _isRecycleBinEnabled = mutableStateOf(true)
     val isRecycleBinEnabled: State<Boolean> = _isRecycleBinEnabled
@@ -280,6 +284,8 @@ object SettingsManager {
             if (value is Long) _folderColors[key] = value
             else if (value is Int) _folderColors[key] = value.toLong()
         }
+
+        _defaultFolderColor.longValue = prefs.getLong(KEY_DEFAULT_FOLDER_COLOR, 0xFF2196F3)
 
         val savedFtpMode = prefs.getString(KEY_FTP_SERVER_MODE, FtpMode.FULL_STORAGE.name) ?: FtpMode.FULL_STORAGE.name
         _ftpMode.value = try {
@@ -566,5 +572,12 @@ object SettingsManager {
 
     fun getFolderColor(providerId: String): Long? {
         return _folderColors[providerId]
+    }
+
+    fun setDefaultFolderColor(context: Context, color: Long) {
+        _defaultFolderColor.longValue = color
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putLong(KEY_DEFAULT_FOLDER_COLOR, color).apply()
+        GlobalEvents.triggerConfigUpdate()
     }
 }

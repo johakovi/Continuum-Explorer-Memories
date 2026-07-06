@@ -199,7 +199,19 @@ object ThemeFolderColors {
         0xFFE91E63, // Pink
         0xFF795548, // Brown
         0xFF9E9E9E, // Grey
-        0xFF00BCD4  // Cyan
+        0xFF00BCD4, // Cyan
+        0xFFFF5722, // Deep Orange
+        0xFF3F51B5, // Indigo
+        0xFF009688, // Teal
+        0xFFCDDC39, // Lime
+        0xFFFFC107, // Amber
+        0xFF673AB7, // Deep Purple
+        0xFF03A9F4, // Light Blue
+        0xFF8BC34A, // Light Green
+        0xFF607D8B, // Blue Grey
+        0xFF212121, // Charcoal
+        0xFFFF00FF, // Fuchsia
+        0xFFFF69B4  // Hot Pink
     )
 }
 
@@ -276,6 +288,7 @@ fun FileExplorerTheme(
     val currentPack = ThemePackManager.currentPack.value
     val iconTheme = SettingsManager.iconTheme.value
     val isSystemDark = isSystemInDarkTheme()
+    val defaultFolderColor = Color(SettingsManager.defaultFolderColor.value)
 
     val darkTheme = if (currentPack != null) {
         when (customThemeMode) {
@@ -333,7 +346,7 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFF2D2D2F),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = VeryDarkIcons,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else VeryDarkIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
                 recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryDarkIcons,
                 filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
@@ -355,7 +368,7 @@ fun FileExplorerTheme(
                 musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryDarkIcons,
                 dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
                 picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
-                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryDarkIcons,
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else VeryDarkIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryDarkIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryDarkIcons,
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryDarkIcons,
@@ -398,7 +411,7 @@ fun FileExplorerTheme(
                 tabBarBackground = Color(0xFFfcfcfe),
                 selectionBackground = LightPrimarySelection,
                 sidebarIcons = VeryLightIcons,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else VeryLightIcons,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
                 recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryLightIcons,
                 filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
@@ -420,7 +433,7 @@ fun FileExplorerTheme(
                 musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else VeryLightIcons,
                 dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
                 picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
-                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else VeryLightIcons,
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else VeryLightIcons,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else VeryLightIcons,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else VeryLightIcons,
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else VeryLightIcons,
@@ -466,7 +479,7 @@ fun FileExplorerTheme(
                 tabBarBackground = colorScheme.surfaceContainerHighest,
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = primary,
-                folderIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFolders else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
+                folderIcon = if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else primary,
                 galleryIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
                 recentIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeRecent else if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
                 filesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeFile else if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
@@ -488,7 +501,7 @@ fun FileExplorerTheme(
                 musicIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeAudio else if (iconTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else primary,
                 dcimIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
                 picturesIcon = if (iconTheme == IconTheme.COLOURFUL) ThemeGallery else if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
-                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFoldersDuo else primary,
+                folderIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) defaultFolderColor else primary,
                 filesIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
                 galleryIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
                 recentIconDuo = if (iconTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
