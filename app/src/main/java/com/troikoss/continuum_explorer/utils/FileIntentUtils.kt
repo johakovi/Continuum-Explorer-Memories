@@ -238,7 +238,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
 /**
  * Opens a restricted file (e.g. Android/data) by caching it to .temp first.
  */
-fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalFile) {
+fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
     scope.launch {
         try {
             FileOperationsManager.start()
@@ -259,7 +259,7 @@ fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalF
                 // Use a modified UniversalFile so openFile knows where the actual data is,
                 // but we pass the original providerId in the intent for saving back.
                 val tempFile = file.copy(providerId = cached.absolutePath, provider = LocalProvider)
-                openFile(context, tempFile, originalFile = file)
+                openFile(context, tempFile, originalFile = file, siblings = siblings)
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
@@ -292,7 +292,7 @@ fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile?
             setData(uri)
             putExtra("PROVIDER_KIND", file.provider.kind.name)
             putExtra("CONNECTION_ID", file.provider.connectionId)
-            putExtra("CURRENT_ID", file.providerId)
+            putExtra("CURRENT_ID", if (originalFile != null) originalFile.providerId else file.providerId)
             if (siblings.isNotEmpty()) {
                 putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
             }

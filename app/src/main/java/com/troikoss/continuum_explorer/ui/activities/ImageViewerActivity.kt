@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
@@ -81,14 +80,15 @@ import androidx.compose.ui.layout.ContentScale
 import android.content.ClipboardManager
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Wallpaper
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.content.FileProvider
 import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -144,6 +144,7 @@ fun ImageViewerScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
+    val isFilmstripDragged by listState.interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -155,6 +156,8 @@ fun ImageViewerScreen(
 
     var currentUri by remember { mutableStateOf<Any?>(initialImageUri) }
     var siblingImages by remember { mutableStateOf<List<Any>>(emptyList()) }
+    var isProgrammaticPagerScroll by remember { mutableStateOf(false) }
+    var isProgrammaticListScroll by remember { mutableStateOf(false) }
 
     val pagerState = rememberPagerState(pageCount = { siblingImages.size })
 
@@ -198,7 +201,12 @@ fun ImageViewerScreen(
                         withContext(Dispatchers.Main) {
                             siblingImages = images
                             val currentId = intent.getStringExtra("CURRENT_ID") ?: initialImageUri
-                            currentUri = images.find { it.providerId == currentId } ?: images.firstOrNull() ?: initialImageUri
+                            val matched = images.find { it.providerId == currentId }
+                                ?: images.find { it.name == currentId.substringAfterLast('/') }
+                                ?: images.firstOrNull()
+                            if (matched != null) {
+                                currentUri = matched
+                            }
                         }
                         return@withContext
                     }
@@ -209,7 +217,7 @@ fun ImageViewerScreen(
                 withContext(Dispatchers.Main) {
                     siblingImages = images
                     val initialFileSegment = Uri.parse(initialImageUri).lastPathSegment
-                    val match = images.find { it == initialImageUri || Uri.parse(it).lastPathSegment == initialFileSegment }
+                    val match = images.find { it == initialImageUri || Uri.parse(it).lastPathSegment == initialFileSegment || it.endsWith("/$initialFileSegment") }
                     if (match != null) {
                         currentUri = match
                     } else if (images.isNotEmpty()) {
@@ -220,15 +228,54 @@ fun ImageViewerScreen(
         }
     }
 
-    LaunchedEffect(currentUri, siblingImages) {
-        val index = siblingImages.indexOf(currentUri)
-        if (index >= 0 && pagerState.currentPage != index) {
-            pagerState.scrollToPage(index)
+    var isInitialScrollDone by remember { mutableStateOf(false) }
+
+    // Sync currentUri -> Pager & Filmstrip
+    LaunchedEffect(currentUri, isFilmstripDragged) {
+        if (siblingImages.isNotEmpty() && currentUri != null) {
+            val index = siblingImages.indexOf(currentUri)
+            if (index >= 0) {
+                val isFirstTime = !isInitialScrollDone
+
+                // 1. Sync Pager
+                if (pagerState.currentPage != index) {
+                    if (isFirstTime) {
+                        pagerState.scrollToPage(index)
+                    } else {
+                        isProgrammaticPagerScroll = true
+                        try {
+                            pagerState.animateScrollToPage(index)
+                        } finally {
+                            isProgrammaticPagerScroll = false
+                        }
+                    }
+                }
+
+                // 2. Sync Filmstrip (Center it)
+                // We use 0 as the offset because horizontalPadding already centers the content area
+                if (!isFilmstripDragged && !listState.isScrollInProgress) {
+                    isProgrammaticListScroll = true
+                    try {
+                        if (isFirstTime) {
+                            listState.scrollToItem(index, 0)
+                        } else {
+                            listState.animateScrollToItem(index, 0)
+                        }
+                    } catch (_: Exception) {
+                        listState.scrollToItem(index, 0)
+                    } finally {
+                        isProgrammaticListScroll = false
+                    }
+                }
+
+                if (isFirstTime) isInitialScrollDone = true
+            }
         }
     }
 
+    // Sync Pager -> currentUri (when manually swiping)
     LaunchedEffect(pagerState.currentPage) {
-        if (siblingImages.isNotEmpty() && pagerState.currentPage in siblingImages.indices) {
+        if (!isProgrammaticPagerScroll && isInitialScrollDone && siblingImages.isNotEmpty() && pagerState.currentPage in siblingImages.indices) {
             val newUri = siblingImages[pagerState.currentPage]
             if (currentUri != newUri) {
                 currentUri = newUri
@@ -287,6 +334,7 @@ fun ImageViewerScreen(
                 }
         ) {
             val density = LocalDensity.current
+            val screenWidthDp = maxWidth
             val screenWidthPx = with(density) { maxWidth.toPx() }
             val screenHeightPx = with(density) { maxHeight.toPx() }
             val screenCenter = Offset(screenWidthPx / 2f, screenHeightPx / 2f)
@@ -664,13 +712,16 @@ fun ImageViewerScreen(
 
                 // Filmstrip overlay at the bottom
                 if (siblingImages.size > 1 && !isFullscreen) {
-                    val configuration = LocalConfiguration.current
-                    val screenWidthDp = configuration.screenWidthDp.dp
                     val itemSizeDp = 64.dp
-                    val horizontalPadding = (screenWidthDp - 32.dp - itemSizeDp) / 2
+                    val horizontalPadding = (screenWidthDp - itemSizeDp) / 2
 
-                    LaunchedEffect(listState) {
+                    LaunchedEffect(listState, isFilmstripDragged) {
                         snapshotFlow {
+                            // We only update currentUri from the filmstrip if the user is explicitly dragging it
+                            // OR if the list is scrolling and it's NOT a programmatic scroll (e.g. mouse wheel)
+                            if (!isFilmstripDragged && isProgrammaticListScroll) return@snapshotFlow -1
+                            if (!listState.isScrollInProgress) return@snapshotFlow -1
+
                             val layoutInfo = listState.layoutInfo
                             if (layoutInfo.visibleItemsInfo.isEmpty()) return@snapshotFlow -1
                             val centerOffset = layoutInfo.viewportStartOffset + (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
@@ -718,12 +769,6 @@ fun ImageViewerScreen(
                                         width = if (isSelected) 1.dp else 0.dp,
                                         color = if (isSelected) Color.White else Color.Transparent
                                     )
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            val idx = siblingImages.indexOf(imgUri)
-                                            if (idx >= 0) listState.animateScrollToItem(idx)
-                                        }
-                                    }
                             )
                         }
                     }

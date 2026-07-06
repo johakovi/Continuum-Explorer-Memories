@@ -55,6 +55,7 @@ object GamesManager {
         GameSaveInfo("Wytchwood", "Android/data/com.Alientrap.Wytchwood"),
         GameSaveInfo("NS (Suyu)", "Android/data/org.suyu.suyu_emu/files"),
         GameSaveInfo("The Wreck", "Android/data/com.ThePixelHunt.TheWreck"),
+        GameSaveInfo("Mindustry", "Android/data/io.anuke.mindustry/files/saves"),
     )
 
     fun hasAnyGame(context: Context): Boolean {

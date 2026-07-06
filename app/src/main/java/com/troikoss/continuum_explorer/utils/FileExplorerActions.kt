@@ -64,7 +64,12 @@ fun FileExplorerState.open(item: UniversalFile) {
             } else emptyList()
             openRemoteFile(context, scope, item, siblings)
         } else if (RestrictedCache.isRestricted(item)) {
-            openRestrictedFile(context, scope, item)
+            val extension = item.name.substringAfterLast('.', "").lowercase()
+            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+            val siblings = if (imageExtensions.contains(extension)) {
+                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
+            } else emptyList()
+            openRestrictedFile(context, scope, item, siblings)
         } else {
             val extension = item.name.substringAfterLast('.', "").lowercase()
             val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
