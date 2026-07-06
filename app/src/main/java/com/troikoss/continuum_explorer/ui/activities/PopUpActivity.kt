@@ -1,5 +1,6 @@
 package com.troikoss.continuum_explorer.ui.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.format.Formatter
@@ -24,6 +25,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -32,15 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.NetworkConnection
@@ -65,7 +65,6 @@ import com.troikoss.continuum_explorer.utils.getImageResolution
 import com.troikoss.continuum_explorer.utils.getMediaDuration
 import com.troikoss.continuum_explorer.utils.getVideoResolution
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.model.enums.CompressionLevel
@@ -99,37 +98,57 @@ class PopUpActivity : ComponentActivity() {
         setContent {
             FileExplorerTheme {
                 val extendedColors = LocalExtendedColors.current
+                var isVisible by remember { mutableStateOf(false) }
+                
+                LaunchedEffect(Unit) {
+                    isVisible = true
+                }
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .padding(vertical = 24.dp)
-                            .shadow(12.dp, MaterialTheme.shapes.medium),
-                        shape = MaterialTheme.shapes.medium,
-                        color = extendedColors.sidebarBackground,
-                        tonalElevation = 4.dp
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = scaleIn(initialScale = 0.9f, animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow)) + fadeIn(animationSpec = tween(300)),
+                        exit = scaleOut(targetScale = 0.9f) + fadeOut()
                     ) {
-                        val popupType by FileOperationsManager.popupType
-                        
-                        Box {
-                            when (popupType) {
-                                PopupType.INPUT_TEXT -> InputContent { finish() }
-                                PopupType.COLLISION -> CollisionContent()
-                                PopupType.MOVE_COPY_CHOICE -> MoveCopyContent { finish() }
-                                PopupType.DELETE_CONFIRM -> DeleteConfirmContent { finish() }
-                                PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent { finish() }
-                                PopupType.PASSWORD_INPUT -> PasswordInputContent { finish() }
-                                PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent { finish() }
-                                PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent { finish() }
-                                PopupType.SHORTCUTS -> ShortcutsContent { finish() }
-                                PopupType.PROPERTIES -> PropertiesContent { finish() }
-                                PopupType.NETWORK_CONNECTION -> NetworkConnectionContent { finish() }
-                                PopupType.TERMINAL_DEBUG -> TerminalDebugContent { finish() }
-                                PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent { finish() }
-                                else -> ProgressContent { finish() }
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .padding(vertical = 24.dp)
+                                .shadow(12.dp, MaterialTheme.shapes.medium),
+                            shape = MaterialTheme.shapes.medium,
+                            color = extendedColors.sidebarBackground,
+                            tonalElevation = 4.dp
+                        ) {
+                            val popupType by FileOperationsManager.popupType
+                            
+                            AnimatedContent(
+                                targetState = popupType,
+                                transitionSpec = {
+                                    (fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+                                            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)))
+                                        .togetherWith(fadeOut(animationSpec = tween(90)))
+                                },
+                                label = "PopupContentTransition"
+                            ) { targetPopupType ->
+                                when (targetPopupType) {
+                                    PopupType.INPUT_TEXT -> InputContent { finish() }
+                                    PopupType.COLLISION -> CollisionContent()
+                                    PopupType.MOVE_COPY_CHOICE -> MoveCopyContent { finish() }
+                                    PopupType.DELETE_CONFIRM -> DeleteConfirmContent { finish() }
+                                    PopupType.DELETE_PERMANENT_CONFIRM -> DeletePermanentConfirmContent { finish() }
+                                    PopupType.PASSWORD_INPUT -> PasswordInputContent { finish() }
+                                    PopupType.EXTRACT_OPTIONS -> ExtractOptionsContent { finish() }
+                                    PopupType.ARCHIVE_OPTIONS -> ArchiveOptionsContent { finish() }
+                                    PopupType.SHORTCUTS -> ShortcutsContent { finish() }
+                                    PopupType.PROPERTIES -> PropertiesContent { finish() }
+                                    PopupType.NETWORK_CONNECTION -> NetworkConnectionContent { finish() }
+                                    PopupType.TERMINAL_DEBUG -> TerminalDebugContent { finish() }
+                                    PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent { finish() }
+                                    else -> ProgressContent { finish() }
+                                }
                             }
                         }
                     }
@@ -1278,6 +1297,7 @@ fun DetailRow(label: String, value: String) {
     }
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetworkConnectionContent(onClose: () -> Unit) {
@@ -1310,6 +1330,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
     val isSmb = protocol == NetworkProtocol.SMB
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val remotePathPlaceholder = when {
         isSmb -> "/ShareName  or  /ShareName/subfolder"
@@ -1319,9 +1340,9 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
         else -> "/"
     }
     val remotePathHint = when {
-        isSmb -> "First segment is the share name (e.g. /Documents)"
-        isSftp -> "Absolute path on the server. Leave / for home or root depending on server config."
-        isWebDav -> "Path prefix on the server. Leave / for root."
+        isSmb -> stringResource(R.string.nav_network_smb_path_hint)
+        isSftp -> stringResource(R.string.nav_network_sftp_path_hint)
+        isWebDav -> stringResource(R.string.nav_network_webdav_path_hint)
         else -> null
     }
 
@@ -1401,7 +1422,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             value = displayName,
             onValueChange = { displayName = it; displayNameEdited = true },
             label = { Text(stringResource(R.string.nav_network_display_name)) },
-            placeholder = { Text("My NAS", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+            placeholder = { Text(stringResource(R.string.nav_network_display_name_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -1415,7 +1436,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                 if (!displayNameEdited) displayName = it
             },
             label = { Text(stringResource(R.string.nav_network_host)) },
-            placeholder = { Text("192.168.1.x  or  nas.local", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+            placeholder = { Text(stringResource(R.string.nav_network_host_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -1434,7 +1455,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             value = username,
             onValueChange = { username = it },
             label = { Text(stringResource(R.string.nav_network_username)) },
-                placeholder = { Text(if (isFtp) "Leave blank for anonymous" else "username", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+            placeholder = { Text(if (isFtp) stringResource(R.string.nav_network_username_anon_placeholder) else stringResource(R.string.nav_network_username_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -1450,7 +1471,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                 IconButton(onClick = { showPassword = !showPassword }) {
                     Icon(
                         imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (showPassword) "Hide password" else "Show password"
+                        contentDescription = stringResource(if (showPassword) R.string.nav_network_hide_password else R.string.nav_network_show_password)
                     )
                 }
             },
@@ -1462,8 +1483,8 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             OutlinedTextField(
                 value = sftpPrivateKeyUri,
                 onValueChange = { sftpPrivateKeyUri = it },
-                label = { Text("Private key URI (optional)") },
-                placeholder = { Text("content://...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+                label = { Text(stringResource(R.string.nav_network_sftp_key_uri)) },
+                placeholder = { Text(stringResource(R.string.nav_network_sftp_key_uri_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -1472,14 +1493,14 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             OutlinedTextField(
                 value = sftpPrivateKeyPassphrase,
                 onValueChange = { sftpPrivateKeyPassphrase = it },
-                label = { Text("Private key passphrase (optional)") },
+                label = { Text(stringResource(R.string.nav_network_sftp_key_passphrase)) },
                 singleLine = true,
                 visualTransformation = if (showSftpKeyPassphrase) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { showSftpKeyPassphrase = !showSftpKeyPassphrase }) {
                         Icon(
                             imageVector = if (showSftpKeyPassphrase) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (showSftpKeyPassphrase) "Hide passphrase" else "Show passphrase"
+                            contentDescription = stringResource(if (showSftpKeyPassphrase) R.string.nav_network_hide_passphrase else R.string.nav_network_show_passphrase)
                         )
                     }
                 },
@@ -1490,8 +1511,8 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             OutlinedTextField(
                 value = sftpPrivateKey,
                 onValueChange = { sftpPrivateKey = it },
-                label = { Text("Private key text fallback (optional)") },
-                placeholder = { Text("-----BEGIN OPENSSH PRIVATE KEY-----", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+                label = { Text(stringResource(R.string.nav_network_sftp_key_fallback)) },
+                placeholder = { Text(stringResource(R.string.nav_network_sftp_key_fallback_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
                 singleLine = false,
                 minLines = 4,
                 visualTransformation = if (showPastedPrivateKey) VisualTransformation.None else PasswordVisualTransformation(),
@@ -1499,7 +1520,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                     IconButton(onClick = { showPastedPrivateKey = !showPastedPrivateKey }) {
                         Icon(
                             imageVector = if (showPastedPrivateKey) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (showPastedPrivateKey) "Hide key" else "Show key"
+                            contentDescription = stringResource(if (showPastedPrivateKey) R.string.nav_network_hide_key else R.string.nav_network_show_key)
                         )
                     }
                 },
@@ -1512,7 +1533,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             OutlinedTextField(
                 value = smbDomain,
                 onValueChange = { smbDomain = it },
-                label = { Text("Domain / Workgroup (optional)") },
+                label = { Text(stringResource(R.string.nav_network_smb_domain)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -1586,7 +1607,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
                         scope.launch {
                             val result = FileOperationsManager.testNetworkConnection(conn)
                             isTesting = false
-                            testResult = if (result.isSuccess) "✓ Connected" else "✗ ${result.exceptionOrNull()?.message ?: "Failed"}"
+                            testResult = if (result.isSuccess) "✓ ${context.getString(R.string.nav_network_test_success)}" else "✗ ${context.getString(R.string.nav_network_test_failed)}: ${result.exceptionOrNull()?.message ?: context.getString(R.string.unknown)}"
                         }
                     },
                     enabled = canTest
@@ -1630,7 +1651,7 @@ fun TerminalDebugContent(onClose: () -> Unit) {
     
     Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Text(
-            text = "Terminal Debug Output",
+            text = stringResource(R.string.terminal_debug_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )

@@ -737,7 +737,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             if (showCustomThemeModeDialog) {
                 AlertDialog(
                     onDismissRequest = { showCustomThemeModeDialog = false },
-                    title = { Text("Custom Theme Mode") },
+                    title = { Text(stringResource(R.string.settings_custom_theme_mode)) },
                     text = {
                         Column {
                             OptionItem(
@@ -1180,7 +1180,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showAboutDialog = false }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     }
                 )

@@ -9,7 +9,8 @@ import android.os.Build
 import android.os.Environment
 import android.os.storage.StorageManager
 import android.text.format.Formatter
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -55,6 +56,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.launch
@@ -831,85 +834,118 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
     val folders by SettingsManager.galleryFolders
     val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
 
-    AlertDialog(
+    Dialog(
         onDismissRequest = { appState.isConfiguringGalleryFolders = false },
-        title = { Text(stringResource(R.string.menu_gallery_folders)) },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
-                if (!isFilterEnabled) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
-                    ) {
-                        Text(
-                            "Filtering is currently OFF. Showing all media.",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(8.dp),
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        var isVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { isVisible = true }
 
-                if (folders.isEmpty()) {
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = scaleIn(initialScale = 0.9f) + fadeIn(),
+            exit = scaleOut(targetScale = 0.9f) + fadeOut(),
+            label = "GalleryFoldersDialogAnimation"
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(24.dp)
+                    .shadow(16.dp, RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
                     Text(
-                        "No folders added. Standard media locations will be used if filtering is enabled.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        stringResource(R.string.menu_gallery_folders),
+                        style = MaterialTheme.typography.headlineSmall
                     )
-                } else {
-                    Text(
-                        "Managed Folders:",
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                        itemsIndexed(folders.toList()) { _, path ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                    Spacer(Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+                        if (!isFilterEnabled) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
                             ) {
-                                Icon(Icons.Default.Folder, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
-                                Spacer(Modifier.width(8.dp))
                                 Text(
-                                    text = path,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.weight(1f),
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
+                                    stringResource(R.string.gallery_filter_off_msg),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(8.dp),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
-                                IconButton(onClick = {
-                                    val newSet = folders.toMutableSet()
-                                    newSet.remove(path)
-                                    SettingsManager.setGalleryFolders(context, newSet)
-                                    appState.refresh()
-                                }) {
-                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(20.dp))
+                            }
+                        }
+
+                        if (folders.isEmpty()) {
+                            Text(
+                                stringResource(R.string.gallery_no_folders_msg),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                        } else {
+                            Text(
+                                stringResource(R.string.gallery_managed_folders),
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                                itemsIndexed(folders.toList()) { _, path ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Default.Folder, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = path,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        IconButton(onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.remove(path)
+                                            SettingsManager.setGalleryFolders(context, newSet)
+                                            appState.refresh()
+                                        }) {
+                                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(20.dp))
+                                        }
+                                    }
                                 }
                             }
                         }
+                        
+                        Button(
+                            onClick = {
+                                onAddFolder()
+                            },
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.gallery_add_folder))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { appState.isConfiguringGalleryFolders = false }) {
+                            Text(stringResource(R.string.done))
+                        }
                     }
                 }
-                
-                Button(
-                    onClick = {
-                        onAddFolder()
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Add Folder")
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { appState.isConfiguringGalleryFolders = false }) {
-                Text(stringResource(R.string.done))
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -929,39 +965,43 @@ private fun NavBackgroundContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.nav_add_storage)) },
-            onClick = {
-                onDismissRequest()
-                onAddStorageClick()
-            },
-            leadingIcon = { Icon(Icons.Default.Add, null) }
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.nav_add_network_storage)) },
-            onClick = {
-                onDismissRequest()
-                onAddNetworkClick()
-            },
-            leadingIcon = { Icon(Icons.Default.Cloud, null) }
-        )
-        HorizontalDivider()
-        DropdownMenuItem(
-            text = { 
-                val text = if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) 
-                    stringResource(R.string.nav_stop_ftp) else stringResource(R.string.nav_start_ftp)
-                Text(text)
-            },
-            onClick = {
-                onDismissRequest()
-                if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) {
-                    SettingsManager.setFtpServerEnabled(context, false)
-                } else {
-                    SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.FULL_STORAGE)
-                }
-            },
-            leadingIcon = { Icon(if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
-        )
+        Column(
+            modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.nav_add_storage)) },
+                onClick = {
+                    onDismissRequest()
+                    onAddStorageClick()
+                },
+                leadingIcon = { Icon(Icons.Default.Add, null) }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.nav_add_network_storage)) },
+                onClick = {
+                    onDismissRequest()
+                    onAddNetworkClick()
+                },
+                leadingIcon = { Icon(Icons.Default.Cloud, null) }
+            )
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { 
+                    val text = if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) 
+                        stringResource(R.string.nav_stop_ftp) else stringResource(R.string.nav_start_ftp)
+                    Text(text)
+                },
+                onClick = {
+                    onDismissRequest()
+                    if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) {
+                        SettingsManager.setFtpServerEnabled(context, false)
+                    } else {
+                        SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.FULL_STORAGE)
+                    }
+                },
+                leadingIcon = { Icon(if (isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+            )
+        }
     }
 }
 
@@ -1001,189 +1041,193 @@ private fun NavContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
-        if (section == NavSection.Games) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.nav_add_storage)) },
-                onClick = {
-                    onDismissRequest()
-                    if (onAddStorageClick != null) {
-                        appState.isAddingGameShortcut = true
-                        onAddStorageClick()
-                    }
-                },
-                leadingIcon = { Icon(Icons.Default.Add, null) }
-            )
-            HorizontalDivider()
-        }
-
-        if (section is NavSection.Gallery) {
-            val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
-            val context = LocalContext.current
-
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.menu_gallery_show_all))
-                        if (!isFilterEnabled) {
-                            Spacer(Modifier.weight(1f))
-                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+        Column(
+            modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
+        ) {
+            if (section == NavSection.Games) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.nav_add_storage)) },
+                    onClick = {
+                        onDismissRequest()
+                        if (onAddStorageClick != null) {
+                            appState.isAddingGameShortcut = true
+                            onAddStorageClick()
                         }
-                    }
-                },
-                onClick = {
-                    onDismissRequest()
-                    if (isFilterEnabled) {
-                        SettingsManager.setGalleryFilterEnabled(context, false)
-                        appState.refresh()
-                    }
-                },
-                leadingIcon = { Icon(Icons.Default.Collections, null) }
-            )
+                    },
+                    leadingIcon = { Icon(Icons.Default.Add, null) }
+                )
+                HorizontalDivider()
+            }
 
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.menu_gallery_folders))
-                        if (isFilterEnabled) {
-                            Spacer(Modifier.weight(1f))
-                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                        }
-                    }
-                },
-                onClick = {
-                    onDismissRequest()
-                    if (!isFilterEnabled) {
-                        SettingsManager.setGalleryFilterEnabled(context, true)
-                        appState.refresh()
-                    }
-                    appState.isConfiguringGalleryFolders = true
-                },
-                leadingIcon = { Icon(Icons.Default.Folder, null) }
-            )
-            HorizontalDivider()
-        }
+            if (section is NavSection.Gallery) {
+                val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
+                val context = LocalContext.current
 
-        if (onNavigate != null) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_open)) },
-                onClick = {
-                    onDismissRequest()
-                    onNavigate()
-                },
-                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } // Using back arrow as a placeholder for "Open"
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_open_new_window)) },
-                onClick = {
-                    onDismissRequest()
-                    when {
-                        section is NavSection.RecycleBin -> {
-                            val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                            appState.openInNewWindow(listOf(trashDir.toUniversal()))
-                        }
-                        path != null -> appState.openInNewWindow(listOf(File(path).toUniversal()))
-                        uri != null -> {
-                            DocumentFile.fromTreeUri(appState.context, uri)?.let {
-                                appState.openInNewWindow(listOf(it.toUniversal()))
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_gallery_show_all))
+                            if (!isFilterEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                             }
                         }
-                        else -> appState.openInNewWindow(emptyList())
-                    }
-                },
-                leadingIcon = { Icon(Icons.Default.Tab, null) }
-            )
-        }
-
-        if (onEdit != null) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.nav_network_edit)) },
-                onClick = {
-                    onDismissRequest()
-                    onEdit()
-                },
-                leadingIcon = { Icon(Icons.Default.Edit, null) }
-            )
-        }
-
-        if (onRemove != null) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_remove)) },
-                onClick = {
-                    onDismissRequest()
-                    onRemove()
-                },
-                leadingIcon = { Icon(Icons.Default.Delete, null) }
-            )
-        }
-
-        if (section is NavSection.RecycleBin) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
-                onClick = {
-                    onDismissRequest()
-                    appState.emptyRecycleBin()
-                },
-                leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
-            )
-        }
-
-        if (section is NavSection.Games) {
-            val isFtpEnabled by SettingsManager.isFtpServerEnabled
-            val ftpMode by SettingsManager.ftpMode
-            val context = LocalContext.current
-            
-            val isGamesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAMES
-
-            DropdownMenuItem(
-                text = { Text(if (isGamesFtpActive) "Stop FTP Game Manager Server" else "Start FTP Game Manager Server") },
-                onClick = {
-                    onDismissRequest()
-                    if (isGamesFtpActive) {
-                        SettingsManager.setFtpServerEnabled(context, false)
-                    } else {
-                        SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAMES)
-                    }
-                },
-                leadingIcon = { Icon(if (isGamesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
-            )
-        }
-
-        if (section is NavSection.Documents) {
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Show Folders")
-                        Spacer(Modifier.weight(1f))
-                    }
-                },
-                onClick = {
-                    onDismissRequest()
-                    appState.appConfigs.isDocumentsFolderEnabled = !appState.appConfigs.isDocumentsFolderEnabled
-                },
-                leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
-            )
-        }
-        if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.NetworkStorage) {
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.menu_properties)) },
-                onClick = {
-                    onDismissRequest()
-                    when (section) {
-                        is NavSection.RecycleBin -> {
-                            val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                            appState.showProperties(listOf(trashDir.toUniversal()))
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        if (isFilterEnabled) {
+                            SettingsManager.setGalleryFilterEnabled(context, false)
+                            appState.refresh()
                         }
-                        else -> if (path != null) {
-                            appState.showProperties(listOf(File(path).toUniversal()))
-                        } else if (uri != null) {
-                            val doc = DocumentFile.fromTreeUri(appState.context, uri)
-                            if (doc != null) appState.showProperties(listOf(doc.toUniversal()))
+                    },
+                    leadingIcon = { Icon(Icons.Default.Collections, null) }
+                )
+
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_gallery_folders))
+                            if (isFilterEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
                         }
-                    }
-                },
-                leadingIcon = { Icon(Icons.Default.Info, null) }
-            )
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        if (!isFilterEnabled) {
+                            SettingsManager.setGalleryFilterEnabled(context, true)
+                            appState.refresh()
+                        }
+                        appState.isConfiguringGalleryFolders = true
+                    },
+                    leadingIcon = { Icon(Icons.Default.Folder, null) }
+                )
+                HorizontalDivider()
+            }
+
+            if (onNavigate != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_open)) },
+                    onClick = {
+                        onDismissRequest()
+                        onNavigate()
+                    },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } // Using back arrow as a placeholder for "Open"
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_open_new_window)) },
+                    onClick = {
+                        onDismissRequest()
+                        when {
+                            section is NavSection.RecycleBin -> {
+                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                appState.openInNewWindow(listOf(trashDir.toUniversal()))
+                            }
+                            path != null -> appState.openInNewWindow(listOf(File(path).toUniversal()))
+                            uri != null -> {
+                                DocumentFile.fromTreeUri(appState.context, uri)?.let {
+                                    appState.openInNewWindow(listOf(it.toUniversal()))
+                                }
+                            }
+                            else -> appState.openInNewWindow(emptyList())
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.Tab, null) }
+                )
+            }
+
+            if (onEdit != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.nav_network_edit)) },
+                    onClick = {
+                        onDismissRequest()
+                        onEdit()
+                    },
+                    leadingIcon = { Icon(Icons.Default.Edit, null) }
+                )
+            }
+
+            if (onRemove != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_remove)) },
+                    onClick = {
+                        onDismissRequest()
+                        onRemove()
+                    },
+                    leadingIcon = { Icon(Icons.Default.Delete, null) }
+                )
+            }
+
+            if (section is NavSection.RecycleBin) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
+                    onClick = {
+                        onDismissRequest()
+                        appState.emptyRecycleBin()
+                    },
+                    leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
+                )
+            }
+
+            if (section is NavSection.Games) {
+                val isFtpEnabled by SettingsManager.isFtpServerEnabled
+                val ftpMode by SettingsManager.ftpMode
+                val context = LocalContext.current
+                
+                val isGamesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAMES
+
+                DropdownMenuItem(
+                    text = { Text(if (isGamesFtpActive) stringResource(R.string.nav_stop_ftp_game_manager) else stringResource(R.string.nav_start_ftp_game_manager)) },
+                    onClick = {
+                        onDismissRequest()
+                        if (isGamesFtpActive) {
+                            SettingsManager.setFtpServerEnabled(context, false)
+                        } else {
+                            SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAMES)
+                        }
+                    },
+                    leadingIcon = { Icon(if (isGamesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+                )
+            }
+
+            if (section is NavSection.Documents) {
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_documents_show_folders))
+                            Spacer(Modifier.weight(1f))
+                        }
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        appState.appConfigs.isDocumentsFolderEnabled = !appState.appConfigs.isDocumentsFolderEnabled
+                    },
+                    leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
+                )
+            }
+            if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.NetworkStorage) {
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_properties)) },
+                    onClick = {
+                        onDismissRequest()
+                        when (section) {
+                            is NavSection.RecycleBin -> {
+                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                appState.showProperties(listOf(trashDir.toUniversal()))
+                            }
+                            else -> if (path != null) {
+                                appState.showProperties(listOf(File(path).toUniversal()))
+                            } else if (uri != null) {
+                                val doc = DocumentFile.fromTreeUri(appState.context, uri)
+                                if (doc != null) appState.showProperties(listOf(doc.toUniversal()))
+                            }
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.Info, null) }
+                )
+            }
         }
     }
 }
