@@ -60,6 +60,9 @@ import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.Surface
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
@@ -297,6 +300,11 @@ fun FileExplorerSQ(
             Scaffold(
                 containerColor = extendedColors.background,
                 topBar = {
+                    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+                    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+                    val isPhone = appearance == UIAppearance.PHONE
+                    val hideTopNav = isPhone && isPortrait
+
                     ExplorerTopBar(
                         tabs = tabs,
                         selectedTabIndex = safeIndex,
@@ -317,37 +325,83 @@ fun FileExplorerSQ(
                             }
                         },
                         onMenuClick = { scope.launch { drawerState.open() } },
-                        appState = appState
+                        appState = appState,
+                        hideNavButtons = hideTopNav,
+                        hideSearchButton = hideTopNav,
+                        hideMenuButton = hideTopNav
                     )
                 }
             ) { innerPadding ->
-                ExplorerBody(
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                    ),
-                    appState = appState,
-                    isInWindowMode = isInWindowMode,
-                    onAddStorage = { safLauncher.launch(null) },
-                    onAddSdCard = { volume ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
-                        }
-                    },
-                    onAddNetwork = onAddNetwork,
-                    onEditNetwork = onEditNetwork
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ExplorerBody(
+                        modifier = Modifier.padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                        ),
+                        appState = appState,
+                        isInWindowMode = isInWindowMode,
+                        onAddStorage = { safLauncher.launch(null) },
+                        onAddSdCard = { volume ->
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
+                            }
+                        },
+                        onAddNetwork = onAddNetwork,
+                        onEditNetwork = onEditNetwork
+                    )
+                }
             }
         }
 
         val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        // Adjust fade height: 3-button nav (~48dp) gets a taller fade, gesture nav (~16-24dp) gets a shorter one.
         val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
         val extraHeight = if (isGestureNav) 0.dp else 10.dp
         val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
 
-        if (fadeHeight > 0.dp) {
+        val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+        val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
+
+        if (showBottomBar) {
+            val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
+                extendedColors.navigationBarColor
+            else if (SettingsManager.isColorfulBarsEnabled.value)
+                MaterialTheme.colorScheme.primaryContainer
+            else
+                extendedColors.topBarBackground
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.5f to navColor,
+                            1f to navColor
+                        )
+                    )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    NavigationControls(
+                        appState = appState,
+                        onMenuClick = { scope.launch { drawerState.open() } }
+                    )
+                    SearchButton(
+                        appState = appState,
+                        searchQuery = TextFieldValue(""),
+                        searchSubfolders = false
+                    )
+                }
+            }
+        } else if (fadeHeight > 0.dp) {
             val solidPart = if (isGestureNav) 0.dp else 10.dp
             val stopPoint = (fadeHeight - solidPart).coerceAtLeast(0.dp) / fadeHeight
             Box(
@@ -408,7 +462,10 @@ private fun ExplorerTopBar(
     onAddTab: () -> Unit,
     onCloseTab: (FileExplorerState) -> Unit,
     onMenuClick: () -> Unit,
-    appState: FileExplorerState
+    appState: FileExplorerState,
+    hideNavButtons: Boolean = false,
+    hideSearchButton: Boolean = false,
+    hideMenuButton: Boolean = false
 ) {
     val appearance = appState.getUIAppearance()
     val themeTop = SettingsManager.themeTop.value
@@ -429,7 +486,10 @@ private fun ExplorerTopBar(
 
             TopBar(
                 onMenuClick = onMenuClick,
-                appState = appState
+                appState = appState,
+                hideNavButtons = hideNavButtons,
+                hideSearchButton = hideSearchButton,
+                hideMenuButton = hideMenuButton
             )
 
             if (SettingsManager.isCommandBarVisible.value) {

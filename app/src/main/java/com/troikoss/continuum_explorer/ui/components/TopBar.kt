@@ -80,7 +80,10 @@ import java.io.File
 @Composable
 fun TopBar(
     onMenuClick: () -> Unit,
-    appState: FileExplorerState
+    appState: FileExplorerState,
+    hideNavButtons: Boolean = false,
+    hideSearchButton: Boolean = false,
+    hideMenuButton: Boolean = false
 ) {
 
     val context = LocalContext.current
@@ -91,28 +94,22 @@ fun TopBar(
 
     var optionsMenuExpanded by remember { mutableStateOf(false) }
     var currentOptionsScreen by remember { mutableStateOf("MAIN") }
-    var addressBar by remember { mutableStateOf(false) }
-    var addressBarFocusedOnce by remember { mutableStateOf(false) }
-    var historyMenuExpanded by remember { mutableStateOf(false) }
 
     // Search related state
-    var searchBar by remember { mutableStateOf(false) }
     var searchBarFocusedOnce by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var searchOptionsMenuExpanded by remember { mutableStateOf(false) }
     var searchSubfolders by remember { mutableStateOf(false) }
     var searchKindMenuExpanded by remember { mutableStateOf(false) }
+
+    var addressBarFocusedOnce by remember { mutableStateOf(false) }
+
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
     val isColorful = SettingsManager.isColorfulBarsEnabled.value
     val navButtonBg = if (isColorful) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.navButtonBackground
-
-    // Sync UI searchBar state to global state
-    LaunchedEffect(searchBar) {
-        appState.isSearchUIActive = searchBar
-    }
 
     LaunchedEffect(optionsMenuExpanded) {
         if (!optionsMenuExpanded) {
@@ -166,8 +163,8 @@ fun TopBar(
         mutableStateOf(TextFieldValue(currentPathString))
     }
 
-    LaunchedEffect(addressBar) {
-        if (addressBar) {
+    LaunchedEffect(appState.isAddressBarActive) {
+        if (appState.isAddressBarActive) {
             focusRequester.requestFocus()
             textPathValue = textPathValue.copy(
                 selection = TextRange(0, textPathValue.text.length)
@@ -177,8 +174,8 @@ fun TopBar(
         }
     }
 
-    LaunchedEffect(searchBar) {
-        if (searchBar) {
+    LaunchedEffect(appState.isSearchUIActive) {
+        if (appState.isSearchUIActive) {
             focusRequester.requestFocus()
             searchQuery = searchQuery.copy(
                 selection = TextRange(0, searchQuery.text.length)
@@ -213,181 +210,22 @@ fun TopBar(
         color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.topBarBackground
     ) {
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
-            // NAV BUTTON BACKGROUND SURFACE - INSIDE THE TOP BAR
-            Surface(
-                color = navButtonBg,
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(end = 4.dp)
-            ) {
-                Row(verticalAlignment = CenterVertically) {
-                    if (appState.getScreenSize() == ScreenSize.SMALL) {
-                        IconButton(onClick = onMenuClick) {
-                            Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
-                        }
-                    }
-
-                    // NAVIGATION GROUP (Back/Forward/History)
-                    val isSmall = appState.getScreenSize() == ScreenSize.SMALL
-                    if (!isSmall || !searchBar) Row(verticalAlignment = CenterVertically) {
-                        IconButton(
-                            onClick = { appState.goBack() },
-                            enabled = appState.canGoBack
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = if (appState.canGoBack) MaterialTheme.colorScheme.onSurface
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { appState.goForward() },
-                            enabled = appState.canGoForward
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = stringResource(R.string.forward),
-                                tint = if (appState.canGoForward) MaterialTheme.colorScheme.onSurface
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                            )
-                        }
-
-                        // UNIFIED HISTORY DROPDOWN (MOVE TO RIGHT OF FORWARD)
-                        if (appState.getScreenSize() != ScreenSize.SMALL) {
-                            Box {
-                                IconButton(
-                                    onClick = { historyMenuExpanded = true },
-                                    enabled = appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty(),
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .padding(start = 4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.KeyboardArrowDown,
-                                        contentDescription = stringResource(R.string.history),
-                                        modifier = Modifier.size(16.dp),
-                                        tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
-                                        else MaterialTheme.colorScheme.onSurface.copy(
-                                            alpha = 0.3f
-                                        )
-                                    )
-                                }
-
-                                DropdownMenu(
-                                    expanded = historyMenuExpanded,
-                                    onDismissRequest = { historyMenuExpanded = false },
-                                    shape = RoundedCornerShape(16.dp),
-                                    containerColor = LocalExtendedColors.current.menuBackground
-                                ) {
-                                    // Forward History (Latest at top)
-                                    appState.forwardStack.take(5)
-                                        .forEachIndexed { reversedIndex, location ->
-                                            val unifiedIndex =
-                                                appState.backStack.size + 1 + (appState.forwardStack.size - 1 - reversedIndex)
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Text(
-                                                        appState.getLocationName(
-                                                            location
-                                                        ),
-                                                        maxLines = 1
-                                                    )
-                                                },
-                                                onClick = {
-                                                    appState.jumpToHistory(unifiedIndex)
-                                                    historyMenuExpanded = false
-                                                }
-                                            )
-                                        }
-
-                                    // Current Location (with Checkmark)
-                                    val currentNav = NavLocation(
-                                        path = appState.currentPath,
-                                        uri = appState.currentSafUri,
-                                        archiveFile = appState.currentArchiveFile,
-                                        archiveUri = appState.currentArchiveUri,
-                                        archivePath = appState.currentArchivePath,
-                                        safStack = ArrayList(appState.safStack),
-                                        networkConnectionId = appState.currentNetworkConnectionId,
-                                        networkPath = appState.currentNetworkId
-                                    )
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                appState.getLocationName(currentNav),
-                                                maxLines = 1,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                Icons.Default.Check,
-                                                null,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        },
-                                        onClick = { historyMenuExpanded = false }
-                                    )
-
-                                    // Back History (Most recent just below current)
-                                    appState.backStack.asReversed().take(5)
-                                        .forEachIndexed { reversedIndex, location ->
-                                            val originalIndex =
-                                                appState.backStack.size - 1 - reversedIndex
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Text(
-                                                        appState.getLocationName(
-                                                            location
-                                                        ),
-                                                        maxLines = 1
-                                                    )
-                                                },
-                                                onClick = {
-                                                    appState.jumpToHistory(originalIndex)
-                                                    historyMenuExpanded = false
-                                                }
-                                            )
-                                        }
-                                }
-                            }
-                        }
-                    }
-
-                    // UP BUTTON
-
-                    if (appState.getScreenSize() != ScreenSize.SMALL) {
-                        IconButton(
-                            onClick = { appState.goUp() },
-                            enabled = appState.canGoUp
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowUpward,
-                                contentDescription = stringResource(R.string.up),
-                                tint = if (appState.canGoUp) MaterialTheme.colorScheme.onSurface
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                            )
-                        }
-
-                        // REFRESH / CANCEL BUTTON
-                        if (showCancelButton) {
-                            IconButton(onClick = { appState.cancelLoading() }) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.cancel)
-                                )
-                            }
-                        } else {
-                            // Show Refresh button if not loading, or if loading hasn't reached the 400ms mark yet
-                            IconButton(onClick = { if (!appState.isLoading) appState.refresh() }) {
-                                Icon(
-                                    Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.menu_refresh)
-                                )
-                            }
-                        }
-                    }
+            if (!hideNavButtons) {
+                // NAV BUTTON BACKGROUND SURFACE - INSIDE THE TOP BAR
+                Surface(
+                    color = navButtonBg,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(end = 4.dp)
+                ) {
+                    NavigationControls(
+                        appState = appState,
+                        onMenuClick = onMenuClick,
+                        showCancelButton = showCancelButton
+                    )
+                }
+            } else if (!hideMenuButton && appState.getScreenSize() == ScreenSize.SMALL) {
+                IconButton(onClick = onMenuClick) {
+                    Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
                 }
             }
 
@@ -401,12 +239,12 @@ fun TopBar(
                         interactionSource = interactionSource,
                         indication = null
                     ) {
-                        if (!addressBar && !searchBar) addressBar = true
+                        if (!appState.isAddressBarActive && !appState.isSearchUIActive) appState.isAddressBarActive = true
                     },
                 color = LocalExtendedColors.current.searchBoxBackground,
                 shape = RoundedCornerShape(20.dp)
             ) {
-                if (searchBar) {
+                if (appState.isSearchUIActive) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -421,7 +259,7 @@ fun TopBar(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { 
                                     if (it.isFocused) searchBarFocusedOnce = true
-                                    if (searchBar && searchBarFocusedOnce && !it.isFocused) searchBar = false 
+                                    if (appState.isSearchUIActive && searchBarFocusedOnce && !it.isFocused) appState.isSearchUIActive = false 
                                 }
                                 .focusProperties {
                                     down = FocusRequester.Cancel
@@ -544,7 +382,7 @@ fun TopBar(
                         }
 
                         IconButton(onClick = {
-                            searchBar = false
+                            appState.isSearchUIActive = false
                             focusManager.clearFocus()
                             if (appState.isSearchMode) {
                                 appState.refresh() // Reset to normal view if search was closed
@@ -558,7 +396,7 @@ fun TopBar(
                             )
                         }
                     }
-                } else if (!addressBar) {
+                } else if (!appState.isAddressBarActive) {
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
@@ -842,7 +680,7 @@ fun TopBar(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { 
                                     if (it.isFocused) addressBarFocusedOnce = true
-                                    if (addressBar && addressBarFocusedOnce && !it.isFocused) addressBar = false
+                                    if (appState.isAddressBarActive && addressBarFocusedOnce && !it.isFocused) appState.isAddressBarActive = false
                                 },
                             singleLine = true,
                             textStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -860,11 +698,11 @@ fun TopBar(
                                             if (newFile.exists()) {
                                                 if (newFile.isDirectory) {
                                                     appState.navigateTo(newFile, null)
-                                                    addressBar = false
+                                                    appState.isAddressBarActive = false
                                                     focusManager.clearFocus()
                                                 } else if (ZipUtils.isArchive(newFile.toUniversal())) {
                                                     appState.navigateTo(null, null, archiveFile = newFile, archivePath = "")
-                                                    addressBar = false
+                                                    appState.isAddressBarActive = false
                                                     focusManager.clearFocus()
                                                 } else {
                                                     Toast.makeText(context, msgNotDirArchive, Toast.LENGTH_SHORT).show()
@@ -873,7 +711,7 @@ fun TopBar(
                                                 Toast.makeText(context, msgFileNotFound, Toast.LENGTH_SHORT).show()
                                             }
                                         } else {
-                                            addressBar = false
+                                            appState.isAddressBarActive = false
                                             focusManager.clearFocus()
                                         }
                                     } else {
@@ -885,7 +723,7 @@ fun TopBar(
                         )
 
                         IconButton(onClick = {
-                            addressBar = false
+                            appState.isAddressBarActive = false
                             focusManager.clearFocus()
                         }) {
                             Icon(
@@ -899,15 +737,8 @@ fun TopBar(
                 }
             }
 
-            IconButton(onClick = {
-                if (searchBar) {
-                    appState.performSearch(searchQuery.text, searchSubfolders)
-                } else {
-                    searchBar = true
-                    addressBar = false
-                }
-            }) {
-                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
+            if (!hideSearchButton) {
+                SearchButton(appState = appState, searchQuery = searchQuery, searchSubfolders = searchSubfolders)
             }
 
             Box {
@@ -1125,6 +956,204 @@ fun TopBar(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchButton(
+    appState: FileExplorerState,
+    searchQuery: TextFieldValue,
+    searchSubfolders: Boolean
+) {
+    IconButton(onClick = {
+        if (appState.isSearchUIActive) {
+            appState.performSearch(searchQuery.text, searchSubfolders)
+        } else {
+            appState.isSearchUIActive = true
+            appState.isAddressBarActive = false
+        }
+    }) {
+        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
+    }
+}
+
+@Composable
+fun NavigationControls(
+    appState: FileExplorerState,
+    onMenuClick: () -> Unit,
+    showCancelButton: Boolean = false
+) {
+    var historyMenuExpanded by remember { mutableStateOf(false) }
+
+    Row(verticalAlignment = CenterVertically) {
+        if (appState.getScreenSize() == ScreenSize.SMALL) {
+            IconButton(onClick = onMenuClick) {
+                Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
+            }
+        }
+
+        // NAVIGATION GROUP (Back/Forward/History)
+        val isSmall = appState.getScreenSize() == ScreenSize.SMALL
+        if (!isSmall || !appState.isSearchUIActive) Row(verticalAlignment = CenterVertically) {
+            IconButton(
+                onClick = { appState.goBack() },
+                enabled = appState.canGoBack
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = if (appState.canGoBack) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                )
+            }
+
+            IconButton(
+                onClick = { appState.goForward() },
+                enabled = appState.canGoForward
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = stringResource(R.string.forward),
+                    tint = if (appState.canGoForward) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                )
+            }
+
+            // UNIFIED HISTORY DROPDOWN (MOVE TO RIGHT OF FORWARD)
+            if (appState.getScreenSize() != ScreenSize.SMALL) {
+                Box {
+                    IconButton(
+                        onClick = { historyMenuExpanded = true },
+                        enabled = appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty(),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(start = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = stringResource(R.string.history),
+                            modifier = Modifier.size(16.dp),
+                            tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.3f
+                            )
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = historyMenuExpanded,
+                        onDismissRequest = { historyMenuExpanded = false },
+                        shape = RoundedCornerShape(16.dp),
+                        containerColor = LocalExtendedColors.current.menuBackground
+                    ) {
+                        // Forward History (Latest at top)
+                        appState.forwardStack.take(5)
+                            .forEachIndexed { reversedIndex, location ->
+                                val unifiedIndex =
+                                    appState.backStack.size + 1 + (appState.forwardStack.size - 1 - reversedIndex)
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            appState.getLocationName(
+                                                location
+                                            ),
+                                            maxLines = 1
+                                        )
+                                    },
+                                    onClick = {
+                                        appState.jumpToHistory(unifiedIndex)
+                                        historyMenuExpanded = false
+                                    }
+                                )
+                            }
+
+                        // Current Location (with Checkmark)
+                        val currentNav = NavLocation(
+                            path = appState.currentPath,
+                            uri = appState.currentSafUri,
+                            archiveFile = appState.currentArchiveFile,
+                            archiveUri = appState.currentArchiveUri,
+                            archivePath = appState.currentArchivePath,
+                            safStack = ArrayList(appState.safStack),
+                            networkConnectionId = appState.currentNetworkConnectionId,
+                            networkPath = appState.currentNetworkId
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    appState.getLocationName(currentNav),
+                                    maxLines = 1,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Check,
+                                    null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            },
+                            onClick = { historyMenuExpanded = false }
+                        )
+
+                        // Back History (Most recent just below current)
+                        appState.backStack.asReversed().take(5)
+                            .forEachIndexed { reversedIndex, location ->
+                                val originalIndex =
+                                    appState.backStack.size - 1 - reversedIndex
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            appState.getLocationName(
+                                                location
+                                            ),
+                                            maxLines = 1
+                                        )
+                                    },
+                                    onClick = {
+                                        appState.jumpToHistory(originalIndex)
+                                        historyMenuExpanded = false
+                                    }
+                                )
+                            }
+                    }
+                }
+            }
+        }
+
+        // UP BUTTON
+
+        if (appState.getScreenSize() != ScreenSize.SMALL) {
+            IconButton(
+                onClick = { appState.goUp() },
+                enabled = appState.canGoUp
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowUpward,
+                    contentDescription = stringResource(R.string.up),
+                    tint = if (appState.canGoUp) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                )
+            }
+
+            // REFRESH / CANCEL BUTTON
+            if (showCancelButton) {
+                IconButton(onClick = { appState.cancelLoading() }) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cancel)
+                    )
+                }
+            } else {
+                // Show Refresh button if not loading, or if loading hasn't reached the 400ms mark yet
+                IconButton(onClick = { if (!appState.isLoading) appState.refresh() }) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.menu_refresh)
+                    )
                 }
             }
         }

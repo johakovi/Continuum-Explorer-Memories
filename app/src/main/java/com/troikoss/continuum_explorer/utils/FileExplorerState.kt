@@ -122,6 +122,7 @@ class FileExplorerState(
 
     var isSearchMode by mutableStateOf(false)
     var isSearchUIActive by mutableStateOf(false)
+    var isAddressBarActive by mutableStateOf(false)
 
     val activeViewMode: ViewMode
         @Composable

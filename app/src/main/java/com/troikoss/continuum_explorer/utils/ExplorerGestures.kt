@@ -47,6 +47,9 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
@@ -879,7 +882,10 @@ fun VerticalResizeHandle(
             .wrapContentWidth(unbounded = true),
         contentAlignment = Alignment.Center
     ) {
-        if (showDivider) VerticalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        if (showDivider) VerticalDivider(
+            thickness = 2.dp,
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
 
         Box(
             modifier = Modifier
@@ -904,8 +910,21 @@ fun VerticalResizeHandle(
                             }
                         }
                     }
-                }
-        )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Visible grab handle - thicker and taller for easier grabbing
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .fillMaxHeight(0.15f)
+                    .heightIn(min = 32.dp, max = 64.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0f),
+                        shape = RoundedCornerShape(3.dp)
+                    )
+            )
+        }
     }
 }
 
