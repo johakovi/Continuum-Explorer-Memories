@@ -430,6 +430,11 @@ private fun NavigationContent(
     isInWindowMode: Boolean = false
 ) {
     val context = LocalContext.current
+    val appearance = appState.getUIAppearance()
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+    val isPhonePortrait = appearance == UIAppearance.PHONE && isPortrait
+
     NavigationPane(
         modifier = modifier,
         appState = appState,
@@ -445,7 +450,10 @@ private fun NavigationContent(
         onAddNetworkClick = onAddNetwork,
         onEditNetworkClick = onEditNetwork,
         onNavigate = onCloseDrawer,
-        currentWidth = appState.appConfigs.navPaneWidth, // Modal drawer usually full width or fixed, but passing for consistency
+        widthProvider = {
+            // Force expanded mode in Phone Portrait to prevent minimized sidebar in the modal drawer
+            if (isPhonePortrait) 300.dp else appState.appConfigs.navPaneWidth
+        },
         isInWindowMode = isInWindowMode
     )
 }
@@ -556,7 +564,7 @@ private fun ExplorerBody(
                             onAddStorageClick = onAddStorage,
                             onAddNetworkClick = onAddNetwork,
                             onEditNetworkClick = onEditNetwork,
-                            currentWidth = navPaneWidth,
+                            widthProvider = { navPaneWidth },
                             isInWindowMode = isInWindowMode
                         )
                     }
@@ -564,8 +572,8 @@ private fun ExplorerBody(
                 VerticalResizeHandle(
                     modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = false,
+                    onResizeStarted = { isResizingNav = true },
                     onResize = { delta ->
-                        isResizingNav = true
                         appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
                     },
                     onResizeFinished = {
@@ -593,11 +601,13 @@ private fun ExplorerBody(
                 VerticalResizeHandle(
                     modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
                     showDivider = !contentIsRounded,
+                    onResizeStarted = { isResizingNav = true },
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
                             (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 300.dp)
                     },
                     onResizeFinished = {
+                        isResizingNav = false
                         appState.appConfigs.savePaneWidths()
                     }
                 )

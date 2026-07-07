@@ -861,11 +861,13 @@ fun VerticalResizeHandle(
     onResize: (Dp) -> Unit,
     modifier: Modifier = Modifier,
     showDivider: Boolean = true,
+    onResizeStarted: (() -> Unit)? = null,
     onResizeFinished: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
     val currentOnResize by rememberUpdatedState(onResize)
+    val currentOnResizeStarted by rememberUpdatedState(onResizeStarted)
     val currentOnResizeFinished by rememberUpdatedState(onResizeFinished)
 
     val resizeIcon = remember(context) {
@@ -892,20 +894,22 @@ fun VerticalResizeHandle(
                 .fillMaxHeight()
                 .requiredWidth(30.dp)
                 .pointerHoverIcon(resizeIcon)
-                .pointerInput(Unit) {
+                .pointerInput(density) { // Use density as key to update if it changes
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
                         down.consume()
+                        currentOnResizeStarted?.invoke()
+                        
                         while (true) {
                             val event = awaitPointerEvent()
-                            val dragChange = event.changes.firstOrNull() ?: break
+                            val dragChange = event.changes.firstOrNull { it.id == down.id } ?: break
                             if (!dragChange.pressed) {
                                 currentOnResizeFinished?.invoke()
                                 break
                             }
                             val deltaPx = dragChange.positionChange().x
                             if (deltaPx != 0f) {
-                                currentOnResize(with(density) { deltaPx.toDp() })
+                                currentOnResize(deltaPx.toDp())
                                 dragChange.consume()
                             }
                         }
@@ -966,6 +970,7 @@ fun Modifier.iconTouchToggle(
 /**
  * Applies a fading edge effect to a scrollable container.
  * The fade is only visible when the container can be scrolled in that direction.
+ * Optimized to avoid allocations during drawing.
  */
 fun Modifier.fadingEdge(
     state: androidx.compose.foundation.gestures.ScrollableState,
@@ -974,7 +979,11 @@ fun Modifier.fadingEdge(
     showTop: Boolean = true,
     showBottom: Boolean = true
 ): Modifier = this
-    .graphicsLayer { alpha = 0.99f } // Create a layer for BlendMode.DstIn to work
+    .graphicsLayer {
+        // Use a slightly transparent alpha to force a layer for BlendMode.DstIn.
+        // This is cheaper than CompositingStrategy.Offscreen.
+        alpha = 0.99f
+    }
     .drawWithContent {
         drawContent()
 
@@ -985,35 +994,21 @@ fun Modifier.fadingEdge(
             val topFadeHeightPx = topFadeHeight.toPx()
             val bottomFadeHeightPx = bottomFadeHeight.toPx()
 
-            val colors = mutableListOf<Color>()
-            val stops = mutableListOf<Float>()
+            val topStop = if (canScrollBackward) (topFadeHeightPx / size.height).coerceIn(0f, 1f) else 0f
+            val bottomStop = if (canScrollForward) (1f - bottomFadeHeightPx / size.height).coerceIn(0f, 1f) else 1f
 
-            if (canScrollBackward) {
-                colors.add(Color.Transparent)
-                stops.add(0f)
-                colors.add(Color.Black)
-                stops.add((topFadeHeightPx / size.height).coerceIn(0f, 1f))
-            } else {
-                colors.add(Color.Black)
-                stops.add(0f)
-            }
-
-            if (canScrollForward) {
-                colors.add(Color.Black)
-                stops.add((1f - bottomFadeHeightPx / size.height).coerceIn(0f, 1f))
-                colors.add(Color.Transparent)
-                stops.add(1f)
-            } else {
-                colors.add(Color.Black)
-                stops.add(1f)
-            }
+            // Create gradient once and reuse if possible, or at least avoid zip/map allocations
+            val brush = Brush.verticalGradient(
+                0f to if (canScrollBackward) Color.Transparent else Color.Black,
+                topStop to Color.Black,
+                bottomStop to Color.Black,
+                1f to if (canScrollForward) Color.Transparent else Color.Black,
+                startY = 0f,
+                endY = size.height
+            )
 
             drawRect(
-                brush = Brush.verticalGradient(
-                    colorStops = stops.zip(colors).map { it.first to it.second }.toTypedArray(),
-                    startY = 0f,
-                    endY = size.height
-                ),
+                brush = brush,
                 blendMode = BlendMode.DstIn
             )
         }
