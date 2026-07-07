@@ -13,7 +13,14 @@ class MainApplication : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
-        .components { add(UniversalFileFetcher.Factory()) }
+        .components {
+            add(UniversalFileFetcher.Factory())
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                add(coil.decode.ImageDecoderDecoder.Factory())
+            } else {
+                add(coil.decode.GifDecoder.Factory())
+            }
+        }
         .respectCacheHeaders(enable = false)
         .build()
 }

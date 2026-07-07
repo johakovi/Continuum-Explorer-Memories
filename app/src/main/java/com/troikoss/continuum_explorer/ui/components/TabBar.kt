@@ -59,6 +59,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +67,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.SettingsManager
@@ -139,13 +141,24 @@ fun TabBar(
 
     val isFloat = themeTop == ThemeTopMode.FLOAT
 
+    val backgroundUri = SettingsManager.tabBarBackgroundUri.value
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .height(totalBarHeight)
-            .background(LocalExtendedColors.current.tabBarBackground),
+            .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground),
         contentAlignment = Alignment.BottomStart
     ) {
+        backgroundUri?.let { uri ->
+            AsyncImage(
+                model = uri,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
         val currentMaxWidth = maxWidth
 
         // Unified Safety Fallback for all windowed modes (DeX & Pop-ups)

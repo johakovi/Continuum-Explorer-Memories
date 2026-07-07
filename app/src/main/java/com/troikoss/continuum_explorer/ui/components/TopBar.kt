@@ -1005,8 +1005,8 @@ fun NavigationControls(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = if (appState.canGoBack) MaterialTheme.colorScheme.onSurface
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    tint = if (appState.canGoBack) LocalContentColor.current
+                    else LocalContentColor.current.copy(alpha = 0.3f)
                 )
             }
 
@@ -1017,8 +1017,8 @@ fun NavigationControls(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = stringResource(R.string.forward),
-                    tint = if (appState.canGoForward) MaterialTheme.colorScheme.onSurface
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    tint = if (appState.canGoForward) LocalContentColor.current
+                    else LocalContentColor.current.copy(alpha = 0.3f)
                 )
             }
 
@@ -1036,8 +1036,8 @@ fun NavigationControls(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = stringResource(R.string.history),
                             modifier = Modifier.size(16.dp),
-                            tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) MaterialTheme.colorScheme.onSurface
-                            else MaterialTheme.colorScheme.onSurface.copy(
+                            tint = if (appState.backStack.isNotEmpty() || appState.forwardStack.isNotEmpty()) LocalContentColor.current
+                            else LocalContentColor.current.copy(
                                 alpha = 0.3f
                             )
                         )
@@ -1134,8 +1134,8 @@ fun NavigationControls(
                 Icon(
                     imageVector = Icons.Default.ArrowUpward,
                     contentDescription = stringResource(R.string.up),
-                    tint = if (appState.canGoUp) MaterialTheme.colorScheme.onSurface
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    tint = if (appState.canGoUp) LocalContentColor.current
+                    else LocalContentColor.current.copy(alpha = 0.3f)
                 )
             }
 

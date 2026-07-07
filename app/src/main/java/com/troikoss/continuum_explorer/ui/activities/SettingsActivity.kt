@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
@@ -107,6 +108,21 @@ fun SettingsScreen(onBack: () -> Unit) {
             } else {
                 Toast.makeText(context, R.string.msg_theme_pack_failed, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    val backgroundPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {
+            }
+            SettingsManager.setTabBarBackgroundUri(context, it.toString())
         }
     }
 
@@ -197,6 +213,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                         checked = isColorfulBarsEnabled,
                         onCheckedChange = { SettingsManager.setColorfulBarsEnabled(context, it) }
                     )
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_tab_bar_background)) },
+                supportingContent = {
+                    SettingsManager.tabBarBackgroundUri.value?.let { Text(it) } ?: Text(stringResource(R.string.settings_tab_bar_background_none))
+                },
+                modifier = Modifier.clickable { backgroundPickerLauncher.launch(arrayOf("image/*")) },
+                trailingContent = {
+                    if (SettingsManager.tabBarBackgroundUri.value != null) {
+                        IconButton(onClick = { SettingsManager.setTabBarBackgroundUri(context, null) }) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_clear))
+                        }
+                    }
                 }
             )
 

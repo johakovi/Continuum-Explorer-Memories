@@ -197,6 +197,9 @@
     <string name="settings_themetop">Tab</string>
     <string name="settings_themetop_attached">Attached</string>
     <string name="settings_themetop_float">Float</string>
+    <string name="settings_tab_bar_background">Tab Bar Background Image</string>
+    <string name="settings_tab_bar_background_none">None</string>
+    <string name="settings_clear">Clear</string>
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colours for the top bar and tab bar.</string>
     <string name="settings_icon_theme">Icon Theme</string>

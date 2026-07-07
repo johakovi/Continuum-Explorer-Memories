@@ -36,9 +36,11 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -386,15 +388,17 @@ fun FileExplorerRO(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    NavigationControls(
-                        appState = appState,
-                        onMenuClick = { scope.launch { drawerState.open() } }
-                    )
-                    SearchButton(
-                        appState = appState,
-                        searchQuery = TextFieldValue(""),
-                        searchSubfolders = false
-                    )
+                    CompositionLocalProvider(LocalContentColor provides extendedColors.sidebarIcons) {
+                        NavigationControls(
+                            appState = appState,
+                            onMenuClick = { scope.launch { drawerState.open() } }
+                        )
+                        SearchButton(
+                            appState = appState,
+                            searchQuery = TextFieldValue(""),
+                            searchSubfolders = false
+                        )
+                    }
                 }
             }
         } else if (fadeHeight > 0.dp) {

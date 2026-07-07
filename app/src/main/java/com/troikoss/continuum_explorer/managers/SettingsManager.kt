@@ -67,6 +67,7 @@ object SettingsManager {
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
+    private const val KEY_TAB_BAR_BACKGROUND_URI = "tab_bar_background_uri"
 
     private const val KEY_COMMAND_BAR_VISIBLE = "command_bar_visible"
     private const val KEY_SHOW_HIDDEN_FILES = "show_hidden_files"
@@ -118,6 +119,9 @@ object SettingsManager {
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
+
+    private val _tabBarBackgroundUri = mutableStateOf<String?>(null)
+    val tabBarBackgroundUri: State<String?> = _tabBarBackgroundUri
 
     private val _detailsMode = mutableStateOf(DetailsMode.OFF)
     val detailsMode: State<DetailsMode> = _detailsMode
@@ -252,6 +256,8 @@ object SettingsManager {
         _language.value = savedLanguage
         applyLocale(savedLanguage)
 
+        _tabBarBackgroundUri.value = prefs.getString(KEY_TAB_BAR_BACKGROUND_URI, null)
+
         val savedDetails = prefs.getString(KEY_DETAILS_MODE, DetailsMode.OFF.name)
         _detailsMode.value = try {
             DetailsMode.valueOf(savedDetails ?: DetailsMode.OFF.name)
@@ -324,6 +330,17 @@ object SettingsManager {
         _detailsMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_DETAILS_MODE, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setTabBarBackgroundUri(context: Context, uri: String?) {
+        _tabBarBackgroundUri.value = uri
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        if (uri == null) {
+            prefs.edit().remove(KEY_TAB_BAR_BACKGROUND_URI).apply()
+        } else {
+            prefs.edit().putString(KEY_TAB_BAR_BACKGROUND_URI, uri).apply()
+        }
         GlobalEvents.triggerConfigUpdate()
     }
 

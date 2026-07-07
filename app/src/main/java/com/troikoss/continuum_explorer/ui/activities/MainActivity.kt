@@ -182,6 +182,11 @@ open class MainActivity : AppCompatActivity() {
                 .components {
                     add(UniversalFileFetcher.Factory())
                     add(VideoFrameDecoder.Factory())
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        add(coil.decode.ImageDecoderDecoder.Factory())
+                    } else {
+                        add(coil.decode.GifDecoder.Factory())
+                    }
                 }
                 .crossfade(enable = true)
                 .build()
