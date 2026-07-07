@@ -197,12 +197,16 @@
     <string name="settings_themetop">탭 스타일</string>
     <string name="settings_themetop_attached">부착형</string>
     <string name="settings_themetop_float">플로팅형</string>
+    <string name="settings_tab_bar_background">탭 바 배경 이미지</string>
+    <string name="settings_tab_bar_background_none">없음</string>
+    <string name="settings_clear">지우기</string>
     <string name="settings_colorful_bars">상단 및 탭 바 색상 적용</string>
     <string name="settings_colorful_bars_desc">상단 바와 탭 바에 강조 색상을 적용합니다.</string>
     <string name="settings_icon_theme">아이콘 테마</string>
     <string name="settings_icon_theme_colourful">컬러풀</string>
     <string name="settings_icon_theme_colourful_duotone">다채로운 듀오톤</string>
     <string name="settings_icon_theme_material">머티리얼</string>
+    <string name="settings_default_folder_color">기본 폴더 색상</string>
     <string name="settings_choose_icon_theme">아이콘 테마 선택</string>
     <string name="settings_details_large">상세 정보 (대화면 전용)</string>
     <string name="settings_details_hidden">숨김</string>
@@ -309,8 +313,13 @@
     <string name="nav_game_saves">게임 관리자</string>
     <string name="menu_gallery_albums">앨범</string>
     <string name="menu_gallery_folders">갤러리 폴더</string>
+    <string name="gallery_filter_off_msg">필터링이 현재 꺼져 있습니다. 모든 미디어를 표시합니다.</string>
+    <string name="gallery_no_folders_msg">추가된 폴더가 없습니다. 필터링이 활성화된 경우 표준 미디어 위치가 사용됩니다.</string>
+    <string name="gallery_managed_folders">관리되는 폴더:</string>
+    <string name="gallery_add_folder">폴더 추가</string>
     <string name="menu_gallery_show_all">모든 미디어 보기</string>
     <string name="menu_documents_folder">폴더</string>
+    <string name="menu_documents_show_folders">폴더 표시</string>
     <string name="nav_add_storage">저장소 추가</string>
     <string name="nav_internal_storage">내부 저장소</string>
     <string name="nav_trash">휴지통</string>
@@ -348,6 +357,8 @@
     <string name="nav_ftp_server">FTP 서버</string>
     <string name="nav_start_ftp">FTP 서버 시작</string>
     <string name="nav_stop_ftp">FTP 서버 중지</string>
+    <string name="nav_stop_ftp_game_manager">게임 관리자 FTP 서버 중지</string>
+    <string name="nav_start_ftp_game_manager">게임 관리자 FTP 서버 시작</string>
 
     <!-- Item Types -->
     <string name="archive">압축 파일</string>
@@ -490,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d분</string>
     <string name="settings_timeout_disabled">사용 안 함</string>
     <string name="settings_custom_theme">테마 사용자 지정</string>
+    <string name="settings_custom_theme_mode">사용자 지정 테마 모드</string>
     <string name="settings_load_theme_pack">테마 팩 불러오기 (.zip)</string>
     <string name="settings_clear_theme_pack">맞춤 테마 지우기</string>
     <string name="msg_theme_pack_loaded">테마 팩 \"%1$s\" 불러옴</string>
@@ -499,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">서버 응답 없음</string>
     <string name="dialog_unresponsive_server_message">\"%1$s\" 서버가 응답하는 데 시간이 오래 걸립니다. 계속 기다리시겠습니까, 아니면 작업을 취소하시겠습니까?</string>
     <string name="dialog_wait">기다리기</string>
+    <string name="terminal_debug_title">터미널 디버그 출력</string>
 </resources>

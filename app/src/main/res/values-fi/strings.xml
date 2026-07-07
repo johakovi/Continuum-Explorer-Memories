@@ -192,6 +192,9 @@
         <string name="settings_themetop">Välilehti</string>
         <string name="settings_themetop_attached">Kiinnitetty</string>
         <string name="settings_themetop_float">Irtonainen</string>
+        <string name="settings_tab_bar_background">Välilehtipalkin taustakuva</string>
+        <string name="settings_tab_bar_background_none">Ei mitään</string>
+        <string name="settings_clear">Tyhjennä</string>
         <string name="settings_theme_system">Järjestelmän oma</string>
         <string name="settings_theme_light">Vaalea tyyli</string>
         <string name="settings_theme_dark">Tumma tyyli</string>
@@ -204,6 +207,7 @@
         <string name="settings_icon_theme_colourful">Värikäs</string>
         <string name="settings_icon_theme_colourful_duotone">Värikäs duotone</string>
         <string name="settings_icon_theme_material">Material</string>
+        <string name="settings_default_folder_color">Kansion oletusväri</string>
         <string name="settings_choose_icon_theme">Valitse kuvakkeiden tyyli</string>
         <string name="settings_details_large">Yksityiskohdat (Isoille ruuduille)</string>
         <string name="settings_details_hidden">Piilotettu</string>
@@ -310,8 +314,13 @@
         <string name="nav_game_saves">Pelien hallinta</string>
         <string name="menu_gallery_albums">Albumit</string>
         <string name="menu_gallery_folders">Gallerian kansiot</string>
+        <string name="gallery_filter_off_msg">Suodatus on tällä hetkellä POIS PÄÄLTÄ. Näytetään kaikki media.</string>
+        <string name="gallery_no_folders_msg">Kansioita ei ole lisätty. Käytetään tavallisia mediasijainteja, jos suodatus on päällä.</string>
+        <string name="gallery_managed_folders">Hallinnoidut kansiot:</string>
+        <string name="gallery_add_folder">Lisää kansio</string>
         <string name="menu_gallery_show_all">Näytä kaikki mediatiedostot</string>
         <string name="menu_documents_folder">Kansio</string>
+        <string name="menu_documents_show_folders">Näytä kansiot</string>
         <string name="nav_add_storage">Lisää tallennustila</string>
         <string name="nav_internal_storage">Sisäinen tallennustila</string>
         <string name="nav_trash">Roskakori</string>
@@ -349,6 +358,8 @@
         <string name="nav_ftp_server">FTP-palvelin</string>
         <string name="nav_start_ftp">Käynnistä FTP-palvelin</string>
         <string name="nav_stop_ftp">Pysäytä FTP-palvelin</string>
+        <string name="nav_stop_ftp_game_manager">Pysäytä FTP-pelienhallintapalvelin</string>
+        <string name="nav_start_ftp_game_manager">Käynnistä FTP-pelienhallintapalvelin</string>
 
         <!-- Item Types -->
         <string name="archive">Arkisto</string>
@@ -492,6 +503,7 @@
     <string name="settings_timeout_minutes">%1$d minuuttia</string>
     <string name="settings_timeout_disabled">Ei koskaan</string>
     <string name="settings_custom_theme">Teeman mukauttaminen</string>
+    <string name="settings_custom_theme_mode">Mukautetun teeman tila</string>
     <string name="settings_load_theme_pack">Lataa teemapaketti (.zip)</string>
     <string name="settings_clear_theme_pack">Tyhjennä mukautettu teema</string>
     <string name="msg_theme_pack_loaded">Teemapaketti \"%1$s\" ladattu</string>
@@ -501,5 +513,6 @@
     <string name="dialog_unresponsive_server_title">Palvelin ei vastaa</string>
     <string name="dialog_unresponsive_server_message">Palvelimelta \"%1$s\" kestää kauan vastata. Haluatko jatkaa odottamista vai peruuttaa toiminnon?</string>
     <string name="dialog_wait">Odota</string>
+    <string name="terminal_debug_title">Terminaalin debug-tuloste</string>
 </resources>
 

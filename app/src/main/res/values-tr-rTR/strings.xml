@@ -180,6 +180,9 @@
     <string name="settings_themetop">Sekme</string>
     <string name="settings_themetop_attached">Bitişik</string>
     <string name="settings_themetop_float">Yüzen</string>
+    <string name="settings_tab_bar_background">Sekme Çubuğu Arka Plan Resmi</string>
+    <string name="settings_tab_bar_background_none">Yok</string>
+    <string name="settings_clear">Temizle</string>
     <string name="settings_details_large">Ayrıntılar (Sadece büyük ekranlar için geçerli)</string>
     <string name="settings_details_hidden">Gizli</string>
     <string name="settings_details_pane">Yan Panel</string>
@@ -282,8 +285,13 @@
     <string name="nav_game_saves">Oyun Yöneticisi</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
+    <string name="gallery_filter_off_msg">Filtreleme şu anda KAPALI. Tüm medya gösteriliyor.</string>
+    <string name="gallery_no_folders_msg">Hiçbir klasör eklenmedi. Filtreleme etkinleştirilirse standart medya konumları kullanılacaktır.</string>
+    <string name="gallery_managed_folders">Yönetilen Klasörler:</string>
+    <string name="gallery_add_folder">Klasör Ekle</string>
     <string name="menu_gallery_show_all">Tüm Medyayı Göster</string>
     <string name="menu_documents_folder">Klasör</string>
+    <string name="menu_documents_show_folders">Klasörleri Göster</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
     <string name="nav_trash">Geri Dönüşüm Kutusu</string>
@@ -418,12 +426,15 @@
     <string name="nav_ftp_server">FTP Sunucusu</string>
     <string name="nav_start_ftp">FTP Sunucusunu Başlat</string>
     <string name="nav_stop_ftp">FTP Sunucusunu Durdur</string>
+    <string name="nav_stop_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Durdur</string>
+    <string name="nav_start_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Başlat</string>
     <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
     <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
     <string name="settings_icon_theme">Simge Teması</string>
     <string name="settings_icon_theme_colourful">Renkli</string>
     <string name="settings_icon_theme_colourful_duotone">Renkli Çift Tonlu</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Varsayılan Klasör Rengi</string>
     <string name="settings_choose_icon_theme">Simge Teması Seç</string>
     <string name="msg_remote_permanent_warning">Ağ dosyaları kalıcı olarak silinecek (çöp kutusuna taşınamaz).</string>
     <string name="msg_archive_remote_unsupported">Arşivleme henüz ağ konumları için desteklenmiyor.</string>
@@ -457,6 +468,7 @@
     <string name="settings_timeout_minutes">%1$d dakika</string>
     <string name="settings_timeout_disabled">Asla</string>
     <string name="settings_custom_theme">Tema Özelleştirme</string>
+    <string name="settings_custom_theme_mode">Özel Tema Modu</string>
     <string name="settings_load_theme_pack">Tema Paketi Yükle (.zip)</string>
     <string name="settings_clear_theme_pack">Özel Temayı Temizle</string>
     <string name="msg_theme_pack_loaded">Tema paketi \"%1$s\" yüklendi</string>
@@ -466,4 +478,5 @@
     <string name="dialog_unresponsive_server_title">Sunucu Yanıt Vermiyor</string>
     <string name="dialog_unresponsive_server_message">\"%1$s\" sunucusunun yanıt vermesi uzun sürüyor. Beklemeye devam mı etmek istersiniz yoksa işlemi iptal mi etmek istersiniz?</string>
     <string name="dialog_wait">Bekle</string>
+    <string name="terminal_debug_title">Terminal Hata Ayıklama Çıktısı</string>
 </resources>

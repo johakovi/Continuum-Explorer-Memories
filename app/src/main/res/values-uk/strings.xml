@@ -197,12 +197,16 @@
     <string name="settings_themetop">Вкладка</string>
     <string name="settings_themetop_attached">Прикріплена</string>
     <string name="settings_themetop_float">Плаває</string>
+    <string name="settings_tab_bar_background">Фонове зображення панелі вкладок</string>
+    <string name="settings_tab_bar_background_none">Немає</string>
+    <string name="settings_clear">Очистити</string>
     <string name="settings_colorful_bars">Кольорові панелі</string>
     <string name="settings_colorful_bars_desc">Увімкнути акцентні кольори для верхньої панелі та панелі вкладок.</string>
     <string name="settings_icon_theme">Тема значків</string>
     <string name="settings_icon_theme_colourful">Кольорові</string>
     <string name="settings_icon_theme_colourful_duotone">Барвистий дуотон</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Колір папки за замовчуванням</string>
     <string name="settings_choose_icon_theme">Виберіть тему значків</string>
     <string name="settings_details_large">Деталі (тільки для великих екранів)</string>
     <string name="settings_details_hidden">Приховано</string>
@@ -309,8 +313,13 @@
     <string name="nav_game_saves">Диспетчер ігор</string>
     <string name="menu_gallery_albums">Альбоми</string>
     <string name="menu_gallery_folders">Папки галереї</string>
+    <string name="gallery_filter_off_msg">Фільтрування наразі ВИМКНЕНО. Відображаються всі медіафайли.</string>
+    <string name="gallery_no_folders_msg">Жодної папки не додано. Будуть використані стандартні розташування медіафайлів, якщо фільтрування увімкнено.</string>
+    <string name="gallery_managed_folders">Керовані папки:</string>
+    <string name="gallery_add_folder">Додати папку</string>
     <string name="menu_gallery_show_all">Показати всі медіафайли</string>
     <string name="menu_documents_folder">Папка</string>
+    <string name="menu_documents_show_folders">Показати папки</string>
     <string name="nav_add_storage">Додати сховище</string>
     <string name="nav_internal_storage">Внутрішня пам\'ять</string>
     <string name="nav_trash">Кошик</string>
@@ -348,6 +357,8 @@
     <string name="nav_ftp_server">FTP-сервер</string>
     <string name="nav_start_ftp">Запустити FTP-сервер</string>
     <string name="nav_stop_ftp">Зупинити FTP-сервер</string>
+    <string name="nav_stop_ftp_game_manager">Зупинити FTP-сервер диспетчера ігор</string>
+    <string name="nav_start_ftp_game_manager">Запустити FTP-сервер диспетчера ігор</string>
 
     <!-- Item Types -->
     <string name="archive">Архів</string>
@@ -490,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d хвилин</string>
     <string name="settings_timeout_disabled">Ніколи</string>
     <string name="settings_custom_theme">Налаштування теми</string>
+    <string name="settings_custom_theme_mode">Режим користувацької теми</string>
     <string name="settings_load_theme_pack">Завантажити пакет теми (.zip)</string>
     <string name="settings_clear_theme_pack">Очистити користувацьку тему</string>
     <string name="msg_theme_pack_loaded">Пакет теми \"%1$s\" завантажено</string>
@@ -499,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">Сервер не відповідає</string>
     <string name="dialog_unresponsive_server_message">Сервер «%1$s» занадто довго не відповідає. Бажаєте продовжити очікування чи скасувати операцію?</string>
     <string name="dialog_wait">Зачекати</string>
+    <string name="terminal_debug_title">Вивід налагодження терміналу</string>
 </resources>

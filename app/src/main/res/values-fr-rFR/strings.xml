@@ -196,6 +196,9 @@
     <string name="settings_themetop">Onglet</string>
     <string name="settings_themetop_attached">Attaché</string>
     <string name="settings_themetop_float">Flottant</string>
+    <string name="settings_tab_bar_background">Image de fond de la barre d\'onglets</string>
+    <string name="settings_tab_bar_background_none">Aucun</string>
+    <string name="settings_clear">Effacer</string>
     <string name="settings_details_large">Détails (Grands écrans uniquement)</string>
     <string name="settings_details_hidden">Masqué</string>
     <string name="settings_details_pane">Panneau latéral</string>
@@ -301,8 +304,14 @@
     <string name="nav_game_saves">Gestionnaire de jeux</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_gallery_folders">Dossiers de la galerie</string>
+    <string name="gallery_filter_off_msg">Le filtrage est actuellement DÉSACTIVÉ. Affichage de tous les médias.</string>
+    <string name="gallery_no_folders_msg">Aucun dossier ajouté. Les emplacements multimédias standards seront utilisés si le filtrage est activé.</string>
+    <string name="gallery_managed_folders">Dossiers gérés :</string>
+    <string name="gallery_add_folder">Ajouter un dossier</string>
     <string name="menu_gallery_show_all">Afficher tous les médias</string>
-    <string name="menu_documents_folder">Dossier</string>    <string name="nav_add_storage">Ajouter un stockage</string>
+    <string name="menu_documents_folder">Dossier</string>
+    <string name="menu_documents_show_folders">Afficher les dossiers</string>
+    <string name="nav_add_storage">Ajouter un stockage</string>
     <string name="nav_internal_storage">Stockage interne</string>
     <string name="nav_trash">Corbeille</string>
     <string name="nav_external_drive">Lecteur externe</string>
@@ -450,12 +459,15 @@
     <string name="nav_ftp_server">Serveur FTP</string>
     <string name="nav_start_ftp">Démarrer le serveur FTP</string>
     <string name="nav_stop_ftp">Arrêter le serveur FTP</string>
+    <string name="nav_stop_ftp_game_manager">Arrêter le serveur FTP du gestionnaire de jeux</string>
+    <string name="nav_start_ftp_game_manager">Démarrer le serveur FTP du gestionnaire de jeux</string>
     <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
     <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
     <string name="settings_icon_theme">Thème d\'icônes</string>
     <string name="settings_icon_theme_colourful">Coloré</string>
     <string name="settings_icon_theme_colourful_duotone">Bichromie colorée</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Couleur de dossier par défaut</string>
     <string name="settings_choose_icon_theme">Choisir le thème d\'icônes</string>
     <string name="msg_remote_permanent_warning">Les fichiers réseau seront supprimés définitivement (impossible de les déplacer vers la corbeille).</string>
     <string name="msg_archive_remote_unsupported">L\'archivage n\'est pas encore pris en charge pour les emplacements réseau.</string>
@@ -489,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d minutes</string>
     <string name="settings_timeout_disabled">Jamais</string>
     <string name="settings_custom_theme">Personnalisation du thème</string>
+    <string name="settings_custom_theme_mode">Mode de thème personnalisé</string>
     <string name="settings_load_theme_pack">Charger un pack de thèmes (.zip)</string>
     <string name="settings_clear_theme_pack">Effacer le thème personnalisé</string>
     <string name="msg_theme_pack_loaded">Pack de thèmes \"%1$s\" chargé</string>
@@ -498,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">Le serveur ne répond pas</string>
     <string name="dialog_unresponsive_server_message">Le serveur \"%1$s\" met beaucoup de temps à répondre. Voulez-vous continuer à attendre ou annuler l\'opération ?</string>
     <string name="dialog_wait">Attendre</string>
+    <string name="terminal_debug_title">Sortie de débogage du terminal</string>
 </resources>

@@ -197,12 +197,16 @@
     <string name="settings_themetop">Tab</string>
     <string name="settings_themetop_attached">Angeheftet</string>
     <string name="settings_themetop_float">Schwebend</string>
+    <string name="settings_tab_bar_background">Hintergrundbild der Tab-Leiste</string>
+    <string name="settings_tab_bar_background_none">Keins</string>
+    <string name="settings_clear">Löschen</string>
     <string name="settings_colorful_bars">Farbige Kopf- und Tab-Leisten</string>
     <string name="settings_colorful_bars_desc">Akzentfarben für die Kopfzeile und die Tab-Leiste aktivieren.</string>
     <string name="settings_icon_theme">Symbol-Design</string>
     <string name="settings_icon_theme_colourful">Farbenfroh</string>
     <string name="settings_icon_theme_colourful_duotone">Farbenfroher Duoton</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Standard-Ordnerfarbe</string>
     <string name="settings_choose_icon_theme">Symbol-Design wählen</string>
     <string name="settings_details_large">Details (nur große Bildschirme)</string>
     <string name="settings_details_hidden">Ausgeblendet</string>
@@ -309,8 +313,13 @@
     <string name="nav_game_saves">Spiele-Manager</string>
     <string name="menu_gallery_albums">Alben</string>
     <string name="menu_gallery_folders">Galerie-Ordner</string>
+    <string name="gallery_filter_off_msg">Filterung ist momentan AUS. Alle Medien werden angezeigt.</string>
+    <string name="gallery_no_folders_msg">Keine Ordner hinzugefügt. Standard-Medienorte werden verwendet, wenn die Filterung aktiviert ist.</string>
+    <string name="gallery_managed_folders">Verwaltete Ordner:</string>
+    <string name="gallery_add_folder">Ordner hinzufügen</string>
     <string name="menu_gallery_show_all">Alle Medien anzeigen</string>
     <string name="menu_documents_folder">Ordner</string>
+    <string name="menu_documents_show_folders">Ordner anzeigen</string>
     <string name="nav_add_storage">Speicher hinzufügen</string>
     <string name="nav_internal_storage">Interner Speicher</string>
     <string name="nav_trash">Papierkorb</string>
@@ -348,6 +357,8 @@
     <string name="nav_ftp_server">FTP-Server</string>
     <string name="nav_start_ftp">FTP-Server starten</string>
     <string name="nav_stop_ftp">FTP-Server stoppen</string>
+    <string name="nav_stop_ftp_game_manager">FTP-Spiele-Manager-Server stoppen</string>
+    <string name="nav_start_ftp_game_manager">FTP-Spiele-Manager-Server starten</string>
 
     <!-- Item Types -->
     <string name="archive">Archiv</string>
@@ -490,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d Minuten</string>
     <string name="settings_timeout_disabled">Nie</string>
     <string name="settings_custom_theme">Design-Anpassung</string>
+    <string name="settings_custom_theme_mode">Benutzerdefinierter Design-Modus</string>
     <string name="settings_load_theme_pack">Design-Paket laden (.zip)</string>
     <string name="settings_clear_theme_pack">Benutzerdefiniertes Design löschen</string>
     <string name="msg_theme_pack_loaded">Design-Paket \"%1$s\" geladen</string>
@@ -499,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">Server antwortet nicht</string>
     <string name="dialog_unresponsive_server_message">Der Server \"%1$s\" braucht lange für eine Antwort. Möchten Sie weiter warten oder den Vorgang abbrechen?</string>
     <string name="dialog_wait">Warten</string>
+    <string name="terminal_debug_title">Terminal-Debug-Ausgabe</string>
 </resources>

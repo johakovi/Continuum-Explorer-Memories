@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.core.os.LocaleListCompat
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.utils.GlobalEvents

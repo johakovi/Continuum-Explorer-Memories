@@ -63,13 +63,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.Surface
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import com.troikoss.continuum_explorer.managers.DetailsMode
@@ -185,7 +183,6 @@ fun FileExplorerSQ(
     val appState = tabs[safeIndex]
     val focusManager = LocalFocusManager.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val themeTop = SettingsManager.themeTop.value
     val sidebarBg = LocalExtendedColors.current.sidebarBackground
 
     // --- Storage Access Framework Launcher ---
@@ -536,7 +533,6 @@ private fun ExplorerBody(
     val detailsPaneWidth = appState.appConfigs.detailsPaneWidth
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
     val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
-    val themeTop = SettingsManager.themeTop.value
     val sidebarBg = LocalExtendedColors.current.topBarBackground
 
     Column(modifier = modifier.fillMaxSize()) {

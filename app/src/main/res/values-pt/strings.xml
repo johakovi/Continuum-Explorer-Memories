@@ -196,6 +196,9 @@
     <string name="settings_themetop">Guia</string>
     <string name="settings_themetop_attached">Anexada</string>
     <string name="settings_themetop_float">Flutuante</string>
+    <string name="settings_tab_bar_background">Imagem de fundo da barra de separadores</string>
+    <string name="settings_tab_bar_background_none">Nenhuma</string>
+    <string name="settings_clear">Limpar</string>
     <string name="settings_details_large">Detalhes (Apenas telas grandes)</string>
     <string name="settings_details_hidden">Oculto</string>
     <string name="settings_details_pane">Painel Lateral</string>
@@ -303,8 +306,13 @@
     <string name="nav_game_saves">Gestor de jogos</string>
     <string name="menu_gallery_albums">Álbuns</string>
     <string name="menu_gallery_folders">Pastas da Galeria</string>
+    <string name="gallery_filter_off_msg">A filtragem está DESATIVADA. Mostrando todos os ficheiros multimédia.</string>
+    <string name="gallery_no_folders_msg">Nenhuma pasta adicionada. Os locais de multimédia padrão serão usados se a filtragem estiver ativada.</string>
+    <string name="gallery_managed_folders">Pastas geridas:</string>
+    <string name="gallery_add_folder">Adicionar pasta</string>
     <string name="menu_gallery_show_all">Mostrar Todas as Mídias</string>
     <string name="menu_documents_folder">Pasta</string>
+    <string name="menu_documents_show_folders">Mostrar pastas</string>
     <string name="nav_add_storage">Adicionar Armazenamento</string>
     <string name="nav_internal_storage">Armazenamento Interno</string>
     <string name="nav_trash">Lixeira</string>
@@ -451,12 +459,15 @@
     <string name="nav_ftp_server">Servidor FTP</string>
     <string name="nav_start_ftp">Iniciar servidor FTP</string>
     <string name="nav_stop_ftp">Parar servidor FTP</string>
+    <string name="nav_stop_ftp_game_manager">Parar servidor FTP do gestor de jogos</string>
+    <string name="nav_start_ftp_game_manager">Iniciar servidor FTP do gestor de jogos</string>
     <string name="settings_colorful_bars">Barras superior e de abas coloridas</string>
     <string name="settings_colorful_bars_desc">Ativar cores de destaque para a barra superior e a barra de abas.</string>
     <string name="settings_icon_theme">Tema de Ícones</string>
     <string name="settings_icon_theme_colourful">Colorido</string>
     <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Cor padrão da pasta</string>
     <string name="settings_choose_icon_theme">Escolher Tema de Ícones</string>
     <string name="msg_remote_permanent_warning">Os arquivos de rede serão excluídos permanentemente (não podem ser movidos para a lixeira).</string>
     <string name="msg_archive_remote_unsupported">O arquivamento ainda não é suportado para locais de rede.</string>
@@ -490,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d minutos</string>
     <string name="settings_timeout_disabled">Nunca</string>
     <string name="settings_custom_theme">Personalização do tema</string>
+    <string name="settings_custom_theme_mode">Modo de tema personalizado</string>
     <string name="settings_load_theme_pack">Carregar pacote de tema (.zip)</string>
     <string name="settings_clear_theme_pack">Limpar tema personalizado</string>
     <string name="msg_theme_pack_loaded">Pacote de tema \"%1$s\" carregado</string>
@@ -499,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">Servidor sem resposta</string>
     <string name="dialog_unresponsive_server_message">O servidor \"%1$s\" está demorando muito para responder. Deseja continuar esperando ou cancelar a operação?</string>
     <string name="dialog_wait">Esperar</string>
+    <string name="terminal_debug_title">Saída de depuração do terminal</string>
 </resources>

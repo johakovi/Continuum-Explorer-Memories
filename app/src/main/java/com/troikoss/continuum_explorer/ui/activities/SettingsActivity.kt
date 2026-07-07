@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -92,6 +90,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val defaultFolderColor = SettingsManager.defaultFolderColor.value
     val currentThemePack = ThemePackManager.currentPack.value
 
+    val msgThemePackLoadedTemplate = stringResource(R.string.msg_theme_pack_loaded)
     val themePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -103,7 +102,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
             if (ThemePackManager.loadPack(context, file)) {
-                Toast.makeText(context, context.getString(R.string.msg_theme_pack_loaded, ThemePackManager.currentPack.value?.name), Toast.LENGTH_SHORT).show()
+                val packName = ThemePackManager.currentPack.value?.name ?: ""
+                Toast.makeText(context, msgThemePackLoadedTemplate.format(packName), Toast.LENGTH_SHORT).show()
                 GlobalEvents.triggerConfigUpdate()
             } else {
                 Toast.makeText(context, R.string.msg_theme_pack_failed, Toast.LENGTH_SHORT).show()

@@ -197,12 +197,16 @@
     <string name="settings_themetop">Вкладка</string>
     <string name="settings_themetop_attached">Прикрепленная</string>
     <string name="settings_themetop_float">Плавающая</string>
+    <string name="settings_tab_bar_background">Фоновое изображение панели вкладок</string>
+    <string name="settings_tab_bar_background_none">Нет</string>
+    <string name="settings_clear">Очистить</string>
     <string name="settings_colorful_bars">Цветные панели</string>
     <string name="settings_colorful_bars_desc">Включить акцентные цвета для верхней панели и панели вкладок.</string>
     <string name="settings_icon_theme">Тема значков</string>
     <string name="settings_icon_theme_colourful">Цветные</string>
     <string name="settings_icon_theme_colourful_duotone">Красочный дуотон</string>
     <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Цвет папки по умолчанию</string>
     <string name="settings_choose_icon_theme">Выберите тему значков</string>
     <string name="settings_details_large">Детали (только для больших экранов)</string>
     <string name="settings_details_hidden">Скрыты</string>
@@ -309,8 +313,13 @@
     <string name="nav_game_saves">Диспетчер игр</string>
     <string name="menu_gallery_albums">Альбомы</string>
     <string name="menu_gallery_folders">Папки галереи</string>
+    <string name="gallery_filter_off_msg">Фильтрация в данный момент ВЫКЛЮЧЕНА. Отображаются все медиафайлы.</string>
+    <string name="gallery_no_folders_msg">Папки не добавлены. Будут использованы стандартные расположения медиафайлов, если фильтрация включена.</string>
+    <string name="gallery_managed_folders">Управляемые папки:</string>
+    <string name="gallery_add_folder">Добавить папку</string>
     <string name="menu_gallery_show_all">Показать все медиа</string>
     <string name="menu_documents_folder">Папка</string>
+    <string name="menu_documents_show_folders">Показать папки</string>
     <string name="nav_add_storage">Добавить хранилище</string>
     <string name="nav_internal_storage">Внутренняя память</string>
     <string name="nav_trash">Корзина</string>
@@ -348,6 +357,8 @@
     <string name="nav_ftp_server">FTP-сервер</string>
     <string name="nav_start_ftp">Запустить FTP-сервер</string>
     <string name="nav_stop_ftp">Остановить FTP-сервер</string>
+    <string name="nav_stop_ftp_game_manager">Остановить FTP-сервер диспетчера игр</string>
+    <string name="nav_start_ftp_game_manager">Запустить FTP-сервер диспетчера игр</string>
 
     <!-- Item Types -->
     <string name="archive">Архив</string>
@@ -490,6 +501,7 @@
     <string name="settings_timeout_minutes">%1$d минут</string>
     <string name="settings_timeout_disabled">Никогда</string>
     <string name="settings_custom_theme">Настройка темы</string>
+    <string name="settings_custom_theme_mode">Режим пользовательской темы</string>
     <string name="settings_load_theme_pack">Загрузить пакет темы (.zip)</string>
     <string name="settings_clear_theme_pack">Очистить пользовательскую тему</string>
     <string name="msg_theme_pack_loaded">Пакет темы \"%1$s\" загружен</string>
@@ -499,4 +511,5 @@
     <string name="dialog_unresponsive_server_title">Сервер не отвечает</string>
     <string name="dialog_unresponsive_server_message">Сервер «%1$s» слишком долго не отвечает. Хотите продолжить ожидание или отменить операцию?</string>
     <string name="dialog_wait">Подождать</string>
+    <string name="terminal_debug_title">Вывод отладки терминала</string>
 </resources>
