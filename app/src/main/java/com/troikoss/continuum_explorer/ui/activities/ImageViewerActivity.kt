@@ -8,6 +8,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
@@ -375,7 +380,10 @@ fun ImageViewerScreen(
                             .then(if (isCurrent) {
                                 Modifier
                                     .pointerInput(Unit) {
-                                        detectTapGestures(onDoubleTap = { onToggleFullscreen() })
+                                        detectTapGestures(
+                                            onTap = { onToggleFullscreen() },
+                                            onDoubleTap = { onToggleFullscreen() }
+                                        )
                                     }
                                     .contextMenuDetector { clickOffset ->
                                         menuOffset = clickOffset
@@ -711,7 +719,12 @@ fun ImageViewerScreen(
                 }
 
                 // Filmstrip overlay at the bottom
-                if (siblingImages.size > 1 && !isFullscreen) {
+                AnimatedVisibility(
+                    visible = siblingImages.size > 1 && !isFullscreen,
+                    enter = fadeIn() + slideInVertically { it },
+                    exit = fadeOut() + slideOutVertically { it },
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
                     val itemSizeDp = 64.dp
                     val horizontalPadding = (screenWidthDp - itemSizeDp) / 2
 
@@ -750,7 +763,6 @@ fun ImageViewerScreen(
                         flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .background(Color.Black.copy(alpha = 0.6f))
                             .padding(vertical = 8.dp),
