@@ -166,6 +166,12 @@ fun NavigationPane(
     val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
     val isRecycleBinEnabled by SettingsManager.isRecycleBinEnabled
 
+    val isFavoritesExpanded by SettingsManager.isFavoritesExpanded
+    val isLibraryExpanded by SettingsManager.isLibraryExpanded
+    val isStorageExpanded by SettingsManager.isStorageExpanded
+    val isAddedLocationsExpanded by SettingsManager.isAddedLocationsExpanded
+    val isNetworkExpanded by SettingsManager.isNetworkExpanded
+
     fun getStorageVolumes(): List<StorageVolumeInfo> {
         val volumes = mutableListOf<StorageVolumeInfo>()
 
@@ -349,16 +355,29 @@ fun NavigationPane(
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
             // Section: Favorites
-            item { NavSectionHeader(stringResource(R.string.nav_favorites), textAlphaProvider) }
+            item {
+                NavSectionHeader(
+                    stringResource(R.string.nav_favorites),
+                    textAlphaProvider,
+                    isExpanded = isFavoritesExpanded,
+                    onToggle = { SettingsManager.setFavoritesExpanded(context, !isFavoritesExpanded) }
+                )
+            }
 
             if (appState.appConfigs.favoritePaths.isEmpty() && !isMinimized) {
                 item {
-                    Text(
-                        text = stringResource(R.string.nav_no_favorites),
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    )
+                    AnimatedVisibility(
+                        visible = isFavoritesExpanded,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.nav_no_favorites),
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
                 }
             } else {
                 itemsIndexed(
@@ -369,92 +388,98 @@ fun NavigationPane(
                     val isDragging = draggedItemId == path
                     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "FavoriteElevation")
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (isDragging) Modifier else Modifier.animateItem())
-                            .zIndex(if (isDragging) 1f else 0f)
-                            .offset {
-                                IntOffset(
-                                    0,
-                                    if (isDragging) draggingOffset.roundToInt() else 0
-                                )
-                            }
-                            .shadow(elevation)
-                            .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
-                            .pointerInput(path) {
-                                awaitEachGesture {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
+                    AnimatedVisibility(
+                        visible = isFavoritesExpanded || isMinimized,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(if (isDragging) Modifier else Modifier.animateItem())
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .offset {
+                                    IntOffset(
+                                        0,
+                                        if (isDragging) draggingOffset.roundToInt() else 0
+                                    )
+                                }
+                                .shadow(elevation)
+                                .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
+                                .pointerInput(path) {
+                                    awaitEachGesture {
+                                        val down = awaitFirstDown(requireUnconsumed = false)
 
-                                    // REORDER LOGIC:
-                                    // - Mouse: Drag from anywhere on the item
-                                    // - Touch: Drag only from the icon area (handleWidthPx)
-                                    if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
-                                        val pointerId = down.id
-                                        var triggerDrag = false
-                                        var distance = 0f
+                                        // REORDER LOGIC:
+                                        // - Mouse: Drag from anywhere on the item
+                                        // - Touch: Drag only from the icon area (handleWidthPx)
+                                        if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
+                                            val pointerId = down.id
+                                            var triggerDrag = false
+                                            var distance = 0f
 
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            val move =
-                                                event.changes.firstOrNull { it.id == pointerId }
-                                                    ?: break
-                                            if (!move.pressed) break
-                                            distance += (move.position - down.position).getDistance()
-                                            if (distance > 5f) {
-                                                triggerDrag = true
-                                                break
-                                            }
-                                        }
-
-                                        if (triggerDrag) {
-                                            draggedItemId = path
-                                            draggingOffset = 0f
-
-                                            drag(down.id) { change ->
-                                                val changeOffset = change.positionChange()
-                                                draggingOffset += changeOffset.y
-
-                                                val currentIndex =
-                                                    appState.appConfigs.favoritePaths.indexOf(path)
-                                                if (currentIndex != -1) {
-                                                    val itemHeight = 40.dp.toPx()
-                                                    val threshold = itemHeight * 0.6f
-
-                                                    if (draggingOffset > threshold && currentIndex < appState.appConfigs.favoritePaths.size - 1) {
-                                                        appState.appConfigs.moveFavorite(
-                                                            currentIndex,
-                                                            currentIndex + 1
-                                                        )
-                                                        draggingOffset -= itemHeight
-                                                    } else if (draggingOffset < -threshold && currentIndex > 0) {
-                                                        appState.appConfigs.moveFavorite(
-                                                            currentIndex,
-                                                            currentIndex - 1
-                                                        )
-                                                        draggingOffset += itemHeight
-                                                    }
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                val move =
+                                                    event.changes.firstOrNull { it.id == pointerId }
+                                                        ?: break
+                                                if (!move.pressed) break
+                                                distance += (move.position - down.position).getDistance()
+                                                if (distance > 5f) {
+                                                    triggerDrag = true
+                                                    break
                                                 }
-                                                change.consume()
                                             }
-                                            draggedItemId = null
-                                            draggingOffset = 0f
+
+                                            if (triggerDrag) {
+                                                draggedItemId = path
+                                                draggingOffset = 0f
+
+                                                drag(down.id) { change ->
+                                                    val changeOffset = change.positionChange()
+                                                    draggingOffset += changeOffset.y
+
+                                                    val currentIndex =
+                                                        appState.appConfigs.favoritePaths.indexOf(path)
+                                                    if (currentIndex != -1) {
+                                                        val itemHeight = 40.dp.toPx()
+                                                        val threshold = itemHeight * 0.6f
+
+                                                        if (draggingOffset > threshold && currentIndex < appState.appConfigs.favoritePaths.size - 1) {
+                                                            appState.appConfigs.moveFavorite(
+                                                                currentIndex,
+                                                                currentIndex + 1
+                                                            )
+                                                            draggingOffset -= itemHeight
+                                                        } else if (draggingOffset < -threshold && currentIndex > 0) {
+                                                            appState.appConfigs.moveFavorite(
+                                                                currentIndex,
+                                                                currentIndex - 1
+                                                            )
+                                                            draggingOffset += itemHeight
+                                                        }
+                                                    }
+                                                    change.consume()
+                                                }
+                                                draggedItemId = null
+                                                draggingOffset = 0f
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            .fileDropTarget(appState, destPath = file),
-                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
-                    ) {
-                        NavFavoriteItem(
-                            label = file.name,
-                            path = path,
-                            onClick = { appState.navigateTo(file, null); onNavigate() },
-                            onRemove = { appState.appConfigs.removeFavorite(path) },
-                            appState = appState,
-                            textAlphaProvider = textAlphaProvider,
-                            isMinimized = isMinimized
-                        )
+                                .fileDropTarget(appState, destPath = file),
+                            contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
+                        ) {
+                            NavFavoriteItem(
+                                label = file.name,
+                                path = path,
+                                onClick = { appState.navigateTo(file, null); onNavigate() },
+                                onRemove = { appState.appConfigs.removeFavorite(path) },
+                                appState = appState,
+                                textAlphaProvider = textAlphaProvider,
+                                isMinimized = isMinimized
+                            )
+                        }
                     }
                 }
             }
@@ -465,7 +490,12 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_library), textAlphaProvider)
+                        NavSectionHeader(
+                            stringResource(R.string.nav_library),
+                            textAlphaProvider,
+                            isExpanded = isLibraryExpanded,
+                            onToggle = { SettingsManager.setLibraryExpanded(context, !isLibraryExpanded) }
+                        )
                     }
                 }
 
@@ -476,149 +506,155 @@ fun NavigationPane(
                     val isDragging = draggedItemId == id
                     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "LibraryElevation")
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (isDragging) Modifier else Modifier.animateItem())
-                            .zIndex(if (isDragging) 1f else 0f)
-                            .offset {
-                                IntOffset(
-                                    0,
-                                    if (isDragging) draggingOffset.roundToInt() else 0
-                                )
-                            }
-                            .shadow(elevation)
-                            .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
-                            .pointerInput(id) {
-                                awaitEachGesture {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
+                    AnimatedVisibility(
+                        visible = isLibraryExpanded || isMinimized,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(if (isDragging) Modifier else Modifier.animateItem())
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .offset {
+                                    IntOffset(
+                                        0,
+                                        if (isDragging) draggingOffset.roundToInt() else 0
+                                    )
+                                }
+                                .shadow(elevation)
+                                .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
+                                .pointerInput(id) {
+                                    awaitEachGesture {
+                                        val down = awaitFirstDown(requireUnconsumed = false)
 
-                                    // REORDER LOGIC:
-                                    // - Mouse: Drag from anywhere on the item
-                                    // - Touch: Drag only from the icon area (handleWidthPx)
-                                    if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
-                                        val pointerId = down.id
-                                        var triggerDrag = false
-                                        var distance = 0f
+                                        // REORDER LOGIC:
+                                        // - Mouse: Drag from anywhere on the item
+                                        // - Touch: Drag only from the icon area (handleWidthPx)
+                                        if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
+                                            val pointerId = down.id
+                                            var triggerDrag = false
+                                            var distance = 0f
 
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            val move =
-                                                event.changes.firstOrNull { it.id == pointerId }
-                                                    ?: break
-                                            if (!move.pressed) break
-                                            distance += (move.position - down.position).getDistance()
-                                            if (distance > 5f) {
-                                                triggerDrag = true
-                                                break
-                                            }
-                                        }
-
-                                        if (triggerDrag) {
-                                            draggedItemId = id
-                                            draggingOffset = 0f
-
-                                            drag(down.id) { change ->
-                                                val changeOffset = change.positionChange()
-                                                draggingOffset += changeOffset.y
-
-                                                val currentIndex =
-                                                    appState.appConfigs.libraryOrder.indexOf(id)
-                                                if (currentIndex != -1) {
-                                                    val itemHeight = 40.dp.toPx()
-                                                    val threshold = itemHeight * 0.6f
-
-                                                    if (draggingOffset > threshold && currentIndex < appState.appConfigs.libraryOrder.size - 1) {
-                                                        appState.appConfigs.moveLibraryItem(
-                                                            currentIndex,
-                                                            currentIndex + 1
-                                                        )
-                                                        draggingOffset -= itemHeight
-                                                    } else if (draggingOffset < -threshold && currentIndex > 0) {
-                                                        appState.appConfigs.moveLibraryItem(
-                                                            currentIndex,
-                                                            currentIndex - 1
-                                                        )
-                                                        draggingOffset += itemHeight
-                                                    }
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                val move =
+                                                    event.changes.firstOrNull { it.id == pointerId }
+                                                        ?: break
+                                                if (!move.pressed) break
+                                                distance += (move.position - down.position).getDistance()
+                                                if (distance > 5f) {
+                                                    triggerDrag = true
+                                                    break
                                                 }
-                                                change.consume()
                                             }
-                                            draggedItemId = null
-                                            draggingOffset = 0f
+
+                                            if (triggerDrag) {
+                                                draggedItemId = id
+                                                draggingOffset = 0f
+
+                                                drag(down.id) { change ->
+                                                    val changeOffset = change.positionChange()
+                                                    draggingOffset += changeOffset.y
+
+                                                    val currentIndex =
+                                                        appState.appConfigs.libraryOrder.indexOf(id)
+                                                    if (currentIndex != -1) {
+                                                        val itemHeight = 40.dp.toPx()
+                                                        val threshold = itemHeight * 0.6f
+
+                                                        if (draggingOffset > threshold && currentIndex < appState.appConfigs.libraryOrder.size - 1) {
+                                                            appState.appConfigs.moveLibraryItem(
+                                                                currentIndex,
+                                                                currentIndex + 1
+                                                            )
+                                                            draggingOffset -= itemHeight
+                                                        } else if (draggingOffset < -threshold && currentIndex > 0) {
+                                                            appState.appConfigs.moveLibraryItem(
+                                                                currentIndex,
+                                                                currentIndex - 1
+                                                            )
+                                                            draggingOffset += itemHeight
+                                                        }
+                                                    }
+                                                    change.consume()
+                                                }
+                                                draggedItemId = null
+                                                draggingOffset = 0f
+                                            }
                                         }
                                     }
-                                }
-                            },
-                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
-                    ) {
-                        when (id) {
-                            "gallery" -> NavItem(
-                                label = stringResource(R.string.nav_gallery),
-                                icon = Icons.Default.Image,
-                                customIcon = R.drawable.ic_nav_gallery,
-                                onClick = { onItemSelected(NavSection.Gallery) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                section = NavSection.Gallery,
-                                isMinimized = isMinimized,
-                                onAddStorageClick = onAddStorageClick
-                            )
-                            "recent" -> NavItem(
-                                label = stringResource(R.string.nav_recent),
-                                icon = Icons.Default.History,
-                                customIcon = R.drawable.ic_nav_recent,
-                                onClick = { onItemSelected(NavSection.Recent) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                section = NavSection.Recent,
-                                isMinimized = isMinimized
-                            )
-                            "trash" -> {
-                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                                NavItem(
-                                    label = stringResource(R.string.nav_trash),
-                                    icon = Icons.Default.Delete,
-                                    customIcon = R.drawable.ic_nav_trash,
-                                    onClick = { onItemSelected(NavSection.RecycleBin) },
-                                    modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
+                                },
+                            contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
+                        ) {
+                            when (id) {
+                                "gallery" -> NavItem(
+                                    label = stringResource(R.string.nav_gallery),
+                                    icon = Icons.Default.Image,
+                                    customIcon = R.drawable.ic_nav_gallery,
+                                    onClick = { onItemSelected(NavSection.Gallery) },
                                     appState = appState,
                                     textAlphaProvider = textAlphaProvider,
-                                    section = NavSection.RecycleBin,
+                                    section = NavSection.Gallery,
+                                    isMinimized = isMinimized,
+                                    onAddStorageClick = onAddStorageClick
+                                )
+                                "recent" -> NavItem(
+                                    label = stringResource(R.string.nav_recent),
+                                    icon = Icons.Default.History,
+                                    customIcon = R.drawable.ic_nav_recent,
+                                    onClick = { onItemSelected(NavSection.Recent) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Recent,
                                     isMinimized = isMinimized
                                 )
+                                "trash" -> {
+                                    val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                    NavItem(
+                                        label = stringResource(R.string.nav_trash),
+                                        icon = Icons.Default.Delete,
+                                        customIcon = R.drawable.ic_nav_trash,
+                                        onClick = { onItemSelected(NavSection.RecycleBin) },
+                                        modifier = Modifier.fileDropTarget(appState, destPath = trashDir),
+                                        appState = appState,
+                                        textAlphaProvider = textAlphaProvider,
+                                        section = NavSection.RecycleBin,
+                                        isMinimized = isMinimized
+                                    )
+                                }
+                                "downloads" -> NavItem(
+                                    label = stringResource(R.string.nav_downloads),
+                                    icon = Icons.Default.FileDownload,
+                                    customIcon = R.drawable.ic_nav_downloads,
+                                    onClick = { onItemSelected(NavSection.Downloads) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Downloads,
+                                    isMinimized = isMinimized
+                                )
+                                "documents" -> NavItem(
+                                    label = stringResource(R.string.nav_documents),
+                                    icon = Icons.AutoMirrored.Filled.List,
+                                    customIcon = R.drawable.ic_nav_documents,
+                                    onClick = { onItemSelected(NavSection.Documents) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Documents,
+                                    isMinimized = isMinimized
+                                )
+                                "games_manager" -> NavItem(
+                                    label = stringResource(R.string.nav_game_saves),
+                                    icon = Icons.AutoMirrored.Filled.List,
+                                    customIcon = R.drawable.ic_nav_game,
+                                    onClick = { onItemSelected(NavSection.Games) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Games,
+                                    isMinimized = isMinimized,
+                                    onAddStorageClick = onAddStorageClick
+                                )
                             }
-                            "downloads" -> NavItem(
-                                label = stringResource(R.string.nav_downloads),
-                                icon = Icons.Default.FileDownload,
-                                customIcon = R.drawable.ic_nav_downloads,
-                                onClick = { onItemSelected(NavSection.Downloads) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                section = NavSection.Downloads,
-                                isMinimized = isMinimized
-                            )
-                            "documents" -> NavItem(
-                                label = stringResource(R.string.nav_documents),
-                                icon = Icons.AutoMirrored.Filled.List,
-                                customIcon = R.drawable.ic_nav_documents,
-                                onClick = { onItemSelected(NavSection.Documents) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                section = NavSection.Documents,
-                                isMinimized = isMinimized
-                            )
-                            "games_manager" -> NavItem(
-                                label = stringResource(R.string.nav_game_saves),
-                                icon = Icons.AutoMirrored.Filled.List,
-                                customIcon = R.drawable.ic_nav_game,
-                                onClick = { onItemSelected(NavSection.Games) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                section = NavSection.Games,
-                                isMinimized = isMinimized,
-                                onAddStorageClick = onAddStorageClick
-                            )
                         }
                     }
                 }
@@ -634,25 +670,41 @@ fun NavigationPane(
 
             // Section: Storage
             if (!isMinimized) {
-                item { NavSectionHeader(stringResource(R.string.nav_storage), textAlphaProvider) }
+                item {
+                    NavSectionHeader(
+                        stringResource(R.string.nav_storage),
+                        textAlphaProvider,
+                        isExpanded = isStorageExpanded,
+                        onToggle = { SettingsManager.setStorageExpanded(context, !isStorageExpanded) }
+                    )
+                }
             }
             
-            itemsIndexed(storageVolumes) { _, volume ->
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart) {
-                    NavStorageItem(
-                        label = volume.label,
-                        icon = volume.icon,
-                        totalSpace = volume.totalSpace,
-                        freeSpace = volume.freeSpace,
-                        onClick = { onItemSelected(volume.section) },
-                        modifier = Modifier.fileDropTarget(appState, destPath = volume.path),
-                        appState = appState,
-                        textAlphaProvider = textAlphaProvider,
-                        path = volume.path,
-                        onNavigate = onNavigate,
-                        customIcon = volume.customIcon,
-                        isMinimized = isMinimized
-                    )
+            itemsIndexed(
+                items = storageVolumes,
+                key = { _, volume -> volume.path?.absolutePath ?: volume.uri?.toString() ?: volume.label }
+            ) { _, volume ->
+                AnimatedVisibility(
+                    visible = isStorageExpanded || isMinimized,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth().animateItem(), contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart) {
+                        NavStorageItem(
+                            label = volume.label,
+                            icon = volume.icon,
+                            totalSpace = volume.totalSpace,
+                            freeSpace = volume.freeSpace,
+                            onClick = { onItemSelected(volume.section) },
+                            modifier = Modifier.fileDropTarget(appState, destPath = volume.path),
+                            appState = appState,
+                            textAlphaProvider = textAlphaProvider,
+                            path = volume.path,
+                            onNavigate = onNavigate,
+                            customIcon = volume.customIcon,
+                            isMinimized = isMinimized
+                        )
+                    }
                 }
             }
 
@@ -663,7 +715,12 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_added_locations), textAlphaProvider)
+                        NavSectionHeader(
+                            stringResource(R.string.nav_added_locations),
+                            textAlphaProvider,
+                            isExpanded = isAddedLocationsExpanded,
+                            onToggle = { SettingsManager.setAddedLocationsExpanded(context, !isAddedLocationsExpanded) }
+                        )
                     }
                 }
 
@@ -676,65 +733,71 @@ fun NavigationPane(
                     val isDragging = draggedItemId == uriKey
                     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "SafElevation")
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (isDragging) Modifier else Modifier.animateItem())
-                            .zIndex(if (isDragging) 1f else 0f)
-                            .offset { IntOffset(0, if (isDragging) draggingOffset.roundToInt() else 0) }
-                            .shadow(elevation)
-                            .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
-                            .pointerInput(uriKey) {
-                                awaitEachGesture {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
-                                        val pointerId = down.id
-                                        var triggerDrag = false
-                                        var distance = 0f
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            val move = event.changes.firstOrNull { it.id == pointerId } ?: break
-                                            if (!move.pressed) break
-                                            distance += (move.position - down.position).getDistance()
-                                            if (distance > 5f) { triggerDrag = true; break }
-                                        }
-                                        if (triggerDrag) {
-                                            draggedItemId = uriKey
-                                            draggingOffset = 0f
-                                            drag(down.id) { change ->
-                                                draggingOffset += change.positionChange().y
-                                                val currentIndex = appState.appConfigs.addedSafUris.indexOfFirst { it.toString() == uriKey }
-                                                if (currentIndex != -1) {
-                                                    val itemHeight = 40.dp.toPx()
-                                                    val threshold = itemHeight * 0.6f
-                                                    if (draggingOffset > threshold && currentIndex < appState.appConfigs.addedSafUris.size - 1) {
-                                                        appState.appConfigs.moveSafUri(currentIndex, currentIndex + 1)
-                                                        draggingOffset -= itemHeight
-                                                    } else if (draggingOffset < -threshold && currentIndex > 0) {
-                                                        appState.appConfigs.moveSafUri(currentIndex, currentIndex - 1)
-                                                        draggingOffset += itemHeight
-                                                    }
-                                                }
-                                                change.consume()
+                    AnimatedVisibility(
+                        visible = isAddedLocationsExpanded || isMinimized,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(if (isDragging) Modifier else Modifier.animateItem())
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .offset { IntOffset(0, if (isDragging) draggingOffset.roundToInt() else 0) }
+                                .shadow(elevation)
+                                .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
+                                .pointerInput(uriKey) {
+                                    awaitEachGesture {
+                                        val down = awaitFirstDown(requireUnconsumed = false)
+                                        if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
+                                            val pointerId = down.id
+                                            var triggerDrag = false
+                                            var distance = 0f
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                val move = event.changes.firstOrNull { it.id == pointerId } ?: break
+                                                if (!move.pressed) break
+                                                distance += (move.position - down.position).getDistance()
+                                                if (distance > 5f) { triggerDrag = true; break }
                                             }
-                                            draggedItemId = null
-                                            draggingOffset = 0f
+                                            if (triggerDrag) {
+                                                draggedItemId = uriKey
+                                                draggingOffset = 0f
+                                                drag(down.id) { change ->
+                                                    draggingOffset += change.positionChange().y
+                                                    val currentIndex = appState.appConfigs.addedSafUris.indexOfFirst { it.toString() == uriKey }
+                                                    if (currentIndex != -1) {
+                                                        val itemHeight = 40.dp.toPx()
+                                                        val threshold = itemHeight * 0.6f
+                                                        if (draggingOffset > threshold && currentIndex < appState.appConfigs.addedSafUris.size - 1) {
+                                                            appState.appConfigs.moveSafUri(currentIndex, currentIndex + 1)
+                                                            draggingOffset -= itemHeight
+                                                        } else if (draggingOffset < -threshold && currentIndex > 0) {
+                                                            appState.appConfigs.moveSafUri(currentIndex, currentIndex - 1)
+                                                            draggingOffset += itemHeight
+                                                        }
+                                                    }
+                                                    change.consume()
+                                                }
+                                                draggedItemId = null
+                                                draggingOffset = 0f
+                                            }
                                         }
                                     }
-                                }
-                            },
-                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
-                    ) {
-                        NavSafItem(
-                            label = label,
-                            uri = uri,
-                            onClick = { onSafItemSelected(uri) },
-                            onRemove = { appState.removeSafUri(uri) },
-                            modifier = Modifier.fileDropTarget(appState, destSafUri = uri),
-                            appState = appState,
-                            textAlphaProvider = textAlphaProvider,
-                            isMinimized = isMinimized
-                        )
+                                },
+                            contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
+                        ) {
+                            NavSafItem(
+                                label = label,
+                                uri = uri,
+                                onClick = { onSafItemSelected(uri) },
+                                onRemove = { appState.removeSafUri(uri) },
+                                modifier = Modifier.fileDropTarget(appState, destSafUri = uri),
+                                appState = appState,
+                                textAlphaProvider = textAlphaProvider,
+                                isMinimized = isMinimized
+                            )
+                        }
                     }
                 }
             }
@@ -746,7 +809,12 @@ fun NavigationPane(
                         Spacer(modifier = Modifier.height(16.dp))
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        NavSectionHeader(stringResource(R.string.nav_network), textAlphaProvider)
+                        NavSectionHeader(
+                            stringResource(R.string.nav_network),
+                            textAlphaProvider,
+                            isExpanded = isNetworkExpanded,
+                            onToggle = { SettingsManager.setNetworkExpanded(context, !isNetworkExpanded) }
+                        )
                     }
                 }
 
@@ -757,64 +825,70 @@ fun NavigationPane(
                     val isDragging = draggedItemId == connection.id
                     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "NetworkElevation")
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (isDragging) Modifier else Modifier.animateItem())
-                            .zIndex(if (isDragging) 1f else 0f)
-                            .offset { IntOffset(0, if (isDragging) draggingOffset.roundToInt() else 0) }
-                            .shadow(elevation)
-                            .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
-                            .pointerInput(connection.id) {
-                                awaitEachGesture {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
-                                        val pointerId = down.id
-                                        var triggerDrag = false
-                                        var distance = 0f
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            val move = event.changes.firstOrNull { it.id == pointerId } ?: break
-                                            if (!move.pressed) break
-                                            distance += (move.position - down.position).getDistance()
-                                            if (distance > 5f) { triggerDrag = true; break }
-                                        }
-                                        if (triggerDrag) {
-                                            draggedItemId = connection.id
-                                            draggingOffset = 0f
-                                            drag(down.id) { change ->
-                                                draggingOffset += change.positionChange().y
-                                                val currentIndex = appState.appConfigs.networkConnections.indexOfFirst { it.id == connection.id }
-                                                if (currentIndex != -1) {
-                                                    val itemHeight = 40.dp.toPx()
-                                                    val threshold = itemHeight * 0.6f
-                                                    if (draggingOffset > threshold && currentIndex < appState.appConfigs.networkConnections.size - 1) {
-                                                        appState.appConfigs.moveNetworkConnection(currentIndex, currentIndex + 1)
-                                                        draggingOffset -= itemHeight
-                                                    } else if (draggingOffset < -threshold && currentIndex > 0) {
-                                                        appState.appConfigs.moveNetworkConnection(currentIndex, currentIndex - 1)
-                                                        draggingOffset += itemHeight
-                                                    }
-                                                }
-                                                change.consume()
+                    AnimatedVisibility(
+                        visible = isNetworkExpanded || isMinimized,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(if (isDragging) Modifier else Modifier.animateItem())
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .offset { IntOffset(0, if (isDragging) draggingOffset.roundToInt() else 0) }
+                                .shadow(elevation)
+                                .background(if (isDragging) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
+                                .pointerInput(connection.id) {
+                                    awaitEachGesture {
+                                        val down = awaitFirstDown(requireUnconsumed = false)
+                                        if (down.type == PointerType.Mouse || down.position.x <= handleWidthPx) {
+                                            val pointerId = down.id
+                                            var triggerDrag = false
+                                            var distance = 0f
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                val move = event.changes.firstOrNull { it.id == pointerId } ?: break
+                                                if (!move.pressed) break
+                                                distance += (move.position - down.position).getDistance()
+                                                if (distance > 5f) { triggerDrag = true; break }
                                             }
-                                            draggedItemId = null
-                                            draggingOffset = 0f
+                                            if (triggerDrag) {
+                                                draggedItemId = connection.id
+                                                draggingOffset = 0f
+                                                drag(down.id) { change ->
+                                                    draggingOffset += change.positionChange().y
+                                                    val currentIndex = appState.appConfigs.networkConnections.indexOfFirst { it.id == connection.id }
+                                                    if (currentIndex != -1) {
+                                                        val itemHeight = 40.dp.toPx()
+                                                        val threshold = itemHeight * 0.6f
+                                                        if (draggingOffset > threshold && currentIndex < appState.appConfigs.networkConnections.size - 1) {
+                                                            appState.appConfigs.moveNetworkConnection(currentIndex, currentIndex + 1)
+                                                            draggingOffset -= itemHeight
+                                                        } else if (draggingOffset < -threshold && currentIndex > 0) {
+                                                            appState.appConfigs.moveNetworkConnection(currentIndex, currentIndex - 1)
+                                                            draggingOffset += itemHeight
+                                                        }
+                                                    }
+                                                    change.consume()
+                                                }
+                                                draggedItemId = null
+                                                draggingOffset = 0f
+                                            }
                                         }
                                     }
-                                }
-                            },
-                        contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
-                    ) {
-                        NavNetworkItem(
-                            connection = connection,
-                            onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
-                            onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
-                            onEdit = { onEditNetworkClick(connection) },
-                            appState = appState,
-                            textAlphaProvider = textAlphaProvider,
-                            isMinimized = isMinimized
-                        )
+                                },
+                            contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
+                        ) {
+                            NavNetworkItem(
+                                connection = connection,
+                                onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
+                                onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
+                                onEdit = { onEditNetworkClick(connection) },
+                                appState = appState,
+                                textAlphaProvider = textAlphaProvider,
+                                isMinimized = isMinimized
+                            )
+                        }
                     }
                 }
             }
@@ -1016,20 +1090,41 @@ private fun NavBackgroundContextMenu(
 }
 
 @Composable
-private fun NavSectionHeader(text: String, textAlphaProvider: State<Float>) {
+private fun NavSectionHeader(
+    text: String,
+    textAlphaProvider: State<Float>,
+    isExpanded: Boolean = true,
+    onToggle: (() -> Unit)? = null
+) {
     val textAlpha = textAlphaProvider.value
     if (textAlpha <= 0f) return
-    Text(
-        text = text.uppercase(),
+    Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .horizontalFadingEdge { textAlpha },
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontWeight = FontWeight.Normal,
-        letterSpacing = 0.5.sp
-    )
+            .then(if (onToggle != null) Modifier.clickable { onToggle() } else Modifier)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text.uppercase(),
+            modifier = Modifier
+                .weight(1f)
+                .horizontalFadingEdge { textAlpha },
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.5.sp
+        )
+        if (onToggle != null) {
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp).graphicsLayer { alpha = textAlpha },
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
 }
 
 @Composable

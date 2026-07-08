@@ -87,6 +87,12 @@ object SettingsManager {
     private const val PREFS_FOLDER_COLORS = "folder_colors"
     private const val KEY_DEFAULT_FOLDER_COLOR = "default_folder_color"
 
+    private const val KEY_NAV_FAVORITES_EXPANDED = "nav_favorites_expanded"
+    private const val KEY_NAV_LIBRARY_EXPANDED = "nav_library_expanded"
+    private const val KEY_NAV_STORAGE_EXPANDED = "nav_storage_expanded"
+    private const val KEY_NAV_ADDED_LOCATIONS_EXPANDED = "nav_added_locations_expanded"
+    private const val KEY_NAV_NETWORK_EXPANDED = "nav_network_expanded"
+
     enum class FtpMode {
         FULL_STORAGE,
         GAMES
@@ -185,6 +191,21 @@ object SettingsManager {
     private val _isDefaultArchiveViewerEnabled = mutableStateOf(true)
     val isDefaultArchiveViewerEnabled: State<Boolean> = _isDefaultArchiveViewerEnabled
 
+    private val _isFavoritesExpanded = mutableStateOf(true)
+    val isFavoritesExpanded: State<Boolean> = _isFavoritesExpanded
+
+    private val _isLibraryExpanded = mutableStateOf(true)
+    val isLibraryExpanded: State<Boolean> = _isLibraryExpanded
+
+    private val _isStorageExpanded = mutableStateOf(true)
+    val isStorageExpanded: State<Boolean> = _isStorageExpanded
+
+    private val _isAddedLocationsExpanded = mutableStateOf(true)
+    val isAddedLocationsExpanded: State<Boolean> = _isAddedLocationsExpanded
+
+    private val _isNetworkExpanded = mutableStateOf(true)
+    val isNetworkExpanded: State<Boolean> = _isNetworkExpanded
+
     private var isInitialized = false
 
     fun init(context: Context) {
@@ -271,6 +292,13 @@ object SettingsManager {
 
         _isDefaultArchiveViewerEnabled.value = prefs.getBoolean(KEY_DEFAULT_ARCHIVE_VIEWER, true)
         _termuxSupport.value = prefs.getBoolean(KEY_TERMUX_SUPPORT, true)
+        
+        _isFavoritesExpanded.value = prefs.getBoolean(KEY_NAV_FAVORITES_EXPANDED, true)
+        _isLibraryExpanded.value = prefs.getBoolean(KEY_NAV_LIBRARY_EXPANDED, true)
+        _isStorageExpanded.value = prefs.getBoolean(KEY_NAV_STORAGE_EXPANDED, true)
+        _isAddedLocationsExpanded.value = prefs.getBoolean(KEY_NAV_ADDED_LOCATIONS_EXPANDED, true)
+        _isNetworkExpanded.value = prefs.getBoolean(KEY_NAV_NETWORK_EXPANDED, true)
+
         _isFtpServerEnabled.value = prefs.getBoolean(KEY_FTP_SERVER_ENABLED, false)
         _ftpUser.value = prefs.getString(KEY_FTP_USER, "admin") ?: "admin"
         _ftpPassword.value = prefs.getString(KEY_FTP_PASSWORD, "admin") ?: "admin"
@@ -595,5 +623,35 @@ object SettingsManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putLong(KEY_DEFAULT_FOLDER_COLOR, color).apply()
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setFavoritesExpanded(context: Context, expanded: Boolean) {
+        _isFavoritesExpanded.value = expanded
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_NAV_FAVORITES_EXPANDED, expanded).apply()
+    }
+
+    fun setLibraryExpanded(context: Context, expanded: Boolean) {
+        _isLibraryExpanded.value = expanded
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_NAV_LIBRARY_EXPANDED, expanded).apply()
+    }
+
+    fun setStorageExpanded(context: Context, expanded: Boolean) {
+        _isStorageExpanded.value = expanded
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_NAV_STORAGE_EXPANDED, expanded).apply()
+    }
+
+    fun setAddedLocationsExpanded(context: Context, expanded: Boolean) {
+        _isAddedLocationsExpanded.value = expanded
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_NAV_ADDED_LOCATIONS_EXPANDED, expanded).apply()
+    }
+
+    fun setNetworkExpanded(context: Context, expanded: Boolean) {
+        _isNetworkExpanded.value = expanded
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_NAV_NETWORK_EXPANDED, expanded).apply()
     }
 }
