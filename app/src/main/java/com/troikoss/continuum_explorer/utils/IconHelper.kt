@@ -538,6 +538,8 @@ object IconHelper {
             name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_docx_duo else R.drawable.ic_docx
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
             name.endsWith(".sh") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_terminal_duo else R.drawable.ic_terminal
+            name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
+                    name.endsWith(".m4a") || name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_duo else R.drawable.ic_audio
             name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
                     name.endsWith(".mov") || name.endsWith(".webm") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_video_duo else R.drawable.ic_video
 

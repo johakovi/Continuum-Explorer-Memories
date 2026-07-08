@@ -32,6 +32,7 @@ val ThemeRecycleBin = Color(0xFF98C52F)
 val ThemeDownloads = Color(0xFF69CCB8)
 val ThemeAndroid = Color(0xFF4CAF50)
 val ThemeGameSaves = Color(0xFF7C4DFF)
+val ThemeAudio = Color(0xFF4C54EC)
 
 val DefaultFolderColor = Color(0xFF2196F3)
 
@@ -44,7 +45,6 @@ val ThemeTxt = Color(0xFF78909C)
 val ThemeTerminal = Color(0xFF424242)
 val ThemeImage = Color(0xFFE15D82)
 val ThemeVideo = Color(0xFFFF9800)
-val ThemeAudio = Color(0xFFE91E63)
 
 val ThemeFileDuo = Color(0xFFB0BEC5)
 val ThemeZipDuo = Color(0xFFE99C47)
@@ -60,8 +60,8 @@ val ThemeRecycleBinDuo = Color(0xFF98C52F)
 val ThemeDownloadsDuo = Color(0xFF69CCB8)
 val ThemeAndroidDuo = Color(0xFF4CAF50)
 val ThemeGameSavesDuo = Color(0xFF7C4DFF)
+val ThemeAudioDuo = Color(0xFF4C54EC)
 val ThemeImageDuo = Color(0xFFE15D82)
 val ThemeVideoDuo = Color(0xFFFF9800)
-val ThemeAudioDuo = Color(0xFFE91E63)
 
 
