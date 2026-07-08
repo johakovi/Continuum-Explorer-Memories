@@ -9,6 +9,7 @@ import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
@@ -177,6 +178,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
         .getMimeTypeFromExtension(file.name.substringAfterLast('.', "").lowercase())
 
     val isImage = mime?.startsWith("image/") == true
+    val isAudio = mime?.startsWith("audio/") == true
 
     scope.launch {
         try {
@@ -192,6 +194,11 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
+                return@launch
+            }
+
+            if (isAudio) {
+                AudioManager.play(context, file, siblings)
                 return@launch
             }
 
@@ -259,7 +266,14 @@ fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalF
                 // Use a modified UniversalFile so openFile knows where the actual data is,
                 // but we pass the original providerId in the intent for saving back.
                 val tempFile = file.copy(providerId = cached.absolutePath, provider = LocalProvider)
-                openFile(context, tempFile, originalFile = file, siblings = siblings)
+                
+                // If it's an audio file, we need to make sure siblings are also handled or at least this file is played
+                val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(tempFile.name.substringAfterLast('.', "").lowercase())
+                if (mime?.startsWith("audio/") == true) {
+                    AudioManager.play(context, tempFile, siblings)
+                } else {
+                    openFile(context, tempFile, originalFile = file, siblings = siblings)
+                }
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
@@ -325,6 +339,13 @@ fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile?
                 return
             }
         }
+    }
+
+    // Use internal Audio Player
+    val audioExtensions = setOf("mp3", "wav", "ogg", "m4a", "aac", "flac")
+    if (audioExtensions.contains(extension) || mimeType.startsWith("audio/")) {
+        AudioManager.play(context, file, siblings)
+        return
     }
 
     // Use internal Text Editor for text files

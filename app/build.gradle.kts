@@ -88,6 +88,7 @@ dependencies {
     }
     implementation(libs.okhttp)
     implementation(libs.smbj)
+    implementation(libs.wavy.slider)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

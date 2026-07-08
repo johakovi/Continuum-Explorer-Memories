@@ -33,6 +33,7 @@ slf4j = "2.0.18"
 pdf-viewer = "1.0.0-alpha18"
 material = "1.14.0"
 fragment = "1.8.9"
+wavyslider = "2.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -80,6 +81,7 @@ slf4j-nop = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j" }
 androidx-pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer-fragment", version.ref = "pdf-viewer" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
+wavy-slider = { group = "ir.mahozad.multiplatform", name = "wavy-slider", version.ref = "wavyslider" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

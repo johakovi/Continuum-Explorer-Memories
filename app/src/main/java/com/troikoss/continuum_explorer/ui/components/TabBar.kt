@@ -114,7 +114,7 @@ fun TabBar(
 
     // hasCaption: strictly for when the system provides a caption handle area
     val hasCaption = captionPadding > 0.dp
-    
+
     // Always move tabs into title bar area if a handle is detected or in window mode
     val useInCaptionTabs = hasCaption || isInWindowMode
     

@@ -420,6 +420,13 @@ fun FileExplorerSQ(
                     )
             )
         }
+
+        AudioPlayerBar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = if (showBottomBar) 84.dp else 16.dp)
+        )
     }
 }
 

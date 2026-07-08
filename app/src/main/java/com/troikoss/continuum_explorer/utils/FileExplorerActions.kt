@@ -54,29 +54,27 @@ fun FileExplorerState.open(item: UniversalFile) {
     } else {
         if (ZipUtils.isArchive(item) && SettingsManager.isDefaultArchiveViewerEnabled.value) {
             openInNewTab(listOf(item))
-        } else if (item.isArchiveEntry) {
+            return
+        }
+        
+        if (item.isArchiveEntry) {
             Toast.makeText(context, context.getString(R.string.msg_not_supported_archive), Toast.LENGTH_SHORT).show()
-        } else if (item.provider.capabilities.isRemote) {
-            val extension = item.name.substringAfterLast('.', "").lowercase()
-            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
-            val siblings = if (imageExtensions.contains(extension)) {
-                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
-            } else emptyList()
-            openRemoteFile(context, scope, item, siblings)
-        } else if (RestrictedCache.isRestricted(item)) {
-            val extension = item.name.substringAfterLast('.', "").lowercase()
-            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
-            val siblings = if (imageExtensions.contains(extension)) {
-                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
-            } else emptyList()
-            openRestrictedFile(context, scope, item, siblings)
-        } else {
-            val extension = item.name.substringAfterLast('.', "").lowercase()
-            val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
-            val siblings = if (imageExtensions.contains(extension)) {
-                files.filter { !it.isDirectory && imageExtensions.contains(it.name.substringAfterLast('.', "").lowercase()) }
-            } else emptyList()
-            openFile(context, item, siblings = siblings)
+            return
+        }
+
+        val extension = item.name.substringAfterLast('.', "").lowercase()
+        val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+        val audioExtensions = setOf("mp3", "wav", "ogg", "m4a", "aac", "flac")
+        
+        val siblings = if (imageExtensions.contains(extension) || audioExtensions.contains(extension)) {
+            val targets = if (imageExtensions.contains(extension)) imageExtensions else audioExtensions
+            files.filter { !it.isDirectory && targets.contains(it.name.substringAfterLast('.', "").lowercase()) }
+        } else emptyList()
+
+        when {
+            item.provider.capabilities.isRemote -> openRemoteFile(context, scope, item, siblings)
+            RestrictedCache.isRestricted(item) -> openRestrictedFile(context, scope, item, siblings)
+            else -> openFile(context, item, siblings = siblings)
         }
     }
 }

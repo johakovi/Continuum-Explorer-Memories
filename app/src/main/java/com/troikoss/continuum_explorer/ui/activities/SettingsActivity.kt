@@ -1204,12 +1204,22 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
+
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "Icons used:",
+                                    text = "Wave animation:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
+
+                                Text(
+                                    text = "https://github.com/mahozad/wavy-slider",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+
+
                                 Text(
                                     text = "- Fluent UI System Color Icons",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,

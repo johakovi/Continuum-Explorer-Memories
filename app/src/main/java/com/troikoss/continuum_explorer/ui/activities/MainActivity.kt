@@ -224,6 +224,8 @@ open class MainActivity : AppCompatActivity() {
         inactivityHandler.removeCallbacks(sleepRunnable)
         Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
         
+        com.troikoss.continuum_explorer.managers.AudioManager.release()
+
         // Final cleanup on exit
         lifecycleScope.launch(Dispatchers.IO) {
             CleanupManager.clearCache(applicationContext)
