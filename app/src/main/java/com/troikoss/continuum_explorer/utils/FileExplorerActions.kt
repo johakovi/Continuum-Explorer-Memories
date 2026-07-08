@@ -39,11 +39,13 @@ fun FileExplorerState.open(item: UniversalFile) {
             val itemFileRef = item.fileRef
             val itemDocRef = item.documentFileRef
             if (itemFileRef != null) {
-                if (libraryItem == LibraryItem.Gallery) {
-                    navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
-                } else {
-                    safStack.clear()
-                    navigateTo(itemFileRef, null)
+                when {
+                    libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
+                    item.providerId.startsWith("virtual://music") -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
+                    else -> {
+                        safStack.clear()
+                        navigateTo(itemFileRef, null)
+                    }
                 }
             } else if (itemDocRef != null) {
                 val oldUri = currentSafUri

@@ -268,14 +268,16 @@ class AppConfigurations(private val context: Context) {
     val addedSafUris = mutableStateListOf<Uri>()
     val gameSafShortcuts = mutableStateListOf<GameShortcut>()
     val favoritePaths = mutableStateListOf<String>()
-    val libraryOrder = mutableStateListOf("gallery", "recent", "downloads", "documents", "games_manager", "trash")
+    val libraryOrder = mutableStateListOf("gallery", "music", "recent", "downloads", "documents", "games_manager", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
+    var isMusicVisible by mutableStateOf(true)
     var isDownloadsVisible by mutableStateOf(true)
     var isDocumentsVisible by mutableStateOf(true)
     var isGamesVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
+    var isMusicAlbumsEnabled by mutableStateOf(false)
     var isDocumentsFolderEnabled by mutableStateOf(false)
 
     var navPaneWidth by mutableStateOf(240.dp)
@@ -294,10 +296,13 @@ class AppConfigurations(private val context: Context) {
         loadNetworkConnections()
 
         // Ensure all library items are present in the order list
-        val required = listOf("gallery", "recent", "downloads", "documents", "games_manager", "trash")
+        val required = listOf("gallery", "music", "recent", "downloads", "documents", "games_manager", "trash")
         required.forEach { id ->
             if (!libraryOrder.contains(id)) {
-                if (id == "downloads") {
+                if (id == "music") {
+                    val idx = libraryOrder.indexOf("gallery")
+                    libraryOrder.add(if (idx != -1) idx + 1 else 0, id)
+                } else if (id == "downloads") {
                     val idx = libraryOrder.indexOf("recent")
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else if (id == "documents") {
@@ -465,8 +470,14 @@ class AppConfigurations(private val context: Context) {
             val insertIndex = libraryOrder.indexOf("documents").let { if (it != -1) it + 1 else 0 }
             libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "games_manager")
         }
+        // Migrate: add music if not present in saved order
+        if (!libraryOrder.contains("music")) {
+            val insertIndex = libraryOrder.indexOf("gallery").let { if (it != -1) it + 1 else 0 }
+            libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "music")
+        }
         isRecentVisible = prefs.getBoolean("is_recent_visible", true)
         isGalleryVisible = prefs.getBoolean("is_gallery_visible", true)
+        isMusicVisible = prefs.getBoolean("is_music_visible", true)
         isDownloadsVisible = prefs.getBoolean("is_downloads_visible", true)
         isDocumentsVisible = prefs.getBoolean("is_documents_visible", true)
         isGamesVisible = if (prefs.contains("is_games_visible")) {
@@ -475,6 +486,7 @@ class AppConfigurations(private val context: Context) {
             prefs.getBoolean("is_game_saves_visible", true)
         }
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
+        isMusicAlbumsEnabled = prefs.getBoolean("is_music_albums_enabled", false)
         isDocumentsFolderEnabled = prefs.getBoolean("is_documents_folder_enabled", false)
     }
 
@@ -484,10 +496,12 @@ class AppConfigurations(private val context: Context) {
             putString("order", libraryOrder.joinToString("|"))
             putBoolean("is_recent_visible", isRecentVisible)
             putBoolean("is_gallery_visible", isGalleryVisible)
+            putBoolean("is_music_visible", isMusicVisible)
             putBoolean("is_downloads_visible", isDownloadsVisible)
             putBoolean("is_documents_visible", isDocumentsVisible)
             putBoolean("is_games_visible", isGamesVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
+            putBoolean("is_music_albums_enabled", isMusicAlbumsEnabled)
             putBoolean("is_documents_folder_enabled", isDocumentsFolderEnabled)
         }.apply()
     }
@@ -500,6 +514,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGalleryVisibility() {
         isGalleryVisible = !isGalleryVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleMusicVisibility() {
+        isMusicVisible = !isMusicVisible
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }
@@ -524,6 +544,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGalleryAlbums() {
         isGalleryAlbumsEnabled = !isGalleryAlbumsEnabled
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleMusicAlbums() {
+        isMusicAlbumsEnabled = !isMusicAlbumsEnabled
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

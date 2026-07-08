@@ -295,6 +295,7 @@ fun NavigationPane(
         isRecycleBinEnabled,
         appState.appConfigs.isRecentVisible,
         appState.appConfigs.isGalleryVisible,
+        appState.appConfigs.isMusicVisible,
         appState.appConfigs.isDownloadsVisible,
         appState.appConfigs.isDocumentsVisible,
         appState.appConfigs.isGamesVisible
@@ -304,6 +305,7 @@ fun NavigationPane(
                 "trash" -> isRecycleBinEnabled
                 "recent" -> appState.appConfigs.isRecentVisible
                 "gallery" -> appState.appConfigs.isGalleryVisible
+                "music" -> appState.appConfigs.isMusicVisible
                 "downloads" -> appState.appConfigs.isDownloadsVisible
                 "documents" -> appState.appConfigs.isDocumentsVisible
                 "games_manager" -> appState.appConfigs.isGamesVisible
@@ -596,6 +598,17 @@ fun NavigationPane(
                                     appState = appState,
                                     textAlphaProvider = textAlphaProvider,
                                     section = NavSection.Gallery,
+                                    isMinimized = isMinimized,
+                                    onAddStorageClick = onAddStorageClick
+                                )
+                                "music" -> NavItem(
+                                    label = stringResource(R.string.nav_music),
+                                    icon = Icons.Default.MusicNote,
+                                    customIcon = R.drawable.ic_music_logo,
+                                    onClick = { onItemSelected(NavSection.Music) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Music,
                                     isMinimized = isMinimized,
                                     onAddStorageClick = onAddStorageClick
                                 )
@@ -910,6 +923,9 @@ fun NavigationPane(
     if (appState.isConfiguringGalleryFolders) {
         GalleryFoldersDialog(appState, onAddStorageClick)
     }
+    if (appState.isConfiguringMusicFolders) {
+        MusicFoldersDialog(appState, onAddStorageClick)
+    }
 }
 
 @Composable
@@ -1003,17 +1019,17 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                             }
                         }
                         
-                        Button(
-                            onClick = {
-                                onAddFolder()
-                            },
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.gallery_add_folder))
-                        }
+                            Button(
+                                onClick = {
+                                    onAddFolder()
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.gallery_add_folder))
+                            }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -1023,6 +1039,126 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { appState.isConfiguringGalleryFolders = false }) {
+                            Text(stringResource(R.string.done))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MusicFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
+    val context = LocalContext.current
+    val folders by SettingsManager.musicFolders
+    val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+
+    Dialog(
+        onDismissRequest = { appState.isConfiguringMusicFolders = false },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        var isVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { isVisible = true }
+
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = scaleIn(initialScale = 0.9f) + fadeIn(),
+            exit = scaleOut(targetScale = 0.9f) + fadeOut(),
+            label = "MusicFoldersDialogAnimation"
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(24.dp)
+                    .shadow(16.dp, RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        stringResource(R.string.menu_music_folders),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Spacer(Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+                        if (!isFilterEnabled) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                            ) {
+                                Text(
+                                    stringResource(R.string.gallery_filter_off_msg),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(8.dp),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        if (folders.isEmpty()) {
+                            Text(
+                                "No music folders added. Standard music locations will be used if filtering is enabled.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                        } else {
+                            Text(
+                                "Managed Music Folders:",
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                                itemsIndexed(folders.toList()) { _, path ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Default.Folder, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = path,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        IconButton(onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.remove(path)
+                                            SettingsManager.setMusicFolders(context, newSet)
+                                            appState.refresh()
+                                        }) {
+                                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(20.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                            Button(
+                                onClick = {
+                                    onAddFolder()
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Add Music Folder")
+                            }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { appState.isConfiguringMusicFolders = false }) {
                             Text(stringResource(R.string.done))
                         }
                     }
@@ -1211,6 +1347,79 @@ private fun NavContextMenu(
                 HorizontalDivider()
             }
 
+            if (section is NavSection.Music) {
+                val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+                val context = LocalContext.current
+
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_gallery_show_all))
+                            if (!isFilterEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        if (isFilterEnabled) {
+                            SettingsManager.setMusicFilterEnabled(context, false)
+                            appState.refresh()
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.LibraryMusic, null) }
+                )
+
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_music_folders))
+                            if (isFilterEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        if (!isFilterEnabled) {
+                            SettingsManager.setMusicFilterEnabled(context, true)
+                            appState.refresh()
+                        }
+                        appState.isConfiguringMusicFolders = true
+                    },
+                    leadingIcon = { Icon(Icons.Default.Folder, null) }
+                )
+
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_music_albums))
+                            if (appState.appConfigs.isMusicAlbumsEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        appState.appConfigs.toggleMusicAlbums()
+                    },
+                    leadingIcon = { Icon(Icons.Default.Album, null) }
+                )
+                
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_create_playlist)) },
+                    onClick = {
+                        onDismissRequest()
+                        // Playlist creation logic could go here
+                    },
+                    leadingIcon = { Icon(Icons.Default.PlaylistAdd, null) }
+                )
+                HorizontalDivider()
+            }
+
             if (onNavigate != null) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_open)) },
@@ -1311,7 +1520,7 @@ private fun NavContextMenu(
                     leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
                 )
             }
-            if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.NetworkStorage) {
+            if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.Music && section !is NavSection.NetworkStorage) {
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_properties)) },
@@ -1368,6 +1577,7 @@ private fun NavItem(
         val iconTheme = SettingsManager.iconTheme.value
         val tint = when (section) {
             is NavSection.Gallery -> extendedColors.galleryIcon
+            is NavSection.Music -> extendedColors.musicIcon
             is NavSection.Recent -> extendedColors.recentIcon
             is NavSection.Downloads -> extendedColors.downloadsIcon
             is NavSection.RecycleBin -> extendedColors.recycleBinIcon
@@ -1379,6 +1589,7 @@ private fun NavItem(
             val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
                 when (customIcon) {
                     R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
+                    R.drawable.ic_music_logo -> R.drawable.ic_music_logo // Assuming we might want a duo version later
                     R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                     R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                     R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
@@ -1763,7 +1974,7 @@ private fun NavNetworkItem(
 }
 
 /**
- * Custom navigation item for Storage that shows a progress bar and usage details.
+ * Item for Storage that shows a progress bar and usage details.
  */
 @Composable
 private fun NavStorageItem(

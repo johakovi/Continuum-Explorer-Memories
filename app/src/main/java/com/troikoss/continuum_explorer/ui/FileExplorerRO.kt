@@ -660,6 +660,7 @@ private fun navigateToSection(
         }
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
+        is NavSection.Music -> appState.navigateTo(null, null, libraryItem = LibraryItem.Music)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
         is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)
         is NavSection.Documents -> {

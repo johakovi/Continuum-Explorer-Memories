@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.managers
 import android.content.Context
 import androidx.compose.runtime.*
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -19,7 +20,11 @@ object AudioManager {
     private var exoPlayer: ExoPlayer? = null
     
     var currentTrack by mutableStateOf<UniversalFile?>(null)
+    var currentTitle by mutableStateOf<String?>(null)
+    var currentArtist by mutableStateOf<String?>(null)
     var isAudioPlaying by mutableStateOf(false)
+    var isMinimized by mutableStateOf(false)
+    var isExpanded by mutableStateOf(false)
     var currentPosition by mutableLongStateOf(0L)
     var duration by mutableLongStateOf(0L)
     var currentIndex by mutableIntStateOf(-1)
@@ -58,6 +63,11 @@ object AudioManager {
                             currentTrack = playlist[currentIndex]
                         }
                     }
+
+                    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                        currentTitle = mediaMetadata.title?.toString()
+                        currentArtist = mediaMetadata.artist?.toString()
+                    }
                 })
             }
         }
@@ -65,9 +75,14 @@ object AudioManager {
 
     fun play(context: Context, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
         init(context)
-        
-        playlist.clear()
-        playlist.addAll(siblings.ifEmpty { listOf(file) })
+        isMinimized = false
+
+        // If we are playing a file from the CURRENT playlist, don't clear it.
+        // Otherwise, siblings is a new list from the file explorer.
+        if (siblings !== playlist) {
+            playlist.clear()
+            playlist.addAll(siblings.ifEmpty { listOf(file) })
+        }
         
         // Find the index of the clicked file. 
         // We match by name AND parentId/path to be as specific as possible.
@@ -125,6 +140,8 @@ object AudioManager {
         exoPlayer?.stop()
         exoPlayer?.clearMediaItems()
         currentTrack = null
+        currentTitle = null
+        currentArtist = null
         isAudioPlaying = false
         currentPosition = 0L
         duration = 0L

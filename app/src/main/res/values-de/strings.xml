@@ -308,11 +308,15 @@
     <string name="nav_library_items">Bibliothekselemente</string>
     <string name="nav_recent">Zuletzt verwendet</string>
     <string name="nav_gallery">Galerie</string>
+    <string name="nav_music">Musik</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Dokumente</string>
     <string name="nav_game_saves">Spiele-Manager</string>
     <string name="menu_gallery_albums">Alben</string>
     <string name="menu_gallery_folders">Galerie-Ordner</string>
+    <string name="menu_music_albums">Alben</string>
+    <string name="menu_music_folders">Musik-Ordner</string>
+    <string name="menu_create_playlist">Playlist erstellen</string>
     <string name="gallery_filter_off_msg">Filterung ist momentan AUS. Alle Medien werden angezeigt.</string>
     <string name="gallery_no_folders_msg">Keine Ordner hinzugefügt. Standard-Medienorte werden verwendet, wenn die Filterung aktiviert ist.</string>
     <string name="gallery_managed_folders">Verwaltete Ordner:</string>

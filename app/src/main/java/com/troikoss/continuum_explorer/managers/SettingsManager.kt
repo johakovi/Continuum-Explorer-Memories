@@ -84,6 +84,8 @@ object SettingsManager {
     private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
     private const val KEY_GALLERY_FOLDERS = "gallery_folders"
     private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
+    private const val KEY_MUSIC_FOLDERS = "music_folders"
+    private const val KEY_MUSIC_FILTER_ENABLED = "music_filter_enabled"
     private const val PREFS_FOLDER_COLORS = "folder_colors"
     private const val KEY_DEFAULT_FOLDER_COLOR = "default_folder_color"
 
@@ -178,6 +180,12 @@ object SettingsManager {
 
     private val _isGalleryFilterEnabled = mutableStateOf(false)
     val isGalleryFilterEnabled: State<Boolean> = _isGalleryFilterEnabled
+
+    private val _musicFolders = mutableStateOf(setOf<String>())
+    val musicFolders: State<Set<String>> = _musicFolders
+
+    private val _isMusicFilterEnabled = mutableStateOf(false)
+    val isMusicFilterEnabled: State<Boolean> = _isMusicFilterEnabled
 
     private val _folderColors = mutableStateMapOf<String, Long>()
     val folderColors: Map<String, Long> = _folderColors
@@ -310,6 +318,9 @@ object SettingsManager {
 
         _galleryFolders.value = prefs.getStringSet(KEY_GALLERY_FOLDERS, emptySet()) ?: emptySet()
         _isGalleryFilterEnabled.value = prefs.getBoolean(KEY_GALLERY_FILTER_ENABLED, false)
+
+        _musicFolders.value = prefs.getStringSet(KEY_MUSIC_FOLDERS, emptySet()) ?: emptySet()
+        _isMusicFilterEnabled.value = prefs.getBoolean(KEY_MUSIC_FILTER_ENABLED, false)
 
         val colorPrefs = context.getSharedPreferences(PREFS_FOLDER_COLORS, Context.MODE_PRIVATE)
         _folderColors.clear()
@@ -599,6 +610,20 @@ object SettingsManager {
         _isGalleryFilterEnabled.value = enabled
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_GALLERY_FILTER_ENABLED, enabled).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setMusicFolders(context: Context, folders: Set<String>) {
+        _musicFolders.value = folders
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putStringSet(KEY_MUSIC_FOLDERS, folders).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setMusicFilterEnabled(context: Context, enabled: Boolean) {
+        _isMusicFilterEnabled.value = enabled
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_MUSIC_FILTER_ENABLED, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

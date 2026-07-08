@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.Terminal
@@ -278,6 +281,7 @@ object IconHelper {
             if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
+                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") -> extendedColors.musicIcon
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
@@ -454,6 +458,11 @@ object IconHelper {
                 file.providerId == "virtual://recent" -> Icons.Default.History
                 file.providerId == "virtual://documents" -> Icons.Default.Description
                 file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> Icons.Default.Collections
+                file.providerId == "virtual://music" -> Icons.Default.MusicNote
+                file.providerId == "virtual://music/songs" -> Icons.Default.MusicNote
+                file.providerId == "virtual://music/albums" -> Icons.Default.Album
+                file.providerId == "virtual://music/playlists" -> Icons.AutoMirrored.Filled.PlaylistPlay
+                file.providerId.startsWith("virtual://music_album:") -> Icons.Default.MusicNote
                 file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> Icons.Default.Delete
                 file.parentId == "virtual://games_manager" -> Icons.AutoMirrored.Filled.ListAlt
                 else -> Icons.Default.Folder
@@ -507,6 +516,11 @@ object IconHelper {
         if (file.isDirectory) {
             return when {
                 file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
+                file.providerId == "virtual://music" -> R.drawable.ic_music_logo
+                file.providerId == "virtual://music/songs" -> R.drawable.ic_music_logo
+                file.providerId == "virtual://music/albums" -> R.drawable.ic_music_logo // TODO: Album drawable
+                file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_logo // TODO: Playlist drawable
+                file.providerId.startsWith("virtual://music_album:") -> R.drawable.ic_music_logo
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
@@ -574,6 +588,7 @@ object IconHelper {
             return when {
                 lPath.contains("recent") -> R.drawable.ic_nav_recent
                 lPath.contains("gallery") -> R.drawable.ic_nav_gallery
+                lPath.contains("music") -> R.drawable.ic_music_logo
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
                 lPath.contains("games_manager") -> R.drawable.ic_nav_game

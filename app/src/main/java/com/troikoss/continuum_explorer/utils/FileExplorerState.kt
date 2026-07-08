@@ -18,6 +18,7 @@ import com.troikoss.continuum_explorer.managers.DocumentsManager
 import com.troikoss.continuum_explorer.managers.DownloadsManager
 import com.troikoss.continuum_explorer.managers.GalleryManager
 import com.troikoss.continuum_explorer.managers.GamesManager
+import com.troikoss.continuum_explorer.managers.MusicManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
 import com.troikoss.continuum_explorer.managers.SelectionManager
@@ -101,6 +102,7 @@ class FileExplorerState(
     // Flag for adding game shortcuts
     var isAddingGameShortcut by mutableStateOf(false)
     var isConfiguringGalleryFolders by mutableStateOf(false)
+    var isConfiguringMusicFolders by mutableStateOf(false)
 
     // Centralized selection manager
     val selectionManager = SelectionManager()
@@ -210,6 +212,15 @@ class FileExplorerState(
                 context.getString(R.string.nav_game_saves)
             } else if (libraryItem == LibraryItem.Documents) {
                 context.getString(R.string.nav_documents)
+            } else if (libraryItem == LibraryItem.Music) {
+                val p = currentPath?.path ?: ""
+                when {
+                    p.contains("music/songs") -> context.getString(R.string.audio)
+                    p.contains("music/albums") -> context.getString(R.string.menu_music_albums)
+                    p.contains("music/playlists") -> "Playlists"
+                    currentPath != null -> currentPath!!.name
+                    else -> context.getString(R.string.nav_music)
+                }
             } else if (libraryItem == LibraryItem.Gallery) {
                 if (currentPath != null) currentPath!!.name
                 else context.getString(R.string.nav_gallery)
@@ -280,6 +291,24 @@ class FileExplorerState(
                 providerId = currentPath?.absolutePath ?: "virtual://gallery",
             )
 
+            libraryItem == LibraryItem.Music -> {
+                val p = currentPath?.path ?: ""
+                UniversalFile(
+                    name = when {
+                        p.contains("music/songs") -> context.getString(R.string.audio)
+                        p.contains("music/albums") -> context.getString(R.string.menu_music_albums)
+                        p.contains("music/playlists") -> "Playlists"
+                        currentPath != null -> currentPath!!.name
+                        else -> context.getString(R.string.nav_music)
+                    },
+                    isDirectory = true,
+                    lastModified = 0L,
+                    length = 0L,
+                    provider = LocalProvider,
+                    providerId = currentPath?.path ?: "virtual://music",
+                )
+            }
+
             libraryItem == LibraryItem.Recent -> UniversalFile(
                 name = context.getString(R.string.nav_recent),
                 isDirectory = true,
@@ -325,7 +354,7 @@ class FileExplorerState(
         } else if (currentArchiveFile != null || currentArchiveUri != null) {
             true
         } else if (libraryItem != LibraryItem.None) {
-            libraryItem == LibraryItem.Gallery && currentPath != null
+            (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Music) && currentPath != null
         } else if (currentPath != null) {
             currentPath?.absolutePath != storageRoot.absolutePath
         } else if (currentSafUri != null) {
@@ -436,6 +465,15 @@ class FileExplorerState(
                 }
                 isConfiguringGalleryFolders = false
                 refresh()
+            } else if (isConfiguringMusicFolders) {
+                val path = SafUtils.getRawPathFromUri(context, uri)
+                if (path != null) {
+                    val currentFolders = SettingsManager.musicFolders.value.toMutableSet()
+                    currentFolders.add(path)
+                    SettingsManager.setMusicFolders(context, currentFolders)
+                }
+                isConfiguringMusicFolders = false
+                refresh()
             } else {
                 if (!appConfigs.addedSafUris.contains(uri)) {
                     appConfigs.addedSafUris.add(uri)
@@ -447,6 +485,8 @@ class FileExplorerState(
             }
         } else {
             isAddingGameShortcut = false
+            isConfiguringGalleryFolders = false
+            isConfiguringMusicFolders = false
         }
     }
 
@@ -515,6 +555,20 @@ class FileExplorerState(
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
                         else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
                     }
+                    LibraryItem.Music -> {
+                        val p = currentPath?.path ?: ""
+                        when {
+                            currentPath == null -> listOf(
+                                UniversalFile("Songs", true, 0, 0, LocalProvider, "virtual://music/songs", "virtual://music"),
+                                UniversalFile("Albums", true, 0, 0, LocalProvider, "virtual://music/albums", "virtual://music"),
+                                UniversalFile("Playlists", true, 0, 0, LocalProvider, "virtual://music/playlists", "virtual://music")
+                            )
+                            p.contains("songs") -> MusicManager.getMusicFiles(context, if (SettingsManager.isMusicFilterEnabled.value) SettingsManager.musicFolders.value else emptySet())
+                            p.contains("albums") -> MusicManager.getMusicAlbums(context, if (SettingsManager.isMusicFilterEnabled.value) SettingsManager.musicFolders.value else emptySet())
+                            p.contains("playlists") -> emptyList() // TODO: Implement playlists
+                            else -> MusicManager.getMusicAlbumContents(context, currentPath!!.absolutePath)
+                        }
+                    }
                     LibraryItem.RecycleBin -> if (currentPath != null) {
                         val trashRoot = File(Environment.getExternalStorageDirectory(), ".Trash")
                         if (currentPath!!.absolutePath == trashRoot.absolutePath) {
@@ -532,8 +586,7 @@ class FileExplorerState(
                             archiveCache = ZipUtils.parseArchive(context, source, currentArchiveName)
                         }
                         archiveCache?.get(currentArchivePath) ?: emptyList()
-                    }
- else if (currentNetworkProvider != null && currentNetworkId != null) {
+                    } else if (currentNetworkProvider != null && currentNetworkId != null) {
                         try {
                             val result = currentNetworkProvider!!.listChildren(currentNetworkId!!)
                             withContext(Dispatchers.Main) { networkError = null }
@@ -565,7 +618,7 @@ class FileExplorerState(
 
                 val filteredList = if (showHidden) universalList else universalList.filter { !it.name.startsWith(".") }
 
-                val skipSort = libraryItem == LibraryItem.Recent || (libraryItem == LibraryItem.Gallery && !appConfigs.isGalleryAlbumsEnabled)
+                val skipSort = libraryItem == LibraryItem.Recent || (libraryItem == LibraryItem.Gallery && !appConfigs.isGalleryAlbumsEnabled) || (libraryItem == LibraryItem.Music && !appConfigs.isMusicAlbumsEnabled)
                 Pair(if (skipSort) filteredList else sortFiles(filteredList, sortParams, meta), meta)
             }
 
@@ -600,6 +653,7 @@ class FileExplorerState(
                 loadedPathKey = key ?: when (libraryItem) {
                     LibraryItem.Recent -> "recent"
                     LibraryItem.Gallery -> "gallery"
+                    LibraryItem.Music -> "music"
                     LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
                     LibraryItem.Games -> "games_manager"
@@ -682,6 +736,15 @@ class FileExplorerState(
         } else if (libraryItem == LibraryItem.Gallery) {
             if (currentPath != null) "virtual://gallery_album:${currentPath!!.absolutePath}"
             else "virtual://gallery"
+        } else if (libraryItem == LibraryItem.Music) {
+            val p = currentPath?.path ?: ""
+            when {
+                p.contains("music/songs") -> "virtual://music/songs"
+                p.contains("music/albums") -> "virtual://music/albums"
+                p.contains("music/playlists") -> "virtual://music/playlists"
+                currentPath != null -> "virtual://music_album:${currentPath!!.absolutePath}"
+                else -> "virtual://music"
+            }
         } else if (libraryItem == LibraryItem.Recent) {
             "virtual://recent"
         } else if (libraryItem == LibraryItem.Downloads) {

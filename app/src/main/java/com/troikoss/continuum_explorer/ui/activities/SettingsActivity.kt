@@ -1211,11 +1211,15 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
-
                                 Text(
-                                    text = "https://github.com/mahozad/wavy-slider",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    text = "wavy-slider by mahozad",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
+                                    modifier = Modifier
+                                        .clickable {
+                                            uriHandler.openUri("https://github.com/mahozad/wavy-slider")
+                                        }
+                                        .padding(top = 4.dp)
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
 
