@@ -79,6 +79,7 @@ import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.ui.theme.ExtendedColors
+import com.troikoss.continuum_explorer.ui.theme.ThemeMusicIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -436,7 +437,7 @@ object IconHelper {
                             SubcomposeAsyncImageContent()
                         } else {
                             val painterToUse = if (isAudio) painterResource(R.drawable.ic_audio) else fallbackPainter
-                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = if (isAudio) Color.Unspecified else finalTint)
+                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = if (isAudio) ThemeMusicIcon else finalTint)
                         }
                     }
                 }
