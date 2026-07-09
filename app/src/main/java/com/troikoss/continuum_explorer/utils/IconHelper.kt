@@ -378,16 +378,33 @@ object IconHelper {
                 } else if (isShowingAppIcon) {
                     AppIcon(packageName!!, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
                 } else {
-                    val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                    Icon(
-                        painter = rememberThemePainter(resId = baseFolderRes),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        tint = finalTint
-                    )
+                    val providerPath = file.providerId.ifEmpty { file.absolutePath }
+                    val isMusicVirtual = providerPath.startsWith("virtual://music") || providerPath.startsWith("virtual://music_album:")
+                    if (isMusicVirtual) {
+                        val musicRes = when {
+                            providerPath.endsWith("/songs") -> R.drawable.ic_music_music
+                            providerPath.endsWith("/albums") -> R.drawable.ic_music_album
+                            providerPath.endsWith("/playlists") -> R.drawable.ic_music_playlist
+                            else -> R.drawable.ic_music_logo
+                        }
+                        Icon(
+                            painter = rememberThemePainter(resId = musicRes),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = finalTint
+                        )
+                    } else {
+                        val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                        Icon(
+                            painter = rememberThemePainter(resId = baseFolderRes),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = finalTint
+                        )
+                    }
                 }
 
-                if (overlayRes != null && !isShowingAppIcon && rootCustomIcon == null) {
+                if (overlayRes != null && overlayRes != R.drawable.ic_nav_music && !isShowingAppIcon && rootCustomIcon == null) {
                     val finalOverlayRes = if (isDuo) {
                         when (overlayRes) {
                             R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
@@ -559,9 +576,10 @@ object IconHelper {
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
             name.endsWith(".sh") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_terminal_duo else R.drawable.ic_terminal
             name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                    name.endsWith(".m4a") || name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_duo else R.drawable.ic_audio
+                     name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_duo else R.drawable.ic_audio
             name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
                     name.endsWith(".mov") || name.endsWith(".webm") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_video_duo else R.drawable.ic_video
+            name.endsWith(".m4a") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_rec_duo else R.drawable.ic_audio_rec
 
             // Default file icon
             else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_file_duo else R.drawable.ic_file
@@ -594,7 +612,7 @@ object IconHelper {
             return when {
                 lPath.contains("recent") -> R.drawable.ic_nav_recent
                 lPath.contains("gallery") -> R.drawable.ic_nav_gallery
-                lPath.contains("music") -> R.drawable.ic_nav_music
+                //lPath.contains("music") -> R.drawable.ic_nav_music
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
                 lPath.contains("games_manager") -> R.drawable.ic_nav_game

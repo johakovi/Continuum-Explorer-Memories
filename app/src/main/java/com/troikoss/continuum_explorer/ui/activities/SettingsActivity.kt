@@ -1227,6 +1227,11 @@ fun SettingsScreen(onBack: () -> Unit) {
 
 
                                 Text(
+                                    text = "Icons used:",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
                                     text = "- Fluent UI System Color Icons",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium

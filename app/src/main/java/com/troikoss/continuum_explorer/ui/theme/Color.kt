@@ -35,7 +35,9 @@ val ThemeGameSaves = Color(0xFF7C4DFF)
 val ThemeAudio = Color(0xFF4C54EC)
 
 val DefaultFolderColor = Color(0xFF2196F3)
-val ThemeMusicIcon = Color(0xFF4C54EC)  // Purple-blue, matches ThemeAudio
+val ThemeMusicIcon = Color(0xFF8687AB)
+
+val ThemeMusicList = Color(0xFFD2D3E7)
 
 val ThemeFile = Color(0xFFB0BEC5)
 val ThemeZip = Color(0xFFE99C47)
@@ -61,7 +63,7 @@ val ThemeRecycleBinDuo = Color(0xFF98C52F)
 val ThemeDownloadsDuo = Color(0xFF69CCB8)
 val ThemeAndroidDuo = Color(0xFF4CAF50)
 val ThemeGameSavesDuo = Color(0xFF7C4DFF)
-val ThemeAudioDuo = Color(0xFF4C54EC)
+val ThemeAudioDuo = Color(0xFF2B31CE)
 val ThemeImageDuo = Color(0xFFE15D82)
 val ThemeVideoDuo = Color(0xFFFF9800)
 
