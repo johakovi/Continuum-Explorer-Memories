@@ -517,9 +517,9 @@ object IconHelper {
             return when {
                 file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
                 file.providerId == "virtual://music" -> R.drawable.ic_music_logo
-                file.providerId == "virtual://music/songs" -> R.drawable.ic_music_logo
-                file.providerId == "virtual://music/albums" -> R.drawable.ic_music_logo // TODO: Album drawable
-                file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_logo // TODO: Playlist drawable
+                file.providerId == "virtual://music/songs" -> R.drawable.ic_music_music
+                file.providerId == "virtual://music/albums" -> R.drawable.ic_music_album
+                file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_playlist
                 file.providerId.startsWith("virtual://music_album:") -> R.drawable.ic_music_logo
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
@@ -588,7 +588,7 @@ object IconHelper {
             return when {
                 lPath.contains("recent") -> R.drawable.ic_nav_recent
                 lPath.contains("gallery") -> R.drawable.ic_nav_gallery
-                lPath.contains("music") -> R.drawable.ic_music_logo
+                lPath.contains("music") -> R.drawable.ic_nav_music
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
                 lPath.contains("games_manager") -> R.drawable.ic_nav_game

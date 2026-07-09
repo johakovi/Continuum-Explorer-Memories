@@ -259,7 +259,7 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
 
                             val progress = if (duration > 0) position.toFloat() / duration.toFloat() else 0f
 
-                            WavySlider2(
+                            WavySlider(
                                 value = progress,
                                 onValueChange = { AudioManager.seekTo((it * duration).toLong()) },
                                 enabled = true,

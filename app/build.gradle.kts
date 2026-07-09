@@ -44,6 +44,7 @@ android {
             excludes += "/META-INF/DEPENDENCIES"
         }
     }
+
 }
 
 dependencies {
