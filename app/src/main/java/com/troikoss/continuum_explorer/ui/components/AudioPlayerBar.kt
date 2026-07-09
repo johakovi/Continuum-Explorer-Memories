@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
+import ir.mahozad.multiplatform.wavyslider.material.WavySlider
 import ir.mahozad.multiplatform.wavyslider.WaveDirection
 import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.R
