@@ -9,11 +9,18 @@ Note: This project is forked from troikoss / Continuum Explorer
 
 [**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
 
-<img width="600" height="543" alt="Screenshot_20260613_003403_Continuum Explorer" src="https://github.com/user-attachments/assets/7790a4c2-e4ce-4cef-a5fc-9f7fbb0af785" />
-<img width="600" height="543" alt="Screenshot_20260613_003331_Continuum Explorer" src="https://github.com/user-attachments/assets/005f6640-50ae-4176-ae59-02fe869b9ac3" />
+
+| | |
+|:---:|:---:|
+| <img width="600" height="543" alt="Screenshot_20260613_003403_Continuum Explorer" src="https://github.com/user-attachments/assets/7790a4c2-e4ce-4cef-a5fc-9f7fbb0af785" /> | <img width="600" height="543" alt="Screenshot_20260613_003331_Continuum Explorer" src="https://github.com/user-attachments/assets/005f6640-50ae-4176-ae59-02fe869b9ac3" /> |
+| Colourful Duotone iconpack, with light theme | Demo theme pack installed |
+| <img width="306" height="751" alt="Screenshot_20260524_004233_Continuum Explorer" src="https://github.com/user-attachments/assets/4f90c6a7-38dd-45d1-88eb-454c322c56ed" /> |
+| Phone UI |  |
 
 
-<img width="306" height="751" alt="Screenshot_20260524_004233_Continuum Explorer" src="https://github.com/user-attachments/assets/4f90c6a7-38dd-45d1-88eb-454c322c56ed" />
+
+
+
 
 
 ## Key Features:
