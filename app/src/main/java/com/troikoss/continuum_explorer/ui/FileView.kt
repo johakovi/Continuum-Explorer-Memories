@@ -1,6 +1,5 @@
 package com.troikoss.continuum_explorer.ui
 
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.ScrollState
@@ -42,7 +41,7 @@ import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
 import com.troikoss.continuum_explorer.utils.IconHelper.isMimeTypePreviewable
 import com.troikoss.continuum_explorer.R
-import android.text.format.DateFormat
+import com.troikoss.continuum_explorer.ui.theme.ThemeAudio
 
 
 /**
@@ -160,6 +159,7 @@ fun FileView(
                     ViewMode.GALLERY -> FileGalleryView(file, isSelected, isHovered, isLead, appState, mouseTooltipProvider)
                     ViewMode.CONTENT -> FileContentView(file, isSelected, isHovered, isLead, appState, mouseTooltipProvider)
                     ViewMode.DETAILS -> FileDetailsView(file, isSelected, isHovered, isLead, appState, hScrollState, mouseTooltipProvider)
+                    ViewMode.MUSIC -> FileMusicView(file, isSelected, isHovered, isLead, appState, mouseTooltipProvider)
                 }
             }
 
@@ -400,6 +400,97 @@ private fun FileContentView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FileMusicView(
+    file: UniversalFile,
+    isSelected: Boolean,
+    isHovered: Boolean,
+    isLead: Boolean,
+    appState: FileExplorerState,
+    toolTipProvider: PopupPositionProvider,
+) {
+    val formattedSize = remember(file) { appState.formatSize(file.length) }
+    val formattedDate = remember(file) { appState.formatDate(file.lastModified) }
+    val tooltipState = rememberTooltipState()
+    var isOverflowing by remember { mutableStateOf(value = false) }
+    val shape = RoundedCornerShape(12.dp)
+    val itemSize = 40.dp
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .selectionBackground(isSelected, isHovered, isLead, shape = shape),
+        shape = shape,
+        color = Color.Transparent
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box {
+                FileThumbnail(
+                    file = file,
+                    selected = isSelected,
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary else ThemeAudio,
+                    modifier = Modifier.size(itemSize),
+                    iconSize = itemSize,
+                    contentScale = ContentScale.Crop
+                )
+                FolderPreview(
+                    folder = file,
+                    thumbSize = itemSize * 0.6f,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                TooltipBox(
+                    positionProvider = toolTipProvider,
+                    tooltip = { if (isOverflowing) PlainTooltip { Text(file.name) } },
+                    state = tooltipState
+                ) {
+                    Text(
+                        text = file.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        onTextLayout = { textLayoutResult ->
+                            isOverflowing = textLayoutResult.hasVisualOverflow
+                        },
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                Row {
+                    Text(
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    if (!file.isDirectory) {
+                        Text(
+                            text = "•",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = formattedSize,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun FileDetailsView(

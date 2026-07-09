@@ -273,6 +273,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ViewMode.CONTENT -> stringResource(R.string.menu_content)
                         ViewMode.GRID -> stringResource(R.string.menu_grid)
                         ViewMode.GALLERY -> stringResource(R.string.menu_gallery)
+                        ViewMode.MUSIC -> stringResource(R.string.menu_music)
+
                     }
                     Text(text)
                 },

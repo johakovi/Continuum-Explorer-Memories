@@ -71,6 +71,7 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
 import com.troikoss.continuum_explorer.ui.components.DetailsHeader
+import com.troikoss.continuum_explorer.ui.components.MusicHeader
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.delay
@@ -128,7 +129,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     // Dynamic column count based on view mode and actual grid layout
     val columnCount by remember(gridState, viewMode, containerCoordinates?.size?.width, appState.folderConfigs.gridItemSize, density) {
         derivedStateOf {
-            if (viewMode == ViewMode.DETAILS || viewMode == ViewMode.CONTENT) {
+            if (viewMode == ViewMode.DETAILS || viewMode == ViewMode.CONTENT || viewMode == ViewMode.MUSIC) {
                 1
             } else {
                 val visibleItems = gridState.layoutInfo.visibleItemsInfo
@@ -310,13 +311,15 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                                 appState.getCurrentStorageKey()
                             )
                         }
-                        ViewMode.CONTENT -> {
+                        ViewMode.CONTENT, ViewMode.MUSIC -> {
                             val newSize = (appState.folderConfigs.contentItemSize * factor).toInt()
                             appState.folderConfigs.updateContentSize(
                                 newSize.coerceIn(32, 120),
                                 appState.getCurrentStorageKey()
                             )
                         }
+
+                    
                     }
                 },
                 onDragStart = { offset ->
@@ -460,6 +463,13 @@ private fun FileLayout(
                 .onGloballyPositioned { headerHeightPx = it.size.height.toFloat() }
             ) {
                 DetailsHeader(appState = appState, scrollState = hScrollState)
+            }
+        } else if (viewMode == ViewMode.MUSIC) {
+            Box(modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .onGloballyPositioned { headerHeightPx = it.size.height.toFloat() }
+            ) {
+                MusicHeader(appState = appState, scrollState = hScrollState)
             }
         } else {
             headerHeightPx = 0f

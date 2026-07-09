@@ -35,6 +35,7 @@ val ThemeGameSaves = Color(0xFF7C4DFF)
 val ThemeAudio = Color(0xFF4C54EC)
 
 val DefaultFolderColor = Color(0xFF2196F3)
+val ThemeMusicIcon = Color(0xFF4C54EC)  // Purple-blue, matches ThemeAudio
 
 val ThemeFile = Color(0xFFB0BEC5)
 val ThemeZip = Color(0xFFE99C47)

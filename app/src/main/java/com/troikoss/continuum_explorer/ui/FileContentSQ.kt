@@ -134,7 +134,7 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     // Dynamic column count based on view mode and actual grid layout
     val columnCount by remember(gridState, viewMode, containerCoordinates?.size?.width, appState.folderConfigs.gridItemSize, density) {
         derivedStateOf {
-            if (viewMode == ViewMode.DETAILS || viewMode == ViewMode.CONTENT) {
+            if (viewMode == ViewMode.DETAILS || viewMode == ViewMode.CONTENT || viewMode == ViewMode.MUSIC) {
                 1
             } else {
                 val visibleItems = gridState.layoutInfo.visibleItemsInfo
@@ -320,13 +320,14 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                                 appState.getCurrentStorageKey()
                             )
                         }
-                        ViewMode.CONTENT -> {
+                        ViewMode.CONTENT, ViewMode.MUSIC -> {
                             val newSize = (appState.folderConfigs.contentItemSize * factor).toInt()
                             appState.folderConfigs.updateContentSize(
                                 newSize.coerceIn(32, 120),
                                 appState.getCurrentStorageKey()
                             )
                         }
+
                     }
                 },
                 onDragStart = { offset ->

@@ -133,7 +133,11 @@ class FolderConfigurations(private val context: Context) {
                 } catch (_: Exception) {}
             }
         }
-        val fallback = if (key == "virtual://gallery" || key?.startsWith("virtual://gallery_album:") == true) ViewMode.GALLERY else SettingsManager.defaultViewMode.value
+        val fallback = when {
+            key == "virtual://gallery" || key?.startsWith("virtual://gallery_album:") == true -> ViewMode.GALLERY
+            key == "virtual://music" || key?.startsWith("virtual://music/") == true || key?.startsWith("virtual://music_album:") == true -> ViewMode.MUSIC
+            else -> SettingsManager.defaultViewMode.value
+        }
         updateViewMode(fallback, null)
     }
 

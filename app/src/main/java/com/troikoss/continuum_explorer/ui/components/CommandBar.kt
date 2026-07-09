@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Restore
@@ -459,6 +460,7 @@ private fun ViewMenuDropDown(appState: FileExplorerState) {
         ViewMode.CONTENT -> Icons.AutoMirrored.Filled.List
         ViewMode.GRID -> Icons.Default.ViewModule
         ViewMode.GALLERY -> Icons.Default.PhotoLibrary
+        ViewMode.MUSIC -> Icons.Default.MusicNote
     }
 
     CommandDropDown(text = stringResource(R.string.menu_view), icon = viewIcon) { onDismiss ->

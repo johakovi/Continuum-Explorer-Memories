@@ -416,8 +416,11 @@ object IconHelper {
             rememberVectorPainter(getIconForItem(file))
         }
 
+        val name = file.name.lowercase()
+        val isAudio = name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
+                name.endsWith(".m4a") || name.endsWith(".flac")
+
         if (!file.isDirectory && isMimeTypePreviewable(file)) {
-            val name = file.name.lowercase()
             when {
                 name.endsWith(".pdf") -> PdfThumbnail(file, fallbackPainter, modifier, iconSize, finalTint)
                 name.endsWith(".apk") -> ApkThumbnail(file, fallbackPainter, modifier, iconSize, finalTint)
@@ -432,17 +435,19 @@ object IconHelper {
                         if (painter.state is AsyncImagePainter.State.Success) {
                             SubcomposeAsyncImageContent()
                         } else {
-                            Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
+                            val painterToUse = if (isAudio) painterResource(R.drawable.ic_audio) else fallbackPainter
+                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = if (isAudio) Color.Unspecified else finalTint)
                         }
                     }
                 }
             }
         } else {
+            val painterToUse = if (isAudio) painterResource(R.drawable.ic_audio) else fallbackPainter
             Icon(
-                painter = fallbackPainter,
+                painter = painterToUse,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
-                tint = finalTint
+                tint = if (isAudio) Color.Unspecified else finalTint
             )
         }
     }
@@ -672,7 +677,8 @@ object IconHelper {
 
     private val PREVIEWABLE_EXTENSIONS = setOf(
         ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp",
-        ".mp4", ".mkv", ".avi", ".pdf", ".apk", ".txt"
+        ".mp4", ".mkv", ".avi", ".pdf", ".apk", ".txt",
+        ".mp3", ".wav", ".ogg", ".m4a", ".flac"
     )
 
     // --- Internal Thumbnail Helpers ---
