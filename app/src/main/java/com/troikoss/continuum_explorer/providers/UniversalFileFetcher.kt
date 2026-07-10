@@ -7,6 +7,7 @@ import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.utils.RemoteCache
 import okio.buffer
@@ -18,6 +19,35 @@ class UniversalFileFetcher(
     private val options: Options,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
+        val isAudio = file.mimeType?.startsWith("audio/") == true || 
+                listOf(".mp3", ".wav", ".ogg", ".m4a", ".flac").any { file.name.lowercase().endsWith(it) }
+
+        if (file.mimeType == "album") {
+            val coverPath = MusicMetadataManager.getCoverPath(file.name, options.context)
+            if (coverPath != null) {
+                val coverFile = java.io.File(coverPath)
+                if (coverFile.exists()) {
+                    return SourceResult(
+                        source = ImageSource(file = coverFile.absolutePath.toPath(), fileSystem = okio.FileSystem.SYSTEM),
+                        mimeType = "image/jpeg",
+                        dataSource = DataSource.DISK
+                    )
+                }
+            }
+        } else if (isAudio) {
+            val coverPath = MusicMetadataManager.getCoverPathForSong(options.context, file)
+            if (coverPath != null) {
+                val coverFile = java.io.File(coverPath)
+                if (coverFile.exists()) {
+                    return SourceResult(
+                        source = ImageSource(file = coverFile.absolutePath.toPath(), fileSystem = okio.FileSystem.SYSTEM),
+                        mimeType = "image/jpeg",
+                        dataSource = DataSource.DISK
+                    )
+                }
+            }
+        }
+
         val useCache = file.provider.capabilities.isRemote
         val source = if (useCache) {
             val cachedFile = RemoteCache.cache(options.context, file)

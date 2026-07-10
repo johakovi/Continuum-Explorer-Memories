@@ -19,6 +19,7 @@ import com.troikoss.continuum_explorer.managers.DownloadsManager
 import com.troikoss.continuum_explorer.managers.GalleryManager
 import com.troikoss.continuum_explorer.managers.GamesManager
 import com.troikoss.continuum_explorer.managers.MusicManager
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
 import com.troikoss.continuum_explorer.managers.SelectionManager
@@ -213,11 +214,13 @@ class FileExplorerState(
             } else if (libraryItem == LibraryItem.Documents) {
                 context.getString(R.string.nav_documents)
             } else if (libraryItem == LibraryItem.Music) {
-                val p = currentPath?.path ?: ""
+                val pathStr = currentPath?.path ?: ""
+                val normalized = pathStr.replace("//", "/").removeSuffix("/")
                 when {
-                    p.contains("music/songs") -> context.getString(R.string.audio)
-                    p.contains("music/albums") -> context.getString(R.string.menu_music_albums)
-                    p.contains("music/playlists") -> "Playlists"
+                    normalized.endsWith("/music/songs") -> context.getString(R.string.audio)
+                    normalized.endsWith("/music/albums") -> context.getString(R.string.menu_music_albums)
+                    normalized.endsWith("/music/favourites") -> context.getString(R.string.menu_music_favourites)
+                    normalized.endsWith("/music/playlists") -> context.getString(R.string.menu_music_playlists)
                     currentPath != null -> currentPath!!.name
                     else -> context.getString(R.string.nav_music)
                 }
@@ -292,12 +295,28 @@ class FileExplorerState(
             )
 
             libraryItem == LibraryItem.Music -> {
-                val p = currentPath?.path ?: ""
+                val pathStr = currentPath?.path ?: ""
+                val normalized = pathStr.replace("//", "/").removeSuffix("/")
+                
+                val isSongs = normalized.endsWith("/music/songs")
+                val isAlbumsRoot = normalized.endsWith("/music/albums")
+                val isFavourites = normalized.endsWith("/music/favourites")
+                val isPlaylists = normalized.endsWith("/music/playlists")
+                val isSpecificAlbum = normalized.contains("/music/albums/") || pathStr.contains("#album:")
+                
+                val albumName = when {
+                    pathStr.contains("#album:") -> pathStr.substringAfterLast("#album:")
+                    isSpecificAlbum -> pathStr.substringAfterLast("/")
+                    else -> currentPath?.name ?: ""
+                }
+                
                 UniversalFile(
                     name = when {
-                        p.contains("music/songs") -> context.getString(R.string.audio)
-                        p.contains("music/albums") -> context.getString(R.string.menu_music_albums)
-                        p.contains("music/playlists") -> "Playlists"
+                        isSongs -> context.getString(R.string.audio)
+                        isAlbumsRoot -> context.getString(R.string.menu_music_albums)
+                        isFavourites -> "Favourites"
+                        isPlaylists -> "Playlists"
+                        isSpecificAlbum -> albumName
                         currentPath != null -> currentPath!!.name
                         else -> context.getString(R.string.nav_music)
                     },
@@ -305,7 +324,8 @@ class FileExplorerState(
                     lastModified = 0L,
                     length = 0L,
                     provider = LocalProvider,
-                    providerId = currentPath?.path ?: "virtual://music",
+                    providerId = pathStr.ifEmpty { "virtual://music" },
+                    mimeType = if (isSpecificAlbum) "album" else null
                 )
             }
 
@@ -556,16 +576,27 @@ class FileExplorerState(
                         else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
                     }
                     LibraryItem.Music -> {
-                        val p = currentPath?.path ?: ""
+                        val pathStr = currentPath?.path ?: ""
+                        val normalized = pathStr.replace("//", "/").removeSuffix("/")
                         when {
                             currentPath == null -> listOf(
                                 UniversalFile("Songs", true, 0, 0, LocalProvider, "virtual://music/songs", "virtual://music"),
                                 UniversalFile("Albums", true, 0, 0, LocalProvider, "virtual://music/albums", "virtual://music"),
+                                UniversalFile("Favourites", true, 0, 0, LocalProvider, "virtual://music/favourites", "virtual://music"),
                                 UniversalFile("Playlists", true, 0, 0, LocalProvider, "virtual://music/playlists", "virtual://music")
                             )
-                            p.contains("songs") -> MusicManager.getMusicFiles(context, if (SettingsManager.isMusicFilterEnabled.value) SettingsManager.musicFolders.value else emptySet())
-                            p.contains("albums") -> MusicManager.getMusicAlbums(context, if (SettingsManager.isMusicFilterEnabled.value) SettingsManager.musicFolders.value else emptySet())
-                            p.contains("playlists") -> emptyList() // TODO: Implement playlists
+                            normalized.endsWith("/music/songs") -> MusicMetadataManager.getSongs(context)
+                            normalized.endsWith("/music/albums") -> MusicMetadataManager.getAlbums(context)
+                            normalized.endsWith("/music/favourites") -> MusicMetadataManager.getFavourites(context)
+                            normalized.endsWith("/music/playlists") -> emptyList()
+                            normalized.contains("/music/albums/") -> {
+                                val albumName = pathStr.substringAfterLast("/")
+                                MusicMetadataManager.getSongsForAlbum(context, albumName)
+                            }
+                            pathStr.contains("#album:") -> {
+                                val albumName = pathStr.substringAfterLast("#album:")
+                                MusicMetadataManager.getSongsForAlbum(context, albumName)
+                            }
                             else -> MusicManager.getMusicAlbumContents(context, currentPath!!.absolutePath)
                         }
                     }
@@ -737,12 +768,14 @@ class FileExplorerState(
             if (currentPath != null) "virtual://gallery_album:${currentPath!!.absolutePath}"
             else "virtual://gallery"
         } else if (libraryItem == LibraryItem.Music) {
-            val p = currentPath?.path ?: ""
+            val pathStr = currentPath?.path ?: ""
+            val normalized = pathStr.replace("//", "/").removeSuffix("/")
             when {
-                p.contains("music/songs") -> "virtual://music/songs"
-                p.contains("music/albums") -> "virtual://music/albums"
-                p.contains("music/playlists") -> "virtual://music/playlists"
-                currentPath != null -> "virtual://music_album:${currentPath!!.absolutePath}"
+                normalized.endsWith("/music/songs") -> "virtual://music/songs"
+                normalized.endsWith("/music/albums") -> "virtual://music/albums"
+                normalized.endsWith("/music/favourites") -> "virtual://music/favourites"
+                normalized.endsWith("/music/playlists") -> "virtual://music/playlists"
+                normalized.contains("/music/albums/") || pathStr.contains("#album:") -> "virtual://music_album:${currentPath!!.absolutePath}"
                 else -> "virtual://music"
             }
         } else if (libraryItem == LibraryItem.Recent) {

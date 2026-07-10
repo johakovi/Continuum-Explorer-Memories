@@ -283,6 +283,9 @@
     <string name="menu_grid">Grid</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_music">Music</string>
+    <string name="menu_sync_list">Sync List</string>
+    <string name="menu_music_playlists">Playlists</string>
+    <string name="menu_music_favourites">Favourites</string>
     <string name="menu_content">Content</string>
     <string name="menu_subtitles">Subtitles</string>
     <string name="menu_audio_track">Audio Track</string>

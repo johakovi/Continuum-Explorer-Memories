@@ -286,6 +286,25 @@ fun FileExplorerState.goUp() {
         return
     }
 
+    if (libraryItem == LibraryItem.Music && currentPath != null) {
+        val leavingPath = currentPath
+        val p = currentPath!!.path.replace("//", "/")
+        val targetPath = when {
+            p.contains("virtual:/music/") -> {
+                val parent = currentPath?.parentFile
+                val parentPath = parent?.path?.replace("//", "/")
+                if (parentPath == "virtual:/music" || parentPath == "virtual:") null else parent
+            }
+            else -> {
+                val parentDir = currentPath?.parentFile
+                if (parentDir == null || parentDir.absolutePath == storageRoot.absolutePath || !parentDir.exists()) null else parentDir
+            }
+        }
+        navigateTo(newPath = targetPath, newUri = null, libraryItem = LibraryItem.Music)
+        if (targetPath != null) focusItemInList(leavingPath, null)
+        return
+    }
+
     var destinationPath: File? = null
     var destinationUri: Uri? = null
     var leavingPath: File? = null

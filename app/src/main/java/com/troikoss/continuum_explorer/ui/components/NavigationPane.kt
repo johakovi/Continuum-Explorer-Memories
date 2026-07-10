@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -69,10 +68,9 @@ import com.troikoss.continuum_explorer.model.NetworkProtocol
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.GlobalEvents
-import com.troikoss.continuum_explorer.managers.SettingsManager
-import com.troikoss.continuum_explorer.managers.ShizukuManager
-import com.troikoss.continuum_explorer.managers.GamesManager
 import com.troikoss.continuum_explorer.managers.IconTheme
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
+import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.IconHelper
@@ -1156,8 +1154,22 @@ fun MusicFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        TextButton(
+                            onClick = {
+                                appState.scope.launch(Dispatchers.IO) {
+                                    MusicMetadataManager.sync(context, folders)
+                                    GlobalEvents.triggerRefresh()
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Default.Sync, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.menu_sync_list))
+                        }
+
                         TextButton(onClick = { appState.isConfiguringMusicFolders = false }) {
                             Text(stringResource(R.string.done))
                         }
@@ -1416,6 +1428,18 @@ private fun NavContextMenu(
                         // Playlist creation logic could go here
                     },
                     leadingIcon = { Icon(Icons.Default.PlaylistAdd, null) }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_sync_list)) },
+                    onClick = {
+                        onDismissRequest()
+                        appState.scope.launch(Dispatchers.IO) {
+                            MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
+                            GlobalEvents.triggerRefresh()
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.Sync, null) }
                 )
                 HorizontalDivider()
             }

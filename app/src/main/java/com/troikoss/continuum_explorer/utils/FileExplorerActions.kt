@@ -11,7 +11,6 @@ import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.UndoManager
-import com.troikoss.continuum_explorer.ui.activities.MainActivity
 import com.troikoss.continuum_explorer.ui.activities.NewWindowActivity
 import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.LibraryItem
@@ -41,7 +40,7 @@ fun FileExplorerState.open(item: UniversalFile) {
             if (itemFileRef != null) {
                 when {
                     libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
-                    item.providerId.startsWith("virtual://music") -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
+                    item.providerId.startsWith("virtual://music") || item.mimeType == "album" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
                     else -> {
                         safStack.clear()
                         navigateTo(itemFileRef, null)
@@ -68,9 +67,17 @@ fun FileExplorerState.open(item: UniversalFile) {
         val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
         val audioExtensions = setOf("mp3", "wav", "ogg", "m4a", "aac", "flac")
         
-        val siblings = if (imageExtensions.contains(extension) || audioExtensions.contains(extension)) {
-            val targets = if (imageExtensions.contains(extension)) imageExtensions else audioExtensions
-            files.filter { !it.isDirectory && targets.contains(it.name.substringAfterLast('.', "").lowercase()) }
+        val isImage = imageExtensions.contains(extension) || item.mimeType?.startsWith("image/") == true
+        val isAudio = audioExtensions.contains(extension) || item.mimeType?.startsWith("audio/") == true
+
+        val siblings = if (isImage || isAudio) {
+            files.filter { sibling ->
+                !sibling.isDirectory && if (isImage) {
+                    imageExtensions.contains(sibling.name.substringAfterLast('.', "").lowercase()) || sibling.mimeType?.startsWith("image/") == true
+                } else {
+                    audioExtensions.contains(sibling.name.substringAfterLast('.', "").lowercase()) || sibling.mimeType?.startsWith("audio/") == true
+                }
+            }
         } else emptyList()
 
         when {

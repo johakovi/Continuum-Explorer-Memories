@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.SliderDefaults as SliderDefaults2
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import ir.mahozad.multiplatform.wavyslider.material.WavySlider
 import ir.mahozad.multiplatform.wavyslider.WaveDirection
 import com.troikoss.continuum_explorer.managers.AudioManager
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.R
 
 @Composable
@@ -36,6 +38,8 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
     val currentTitle = AudioManager.currentTitle
     val currentArtist = AudioManager.currentArtist
     val isPlaying = AudioManager.isAudioPlaying
+    val isShuffleEnabled = AudioManager.isShuffleEnabled
+    val isRepeatEnabled = AudioManager.isRepeatEnabled
     val position = AudioManager.currentPosition
     val duration = AudioManager.duration
     val playlist = AudioManager.playlist
@@ -140,7 +144,7 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
 
                                 val listState = rememberLazyListState()
                                 LaunchedEffect(currentIndex) {
-                                    if (currentIndex >= 0 && isExpanded) {
+                                    if (currentIndex >= 0) {
                                         listState.animateScrollToItem(currentIndex)
                                     }
                                 }
@@ -152,6 +156,8 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                                 ) {
                                     itemsIndexed(playlist) { index, file ->
                                         val isCurrent = index == currentIndex
+                                        val isFavourite = MusicMetadataManager.isFavourite(file.providerId)
+                                        
                                         ListItem(
                                             headlineContent = {
                                                 Text(
@@ -174,6 +180,16 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                                                         Icons.Default.MusicNote,
                                                         contentDescription = null,
                                                         tint = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                            },
+                                            trailingContent = {
+                                                IconButton(onClick = { MusicMetadataManager.toggleFavourite(context, file.providerId) }) {
+                                                    Icon(
+                                                        painter = painterResource(id = if (isFavourite) R.drawable.ic_music_favourite else R.drawable.ic_music_not_favourite),
+                                                        contentDescription = "Favourite",
+                                                        tint = if (isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                        modifier = Modifier.size(24.dp)
                                                     )
                                                 }
                                             },
@@ -202,7 +218,7 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 24.dp),
+                                    .padding(horizontal = 40.dp), // Increased padding from 24.dp to 40.dp for gap
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
@@ -234,18 +250,45 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                                             tint = if (isExpanded) MaterialTheme.colorScheme.primary else LocalContentColor.current
                                         )
                                     }
+                                    IconButton(onClick = { AudioManager.toggleShuffle() }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Shuffle,
+                                            contentDescription = "Shuffle",
+                                            tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                        )
+                                    }
+                                    IconButton(onClick = { AudioManager.toggleRepeat() }) {
+                                        Icon(
+                                            imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
+                                            contentDescription = "Repeat",
+                                            tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                        )
+                                    }
                                     IconButton(onClick = { AudioManager.playPrevious() }) {
                                         Icon(Icons.Default.SkipPrevious, contentDescription = "Previous")
                                     }
                                     FilledIconButton(
                                         onClick = { AudioManager.togglePlayPause() },
                                         modifier = Modifier.size(48.dp),
-                                        shape = CircleShape
-                                    ) {
-                                        Icon(
-                                            imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                            contentDescription = if (isPlaying) "Pause" else "Play"
+                                        shape = CircleShape,
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
                                         )
+                                    ) {
+                                        AnimatedContent(
+                                            targetState = isPlaying,
+                                            transitionSpec = {
+                                                fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.5f) togetherWith
+                                                        fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.5f)
+                                            },
+                                            label = "PlayPauseAnimation"
+                                        ) { playing ->
+                                            Icon(
+                                                imageVector = if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                                contentDescription = if (playing) "Pause" else "Play"
+                                            )
+                                        }
                                     }
                                     IconButton(onClick = { AudioManager.playNext() }) {
                                         Icon(Icons.Default.SkipNext, contentDescription = "Next")
@@ -263,15 +306,20 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                                 value = progress,
                                 onValueChange = { AudioManager.seekTo((it * duration).toLong()) },
                                 enabled = true,
-                                waveLength = 37.dp,
-                                waveHeight = if (isPlaying) 20.dp else 0.dp,
+                                waveLength = 45.dp,
+                                waveHeight = if (isPlaying) 12.dp else 0.dp,
                                 waveVelocity = 20.dp to WaveDirection.TAIL,
                                 waveThickness = 4.dp,
                                 trackThickness = 10.dp,
                                 incremental = true,
+                                colors = SliderDefaults2.colors(
+                                    thumbColor = MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 24.dp)
+                                    .padding(horizontal = 40.dp) // Match horizontal padding for alignment
                                     .padding(bottom = 12.dp)
                             )
                         }

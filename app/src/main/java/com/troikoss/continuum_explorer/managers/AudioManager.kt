@@ -7,7 +7,6 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import com.troikoss.continuum_explorer.providers.ProviderDataSource
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +22,8 @@ object AudioManager {
     var currentTitle by mutableStateOf<String?>(null)
     var currentArtist by mutableStateOf<String?>(null)
     var isAudioPlaying by mutableStateOf(false)
+    var isShuffleEnabled by mutableStateOf(false)
+    var isRepeatEnabled by mutableStateOf(false)
     var isMinimized by mutableStateOf(false)
     var isExpanded by mutableStateOf(false)
     var currentPosition by mutableLongStateOf(0L)
@@ -39,6 +40,8 @@ object AudioManager {
             exoPlayer = ExoPlayer.Builder(context)
                 .setMediaSourceFactory(mediaSourceFactory)
                 .build().apply {
+                shuffleModeEnabled = isShuffleEnabled
+                repeatMode = if (isRepeatEnabled) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
                 addListener(object : Player.Listener {
                     override fun onIsPlayingChanged(isPlayingNow: Boolean) {
                         isAudioPlaying = isPlayingNow
@@ -119,15 +122,34 @@ object AudioManager {
         }
     }
 
+    fun toggleShuffle() {
+        isShuffleEnabled = !isShuffleEnabled
+        exoPlayer?.shuffleModeEnabled = isShuffleEnabled
+    }
+
+    fun toggleRepeat() {
+        isRepeatEnabled = !isRepeatEnabled
+        exoPlayer?.repeatMode = if (isRepeatEnabled) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+    }
+
     fun playNext() {
-        if (exoPlayer?.hasNextMediaItem() == true) {
-            exoPlayer?.seekToNext()
+        exoPlayer?.let {
+            if (it.hasNextMediaItem()) {
+                it.seekToNext()
+            } else if (playlist.isNotEmpty()) {
+                // If we're at the end and repeat is off, manually wrap around for the button click
+                it.seekToDefaultPosition(0)
+            }
         }
     }
 
     fun playPrevious() {
-        if (exoPlayer?.hasPreviousMediaItem() == true) {
-            exoPlayer?.seekToPrevious()
+        exoPlayer?.let {
+            if (it.hasPreviousMediaItem()) {
+                it.seekToPrevious()
+            } else if (playlist.isNotEmpty()) {
+                it.seekToDefaultPosition(playlist.size - 1)
+            }
         }
     }
 

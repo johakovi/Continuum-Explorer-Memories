@@ -79,7 +79,6 @@ import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.ui.theme.ExtendedColors
-import com.troikoss.continuum_explorer.ui.theme.ThemeMusicIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -282,7 +281,7 @@ object IconHelper {
             if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
-                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") -> extendedColors.musicIcon
+                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> extendedColors.musicIcon
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
@@ -329,6 +328,33 @@ object IconHelper {
         }
 
         if (file.isDirectory) {
+            val isAlbum = file.mimeType == "album" || file.providerId.startsWith("virtual://music_album:")
+            
+            if (isAlbum) {
+                val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
+                Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
+                    SubcomposeAsyncImage(
+                        model = file,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = contentScale,
+                    ) {
+                        if (painter.state is AsyncImagePainter.State.Success) {
+                            SubcomposeAsyncImageContent()
+                        } else {
+                            val albumRes = if (isDuo) R.drawable.ic_music_album else R.drawable.ic_music_album
+                            Icon(
+                                painter = rememberThemePainter(resId = albumRes),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                tint = finalTint
+                            )
+                        }
+                    }
+                }
+                return
+            }
+
             val overlayRes = getOverlayIconRes(file)
             val rootCustomIconName = getRootFolderCustomIconName(file.name, file.providerId)
             val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
@@ -384,6 +410,7 @@ object IconHelper {
                         val musicRes = when {
                             providerPath.endsWith("/songs") -> R.drawable.ic_music_music
                             providerPath.endsWith("/albums") -> R.drawable.ic_music_album
+                            providerPath.endsWith("/favourites") -> R.drawable.ic_music_favourite
                             providerPath.endsWith("/playlists") -> R.drawable.ic_music_playlist
                             else -> R.drawable.ic_music_logo
                         }
@@ -436,7 +463,7 @@ object IconHelper {
 
         val name = file.name.lowercase()
         val isAudio = name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                name.endsWith(".m4a") || name.endsWith(".flac")
+                name.endsWith(".m4a") || name.endsWith(".flac") || file.mimeType?.startsWith("audio/") == true
 
         if (!file.isDirectory && isMimeTypePreviewable(file)) {
             when {
@@ -445,7 +472,7 @@ object IconHelper {
                 name.endsWith(".txt") -> TextFilePreview(file, fallbackPainter, modifier, iconSize, finalTint, isDetailView)
                 else -> {
                     SubcomposeAsyncImage(
-                        model = if (file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath),
+                        model = if (isAudio || file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath),
                         contentDescription = null,
                         modifier = modifier,
                         contentScale = contentScale,
@@ -453,19 +480,25 @@ object IconHelper {
                         if (painter.state is AsyncImagePainter.State.Success) {
                             SubcomposeAsyncImageContent()
                         } else {
-                            val painterToUse = if (isAudio) painterResource(R.drawable.ic_audio) else fallbackPainter
-                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = if (isAudio) ThemeMusicIcon else finalTint)
+                            val painterToUse = if (isAudio) {
+                                val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
+                                painterResource(audioRes)
+                            } else fallbackPainter
+                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
                         }
                     }
                 }
             }
         } else {
-            val painterToUse = if (isAudio) painterResource(R.drawable.ic_audio) else fallbackPainter
+            val painterToUse = if (isAudio) {
+                val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
+                painterResource(audioRes)
+            } else fallbackPainter
             Icon(
                 painter = painterToUse,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
-                tint = if (isAudio) Color.Unspecified else finalTint
+                tint = finalTint
             )
         }
     }
@@ -491,6 +524,7 @@ object IconHelper {
                 else -> Icons.Default.Folder
             }
         }
+        if (file.mimeType?.startsWith("audio/") == true) return Icons.Default.AudioFile
         return getIconByFileName(file.name)
     }
 
@@ -542,8 +576,9 @@ object IconHelper {
                 file.providerId == "virtual://music" -> R.drawable.ic_music_logo
                 file.providerId == "virtual://music/songs" -> R.drawable.ic_music_music
                 file.providerId == "virtual://music/albums" -> R.drawable.ic_music_album
+                file.providerId == "virtual://music/favourites" -> R.drawable.ic_music_favourite
                 file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_playlist
-                file.providerId.startsWith("virtual://music_album:") -> R.drawable.ic_music_logo
+                file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> R.drawable.ic_music_album
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
@@ -552,6 +587,9 @@ object IconHelper {
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
                 else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
+        }
+        if (file.mimeType?.startsWith("audio/") == true) {
+            return if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
         }
         return getDrawableByFileName(file.name, iconTheme)
     }
@@ -576,7 +614,7 @@ object IconHelper {
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
             name.endsWith(".sh") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_terminal_duo else R.drawable.ic_terminal
             name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                     name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_duo else R.drawable.ic_audio
+                     name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
             name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
                     name.endsWith(".mov") || name.endsWith(".webm") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_video_duo else R.drawable.ic_video
             name.endsWith(".m4a") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_rec_duo else R.drawable.ic_audio_rec
@@ -691,7 +729,7 @@ object IconHelper {
 
         fun isMimeTypePreviewable(file: UniversalFile): Boolean {
         val name = file.name.lowercase()
-        return PREVIEWABLE_EXTENSIONS.any { name.endsWith(it) }
+        return PREVIEWABLE_EXTENSIONS.any { name.endsWith(it) } || file.mimeType?.startsWith("audio/") == true
     }
 
     private val PREVIEWABLE_EXTENSIONS = setOf(

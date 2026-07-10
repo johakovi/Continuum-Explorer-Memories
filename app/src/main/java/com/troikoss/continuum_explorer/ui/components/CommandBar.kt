@@ -74,6 +74,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.UndoManager
 import com.troikoss.continuum_explorer.model.FileColumnType
@@ -81,6 +82,7 @@ import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -99,9 +101,10 @@ fun CommandBar(
     val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     var hasClipboardItems by remember { mutableStateOf(clipboard.hasPrimaryClip()) }
 
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.Music)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
+    val isInMusic = appState.libraryItem == LibraryItem.Music
 
     DisposableEffect(clipboard) {
         val listener = ClipboardManager.OnPrimaryClipChangedListener {
@@ -165,6 +168,19 @@ fun CommandBar(
                 SortDropDown(appState, isInRecycleBin)
 
                 ViewMenuDropDown(appState)
+
+                if (isInMusic) {
+                    CommandButton(
+                        text = stringResource(R.string.menu_sync_list),
+                        icon = Icons.Default.MusicNote,
+                        onClick = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                MusicMetadataManager.sync(context, SettingsManager.musicFolders.value)
+                                GlobalEvents.triggerRefresh()
+                            }
+                        }
+                    )
+                }
 
                 VerticalDivider()
 

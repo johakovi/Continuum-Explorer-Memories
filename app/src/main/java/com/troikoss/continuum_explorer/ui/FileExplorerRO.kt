@@ -121,6 +121,7 @@ fun FileExplorerRO(
                     )
                     item.absolutePath == "virtual://recent" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Recent)
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
+                    item.absolutePath == "virtual://music" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Music)
                     item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
                     item.absolutePath == "virtual://games_manager" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Games)

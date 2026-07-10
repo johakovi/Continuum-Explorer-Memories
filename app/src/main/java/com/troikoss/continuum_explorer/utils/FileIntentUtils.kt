@@ -174,11 +174,11 @@ private fun launchOpenWithIntent(context: Context, uri: Uri, fileName: String? =
  * Opens a remote file by caching it locally first, then launching the appropriate viewer.
  */
 fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
-    val mime = MimeTypeMap.getSingleton()
-        .getMimeTypeFromExtension(file.name.substringAfterLast('.', "").lowercase())
+    val extension = file.name.substringAfterLast('.', "").lowercase()
+    val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: file.mimeType
 
-    val isImage = mime?.startsWith("image/") == true
-    val isAudio = mime?.startsWith("audio/") == true
+    val isImage = mime?.startsWith("image/") == true || setOf("jpg", "jpeg", "png", "gif", "webp", "bmp").contains(extension)
+    val isAudio = mime?.startsWith("audio/") == true || setOf("mp3", "wav", "ogg", "m4a", "aac", "flac").contains(extension)
 
     scope.launch {
         try {
@@ -267,9 +267,9 @@ fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalF
                 // but we pass the original providerId in the intent for saving back.
                 val tempFile = file.copy(providerId = cached.absolutePath, provider = LocalProvider)
                 
-                // If it's an audio file, we need to make sure siblings are also handled or at least this file is played
-                val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(tempFile.name.substringAfterLast('.', "").lowercase())
-                if (mime?.startsWith("audio/") == true) {
+                val extension = tempFile.name.substringAfterLast('.', "").lowercase()
+                val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: tempFile.mimeType
+                if (mime?.startsWith("audio/") == true || setOf("mp3", "wav", "ogg", "m4a", "aac", "flac").contains(extension)) {
                     AudioManager.play(context, tempFile, siblings)
                 } else {
                     openFile(context, tempFile, originalFile = file, siblings = siblings)
