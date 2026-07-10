@@ -31,7 +31,11 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.window.PopupPositionProvider
+import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.selectionBackground
 import com.troikoss.continuum_explorer.model.*
@@ -41,7 +45,6 @@ import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
 import com.troikoss.continuum_explorer.utils.IconHelper.isMimeTypePreviewable
 import com.troikoss.continuum_explorer.R
-import com.troikoss.continuum_explorer.ui.theme.ThemeAudio
 
 
 /**
@@ -416,6 +419,9 @@ private fun FileMusicView(
     var isOverflowing by remember { mutableStateOf(value = false) }
     val shape = RoundedCornerShape(12.dp)
     val itemSize = 40.dp
+    
+    val isCurrentTrack = AudioManager.currentTrack?.providerId == file.providerId
+    val isPlaying = isCurrentTrack && AudioManager.isAudioPlaying
 
     Surface(
         modifier = Modifier
@@ -431,11 +437,25 @@ private fun FileMusicView(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (isCurrentTrack) {
+                IconButton(
+                    onClick = { AudioManager.togglePlayPause() },
+                    modifier = Modifier.size(itemSize).padding(end = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = if (isPlaying) "Pause" else "Play",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
             Box {
                 FileThumbnail(
                     file = file,
                     selected = isSelected,
-                    tint = if (isSelected) MaterialTheme.colorScheme.primary else ThemeAudio,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(itemSize),
                     iconSize = itemSize,
                     contentScale = ContentScale.Crop
@@ -515,6 +535,9 @@ private fun FileDetailsView(
     val shape = RoundedCornerShape(8.dp)
     val itemSize = appState.folderConfigs.detailsItemSize.dp
 
+    val isCurrentTrack = AudioManager.currentTrack?.providerId == file.providerId
+    val isPlaying = isCurrentTrack && AudioManager.isAudioPlaying
+
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Column(
             modifier = Modifier
@@ -526,6 +549,20 @@ private fun FileDetailsView(
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (isCurrentTrack) {
+                    IconButton(
+                        onClick = { AudioManager.togglePlayPause() },
+                        modifier = Modifier.size(itemSize + 8.dp).padding(end = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(itemSize)
+                        )
+                    }
+                }
+
                 Box{
                     val iconModifier = if (iconSelectionEnabled) {
                         Modifier.size(itemSize).iconTouchToggle(file, appState.selectionManager)

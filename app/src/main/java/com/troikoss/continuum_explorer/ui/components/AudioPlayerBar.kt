@@ -1,8 +1,9 @@
 package com.troikoss.continuum_explorer.ui.components
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -91,11 +94,17 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                         shadowElevation = 4.dp
                     ) {
                         Box(contentAlignment = Alignment.Center) {
+                            if (isPlaying) {
+                                AXWaveAnimation(
+                                    modifier = Modifier.fillMaxSize(),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_music_logo),
                                 contentDescription = "Expand Player",
                                 modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = if (isPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -111,217 +120,256 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                     tonalElevation = 8.dp,
                     shadowElevation = 4.dp
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { 
-                                if (AudioManager.isExpanded) {
-                                    AudioManager.isExpanded = false
-                                } else {
-                                    AudioManager.isMinimized = true 
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                        val availableWidth = maxWidth
+                        val showShuffleRepeatInMain = availableWidth > 450.dp
+                        val showName = availableWidth > 380.dp
+                        val horizontalPadding = if (availableWidth < 480.dp) 16.dp else 40.dp
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable { 
+                                    if (AudioManager.isExpanded) {
+                                        AudioManager.isExpanded = false
+                                    } else {
+                                        AudioManager.isMinimized = true 
+                                    }
+                                }
+                        ) {
+                            // Expanded Playlist View
+                            if (isExpanded) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 24.dp, start = 32.dp, end = 32.dp, bottom = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Playlist",
+                                            style = MaterialTheme.typography.titleLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        if (!showShuffleRepeatInMain) {
+                                            IconButton(onClick = { AudioManager.toggleShuffle() }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Shuffle,
+                                                    contentDescription = "Shuffle",
+                                                    tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                )
+                                            }
+                                            IconButton(onClick = { AudioManager.toggleRepeat() }) {
+                                                Icon(
+                                                    imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
+                                                    contentDescription = "Repeat",
+                                                    tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                )
+                                            }
+                                        }
+                                        IconButton(onClick = { AudioManager.isExpanded = false }) {
+                                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Collapse")
+                                        }
+                                    }
+
+                                    val listState = rememberLazyListState()
+                                    LaunchedEffect(currentIndex) {
+                                        if (currentIndex >= 0) {
+                                            listState.animateScrollToItem(currentIndex)
+                                        }
+                                    }
+
+                                    LazyColumn(
+                                        state = listState,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                                    ) {
+                                        itemsIndexed(playlist) { index, file ->
+                                            val isCurrent = index == currentIndex
+                                            val isFavourite = MusicMetadataManager.isFavourite(file.providerId)
+                                            
+                                            ListItem(
+                                                headlineContent = {
+                                                    Text(
+                                                        text = file.name,
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis,
+                                                        color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                                        fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
+                                                    )
+                                                },
+                                                leadingContent = {
+                                                    if (isCurrent && isPlaying) {
+                                                        Icon(
+                                                            Icons.AutoMirrored.Filled.VolumeUp,
+                                                            contentDescription = null,
+                                                            tint = MaterialTheme.colorScheme.primary
+                                                        )
+                                                    } else {
+                                                        Icon(
+                                                            Icons.Default.MusicNote,
+                                                            contentDescription = null,
+                                                            tint = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                },
+                                                trailingContent = {
+                                                    IconButton(onClick = { MusicMetadataManager.toggleFavourite(context, file.providerId) }) {
+                                                        Icon(
+                                                            painter = painterResource(id = if (isFavourite) R.drawable.ic_music_favourite else R.drawable.ic_music_not_favourite),
+                                                            contentDescription = "Favourite",
+                                                            tint = if (isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                            modifier = Modifier.size(24.dp)
+                                                        )
+                                                    }
+                                                },
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(30.dp))
+                                                    .clickable {
+                                                        AudioManager.play(context, file, playlist)
+                                                    },
+                                                colors = ListItemDefaults.colors(
+                                                    containerColor = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color.Transparent
+                                                )
+                                            )
+                                        }
+                                    }
+                                    HorizontalDivider(modifier = Modifier.padding(horizontal = 32.dp))
                                 }
                             }
-                    ) {
-                        // Expanded Playlist View
-                        if (isExpanded) {
-                            Column(modifier = Modifier.weight(1f)) {
+
+                            // Player Controls Area
+                            Column(
+                                modifier = Modifier
+                                    .then(if (isExpanded) Modifier.height(130.dp) else Modifier.fillMaxSize())
+                                    .padding(vertical = 8.dp),
+                                verticalArrangement = Arrangement.SpaceEvenly
+                            ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 24.dp, start = 32.dp, end = 32.dp, bottom = 8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                        .padding(horizontal = horizontalPadding),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "Playlist",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    IconButton(onClick = { AudioManager.isExpanded = false }) {
-                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Collapse")
-                                    }
-                                }
-
-                                val listState = rememberLazyListState()
-                                LaunchedEffect(currentIndex) {
-                                    if (currentIndex >= 0) {
-                                        listState.animateScrollToItem(currentIndex)
-                                    }
-                                }
-
-                                LazyColumn(
-                                    state = listState,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                                ) {
-                                    itemsIndexed(playlist) { index, file ->
-                                        val isCurrent = index == currentIndex
-                                        val isFavourite = MusicMetadataManager.isFavourite(file.providerId)
-                                        
-                                        ListItem(
-                                            headlineContent = {
-                                                Text(
-                                                    text = file.name,
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis,
-                                                    color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                                    fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
-                                                )
-                                            },
-                                            leadingContent = {
-                                                if (isCurrent && isPlaying) {
-                                                    Icon(
-                                                        Icons.AutoMirrored.Filled.VolumeUp,
-                                                        contentDescription = null,
-                                                        tint = MaterialTheme.colorScheme.primary
-                                                    )
-                                                } else {
-                                                    Icon(
-                                                        Icons.Default.MusicNote,
-                                                        contentDescription = null,
-                                                        tint = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                                    )
-                                                }
-                                            },
-                                            trailingContent = {
-                                                IconButton(onClick = { MusicMetadataManager.toggleFavourite(context, file.providerId) }) {
-                                                    Icon(
-                                                        painter = painterResource(id = if (isFavourite) R.drawable.ic_music_favourite else R.drawable.ic_music_not_favourite),
-                                                        contentDescription = "Favourite",
-                                                        tint = if (isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                        modifier = Modifier.size(24.dp)
-                                                    )
-                                                }
-                                            },
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(30.dp))
-                                                .clickable {
-                                                    AudioManager.play(context, file, playlist)
-                                                },
-                                            colors = ListItemDefaults.colors(
-                                                containerColor = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color.Transparent
-                                            )
-                                        )
-                                    }
-                                }
-                                HorizontalDivider(modifier = Modifier.padding(horizontal = 32.dp))
-                            }
-                        }
-
-                        // Player Controls Area
-                        Column(
-                            modifier = Modifier
-                                .then(if (isExpanded) Modifier.height(130.dp) else Modifier.fillMaxSize())
-                                .padding(vertical = 8.dp),
-                            verticalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 40.dp), // Increased padding from 24.dp to 40.dp for gap
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    val displayName = remember(currentTitle, currentArtist, currentTrack) {
-                                        if (!currentTitle.isNullOrBlank()) {
-                                            if (!currentArtist.isNullOrBlank()) "$currentArtist - $currentTitle" else currentTitle
-                                        } else {
-                                            currentTrack?.name ?: ""
-                                        }
-                                    }
-                                    Text(
-                                        text = displayName,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = formatTime(position) + " / " + formatTime(duration),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    IconButton(onClick = { AudioManager.isExpanded = !AudioManager.isExpanded }) {
-                                        Icon(
-                                            if (isExpanded) Icons.AutoMirrored.Filled.QueueMusic else Icons.AutoMirrored.Filled.PlaylistPlay,
-                                            contentDescription = "Playlist",
-                                            tint = if (isExpanded) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                                        )
-                                    }
-                                    IconButton(onClick = { AudioManager.toggleShuffle() }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Shuffle,
-                                            contentDescription = "Shuffle",
-                                            tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                                        )
-                                    }
-                                    IconButton(onClick = { AudioManager.toggleRepeat() }) {
-                                        Icon(
-                                            imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
-                                            contentDescription = "Repeat",
-                                            tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                                        )
-                                    }
-                                    IconButton(onClick = { AudioManager.playPrevious() }) {
-                                        Icon(Icons.Default.SkipPrevious, contentDescription = "Previous")
-                                    }
-                                    FilledIconButton(
-                                        onClick = { AudioManager.togglePlayPause() },
-                                        modifier = Modifier.size(48.dp),
-                                        shape = CircleShape,
-                                        colors = IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        verticalArrangement = Arrangement.Center
                                     ) {
-                                        AnimatedContent(
-                                            targetState = isPlaying,
-                                            transitionSpec = {
-                                                fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.5f) togetherWith
-                                                        fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.5f)
-                                            },
-                                            label = "PlayPauseAnimation"
-                                        ) { playing ->
-                                            Icon(
-                                                imageVector = if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                                contentDescription = if (playing) "Pause" else "Play"
+                                        if (showName) {
+                                            val displayName = remember(currentTitle, currentArtist, currentTrack) {
+                                                if (!currentTitle.isNullOrBlank()) {
+                                                    if (!currentArtist.isNullOrBlank()) "$currentArtist - $currentTitle" else currentTitle
+                                                } else {
+                                                    currentTrack?.name ?: ""
+                                                }
+                                            }
+                                            Text(
+                                                text = displayName,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
                                             )
                                         }
+                                        Text(
+                                            text = formatTime(position) + " / " + formatTime(duration),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
-                                    IconButton(onClick = { AudioManager.playNext() }) {
-                                        Icon(Icons.Default.SkipNext, contentDescription = "Next")
-                                    }
-                                    Spacer(Modifier.width(4.dp))
-                                    IconButton(onClick = { AudioManager.stop() }) {
-                                        Icon(Icons.Default.Close, contentDescription = "Close")
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { AudioManager.isExpanded = !AudioManager.isExpanded }) {
+                                            Icon(
+                                                if (isExpanded) Icons.AutoMirrored.Filled.QueueMusic else Icons.AutoMirrored.Filled.PlaylistPlay,
+                                                contentDescription = "Playlist",
+                                                tint = if (isExpanded) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                            )
+                                        }
+                                        if (showShuffleRepeatInMain) {
+                                            IconButton(onClick = { AudioManager.toggleShuffle() }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Shuffle,
+                                                    contentDescription = "Shuffle",
+                                                    tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                )
+                                            }
+                                            IconButton(onClick = { AudioManager.toggleRepeat() }) {
+                                                Icon(
+                                                    imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
+                                                    contentDescription = "Repeat",
+                                                    tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                )
+                                            }
+                                        }
+                                        IconButton(onClick = { AudioManager.playPrevious() }) {
+                                            Icon(Icons.Default.SkipPrevious, contentDescription = "Previous")
+                                        }
+                                        Box(contentAlignment = Alignment.Center) {
+                                            if (isPlaying) {
+                                                PlayPulseAnimation(
+                                                    modifier = Modifier.size(48.dp),
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                            FilledIconButton(
+                                                onClick = { AudioManager.togglePlayPause() },
+                                                modifier = Modifier.size(48.dp),
+                                                shape = CircleShape,
+                                                colors = IconButtonDefaults.filledIconButtonColors(
+                                                    containerColor = MaterialTheme.colorScheme.primary,
+                                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                                )
+                                            ) {
+                                                AnimatedContent(
+                                                    targetState = isPlaying,
+                                                    transitionSpec = {
+                                                        fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.5f) togetherWith
+                                                                fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.5f)
+                                                    },
+                                                    label = "PlayPauseAnimation"
+                                                ) { playing ->
+                                                    Icon(
+                                                        imageVector = if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                                        contentDescription = if (playing) "Pause" else "Play"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        IconButton(onClick = { AudioManager.playNext() }) {
+                                            Icon(Icons.Default.SkipNext, contentDescription = "Next")
+                                        }
+                                        Spacer(Modifier.width(4.dp))
+                                        IconButton(onClick = { AudioManager.stop() }) {
+                                            Icon(Icons.Default.Close, contentDescription = "Close")
+                                        }
                                     }
                                 }
+
+                                val progress = if (duration > 0) position.toFloat() / duration.toFloat() else 0f
+
+                                WavySlider(
+                                    value = progress,
+                                    onValueChange = { AudioManager.seekTo((it * duration).toLong()) },
+                                    enabled = true,
+                                    waveLength = 45.dp,
+                                    waveHeight = if (isPlaying) 12.dp else 0.dp,
+                                    waveVelocity = 20.dp to WaveDirection.TAIL,
+                                    waveThickness = 4.dp,
+                                    trackThickness = 10.dp,
+                                    incremental = true,
+                                    colors = SliderDefaults2.colors(
+                                        thumbColor = MaterialTheme.colorScheme.primary,
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = if (availableWidth < 480.dp) 24.dp else 40.dp) // Match horizontal padding for alignment
+                                        .padding(bottom = 12.dp)
+                                )
                             }
-
-                            val progress = if (duration > 0) position.toFloat() / duration.toFloat() else 0f
-
-                            WavySlider(
-                                value = progress,
-                                onValueChange = { AudioManager.seekTo((it * duration).toLong()) },
-                                enabled = true,
-                                waveLength = 45.dp,
-                                waveHeight = if (isPlaying) 12.dp else 0.dp,
-                                waveVelocity = 20.dp to WaveDirection.TAIL,
-                                waveThickness = 4.dp,
-                                trackThickness = 10.dp,
-                                incremental = true,
-                                colors = SliderDefaults2.colors(
-                                    thumbColor = MaterialTheme.colorScheme.primary,
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 40.dp) // Match horizontal padding for alignment
-                                    .padding(bottom = 12.dp)
-                            )
                         }
                     }
                 }
@@ -340,4 +388,94 @@ private fun formatTime(millis: Long): String {
     } else {
         String.format(locale, "%02d:%02d", minutes, seconds)
     }
+}
+
+@Composable
+fun AXWaveAnimation(
+    modifier: Modifier = Modifier,
+    color: Color
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "AXWave")
+    
+    val phase1 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(3000, easing = LinearEasing)),
+        label = "Phase1"
+    )
+    
+    val phase2 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing)),
+        label = "Phase2"
+    )
+
+    val waveHeight by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(tween(2500, easing = LinearOutSlowInEasing), repeatMode = RepeatMode.Reverse),
+        label = "WaveHeight"
+    )
+
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        
+        fun drawWave(phase: Float, alpha: Float, ampScale: Float, freq: Float, baseOffset: Float) {
+            val path = Path()
+            val baseLine = height * baseOffset
+            val amplitude = height * 0.2f * ampScale
+            
+            path.moveTo(0f, baseLine)
+            for (x in 0..width.toInt() step 5) {
+                val relX = x.toFloat() / width
+                val y = baseLine + kotlin.math.sin((relX * freq + phase) * 2f * Math.PI.toFloat()) * amplitude
+                path.lineTo(x.toFloat(), y)
+            }
+            path.lineTo(width, height)
+            path.lineTo(0f, height)
+            path.close()
+            drawPath(path, color.copy(alpha = alpha))
+        }
+
+        drawWave(phase1, 1f, 1f, 1.2f, 1f - waveHeight)
+        drawWave(phase2, 0.5f, 0.7f, 1.8f, 1f - (waveHeight * 0.9f))
+    }
+}
+
+@Composable
+fun PlayPulseAnimation(
+    modifier: Modifier = Modifier,
+    color: Color
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "PlayPulse")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "Scale"
+    )
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "Alpha"
+    )
+
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+            }
+            .background(color, CircleShape)
+    )
 }

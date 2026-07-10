@@ -281,7 +281,7 @@ object IconHelper {
             if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
-                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> extendedColors.musicIcon
+                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> MaterialTheme.colorScheme.primary
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon

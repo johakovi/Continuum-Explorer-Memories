@@ -76,6 +76,9 @@ object MusicMetadataManager {
     }
 
     fun getFavourites(context: Context): List<UniversalFile> {
+        if (songs.isEmpty()) {
+            loadMetadata(context)
+        }
         return songs.filter { favouritePaths.contains(it.filePath) }.map { song ->
             val file = File(song.filePath)
             UniversalFile(
