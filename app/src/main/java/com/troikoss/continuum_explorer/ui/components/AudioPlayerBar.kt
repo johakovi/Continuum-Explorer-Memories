@@ -5,6 +5,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -21,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,6 +53,7 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
     val isMinimized = AudioManager.isMinimized
     val isExpanded = AudioManager.isExpanded
     val context = LocalContext.current
+    val density = LocalDensity.current
 
     val configuration = LocalConfiguration.current
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -59,9 +63,31 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
     val bottomClearance = if (configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) 84.dp else 16.dp
     val maxHeight = configuration.screenHeightDp.dp - statusBarHeight - navBarHeight - bottomClearance - 23.dp
     
+    var verticalDragOffset by remember { mutableStateOf(0f) }
+    var horizontalDragOffset by remember { mutableStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+
+    val interactiveHeight = remember(verticalDragOffset, isExpanded) {
+        with(density) {
+            val offsetDp = -verticalDragOffset.toDp()
+            if (isExpanded) {
+                (maxHeight + offsetDp).coerceIn(120.dp, maxHeight)
+            } else {
+                (120.dp + offsetDp).coerceIn(120.dp, maxHeight)
+            }
+        }
+    }
+
     val animatedHeight by animateDpAsState(
-        targetValue = if (isExpanded) maxHeight.coerceAtLeast(120.dp) else 120.dp,
+        targetValue = if (isDragging) interactiveHeight else (if (isExpanded) maxHeight.coerceAtLeast(120.dp) else 120.dp),
+        animationSpec = if (isDragging) snap() else spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
         label = "PillHeight"
+    )
+
+    val animatedHorizontalOffset by animateFloatAsState(
+        targetValue = if (isDragging) horizontalDragOffset.coerceAtLeast(0f) else 0f,
+        animationSpec = if (isDragging) snap() else spring(dampingRatio = Spring.DampingRatioNoBouncy),
+        label = "CloseOffset"
     )
 
     AnimatedVisibility(
@@ -114,7 +140,12 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
-                        .height(animatedHeight),
+                        .height(animatedHeight)
+                        .graphicsLayer {
+                            translationX = animatedHorizontalOffset
+                            // Fade out as it slides away
+                            alpha = (1f - (animatedHorizontalOffset / size.width)).coerceIn(0f, 1f)
+                        },
                     shape = RoundedCornerShape(60.dp),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     tonalElevation = 8.dp,
@@ -124,21 +155,13 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                         val availableWidth = maxWidth
                         val showShuffleRepeatInMain = availableWidth > 450.dp
                         val showName = availableWidth > 380.dp
-                        val horizontalPadding = if (availableWidth < 480.dp) 16.dp else 40.dp
+                        val horizontalPadding = if (availableWidth < 480.dp) 28.dp else 40.dp
 
                         Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable { 
-                                    if (AudioManager.isExpanded) {
-                                        AudioManager.isExpanded = false
-                                    } else {
-                                        AudioManager.isMinimized = true 
-                                    }
-                                }
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             // Expanded Playlist View
-                            if (isExpanded) {
+                            if (isExpanded || isDragging) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Row(
                                         modifier = Modifier
@@ -244,6 +267,53 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                             Column(
                                 modifier = Modifier
                                     .then(if (isExpanded) Modifier.height(130.dp) else Modifier.fillMaxSize())
+                                    .pointerInput(Unit) {
+                                        detectDragGestures(
+                                            onDragStart = { 
+                                                isDragging = true
+                                                verticalDragOffset = 0f
+                                                horizontalDragOffset = 0f
+                                            },
+                                            onDrag = { change, dragAmount ->
+                                                change.consume()
+                                                verticalDragOffset += dragAmount.y
+                                                horizontalDragOffset += dragAmount.x
+                                            },
+                                            onDragEnd = {
+                                                isDragging = false
+                                                val vThreshold = 100f
+                                                val hThreshold = 150f
+                                                
+                                                if (kotlin.math.abs(horizontalDragOffset) > kotlin.math.abs(verticalDragOffset) && horizontalDragOffset > hThreshold) {
+                                                    AudioManager.stop()
+                                                } else {
+                                                    if (verticalDragOffset < -vThreshold) { // Swipe Up
+                                                        AudioManager.isExpanded = true
+                                                    } else if (verticalDragOffset > vThreshold) { // Swipe Down
+                                                        if (AudioManager.isExpanded) {
+                                                            AudioManager.isExpanded = false
+                                                        } else {
+                                                            AudioManager.isMinimized = true
+                                                        }
+                                                    }
+                                                }
+                                                verticalDragOffset = 0f
+                                                horizontalDragOffset = 0f
+                                            },
+                                            onDragCancel = {
+                                                isDragging = false
+                                                verticalDragOffset = 0f
+                                                horizontalDragOffset = 0f
+                                            }
+                                        )
+                                    }
+                                    .clickable { 
+                                        if (AudioManager.isExpanded) {
+                                            AudioManager.isExpanded = false
+                                        } else {
+                                            AudioManager.isMinimized = true 
+                                        }
+                                    }
                                     .padding(vertical = 8.dp),
                                 verticalArrangement = Arrangement.SpaceEvenly
                             ) {
@@ -253,30 +323,37 @@ fun AudioPlayerBar(modifier: Modifier = Modifier) {
                                         .padding(horizontal = horizontalPadding),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column(
+                                    BoxWithConstraints(
                                         modifier = Modifier.weight(1f),
-                                        verticalArrangement = Arrangement.Center
+                                        contentAlignment = Alignment.CenterStart
                                     ) {
-                                        if (showName) {
-                                            val displayName = remember(currentTitle, currentArtist, currentTrack) {
-                                                if (!currentTitle.isNullOrBlank()) {
-                                                    if (!currentArtist.isNullOrBlank()) "$currentArtist - $currentTitle" else currentTitle
-                                                } else {
-                                                    currentTrack?.name ?: ""
+                                        if (maxWidth >= 60.dp) {
+                                            Column(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                if (showName) {
+                                                    val displayName = remember(currentTitle, currentArtist, currentTrack) {
+                                                        if (!currentTitle.isNullOrBlank()) {
+                                                            if (!currentArtist.isNullOrBlank()) "$currentArtist - $currentTitle" else currentTitle
+                                                        } else {
+                                                            currentTrack?.name ?: ""
+                                                        }
+                                                    }
+                                                    Text(
+                                                        text = displayName,
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
                                                 }
+                                                Text(
+                                                    text = formatTime(position) + " / " + formatTime(duration),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
                                             }
-                                            Text(
-                                                text = displayName,
-                                                style = MaterialTheme.typography.labelLarge,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
                                         }
-                                        Text(
-                                            text = formatTime(position) + " / " + formatTime(duration),
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
                                     }
 
                                     Row(verticalAlignment = Alignment.CenterVertically) {
