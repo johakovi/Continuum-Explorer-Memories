@@ -4,7 +4,7 @@
  
 
 Multifunctional filemanager, for working with your files or just play media!
-Works with Tablets, Desktops and phones. UI Adapts to your device screen.
+Works with tablets, desktops and phones. UI Adapts to your device screen.
 
 _Note: This project is forked from troikoss / Continuum Explorer_
 
