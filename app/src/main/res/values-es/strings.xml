@@ -224,6 +224,8 @@
     <string name="settings_choose_del_behavior">Elegir comportamiento de eliminación</string>
     <string name="settings_choose_theme">Elegir tema</string>
     <string name="settings_choose_details_mode">Elegir modo de detalles</string>
+    <string name="settings_starting_page">Página de inicio</string>
+    <string name="settings_choose_starting_page">Elegir página de inicio</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_system">Predeterminado del sistema</string>
     <string name="settings_language_english">Inglés</string>

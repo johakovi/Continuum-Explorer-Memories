@@ -168,14 +168,24 @@ open class MainActivity : AppCompatActivity() {
         }
         val initialArchiveUri = intent.getParcelableExtra<Uri>("archiveUri")
         val initialArchiveName = intent.getStringExtra("archiveName")
-        val initialLibraryItem = when {
+        val initialNetworkConnectionId = intent.getStringExtra("networkConnectionId")
+
+        val initialLibraryItemFromIntent = when {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
             intent.getBooleanExtra("isGallery", false) -> LibraryItem.Gallery
             intent.getBooleanExtra("isDocuments", false) -> LibraryItem.Documents
             intent.getBooleanExtra("isRecycleBin", false) -> LibraryItem.RecycleBin
             else -> LibraryItem.None
         }
-        val initialNetworkConnectionId = intent.getStringExtra("networkConnectionId")
+
+        val initialLibraryItem = if (initialLibraryItemFromIntent == LibraryItem.None &&
+            initialPath == null && initialUri == null && initialArchive == null &&
+            initialArchiveUri == null && initialNetworkConnectionId == null
+        ) {
+            SettingsManager.startingPage.value
+        } else {
+            initialLibraryItemFromIntent
+        }
 
         // Build ImageLoader asynchronously to prevent main thread lag on startup
         lifecycleScope.launch(Dispatchers.IO) {

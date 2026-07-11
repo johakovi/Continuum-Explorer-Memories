@@ -51,6 +51,7 @@ import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.managers.ThemeTopMode
 import com.troikoss.continuum_explorer.managers.TouchDragBehavior
 import com.troikoss.continuum_explorer.managers.ShizukuManager
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 
 class SettingsActivity : ComponentActivity() {
@@ -77,6 +78,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val themeTop = SettingsManager.themeTop.value
     val language = SettingsManager.language.value
     val detailsMode = SettingsManager.detailsMode.value
+    val startingPage = SettingsManager.startingPage.value
     val isCommandBarVisible = SettingsManager.isCommandBarVisible.value
     val showHiddenFiles = SettingsManager.showHiddenFiles.value
     val iconTouchSelection = SettingsManager.iconTouchSelection.value
@@ -138,6 +140,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showDefaultFolderColorDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
     var showDetailsDialog by remember { mutableStateOf(false) }
+    var showStartingPageDialog by remember { mutableStateOf(false) }
     var showDefaultViewModeDialog by remember { mutableStateOf(false) }
     var showFtpCredentialsDialog by remember { mutableStateOf(false) }
     var showFtpTimeoutDialog by remember { mutableStateOf(false) }
@@ -265,6 +268,25 @@ fun SettingsScreen(onBack: () -> Unit) {
                 },
                 modifier = Modifier.clickable { showDetailsDialog = true }
             )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_starting_page)) },
+                supportingContent = {
+                    val text = when (startingPage) {
+                        LibraryItem.Recent -> stringResource(R.string.nav_recent)
+                        LibraryItem.Gallery -> stringResource(R.string.nav_gallery)
+                        LibraryItem.Music -> stringResource(R.string.nav_music)
+                        LibraryItem.Downloads -> stringResource(R.string.nav_downloads)
+                        LibraryItem.Documents -> stringResource(R.string.nav_documents)
+                        LibraryItem.Games -> stringResource(R.string.nav_game_saves)
+                        LibraryItem.InternalStorage -> stringResource(R.string.nav_internal_storage)
+                        else -> stringResource(R.string.nav_recent)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showStartingPageDialog = true }
+            )
+
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_default_view_mode)) },
                 supportingContent = {
@@ -1025,6 +1047,41 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showDetailsDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showStartingPageDialog) {
+                AlertDialog(
+                    onDismissRequest = { showStartingPageDialog = false },
+                    title = { Text(stringResource(R.string.settings_choose_starting_page)) },
+                    text = {
+                        Column {
+                            val items = listOf(
+                                LibraryItem.InternalStorage to R.string.nav_internal_storage,
+                                LibraryItem.Recent to R.string.nav_recent,
+                                LibraryItem.Gallery to R.string.nav_gallery,
+                                LibraryItem.Music to R.string.nav_music,
+                                LibraryItem.Downloads to R.string.nav_downloads,
+                                LibraryItem.Documents to R.string.nav_documents,
+                                LibraryItem.Games to R.string.nav_game_saves
+                            )
+                            items.forEach { (item, resId) ->
+                                OptionItem(
+                                    label = stringResource(resId),
+                                    selected = startingPage == item,
+                                    onClick = {
+                                        SettingsManager.setStartingPage(context, item)
+                                        showStartingPageDialog = false
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showStartingPageDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }

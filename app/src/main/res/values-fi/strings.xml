@@ -234,6 +234,8 @@
         <string name="settings_choose_del_behavior">Valitse poistamisen perusasetus</string>
         <string name="settings_choose_theme">Valitse teema</string>
         <string name="settings_choose_details_mode">Valitse yksityiskohdatalle asetus</string>
+        <string name="settings_starting_page">Aloitussivu</string>
+        <string name="settings_choose_starting_page">Valitse aloitussivu</string>
         <string name="settings_language">Kieli</string>
     <string name="settings_language_system">Järjestelmän oma</string>
     <string name="settings_language_english">Englanti</string>

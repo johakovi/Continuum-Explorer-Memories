@@ -162,6 +162,9 @@ fun FileExplorerRO(
                     if (!trashDir.exists()) trashDir.mkdirs()
                     firstState.navigateTo(trashDir, null, addToHistory = false, libraryItem = LibraryItem.RecycleBin)
                 }
+                initialLibraryItem == LibraryItem.InternalStorage -> {
+                    firstState.navigateTo(Environment.getExternalStorageDirectory(), null, addToHistory = false)
+                }
                 initialNetworkConnectionId != null -> {
                     val conn = firstState.appConfigs.networkConnections.find { it.id == initialNetworkConnectionId }
                     if (conn != null) {

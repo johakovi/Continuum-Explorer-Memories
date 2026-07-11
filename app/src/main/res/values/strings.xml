@@ -233,6 +233,8 @@
     <string name="settings_choose_del_behavior">Choose Deletion Behavior</string>
     <string name="settings_choose_theme">Choose Theme</string>
     <string name="settings_choose_details_mode">Choose Details Mode</string>
+    <string name="settings_starting_page">Starting Page</string>
+    <string name="settings_choose_starting_page">Choose Starting Page</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
     <string name="settings_language_english">English</string>

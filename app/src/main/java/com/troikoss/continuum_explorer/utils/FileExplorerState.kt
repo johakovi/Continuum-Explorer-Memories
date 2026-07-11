@@ -203,7 +203,9 @@ class FileExplorerState(
             if (currentNetworkProvider != null && currentNetworkId != null) {
                 return currentNetworkProvider!!.displayName(currentNetworkId!!)
             }
-            return if (libraryItem == LibraryItem.RecycleBin) {
+            return if (libraryItem == LibraryItem.InternalStorage) {
+                context.getString(R.string.nav_internal_storage)
+            } else if (libraryItem == LibraryItem.RecycleBin) {
                 context.getString(R.string.nav_recycle_bin)
             } else if (libraryItem == LibraryItem.Recent) {
                 context.getString(R.string.nav_recent)
@@ -284,6 +286,15 @@ class FileExplorerState(
             }
 
             currentPath != null -> currentPath?.toUniversal()
+
+            libraryItem == LibraryItem.InternalStorage -> UniversalFile(
+                name = context.getString(R.string.nav_internal_storage),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = Environment.getExternalStorageDirectory().absolutePath
+            )
 
             libraryItem == LibraryItem.Gallery -> UniversalFile(
                 name = if (currentPath != null) currentPath!!.name else context.getString(R.string.nav_gallery),
@@ -611,6 +622,7 @@ class FileExplorerState(
                             rawFiles.filter { it.name != ".metadata" }.map { it.toUniversal() }
                         }
                     } else emptyList()
+                    LibraryItem.InternalStorage -> LocalProvider.listChildren(Environment.getExternalStorageDirectory().absolutePath)
                     LibraryItem.None -> if (currentArchiveFile != null || currentArchiveUri != null) {
                         if (archiveCache == null) {
                             val source: Any = currentArchiveFile ?: currentArchiveUri!!
@@ -688,6 +700,7 @@ class FileExplorerState(
                     LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
                     LibraryItem.Games -> "games_manager"
+                    LibraryItem.InternalStorage -> "internal_storage"
                     LibraryItem.None -> "root"
                     LibraryItem.RecycleBin -> "trash"
                 }

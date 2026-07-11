@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.utils.GlobalEvents
 
@@ -67,6 +68,7 @@ object SettingsManager {
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
     private const val KEY_TAB_BAR_BACKGROUND_URI = "tab_bar_background_uri"
+    private const val KEY_STARTING_PAGE = "starting_page"
 
     private const val KEY_COMMAND_BAR_VISIBLE = "command_bar_visible"
     private const val KEY_SHOW_HIDDEN_FILES = "show_hidden_files"
@@ -132,6 +134,9 @@ object SettingsManager {
 
     private val _detailsMode = mutableStateOf(DetailsMode.OFF)
     val detailsMode: State<DetailsMode> = _detailsMode
+
+    private val _startingPage = mutableStateOf(LibraryItem.Recent)
+    val startingPage: State<LibraryItem> = _startingPage
 
     private val _isCommandBarVisible = mutableStateOf(true)
     val isCommandBarVisible: State<Boolean> = _isCommandBarVisible
@@ -293,6 +298,13 @@ object SettingsManager {
             DetailsMode.OFF
         }
 
+        val savedStartingPage = prefs.getString(KEY_STARTING_PAGE, LibraryItem.Recent.name)
+        _startingPage.value = try {
+            LibraryItem.valueOf(savedStartingPage ?: LibraryItem.Recent.name)
+        } catch (_: Exception) {
+            LibraryItem.Recent
+        }
+
         _isCommandBarVisible.value = prefs.getBoolean(KEY_COMMAND_BAR_VISIBLE, true)
         _showHiddenFiles.value = prefs.getBoolean(KEY_SHOW_HIDDEN_FILES, false)
         _iconTouchSelection.value = prefs.getBoolean(KEY_ICON_TOUCH_SELECTION, true)
@@ -368,6 +380,13 @@ object SettingsManager {
         _detailsMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_DETAILS_MODE, mode.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setStartingPage(context: Context, item: LibraryItem) {
+        _startingPage.value = item
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_STARTING_PAGE, item.name).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 
