@@ -3,9 +3,10 @@
 <img width="72" height="72" alt="ic_launcher" src="https://github.com/user-attachments/assets/4da8432b-f41d-443b-af68-88bec19c9cd7" />
  
 
-A modern, feature-rich Android application built with a focus on desktop-grade usability and efficient workflows file manager.
+Multifunctional filemanager, for working with your files or just play media!
+Works with Tablets, Desktops and phones. UI Adapts to your device screen.
 
-Note: This project is forked from troikoss / Continuum Explorer
+_Note: This project is forked from troikoss / Continuum Explorer_
 
 [**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
 
