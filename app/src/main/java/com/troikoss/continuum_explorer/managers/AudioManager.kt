@@ -1,6 +1,8 @@
 package com.troikoss.continuum_explorer.managers
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -14,9 +16,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 object AudioManager {
     private var exoPlayer: ExoPlayer? = null
+    private var appContext: Context? = null
+
+    fun getExoPlayer(context: Context): ExoPlayer {
+        init(context)
+        return exoPlayer!!
+    }
     
     var currentTrack by mutableStateOf<UniversalFile?>(null)
     var currentTitle by mutableStateOf<String?>(null)
@@ -34,10 +43,13 @@ object AudioManager {
     val playlist = mutableStateListOf<UniversalFile>()
 
     fun init(context: Context) {
+        val applicationContext = context.applicationContext
+        appContext = applicationContext
+        MusicMetadataManager.init(applicationContext)
         if (exoPlayer == null) {
-            val mediaSourceFactory = DefaultMediaSourceFactory(context)
+            val mediaSourceFactory = DefaultMediaSourceFactory(applicationContext)
             
-            exoPlayer = ExoPlayer.Builder(context)
+            exoPlayer = ExoPlayer.Builder(applicationContext)
                 .setMediaSourceFactory(mediaSourceFactory)
                 .build().apply {
                 shuffleModeEnabled = isShuffleEnabled
@@ -47,6 +59,7 @@ object AudioManager {
                         isAudioPlaying = isPlayingNow
                         if (isPlayingNow) {
                             startProgressUpdate()
+                            context.applicationContext.startService(Intent(context.applicationContext, com.troikoss.continuum_explorer.services.PlaybackService::class.java))
                         } else {
                             stopProgressUpdate()
                         }
@@ -97,14 +110,30 @@ object AudioManager {
         if (index == -1) index = 0
         this.currentIndex = index
         
+        context.applicationContext.startService(Intent(context.applicationContext, com.troikoss.continuum_explorer.services.PlaybackService::class.java))
+
         exoPlayer?.let { player ->
             player.stop()
             player.clearMediaItems()
             
             val mediaItems = playlist.map { track ->
+                val songMetadata = MusicMetadataManager.getSongMetadata(track.providerId)
+                val metadata = MediaMetadata.Builder()
+                    .setTitle(songMetadata?.title ?: track.name)
+                    .setDisplayTitle(songMetadata?.title ?: track.name)
+                    .setArtist(songMetadata?.artist)
+                    .setAlbumTitle(songMetadata?.album)
+                    .setArtworkUri(songMetadata?.album?.let { albumName ->
+                        MusicMetadataManager.getCoverPath(albumName, context)?.let { path ->
+                            Uri.fromFile(File(path))
+                        }
+                    })
+                    .build()
+
                 MediaItem.Builder()
                     .setUri(getUriForUniversalFile(context, track))
                     .setMediaId(track.providerId)
+                    .setMediaMetadata(metadata)
                     .setTag(track)
                     .build()
             }
@@ -170,6 +199,9 @@ object AudioManager {
         playlist.clear()
         currentIndex = -1
         stopProgressUpdate()
+        appContext?.let {
+            it.stopService(Intent(it, com.troikoss.continuum_explorer.services.PlaybackService::class.java))
+        }
     }
 
     private fun startProgressUpdate() {
@@ -189,6 +221,9 @@ object AudioManager {
 
     fun release() {
         stopProgressUpdate()
+        appContext?.let {
+            it.stopService(Intent(it, com.troikoss.continuum_explorer.services.PlaybackService::class.java))
+        }
         exoPlayer?.release()
         exoPlayer = null
     }

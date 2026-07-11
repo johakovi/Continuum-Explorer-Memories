@@ -66,6 +66,10 @@ object MusicMetadataManager {
 
     fun isFavourite(path: String): Boolean = favouritePaths.contains(path)
 
+    fun getSongMetadata(filePath: String): MusicSongMetadata? {
+        return songs.find { it.filePath == filePath }
+    }
+
     fun toggleFavourite(context: Context, path: String) {
         if (favouritePaths.contains(path)) {
             favouritePaths.remove(path)
