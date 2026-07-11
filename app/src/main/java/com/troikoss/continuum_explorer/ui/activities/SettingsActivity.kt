@@ -280,7 +280,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         LibraryItem.Documents -> stringResource(R.string.nav_documents)
                         LibraryItem.Games -> stringResource(R.string.nav_game_saves)
                         LibraryItem.InternalStorage -> stringResource(R.string.nav_internal_storage)
-                        else -> stringResource(R.string.nav_recent)
+                        else -> stringResource(R.string.nav_internal_storage)
                     }
                     Text(text)
                 },
