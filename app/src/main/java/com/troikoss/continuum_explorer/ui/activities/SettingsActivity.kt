@@ -219,20 +219,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             )
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_tab_bar_background)) },
-                supportingContent = {
-                    SettingsManager.tabBarBackgroundUri.value?.let { Text(it) } ?: Text(stringResource(R.string.settings_tab_bar_background_none))
-                },
-                modifier = Modifier.clickable { backgroundPickerLauncher.launch(arrayOf("image/*")) },
-                trailingContent = {
-                    if (SettingsManager.tabBarBackgroundUri.value != null) {
-                        IconButton(onClick = { SettingsManager.setTabBarBackgroundUri(context, null) }) {
-                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_clear))
-                        }
-                    }
-                }
-            )
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_language)) },
@@ -267,24 +253,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Text(text)
                 },
                 modifier = Modifier.clickable { showDetailsDialog = true }
-            )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_starting_page)) },
-                supportingContent = {
-                    val text = when (startingPage) {
-                        LibraryItem.Recent -> stringResource(R.string.nav_recent)
-                        LibraryItem.Gallery -> stringResource(R.string.nav_gallery)
-                        LibraryItem.Music -> stringResource(R.string.nav_music)
-                        LibraryItem.Downloads -> stringResource(R.string.nav_downloads)
-                        LibraryItem.Documents -> stringResource(R.string.nav_documents)
-                        LibraryItem.Games -> stringResource(R.string.nav_game_saves)
-                        LibraryItem.InternalStorage -> stringResource(R.string.nav_internal_storage)
-                        else -> stringResource(R.string.nav_internal_storage)
-                    }
-                    Text(text)
-                },
-                modifier = Modifier.clickable { showStartingPageDialog = true }
             )
 
             ListItem(
@@ -432,6 +400,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_tab_bar_background)) },
+                supportingContent = {
+                    SettingsManager.tabBarBackgroundUri.value?.let { Text(it) } ?: Text(stringResource(R.string.settings_tab_bar_background_none))
+                },
+                modifier = Modifier.clickable { backgroundPickerLauncher.launch(arrayOf("image/*")) },
+                trailingContent = {
+                    if (SettingsManager.tabBarBackgroundUri.value != null) {
+                        IconButton(onClick = { SettingsManager.setTabBarBackgroundUri(context, null) }) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.settings_clear))
+                        }
+                    }
+                }
+            )
+
             HorizontalDivider()
 
             HorizontalDivider()
@@ -441,6 +424,24 @@ fun SettingsScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(16.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_starting_page)) },
+                supportingContent = {
+                    val text = when (startingPage) {
+                        LibraryItem.Recent -> stringResource(R.string.nav_recent)
+                        LibraryItem.Gallery -> stringResource(R.string.nav_gallery)
+                        LibraryItem.Music -> stringResource(R.string.nav_music)
+                        LibraryItem.Downloads -> stringResource(R.string.nav_downloads)
+                        LibraryItem.Documents -> stringResource(R.string.nav_documents)
+                        LibraryItem.Games -> stringResource(R.string.nav_game_saves)
+                        LibraryItem.InternalStorage -> stringResource(R.string.nav_internal_storage)
+                        else -> stringResource(R.string.nav_internal_storage)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showStartingPageDialog = true }
             )
             
             ListItem(
