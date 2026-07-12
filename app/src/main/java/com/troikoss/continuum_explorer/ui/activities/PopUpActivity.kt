@@ -1237,6 +1237,15 @@ fun ProgressContent (onClose: () -> Unit) {
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = FileOperationsManager.getTitleText(context), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        
+        if (FileOperationsManager.operationQueue.isNotEmpty()) {
+            Text(
+                text = stringResource(R.string.op_items_remaining) + " ${FileOperationsManager.operationQueue.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (isRunning) {

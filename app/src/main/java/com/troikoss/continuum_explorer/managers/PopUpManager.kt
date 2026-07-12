@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -17,7 +18,10 @@ import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.utils.NotificationHelper
 import com.troikoss.continuum_explorer.utils.GlobalEvents
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.io.IOException
@@ -93,6 +97,12 @@ data class ArchiveSettings(
     val isCancelled: Boolean = false
 )
 
+data class QueuedOperation(
+    val type: OperationType,
+    val description: String,
+    val task: suspend () -> Unit
+)
+
 /**
  * A global object to hold the state of the current file operation.
  * Both FileUtils (logic) and PopUpActivity (UI) will talk to this.
@@ -101,6 +111,13 @@ object FileOperationsManager {
     var currentOperationType = mutableStateOf(OperationType.NONE)
     var currentFileName = mutableStateOf<String?>(null)
     var currentProcessedItems = mutableIntStateOf(0)
+
+    // Queue State
+    val operationQueue = mutableStateListOf<QueuedOperation>()
+    val totalQueuedOperations = mutableIntStateOf(0)
+    val completedOperationsInQueue = mutableIntStateOf(0)
+    private val managerScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var isQueueRunning = false
 
     // What kind of popup to show
     var popupType = mutableStateOf(PopupType.PROGRESS)
@@ -188,13 +205,13 @@ object FileOperationsManager {
     }
 
     fun getTitleText(context: Context): String {
-        if (!isOperating.value && !isCancelled.value) return context.getString(R.string.op_finished)
-        if (isCancelled.value) return context.getString(R.string.msg_cancelled)
+        if (!isOperating.value && !isCancelled.value && operationQueue.isEmpty()) return context.getString(R.string.op_finished)
+        if (isCancelled.value && operationQueue.isEmpty()) return context.getString(R.string.msg_cancelled)
         
         val fileName = currentFileName.value ?: ""
         val count = if (itemsTotal.intValue > 0) itemsTotal.intValue else currentProcessedItems.intValue
 
-        return when (currentOperationType.value) {
+        val baseTitle = when (currentOperationType.value) {
             OperationType.DELETE -> {
                 if (count == 1) context.getString(R.string.op_deleting_an_item)
                 else context.getString(R.string.op_deleting_items, count)
@@ -220,7 +237,48 @@ object FileOperationsManager {
                 if (count == 1) context.getString(R.string.op_restoring)
                 else context.getString(R.string.op_restoring_items, count)
             }
-            OperationType.NONE -> ""
+            OperationType.NONE -> if (isOperating.value) context.getString(R.string.op_processing) else ""
+        }
+
+        return if (totalQueuedOperations.intValue > 1) {
+            "(${completedOperationsInQueue.intValue + 1}/${totalQueuedOperations.intValue}) $baseTitle"
+        } else {
+            baseTitle
+        }
+    }
+
+    fun enqueue(type: OperationType, description: String, task: suspend () -> Unit) {
+        operationQueue.add(QueuedOperation(type, description, task))
+        totalQueuedOperations.intValue = operationQueue.size + completedOperationsInQueue.intValue
+        if (!isQueueRunning) {
+            processQueue()
+        }
+        notifyListeners()
+    }
+
+    private fun processQueue() {
+        isQueueRunning = true
+        managerScope.launch {
+            while (operationQueue.isNotEmpty()) {
+                val op = operationQueue.first()
+                start()
+                currentOperationType.value = op.type
+                try {
+                    op.task()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                // Ensure finish() was called, but only once per operation
+                if (isOperating.value) finish()
+                
+                operationQueue.removeAt(0)
+                completedOperationsInQueue.intValue++
+                notifyListeners()
+            }
+            isQueueRunning = false
+            totalQueuedOperations.intValue = 0
+            completedOperationsInQueue.intValue = 0
+            notifyListeners()
         }
     }
 
@@ -499,6 +557,7 @@ object FileOperationsManager {
 
     fun cancel() {
         isCancelled.value = true
+        operationQueue.clear() // Clear upcoming operations
         // Also cancel any pending dialogs
         collisionDeferred?.takeIf { !it.isCompleted }?.complete(CollisionResult.CANCEL)
         moveCopyDeferred?.complete(MoveCopyResult.CANCEL)

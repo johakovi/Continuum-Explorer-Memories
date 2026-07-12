@@ -187,7 +187,6 @@ suspend fun deleteFiles(
     }
 
     if (result == DeleteResult.CANCEL) {
-        FileOperationsManager.finish()
         return
     }
     if (result == DeleteResult.RECYCLE) {
@@ -247,7 +246,6 @@ suspend fun deleteFiles(
             }
         }
         withContext(Dispatchers.Main) {
-            FileOperationsManager.finish()
             val msg = if (FileOperationsManager.isCancelled.value) {
                 context.getString(R.string.msg_cancelled_deletion)
             } else {
@@ -388,7 +386,6 @@ else if (documentFileRef != null) {
         }
     }
     withContext(Dispatchers.Main) {
-        FileOperationsManager.finish()
         val msg = if (movedCount == files.size) {
             context.getString(R.string.msg_moved_to_recycle_bin)
         } else {
@@ -403,7 +400,6 @@ else if (documentFileRef != null) {
  */
 suspend fun restoreFiles(context: Context, files: List<UniversalFile>) {
     withContext(Dispatchers.Main) {
-        FileOperationsManager.start()
         FileOperationsManager.currentOperationType.value = OperationType.RESTORE
         FileOperationsManager.itemsTotal.intValue = files.size
     }
@@ -588,7 +584,6 @@ suspend fun restoreFiles(context: Context, files: List<UniversalFile>) {
             }
         }
         withContext(Dispatchers.Main) {
-            FileOperationsManager.finish()
             Toast.makeText(context, context.getString(R.string.msg_restored_count, restoredCount), Toast.LENGTH_SHORT).show()
         }
     }

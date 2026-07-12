@@ -363,7 +363,6 @@ object ZipUtils {
         toSeparateFolders: Boolean
     ) = withContext(Dispatchers.IO) {
         withContext(Dispatchers.Main) {
-            FileOperationsManager.start()
             FileOperationsManager.currentOperationType.value = OperationType.EXTRACT
             FileOperationsManager.currentProcessedItems.intValue = archives.size
         }
@@ -599,10 +598,6 @@ object ZipUtils {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            withContext(Dispatchers.Main) {
-                FileOperationsManager.finish()
-            }
         }
     }
 
@@ -614,7 +609,6 @@ object ZipUtils {
         settings: ArchiveSettings
     ) = withContext(Dispatchers.IO) {
         withContext(Dispatchers.Main) {
-            FileOperationsManager.start()
             FileOperationsManager.currentOperationType.value = OperationType.COMPRESS
             FileOperationsManager.currentFileName.value = settings.archiveName
             FileOperationsManager.currentProcessedItems.intValue = filesToCompress.size
@@ -626,7 +620,6 @@ object ZipUtils {
                 val result = FileOperationsManager.resolveCollision(destFile.name)
                 when (result) {
                     CollisionResult.CANCEL -> {
-                        FileOperationsManager.finish()
                         return@withContext
                     }
                     CollisionResult.REPLACE -> {
@@ -688,10 +681,6 @@ object ZipUtils {
             e.printStackTrace()
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, context.getString(R.string.msg_compression_failed, e.message), Toast.LENGTH_SHORT).show()
-            }
-        } finally {
-            withContext(Dispatchers.Main) {
-                FileOperationsManager.finish()
             }
         }
     }

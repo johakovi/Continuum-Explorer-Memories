@@ -110,7 +110,6 @@ suspend fun pasteFromClipboard(
     if (clipData == null || clipData.itemCount == 0) {
         withContext(Dispatchers.Main) {
             Toast.makeText(context, context.getString(R.string.msg_empty_clipboard), Toast.LENGTH_SHORT).show()
-            FileOperationsManager.finish()
         }
         return emptyList()
     }
@@ -150,7 +149,6 @@ suspend fun pasteFromClipboard(
     }
 
     if (FileOperationsManager.isCancelled.value) {
-        withContext(Dispatchers.Main) { FileOperationsManager.finish() }
         return emptyList()
     }
 
@@ -396,7 +394,6 @@ suspend fun pasteFromClipboard(
 
     withContext(Dispatchers.Main) {
         val wasCancelled = FileOperationsManager.isCancelled.value
-        FileOperationsManager.finish()
         val message = if (wasCancelled) {
             context.getString(R.string.msg_operation_cancelled)
         } else if (isMove) {

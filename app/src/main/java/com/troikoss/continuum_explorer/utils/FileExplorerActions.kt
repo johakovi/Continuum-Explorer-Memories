@@ -57,7 +57,7 @@ fun FileExplorerState.open(item: UniversalFile) {
             openInNewTab(listOf(item))
             return
         }
-        
+
         if (item.isArchiveEntry) {
             Toast.makeText(context, context.getString(R.string.msg_not_supported_archive), Toast.LENGTH_SHORT).show()
             return
@@ -66,7 +66,7 @@ fun FileExplorerState.open(item: UniversalFile) {
         val extension = item.name.substringAfterLast('.', "").lowercase()
         val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
         val audioExtensions = setOf("mp3", "wav", "ogg", "m4a", "aac", "flac")
-        
+
         val isImage = imageExtensions.contains(extension) || item.mimeType?.startsWith("image/") == true
         val isAudio = audioExtensions.contains(extension) || item.mimeType?.startsWith("audio/") == true
 
@@ -141,21 +141,26 @@ fun FileExplorerState.paste() {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clipData = clipboard.primaryClip
     val isMove = PendingCut.isActive
+    val targetPath = currentPath
+    val targetSafUri = currentSafUri
+    val targetProvider = currentNetworkProvider
+    val targetNetworkId = currentNetworkId
 
-    FileOperationsManager.start()
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
 
-    scope.launch {
-        val pastedNames = pasteFromClipboard(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, clipData)
+    FileOperationsManager.enqueue(OperationType.COPY, context.getString(R.string.op_copying)) {
+        val pastedNames = pasteFromClipboard(context, targetPath, targetSafUri, targetProvider, targetNetworkId, clipData)
         refresh()?.join()
         if (pastedNames.isNotEmpty()) {
             val pastedFiles = files.filter { pastedNames.contains(it.name) }
             if (pastedFiles.isNotEmpty()) {
-                selectionManager.clear()
-                pastedFiles.forEach { selectionManager.select(it) }
+                withContext(Dispatchers.Main) {
+                    selectionManager.clear()
+                    pastedFiles.forEach { selectionManager.select(it) }
+                }
             }
         }
         if (isMove || pastedNames.isNotEmpty()) GlobalEvents.triggerRefresh()
@@ -163,62 +168,62 @@ fun FileExplorerState.paste() {
 }
 
 fun FileExplorerState.deleteSelection(forcePermanent: Boolean = false) {
-    FileOperationsManager.start()
+    val selectedItems = selectionManager.selectedItems.toList()
+    if (selectedItems.isEmpty()) return
+
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
 
-    scope.launch {
-        deleteFiles(context, selectionManager.selectedItems.toList(), forcePermanent)
+    FileOperationsManager.enqueue(OperationType.DELETE, context.getString(R.string.op_deleting)) {
+        deleteFiles(context, selectedItems, forcePermanent)
         refresh()?.join()
-        selectionManager.clear()
+        withContext(Dispatchers.Main) { selectionManager.clear() }
         GlobalEvents.triggerRefresh()
     }
 }
 
 fun FileExplorerState.restoreSelection() {
-    FileOperationsManager.start()
+    val selectedItems = selectionManager.selectedItems.toList()
+    if (selectedItems.isEmpty()) return
+
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
 
-    scope.launch {
-        restoreFiles(context, selectionManager.selectedItems.toList())
+    FileOperationsManager.enqueue(OperationType.RESTORE, context.getString(R.string.op_restoring)) {
+        restoreFiles(context, selectedItems)
         refresh()?.join()
-        selectionManager.clear()
+        withContext(Dispatchers.Main) { selectionManager.clear() }
         GlobalEvents.triggerRefresh()
     }
 }
 
 fun FileExplorerState.undo() {
-    FileOperationsManager.start()
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
 
-    scope.launch {
+    FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.menu_undo)) {
         UndoManager.undo(context)
         refresh()?.join()
         GlobalEvents.triggerRefresh()
-        FileOperationsManager.finish()
     }
 }
 
 fun FileExplorerState.redo() {
-    FileOperationsManager.start()
     val intent = Intent(context, PopUpActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
 
-    scope.launch {
+    FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.menu_redo)) {
         UndoManager.redo(context)
         refresh()?.join()
         GlobalEvents.triggerRefresh()
-        FileOperationsManager.finish()
     }
 }
 
@@ -230,21 +235,17 @@ fun FileExplorerState.extractSelection() {
     val selectedArchives = selectionManager.selectedItems.filter { ZipUtils.isArchive(it) && it.fileRef != null }
     if (selectedArchives.isEmpty()) return
 
-    scope.launch {
-        FileOperationsManager.start()
-        val intent = Intent(context, PopUpActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
+    val intent = Intent(context, PopUpActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
 
+    FileOperationsManager.enqueue(OperationType.EXTRACT, context.getString(R.string.op_extracting)) {
         val displayTitle = if (selectedArchives.size == 1) selectedArchives[0].name else context.getString(R.string.delete_items_count, selectedArchives.size)
         val settings = FileOperationsManager.requestExtractOptions(displayTitle)
-        if (settings.isCancelled) {
-            FileOperationsManager.finish()
-            return@launch
-        }
+        if (settings.isCancelled) return@enqueue
 
-        val parentFile = selectedArchives[0].fileRef?.parentFile ?: return@launch
+        val parentFile = selectedArchives[0].fileRef?.parentFile ?: return@enqueue
         ZipUtils.extractArchives(context, selectedArchives, parentFile, settings.toSeparateFolder)
         if (settings.deleteSource) {
             deleteFiles(context, selectedArchives, forcePermanent = true, silent = true)
@@ -265,18 +266,14 @@ fun FileExplorerState.compressSelection() {
     val folderName = targetFolder.name.ifEmpty { context.getString(R.string.archive) }
     val defaultName = if (selected.size == 1) "${selected[0].name}.zip" else "$folderName.zip"
 
-    scope.launch {
-        FileOperationsManager.start()
-        val intent = Intent(context, PopUpActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
+    val intent = Intent(context, PopUpActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
 
+    FileOperationsManager.enqueue(OperationType.COMPRESS, context.getString(R.string.op_compressing)) {
         val settings = FileOperationsManager.requestArchiveOptions(defaultName)
-        if (settings.isCancelled) {
-            FileOperationsManager.finish()
-            return@launch
-        }
+        if (settings.isCancelled) return@enqueue
 
         ZipUtils.compressFiles(context, selected, targetFolder, settings)
         if (settings.deleteSource) {
@@ -313,13 +310,10 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
         return
     }
 
-    FileOperationsManager.start()
-    FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
-    FileOperationsManager.currentFileName.value = target.name
-    // Don't start a new PopUpActivity here — the existing one (showing INPUT_TEXT) stays alive
-    // and transitions to PROGRESS via the state change above, then to COLLISION if needed.
+    FileOperationsManager.enqueue(OperationType.RENAME, context.getString(R.string.op_renaming, target.name)) {
+        FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
+        FileOperationsManager.currentFileName.value = target.name
 
-    scope.launch {
         val success = renameFile(target, newName, context)
         withContext(Dispatchers.Main) {
             if (success) {
@@ -331,14 +325,13 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
             } else {
                 Toast.makeText(context, context.getString(R.string.msg_rename_failed), Toast.LENGTH_SHORT).show()
             }
-            FileOperationsManager.finish()
         }
     }
 }
 
 fun FileExplorerState.createNewFolder() {
     FileOperationsManager.openCreateFolder(context) { name ->
-        scope.launch {
+        FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.dialog_new_folder)) {
             val success = createDirectory(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
@@ -360,7 +353,7 @@ fun FileExplorerState.createNewFolder() {
 
 fun FileExplorerState.createNewFile() {
     FileOperationsManager.openCreateFile(context) { name ->
-        scope.launch {
+        FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.dialog_new_file)) {
             val success = createFile(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
@@ -400,24 +393,23 @@ fun FileExplorerState.showProperties(items: List<UniversalFile>? = null) {
 }
 
 fun FileExplorerState.emptyRecycleBin() {
-    scope.launch {
-        val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-        val filesToDelete = trashDir.listFiles()?.filter { it.name != ".metadata" }?.map { it.toUniversal() } ?: emptyList()
-        if (filesToDelete.isNotEmpty()) {
-            FileOperationsManager.start()
-            val intent = Intent(context, PopUpActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
+    val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+    val filesToDelete = trashDir.listFiles()?.filter { it.name != ".metadata" }?.map { it.toUniversal() } ?: emptyList()
+    if (filesToDelete.isNotEmpty()) {
+        val intent = Intent(context, PopUpActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
 
+        FileOperationsManager.enqueue(OperationType.DELETE, context.getString(R.string.menu_empty_recycle_bin)) {
             deleteFiles(context, filesToDelete, forcePermanent = true)
             val metaFile = File(trashDir, ".metadata")
             if (metaFile.exists()) metaFile.delete()
             refresh()?.join()
             GlobalEvents.triggerRefresh()
-        } else {
-            Toast.makeText(context, context.getString(R.string.msg_recycle_bin_empty), Toast.LENGTH_SHORT).show()
         }
+    } else {
+        Toast.makeText(context, context.getString(R.string.msg_recycle_bin_empty), Toast.LENGTH_SHORT).show()
     }
 }
 
