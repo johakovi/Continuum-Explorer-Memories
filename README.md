@@ -13,10 +13,11 @@ _Note: This project is forked from troikoss / Continuum Explorer_
 
 | | |
 |:---:|:---:|
+| <img width="368" height="902" alt="Screen_Recording_20260712_215222_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/511cf7cc-eb3d-4eb6-91c1-b2262cd2a595" /> | <img width="548" height="640" alt="Screen_Recording_20260711_094754_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/3d779cc2-0390-478a-b6c3-432ca447ada0" /> | 
+| Phone UI | Music player | 
 | <img width="600" height="543" alt="Screenshot_20260613_003403_Continuum Explorer" src="https://github.com/user-attachments/assets/7790a4c2-e4ce-4cef-a5fc-9f7fbb0af785" /> | <img width="600" height="543" alt="Screenshot_20260613_003331_Continuum Explorer" src="https://github.com/user-attachments/assets/005f6640-50ae-4176-ae59-02fe869b9ac3" /> |
 | Colourful Duotone iconpack, with light theme | Demo theme pack installed |
-| <img width="306" height="751" alt="Screenshot_20260524_004233_Continuum Explorer" src="https://github.com/user-attachments/assets/4f90c6a7-38dd-45d1-88eb-454c322c56ed" /> |
-| Phone UI |  |
+| | |
 
 
 
@@ -25,30 +26,28 @@ _Note: This project is forked from troikoss / Continuum Explorer_
 
 
 ## Key Features:
+### Multimedia:
+- Video player
+- Picture viewer
+- Audio player
+- PDF Viewer
 
-- Internal PDF reader
+### File managament:
 - Internal text editor
-- Dex theme integration
-
 - Tabs & Multi-Window: Support for advanced multitasking.
-
 - Drag-and-Drop: Seamlessly move data between apps and windows.
-
 - Full Peripheral Support: Native mouse support (including right-click context menus) and standard Windows-style keyboard shortcuts.
-
 - Responsive Design: A UI that dynamically adapts to any screen or window dimensions.
-
 - Archive Support: Integrated .zip viewer
-
 - Network storage managment
-
 - Game Save Manager
-
 - Shizuku privilege
-
 - Termux privilege
-- Custom theme packs
 
+### Themes:
+- Custom theme packs
+- Customizable tab bar background
+- Customizable UI
 
 
 ## Recommended apps and sources
