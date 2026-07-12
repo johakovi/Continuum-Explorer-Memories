@@ -20,6 +20,7 @@ import com.troikoss.continuum_explorer.managers.GalleryManager
 import com.troikoss.continuum_explorer.managers.GamesManager
 import com.troikoss.continuum_explorer.managers.MusicManager
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
+import com.troikoss.continuum_explorer.managers.PlaylistManager
 import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
 import com.troikoss.continuum_explorer.managers.SelectionManager
@@ -313,6 +314,7 @@ class FileExplorerState(
                 val isAlbumsRoot = normalized.endsWith("/music/albums")
                 val isFavourites = normalized.endsWith("/music/favourites")
                 val isPlaylists = normalized.endsWith("/music/playlists")
+                val isSpecificPlaylist = normalized.endsWith(".m3u") || normalized.endsWith(".m3u8") || normalized.endsWith(".wpl")
                 val isSpecificAlbum = normalized.contains("/music/albums/") || pathStr.contains("#album:")
                 
                 val albumName = when {
@@ -327,6 +329,7 @@ class FileExplorerState(
                         isAlbumsRoot -> context.getString(R.string.menu_music_albums)
                         isFavourites -> "Favourites"
                         isPlaylists -> "Playlists"
+                        isSpecificPlaylist -> currentPath?.nameWithoutExtension ?: ""
                         isSpecificAlbum -> albumName
                         currentPath != null -> currentPath!!.name
                         else -> context.getString(R.string.nav_music)
@@ -599,7 +602,10 @@ class FileExplorerState(
                             normalized.endsWith("/music/songs") -> MusicMetadataManager.getSongs(context)
                             normalized.endsWith("/music/albums") -> MusicMetadataManager.getAlbums(context)
                             normalized.endsWith("/music/favourites") -> MusicMetadataManager.getFavourites(context)
-                            normalized.endsWith("/music/playlists") -> emptyList()
+                            normalized.endsWith("/music/playlists") -> PlaylistManager.getPlaylists(context)
+                            normalized.endsWith(".m3u") || normalized.endsWith(".m3u8") || normalized.endsWith(".wpl") -> {
+                                PlaylistManager.getPlaylistSongs(context, currentPath!!)
+                            }
                             normalized.contains("/music/albums/") -> {
                                 val albumName = pathStr.substringAfterLast("/")
                                 MusicMetadataManager.getSongsForAlbum(context, albumName)
@@ -788,6 +794,7 @@ class FileExplorerState(
                 normalized.endsWith("/music/albums") -> "virtual://music/albums"
                 normalized.endsWith("/music/favourites") -> "virtual://music/favourites"
                 normalized.endsWith("/music/playlists") -> "virtual://music/playlists"
+                normalized.endsWith(".m3u") || normalized.endsWith(".m3u8") || normalized.endsWith(".wpl") -> "virtual://playlist:${currentPath!!.absolutePath}"
                 normalized.contains("/music/albums/") || pathStr.contains("#album:") -> "virtual://music_album:${currentPath!!.absolutePath}"
                 else -> "virtual://music"
             }

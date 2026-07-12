@@ -32,6 +32,12 @@
     <string name="off">Off</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="repeat">Repeat</string>
+    <string name="playlist">Playlist</string>
+    <string name="audio_expand_player">Expand Player</string>
 
     <!-- Properties / Details -->
     <string name="properties">Properties</string>
@@ -288,6 +294,7 @@
     <string name="menu_sync_list">Sync List</string>
     <string name="menu_music_playlists">Playlists</string>
     <string name="menu_music_favourites">Favourites</string>
+    <string name="menu_new_playlist">New Playlist</string>">
     <string name="menu_content">Content</string>
     <string name="menu_subtitles">Subtitles</string>
     <string name="menu_audio_track">Audio Track</string>
@@ -323,6 +330,10 @@
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Music Folders</string>
     <string name="menu_create_playlist">Create Playlist</string>
+    <string name="default_playlist_name">New Playlist</string>
+    <string name="menu_add_to_playlist">Add to Playlist</string>
+    <string name="msg_no_playlists">No playlists found. Create one first.</string>
+    <string name="msg_added_to_playlist">Added to %1$s</string>
     <string name="gallery_filter_off_msg">Filtering is currently OFF. Showing all media.</string>
     <string name="gallery_no_folders_msg">No folders added. Standard media locations will be used if filtering is enabled.</string>
     <string name="gallery_managed_folders">Managed Folders:</string>
@@ -330,6 +341,7 @@
     <string name="menu_gallery_show_all">Show All Media</string>
     <string name="menu_documents_folder">Folder</string>
     <string name="menu_documents_show_folders">Show Folders</string>
+    <string name="menu_favourite">Favourite</string>
     <string name="nav_add_storage">Add Storage</string>
     <string name="nav_internal_storage">Internal Storage</string>
     <string name="nav_trash">Recycle Bin</string>

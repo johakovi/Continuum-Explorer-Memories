@@ -31,8 +31,14 @@
         <string name="menu_clear_thumbnails">Tyhjennä pikkukuvat</string>
         <string name="msg_thumbnails_cleared">Pikkukuvat tyhjennetty</string>
         <string name="off">Pois</string>
-        <string name="previous">Takaisin</string>
+        <string name="previous">Edellinen</string>
         <string name="next">Seuraava</string>
+        <string name="pause">Tauko</string>
+        <string name="play">Toista</string>
+        <string name="shuffle">Sekoita</string>
+        <string name="repeat">Toisto</string>
+        <string name="playlist">Soittolista</string>
+        <string name="audio_expand_player">Laajenna soitin</string>
 
         <!-- Properties / Details -->
         <string name="properties">Ominaisuudet</string>
@@ -66,7 +72,7 @@
         <!-- Shortcuts Dialog -->
         <string name="shortcuts_title">Lista pikakomennoista</string>
         <string name="shortcuts_nav_selection">Navigoi &amp; Valinta</string>
-        <string name="shortcuts_arrow_keys">Nuoli näppäimet</string>
+        <string name="shortcuts_arrow_keys">Nuolinäppäimet</string>
         <string name="shortcuts_arrow_keys_desc">Siirrä valittua</string>
         <string name="shortcuts_home_end">Home / End</string>
         <string name="shortcuts_home_end_desc">Mene alkuun / Mene loppuun</string>
@@ -104,7 +110,7 @@
         <string name="shortcuts_ctrl_slash_desc">Lista pikakomennoista</string>
         <string name="shortcuts_mouse">Hiiri</string>
         <string name="shortcuts_right_click">Oikea nappi</string>
-        <string name="shortcuts_right_click_desc">Konteksti menu</string>
+        <string name="shortcuts_right_click_desc">Kontekstivalikko</string>
         <string name="shortcuts_middle_click">Keskimmäinen nappi</string>
         <string name="shortcuts_middle_click_desc">Avaa uudessa välilehdessä</string>
         <string name="shortcuts_shift_middle_click">Shift + Keskimmäinen nappi</string>
@@ -115,7 +121,7 @@
         <string name="shortcuts_shift_drag_desc">Siirrä</string>
 
         <!-- Archive Operations -->
-        <string name="archive_create">Arkistoi</string>
+        <string name="archive_create">Luo arkisto</string>
         <string name="archive_name">Arkiston nimi</string>
         <string name="archive_comp_method">Pakkaustapa</string>
         <string name="archive_comp_level">Pakkaustaso</string>
@@ -123,12 +129,12 @@
         <string name="archive_password">Salasana</string>
         <string name="archive_delete_source">Poista alkuperäinen tiedosto arkistoinnin jälkeen</string>
         <string name="archive_extract">Pura arkisto</string>
-        <string name="archive_extract_options">Valitse purkausken asetukset: %1$s</string>
-        <string name="archive_extract_separate">Pura erilliselle kansiolle</string>
-        <string name="archive_extract_current">Pura nykyiselle kansiolle</string>
-        <string name="archive_extract_delete_source">Poista alkuperäinen arkisto purkauksen jälkeen</string>
+        <string name="archive_extract_options">Valitse purkauksen asetukset: %1$s</string>
+        <string name="archive_extract_separate">Pura erilliseen kansioon</string>
+        <string name="archive_extract_current">Pura nykyiseen kansioon</string>
+        <string name="archive_extract_delete_source">Poista alkuperäinen arkisto purkamisen jälkeen</string>
         <string name="archive_encrypted_title">Salattu arkisto</string>
-        <string name="archive_enter_password">Kirjoittakaa salasana: %1$s</string>
+        <string name="archive_enter_password">Kirjoita salasana: %1$s</string>
         <string name="archive_button">Arkistoi</string>
         <string name="extract_button">Pura</string>
         <string name="archive_inner_error">Ei voida avata tiedostoa arkiston sisältä</string>
@@ -140,14 +146,14 @@
         <string name="conflict_merge">Yhdistä</string>
         <string name="conflict_keep_both">Pidä molemmat</string>
         <string name="conflict_replace">Korvaa</string>
-        <string name="delete_confirm_title">Varmistan poiston</string>
+        <string name="delete_confirm_title">Vahvista poisto</string>
         <string name="delete_item_this">Tämä tiedosto</string>
-        <string name="delete_items_count">%1$d tiedostot</string>
-        <string name="delete_confirm_message">Oletko varma %1$s poistosta?</string>
+        <string name="delete_items_count">%1$d tiedostoa</string>
+        <string name="delete_confirm_message">Oletko varma kohteiden %1$s poistosta?</string>
         <string name="delete_recycle_bin">Roskakori</string>
         <string name="delete_permanently">Lopullinen</string>
         <string name="delete_permanent_title">Lopullinen poisto</string>
-        <string name="delete_permanent_message">Oletko varma %1$s lopullisesta poistosta? Tätä toimintoa ei voi perua.</string>
+        <string name="delete_permanent_message">Oletko varma kohteiden %1$s lopullisesta poistosta? Tätä toimintoa ei voi perua.</string>
 
         <!-- Progress Dialog -->
         <string name="op_deleting">Poistetaan tiedostoja…</string>
@@ -162,22 +168,22 @@
         <string name="op_min_remaining">Noin %1$d min jäljellä</string>
         <string name="op_sec_remaining">Noin %1$d sek jäljellä</string>
         <string name="op_renaming">Nimetään uudelleen %1$s…</string>
-        <string name="op_copying">Kopioidaan 1 tiedostoa…</string>
-        <string name="op_copying_items">Kopioidaan %1$d tiedostoja…</string>
-        <string name="op_extracting_an_archive">Puretaan 1 arkistoa…</string>
-        <string name="op_extracting_archives">Puretaan %1$d arkistoja…</string>
-        <string name="op_compressing_an_item">Pakataan 1 tiedostoa…</string>
-        <string name="op_compressing_items">Pakataan %1$d tiedostoja…</string>
-        <string name="op_deleting_an_item">Poistetaan 1 tiedostoa…</string>
-        <string name="op_deleting_items">Poistetaan %1$d tiedostoja…</string>
-        <string name="op_trashing">Siirretään 1 tiedostoa to roskakoriin…</string>
-        <string name="op_trashing_items">Siirretään %1$d tiedostoja roskakoriin…</string>
-        <string name="op_restoring">Palautetaan 1 tiedostoa…</string>
-        <string name="op_restoring_items">Palautetaan %1$d tiedostoja…</string>
+        <string name="op_copying">Kopioidaan 1 tiedosto…</string>
+        <string name="op_copying_items">Kopioidaan %1$d tiedostoa…</string>
+        <string name="op_extracting_an_archive">Puretaan 1 arkisto…</string>
+        <string name="op_extracting_archives">Puretaan %1$d arkistoa…</string>
+        <string name="op_compressing_an_item">Pakataan 1 tiedosto…</string>
+        <string name="op_compressing_items">Pakataan %1$d tiedostoa…</string>
+        <string name="op_deleting_an_item">Poistetaan 1 tiedosto…</string>
+        <string name="op_deleting_items">Poistetaan %1$d tiedostoa…</string>
+        <string name="op_trashing">Siirretään 1 tiedosto roskakoriin…</string>
+        <string name="op_trashing_items">Siirretään %1$d tiedostoa roskakoriin…</string>
+        <string name="op_restoring">Palautetaan 1 tiedosto…</string>
+        <string name="op_restoring_items">Palautetaan %1$d tiedostoa…</string>
         <string name="op_sec">sek</string>
 
         <!-- Notifications -->
-        <string name="notif_description">Tiedoston/-jen toiminnan edistyminen</string>
+        <string name="notif_description">Tiedosto-operaatioiden edistyminen</string>
 
         <!-- Settings -->
         <string name="settings">Asetukset</string>
@@ -201,55 +207,55 @@
         <string name="settings_theme_very_dark">Erittäin tumma tyyli</string>
         <string name="settings_theme_very_light">Erittäin vaalea tyyli</string>
         <string name="settings_theme_enhanced_system">Parannettu järjestelmä</string>
-        <string name="settings_colorful_bars">Värikäs ylä ja ala palkit</string>
-        <string name="settings_colorful_bars_desc">Aktivoi aksentti värit välilehdelle ja ylä ja ala palkeille.</string>
+        <string name="settings_colorful_bars">Värikkäät ylä- ja välilehtipalkit</string>
+        <string name="settings_colorful_bars_desc">Aktivoi aksenttivärit ylä- ja välilehtipalkeille.</string>
         <string name="settings_icon_theme">Kuvakkeiden tyyli</string>
         <string name="settings_icon_theme_colourful">Värikäs</string>
         <string name="settings_icon_theme_colourful_duotone">Värikäs duotone</string>
         <string name="settings_icon_theme_material">Material</string>
         <string name="settings_default_folder_color">Kansion oletusväri</string>
         <string name="settings_choose_icon_theme">Valitse kuvakkeiden tyyli</string>
-        <string name="settings_details_large">Yksityiskohdat (Isoille ruuduille)</string>
+        <string name="settings_details_large">Yksityiskohdat (vain isoille ruuduille)</string>
         <string name="settings_details_hidden">Piilotettu</string>
-        <string name="settings_details_pane">Sivu paneeli</string>
-        <string name="settings_details_bar">Ala palkki</string>
-        <string name="settings_show_command_bar">Näytä komento palkki</string>
-        <string name="settings_show_command_bar_desc">Työkalurivin toiminta näppäimet osoitepalkin alle.</string>
+        <string name="settings_details_pane">Sivupaneeli</string>
+        <string name="settings_details_bar">Alapalkki</string>
+        <string name="settings_show_command_bar">Näytä komentopalkki</string>
+        <string name="settings_show_command_bar_desc">Työkalurivi toimintapainikkeilla osoitepalkin alapuolella.</string>
         <string name="settings_show_hidden_files">Näytä piilotetut tiedostot/kansiot</string>
-        <string name="settings_show_hidden_files_desc">Näytä tiedostot ja kansiot joiden nimet alkavat pisteellä.</string>
-        <string name="settings_icon_selection">Kuvakkeitten valinta tila</string>
-        <string name="settings_icon_selection_desc">Vaihda valintaa napauttamalla tiedostokuvaketta kosketus- tai stylus-komennolla.</string>
-        <string name="settings_file_ops">Tiedoston toiminnot</string>
+        <string name="settings_show_hidden_files_desc">Näytä tiedostot ja kansiot, joiden nimet alkavat pisteellä.</string>
+        <string name="settings_icon_selection">Kuvakkeiden valintatila</string>
+        <string name="settings_icon_selection_desc">Vaihda valintaa napauttamalla tiedostokuvaketta.</string>
+        <string name="settings_file_ops">Tiedostotoiminnot</string>
         <string name="settings_deletion_behavior">Poistaminen</string>
         <string name="settings_del_ask">Kysy aina</string>
         <string name="settings_del_recycle">Siirrä roskakoriin</string>
         <string name="settings_del_permanent">Poista lopullisesti</string>
-        <string name="settings_internal_archive">Käytä sisäistä arkiston näkymää</string>
-        <string name="settings_internal_archive_desc">Avaa zip-tiedosto sovelluksen sisältä, ulkoisen sovellusken puolesta.</string>
+        <string name="settings_internal_archive">Käytä sisäistä arkistonäkymää</string>
+        <string name="settings_internal_archive_desc">Avaa zip-tiedostot suoraan sovelluksessa ulkoisen sovelluksen sijaan.</string>
         <string name="settings_termux_support">Suorita skriptit Termuxissa</string>
         <string name="settings_termux_support_desc">Avaa .sh-tiedostot automaattisesti Termux-terminaalissa.</string>
         <string name="settings_shortcuts_desc">Näytä mahdolliset pikakomennot näppäimistölle ja hiirelle.</string>
-        <string name="settings_default_view_mode">Perusnäkymän valinta</string>
-        <string name="settings_choose_default_view_mode">Valitse perusnäkymä</string>
+        <string name="settings_default_view_mode">Oletusnäkymä</string>
+        <string name="settings_choose_default_view_mode">Valitse oletusnäkymä</string>
         <string name="settings_choose_del_behavior">Valitse poistamisen perusasetus</string>
         <string name="settings_choose_theme">Valitse teema</string>
-        <string name="settings_choose_details_mode">Valitse yksityiskohdatalle asetus</string>
+        <string name="settings_choose_details_mode">Valitse yksityiskohdat-tila</string>
         <string name="settings_starting_page">Aloitussivu</string>
         <string name="settings_choose_starting_page">Valitse aloitussivu</string>
         <string name="settings_language">Kieli</string>
-    <string name="settings_language_system">Järjestelmän oma</string>
-    <string name="settings_language_english">Englanti</string>
-    <string name="settings_language_finnish">Suomi</string>
-    <string name="settings_language_french">Ranska</string>
-    <string name="settings_language_portuguese">Portugali</string>
-    <string name="settings_language_spanish">Espanja</string>
-    <string name="settings_language_turkish">Turkki</string>
-    <string name="settings_language_german">Saksa</string>
-    <string name="settings_language_russian">Venäjä</string>
-    <string name="settings_language_swedish">Ruotsi</string>
-    <string name="settings_language_ukrainian">Ukraina</string>
-    <string name="settings_language_korean">Korea</string>
-    <string name="settings_choose_language">Valitse kieli</string>
+        <string name="settings_language_system">Järjestelmän oma</string>
+        <string name="settings_language_english">Englanti</string>
+        <string name="settings_language_finnish">Suomi</string>
+        <string name="settings_language_french">Ranska</string>
+        <string name="settings_language_portuguese">Portugali</string>
+        <string name="settings_language_spanish">Espanja</string>
+        <string name="settings_language_turkish">Turkki</string>
+        <string name="settings_language_german">Saksa</string>
+        <string name="settings_language_russian">Venäjä</string>
+        <string name="settings_language_swedish">Ruotsi</string>
+        <string name="settings_language_ukrainian">Ukraina</string>
+        <string name="settings_language_korean">Korea</string>
+        <string name="settings_choose_language">Valitse kieli</string>
 
         <!-- Context Menus/Command Bar -->
         <string name="menu_restore">Palauta</string>
@@ -280,11 +286,16 @@
         <string name="menu_by_name">Nimellä</string>
         <string name="menu_by_date">Päivämäärällä</string>
         <string name="menu_by_size">Koolla</string>
-        <string name="menu_by_date_deleted">Poiston päivämäärällä</string>
+        <string name="menu_by_date_deleted">Poistopäivämäärällä</string>
         <string name="menu_by_location">Sijainnilla</string>
         <string name="menu_details">Yksityiskohdat</string>
         <string name="menu_grid">Ruudukko</string>
         <string name="menu_gallery">Galleria</string>
+        <string name="menu_music">Musiikki</string>
+        <string name="menu_sync_list">Synkronoi lista</string>
+        <string name="menu_music_playlists">Soittolistat</string>
+        <string name="menu_music_favourites">Suosikit</string>
+        <string name="menu_new_playlist">Uusi soittolista</string>
         <string name="menu_content">Sisältö</string>
         <string name="menu_subtitles">Tekstitykset</string>
         <string name="menu_audio_track">Ääniraita</string>
@@ -296,26 +307,34 @@
         <string name="menu_clear_selection">Tyhjennä valinta</string>
         <string name="menu_select_inverse">Käänteinen valinta</string>
         <string name="menu_remove">Poista</string>
-        <string name="menu_zoom_in">Suurenna sisään</string>
-        <string name="menu_zoom_out">Suurenna ulos</string>
-        <string name="menu_reset_zoom">Palauta suurennos</string>
+        <string name="menu_zoom_in">Suurenna</string>
+        <string name="menu_zoom_out">Pienennä</string>
+        <string name="menu_reset_zoom">Nollaa suurennus</string>
         <string name="menu_copy_image">Kopioi kuva</string>
-        <string name="menu_set_wallpaper">Taustakuvaksi</string>
-        <string name="menu_fullscreen">Koko ruudulle</string>
+        <string name="menu_set_wallpaper">Aseta taustakuvaksi</string>
+        <string name="menu_fullscreen">Koko ruutu</string>
         <string name="menu_undo">Peruuta</string>
         <string name="menu_redo">Kumoa</string>
         <string name="menu_folder_color">Kansion väri</string>
         <string name="menu_select_folder_color">Valitse kansion väri</string>
 
         <!-- Navigation -->
-        <string name="nav_library_items">Tiedosto kirjasto</string>
+        <string name="nav_library_items">Kirjaston kohteet</string>
         <string name="nav_recent">Viimeisimmät</string>
         <string name="nav_gallery">Galleria</string>
+        <string name="nav_music">Musiikki</string>
         <string name="nav_downloads">Lataukset</string>
         <string name="nav_documents">Asiakirjat</string>
         <string name="nav_game_saves">Pelien hallinta</string>
         <string name="menu_gallery_albums">Albumit</string>
         <string name="menu_gallery_folders">Gallerian kansiot</string>
+        <string name="menu_music_albums">Albumit</string>
+        <string name="menu_music_folders">Musiikkikansiot</string>
+        <string name="menu_create_playlist">Luo soittolista</string>
+        <string name="default_playlist_name">Uusi soittolista</string>
+        <string name="menu_add_to_playlist">Lisää soittolistaan</string>
+        <string name="msg_no_playlists">Soittolistoja ei löytynyt. Luo sellainen ensin.</string>
+        <string name="msg_added_to_playlist">Lisätty kohteeseen %1$s</string>
         <string name="gallery_filter_off_msg">Suodatus on tällä hetkellä POIS PÄÄLTÄ. Näytetään kaikki media.</string>
         <string name="gallery_no_folders_msg">Kansioita ei ole lisätty. Käytetään tavallisia mediasijainteja, jos suodatus on päällä.</string>
         <string name="gallery_managed_folders">Hallinnoidut kansiot:</string>
@@ -323,6 +342,7 @@
         <string name="menu_gallery_show_all">Näytä kaikki mediatiedostot</string>
         <string name="menu_documents_folder">Kansio</string>
         <string name="menu_documents_show_folders">Näytä kansiot</string>
+        <string name="menu_favourite">Suosikki</string>
         <string name="nav_add_storage">Lisää tallennustila</string>
         <string name="nav_internal_storage">Sisäinen tallennustila</string>
         <string name="nav_trash">Roskakori</string>
@@ -332,30 +352,51 @@
         <string name="nav_library">Kirjasto</string>
         <string name="nav_recycle_bin">Roskakori</string>
         <string name="nav_storage">Tallennustila</string>
-        <string name="nav_added_locations">Lisättyjä paikkoja</string>
+        <string name="nav_added_locations">Lisätyt sijainnit</string>
         <string name="nav_sd_card">SD-kortti</string>
-        <string name="nav_external_location">Ulkoinen tallennustila</string>
+        <string name="nav_external_location">Ulkoinen sijainti</string>
         <string name="nav_unknown_folder">Tuntematon kansio</string>
-        <string name="nav_collapse">Vähennä</string>
-        <string name="nav_expand">Lisää</string>
+        <string name="nav_collapse">Pienennä</string>
+        <string name="nav_expand">Laajenna</string>
         <string name="nav_storage_usage_label">%1$s vapaana / %2$s</string>
         <string name="nav_network">Verkko</string>
         <string name="nav_add_local_storage">Lisää paikallinen tallennustila</string>
-        <string name="nav_add_network_storage">Lisää verkko tallennustila</string>
+        <string name="nav_add_network_storage">Lisää verkkotallennustila</string>
         <string name="nav_network_protocol">Protokolla</string>
         <string name="nav_network_display_name">Näytettävä nimi</string>
-        <string name="nav_network_host">Isäntä</string>
+        <string name="nav_network_host">Palvelin</string>
         <string name="nav_network_port">Portti</string>
         <string name="nav_network_username">Käyttäjänimi</string>
         <string name="nav_network_password">Salasana</string>
-        <string name="nav_network_remote_path">Etäosoite</string>
+        <string name="nav_network_remote_path">Etäpolku</string>
         <string name="nav_network_save">Tallenna</string>
-        <string name="nav_network_edit">Muokkaa yhteys</string>
+        <string name="nav_network_edit">Muokkaa yhteyttä</string>
         <string name="nav_network_use_tls">Käytä FTPS (TLS)</string>
         <string name="nav_network_passive_mode">Passiivitila</string>
-        <string name="nav_network_root_url">Täydellinen URL (valinnainen päällekirjoitus)</string>
+        <string name="nav_network_root_url">Täysi URL (valinnainen ohitus)</string>
         <string name="nav_network_accept_untrusted">Hyväksy itse allekirjoitetut varmenteet</string>
         <string name="nav_network_test">Testaa yhteyttä</string>
+        <string name="nav_network_display_name_placeholder">Minun NAS</string>
+        <string name="nav_network_host_placeholder">192.168.1.x tai nas.local</string>
+        <string name="nav_network_username_placeholder">käyttäjänimi</string>
+        <string name="nav_network_username_anon_placeholder">Jätä tyhjäksi nimettömälle</string>
+        <string name="nav_network_hide_password">Piilota salasana</string>
+        <string name="nav_network_show_password">Näytä salasana</string>
+        <string name="nav_network_sftp_key_uri">Yksityisen avaimen URI (valinnainen)</string>
+        <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+        <string name="nav_network_sftp_key_passphrase">Yksityisen avaimen salasana (valinnainen)</string>
+        <string name="nav_network_hide_passphrase">Piilota salasana</string>
+        <string name="nav_network_show_passphrase">Näytä salasana</string>
+        <string name="nav_network_sftp_key_fallback">Yksityinen avain tekstinä (valinnainen)</string>
+        <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+        <string name="nav_network_hide_key">Piilota avain</string>
+        <string name="nav_network_show_key">Näytä avain</string>
+        <string name="nav_network_smb_domain">Toimialue / Työryhmä (valinnainen)</string>
+        <string name="nav_network_smb_path_hint">Ensimmäinen osa on jaon nimi (esim. /Documents)</string>
+        <string name="nav_network_sftp_path_hint">Absoluuttinen polku palvelimella. Jätä / kotihakemistolle tai juurelle.</string>
+        <string name="nav_network_webdav_path_hint">Polun etuliite palvelimella. Jätä / juurelle.</string>
+        <string name="nav_network_test_success">Yhdistetty</string>
+        <string name="nav_network_test_failed">Epäonnistui</string>
 
         <string name="nav_ftp_server">FTP-palvelin</string>
         <string name="nav_start_ftp">Käynnistä FTP-palvelin</string>
@@ -377,51 +418,51 @@
         <string name="msg_starting">Aloitetaan…</string>
         <string name="msg_cancelling">Peruutetaan…</string>
         <string name="msg_cancelled">Peruutettu</string>
-        <string name="msg_rename_failed">Uudelleen nimeäminen epäonnistui</string>
-        <string name="msg_select_rename">Valitse tiedosto uudelleen nimeämiseksi</string>
-        <string name="msg_select_one_rename">Valitse yksi tiedostoa uudelleen nimeämiseksi</string>
+        <string name="msg_rename_failed">Uudelleennimeäminen epäonnistui</string>
+        <string name="msg_select_rename">Valitse tiedosto uudelleennimeämiseksi</string>
+        <string name="msg_select_one_rename">Valitse vain yksi tiedosto uudelleennimeämiseksi</string>
         <string name="msg_failed_create_folder">Kansion luominen epäonnistui</string>
         <string name="msg_failed_create_file">Tiedoston luominen epäonnistui</string>
         <string name="msg_recycle_bin_empty">Roskakori on jo tyhjä</string>
-        <string name="msg_select_pin">Valitse tiedosto tai kansio lisätäkseen</string>
-        <string name="msg_select_one_pin">Valitse yksi tiedosto lisätäkseen</string>
-        <string name="msg_operation_cancelled">Toiminta peruutettu</string>
-        <string name="msg_pasted_count">Liitetty %1$d tiedostoja</string>
-        <string name="msg_moved_count">Siirretty %1$d tiedostoja</string>
-        <string name="msg_restored_count">Palautettu %1$d tiedostoja</string>
+        <string name="msg_select_pin">Valitse lisättävä tiedosto tai kansio</string>
+        <string name="msg_select_one_pin">Valitse vain yksi lisättävä kohde</string>
+        <string name="msg_operation_cancelled">Toiminto peruutettu</string>
+        <string name="msg_pasted_count">Liitetty %1$d tiedostoa</string>
+        <string name="msg_moved_count">Siirretty %1$d tiedostoa</string>
+        <string name="msg_restored_count">Palautettu %1$d tiedostoa</string>
         <string name="msg_moved_to_recycle_bin">Siirretty roskakoriin</string>
-        <string name="msg_moved_to_recycle_bin_count">Siirretty %1$d tiedostoja roskakoriin</string>
-        <string name="msg_moved_to_recycle_bin_partial">Siirretty %1$d tiedostoja roskakoriin (joitain epäonnistui)</string>
-        <string name="msg_share_failed_prepare">Ei voitu valmistaa tiedostoja jakamiseksi</string>
-        <string name="msg_no_app_share">Ei sovelluksia löytynyt tämän tiedoston jakamiseksi</string>
-        <string name="msg_no_app_open">Ei sovelluksia löytynyt tämän tiedoston avaamiseksi</string>
-        <string name="msg_apk_install_permission">Myönnä lupa ja sen jälkeen paina APK uudelleen asentamista varten.</string>
+        <string name="msg_moved_to_recycle_bin_count">Siirretty %1$d tiedostoa roskakoriin</string>
+        <string name="msg_moved_to_recycle_bin_partial">Siirretty %1$d tiedostoa roskakoriin (osa epäonnistui)</string>
+        <string name="msg_share_failed_prepare">Tiedostojen valmistelu jakamista varten epäonnistui</string>
+        <string name="msg_no_app_share">Sovellusta tiedoston jakamiseen ei löytynyt</string>
+        <string name="msg_no_app_open">Sovellusta tiedoston avaamiseen ei löytynyt</string>
+        <string name="msg_apk_install_permission">Myönnä lupa ja napauta sitten APK:ta uudelleen asentaaksesi.</string>
         <string name="msg_search_results" translatable="false">search_results</string>
         <string name="msg_search_failed">Haku epäonnistui</string>
-        <string name="msg_invalid_path">Viallinen polku</string>
-        <string name="msg_file_not_found">Tiedosto tai kansio ei löytynyt</string>
+        <string name="msg_invalid_path">Virheellinen polku</string>
+        <string name="msg_file_not_found">Tiedostoa tai kansiota ei löytynyt</string>
         <string name="msg_not_dir_archive">Ei ole kansio tai arkisto</string>
         <string name="msg_failed_open_image">Kuvan avaaminen epäonnistui</string>
         <string name="msg_image_copied">Kuva kopioitu leikepöydälle</string>
         <string name="msg_failed_copy_image">Kuvan kopioiminen epäonnistui</string>
-        <string name="msg_failed_set_wallpaper">Taustakuvan lisääminen epäonnistui</string>
-        <string name="msg_share_image_via">Jaa kuva seuraavasti</string>
-        <string name="msg_no_file_specified">Ei määritettyä tiedostoa</string>
-        <string name="msg_not_supported_archive">Tiedoston avaaminen arkiston sisältä ei mahdollista</string>
-        <string name="msg_op_completed">Tiedoston toiminta valmis.</string>
-        <string name="msg_already_at_storage_root">On jo tallennustilan juuressa</string>
-        <string name="msg_already_at_saf_root">On jo valitussa kansion juuressa</string>
+        <string name="msg_failed_set_wallpaper">Taustakuvan asettaminen epäonnistui</string>
+        <string name="msg_share_image_via">Jaa kuva sovelluksella</string>
+        <string name="msg_no_file_specified">Tiedostoa ei ole määritetty</string>
+        <string name="msg_not_supported_archive">Tiedoston avaaminen arkiston sisältä ei ole vielä mahdollista</string>
+        <string name="msg_op_completed">Tiedosto-operaatio valmis.</string>
+        <string name="msg_already_at_storage_root">Olet jo tallennustilan juuressa</string>
+        <string name="msg_already_at_saf_root">Olet jo valitun kansion juuressa</string>
         <string name="msg_empty_clipboard">Leikepöytä on tyhjä</string>
         <string name="msg_compression_failed">Pakkaaminen epäonnistui: %1$s</string>
-        <string name="msg_unknown_compression_error">Tuntematon vika pakkaamisessa</string>
-        <string name="menu_set_wallpaper_failed">Taustakuvan lisääminen epäonnistui</string>
+        <string name="msg_unknown_compression_error">Tuntematon pakkausvirhe</string>
+        <string name="menu_set_wallpaper_failed">Taustakuvan asettaminen epäonnistui</string>
 
 
         <!-- Dialog Titles -->
         <string name="dialog_new_folder">Uusi kansio</string>
         <string name="dialog_new_file">Uusi tekstitiedosto</string>
         <string name="dialog_rename">Nimeä uudelleen</string>
-        <string name="dialog_search_options">Haku asetukset</string>
+        <string name="dialog_search_options">Hakuasetukset</string>
 
         <!-- Search -->
         <string name="search_subfolders">Hae kaikista alikansioista</string>
@@ -439,9 +480,9 @@
         <string name="media_loop_off">Silmukka: Pois</string>
         <string name="media_speed_normal">Normaali (1x)</string>
         <string name="media_no_audio_tracks">Ääniraitoja ei löytynyt</string>
-        <string name="media_fit">Sovita (Oletus)</string>
+        <string name="media_fit">Sovita (oletus)</string>
         <string name="media_fill">Täytä</string>
-        <string name="media_zoom">Zumaa (Rajaa)</string>
+        <string name="media_zoom">Zumaa (rajaa)</string>
         <string name="media_fixed_w">Kiinteä leveys</string>
         <string name="media_fixed_h">Kiinteä korkeus</string>
         <string name="media_audio_track">Ääniraita %1$d</string>
@@ -473,12 +514,12 @@
         <string name="menu_by_type">Tyypin mukaan</string>
 
         <!-- Network file operations -->
-        <string name="msg_remote_permanent_warning">Verkkotiedostot poistetaan pysyvästi (ei voi siirtää roskakoriin).</string>
+        <string name="msg_remote_permanent_warning">Verkkotiedostot poistetaan pysyvästi (niitä ei voi siirtää roskakoriin).</string>
         <string name="msg_archive_remote_unsupported">Arkistointia ei vielä tueta verkkosijainneissa.</string>
         <string name="msg_remote_trash_skipped">Verkkotiedostoja ei voi siirtää roskakoriin. Ne poistetaan pysyvästi.</string>
         <string name="settings_about">Tietoja</string>
 
-        <string name="shizuku_status">Shizuku Tila</string>
+        <string name="shizuku_status">Shizuku-tila</string>
         <string name="shizuku_status_authorized">Valtuutettu</string>
         <string name="shizuku_status_not_authorized">Ei valtuutettu</string>
         <string name="shizuku_status_not_running">Ei käynnissä</string>
@@ -492,7 +533,7 @@
     <string name="settings_ftp_credentials_desc">Aseta käyttäjätunnus ja salasana sisäänrakennetulle FTP-palvelimelle.</string>
     <string name="settings_ftp_mode_title">FTP-palvelimen tila</string>
     <string name="settings_ftp_mode_full">Täysi sisäinen tallennustila</string>
-    <string name="settings_ftp_mode_game_saves">Pelien hallintakirjasto (Virtuaalinen)</string>
+    <string name="settings_ftp_mode_game_saves">Pelien hallintakirjasto (virtuaalinen)</string>
     <string name="settings_ftp_mode_choose">Valitse FTP-tila</string>
 
     <string name="error_restricted_access">Pääsy estetty</string>
@@ -513,8 +554,7 @@
 
     <!-- Unresponsive Server -->
     <string name="dialog_unresponsive_server_title">Palvelin ei vastaa</string>
-    <string name="dialog_unresponsive_server_message">Palvelimelta \"%1$s\" kestää kauan vastata. Haluatko jatkaa odottamista vai peruuttaa toiminnon?</string>
+    <string name="dialog_unresponsive_server_message">Palvelimella \"%1$s\" kestää kauan vastata. Haluatko jatkaa odottamista vai peruuttaa toiminnon?</string>
     <string name="dialog_wait">Odota</string>
     <string name="terminal_debug_title">Terminaalin debug-tuloste</string>
 </resources>
-

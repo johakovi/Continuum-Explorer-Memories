@@ -42,6 +42,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.res.painterResource
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol
@@ -147,6 +150,7 @@ class PopUpActivity : ComponentActivity() {
                                     PopupType.NETWORK_CONNECTION -> NetworkConnectionContent { finish() }
                                     PopupType.TERMINAL_DEBUG -> TerminalDebugContent { finish() }
                                     PopupType.UNRESPONSIVE_SERVER -> UnresponsiveServerContent { finish() }
+                                    PopupType.ADD_TO_PLAYLIST -> AddToPlaylistContent { finish() }
                                     else -> ProgressContent { finish() }
                                 }
                             }
@@ -159,6 +163,71 @@ class PopUpActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
+    }
+}
+
+@Composable
+fun AddToPlaylistContent(onDismiss: () -> Unit) {
+    val playlists = FileOperationsManager.playlistOptions
+    val song = FileOperationsManager.songToAddToPlaylist.value
+
+    Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.menu_add_to_playlist),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        Text(
+            text = song?.name ?: "",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 16.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        LazyColumn(modifier = Modifier.heightIn(max = 400.dp).fillMaxWidth()) {
+            items(playlists) { playlist ->
+                Surface(
+                    onClick = {
+                        FileOperationsManager.confirmPlaylistSelection(playlist)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color.Transparent
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_music_playlist),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = playlist.name,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(onClick = {
+                FileOperationsManager.confirmPlaylistSelection(null)
+                onDismiss()
+            }) {
+                Text(stringResource(id = android.R.string.cancel))
+            }
+        }
     }
 }
 

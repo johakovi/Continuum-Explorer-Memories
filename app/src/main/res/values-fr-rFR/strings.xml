@@ -30,6 +30,15 @@
     <string name="options">Options</string>
     <string name="menu_clear_thumbnails">Effacer les miniatures</string>
     <string name="msg_thumbnails_cleared">Miniatures effacées</string>
+    <string name="off">Désactivé</string>
+    <string name="previous">Précédent</string>
+    <string name="next">Suivant</string>
+    <string name="pause">Pause</string>
+    <string name="play">Lecture</string>
+    <string name="shuffle">Aléatoire</string>
+    <string name="repeat">Répéter</string>
+    <string name="playlist">Liste de lecture</string>
+    <string name="audio_expand_player">Agrandir le lecteur</string>
 
     <!-- Properties / Details -->
     <string name="properties">Propriétés</string>
@@ -97,7 +106,7 @@
     <string name="shortcuts_ctrl_zy_desc">Annuler / Rétablir</string>
     <string name="shortcuts_ctrl_wheel">Ctrl + Molette de la souris</string>
     <string name="shortcuts_ctrl_wheel_desc">Zoom avant / arrière</string>
-    <string name="shortcuts_ctrl_slash">Ctrl + !</string>
+    <string name="shortcuts_ctrl_slash">Ctrl + /</string>
     <string name="shortcuts_ctrl_slash_desc">Aide-mémoire des raccourcis</string>
     <string name="shortcuts_mouse">Souris</string>
     <string name="shortcuts_right_click">Clic droit</string>
@@ -199,6 +208,14 @@
     <string name="settings_tab_bar_background">Image de fond de la barre d\'onglets</string>
     <string name="settings_tab_bar_background_none">Aucun</string>
     <string name="settings_clear">Effacer</string>
+    <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
+    <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
+    <string name="settings_icon_theme">Thème d\'icônes</string>
+    <string name="settings_icon_theme_colourful">Coloré</string>
+    <string name="settings_icon_theme_colourful_duotone">Bichromie colorée</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Couleur de dossier par défaut</string>
+    <string name="settings_choose_icon_theme">Choisir le thème d\'icônes</string>
     <string name="settings_details_large">Détails (Grands écrans uniquement)</string>
     <string name="settings_details_hidden">Masqué</string>
     <string name="settings_details_pane">Panneau latéral</string>
@@ -224,6 +241,8 @@
     <string name="settings_choose_del_behavior">Choisir le comportement de suppression</string>
     <string name="settings_choose_theme">Choisir le thème</string>
     <string name="settings_choose_details_mode">Choisir le mode de détails</string>
+    <string name="settings_starting_page">Page de démarrage</string>
+    <string name="settings_choose_starting_page">Choisir la page de démarrage</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_system">Par défaut du système</string>
     <string name="settings_language_english">Anglais</string>
@@ -273,6 +292,11 @@
     <string name="menu_details">Détails</string>
     <string name="menu_grid">Grille</string>
     <string name="menu_gallery">Galerie</string>
+    <string name="menu_music">Musique</string>
+    <string name="menu_sync_list">Synchroniser la liste</string>
+    <string name="menu_music_playlists">Listes de lecture</string>
+    <string name="menu_music_favourites">Favoris</string>
+    <string name="menu_new_playlist">Nouvelle liste de lecture</string>
     <string name="menu_content">Contenu</string>
     <string name="menu_subtitles">Sous-titres</string>
     <string name="menu_audio_track">Piste audio</string>
@@ -299,11 +323,19 @@
     <string name="nav_library_items">Éléments de la bibliothèque</string>
     <string name="nav_recent">Récents</string>
     <string name="nav_gallery">Galerie</string>
+    <string name="nav_music">Musique</string>
     <string name="nav_downloads">Téléchargements</string>
     <string name="nav_documents">Documents</string>
     <string name="nav_game_saves">Gestionnaire de jeux</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_gallery_folders">Dossiers de la galerie</string>
+    <string name="menu_music_albums">Albums</string>
+    <string name="menu_music_folders">Dossiers de musique</string>
+    <string name="menu_create_playlist">Créer une liste de lecture</string>
+    <string name="default_playlist_name">Nouvelle liste de lecture</string>
+    <string name="menu_add_to_playlist">Ajouter à la liste de lecture</string>
+    <string name="msg_no_playlists">Aucune liste de lecture trouvée. Créez-en une d\'abord.</string>
+    <string name="msg_added_to_playlist">Ajouté à %1$s</string>
     <string name="gallery_filter_off_msg">Le filtrage est actuellement DÉSACTIVÉ. Affichage de tous les médias.</string>
     <string name="gallery_no_folders_msg">Aucun dossier ajouté. Les emplacements multimédias standards seront utilisés si le filtrage est activé.</string>
     <string name="gallery_managed_folders">Dossiers gérés :</string>
@@ -311,6 +343,7 @@
     <string name="menu_gallery_show_all">Afficher tous les médias</string>
     <string name="menu_documents_folder">Dossier</string>
     <string name="menu_documents_show_folders">Afficher les dossiers</string>
+    <string name="menu_favourite">Favori</string>
     <string name="nav_add_storage">Ajouter un stockage</string>
     <string name="nav_internal_storage">Stockage interne</string>
     <string name="nav_trash">Corbeille</string>
@@ -327,6 +360,50 @@
     <string name="nav_collapse">Réduire</string>
     <string name="nav_expand">Développer</string>
     <string name="nav_storage_usage_label">%1$s libres sur %2$s</string>
+    <string name="nav_network">Réseau</string>
+    <string name="nav_add_local_storage">Ajouter un stockage local</string>
+    <string name="nav_add_network_storage">Ajouter un stockage réseau</string>
+    <string name="nav_network_protocol">Protocole</string>
+    <string name="nav_network_display_name">Nom d\'affichage</string>
+    <string name="nav_network_host">Hôte</string>
+    <string name="nav_network_port">Port</string>
+    <string name="nav_network_username">Nom d\'utilisateur</string>
+    <string name="nav_network_password">Mot de passe</string>
+    <string name="nav_network_remote_path">Chemin distant</string>
+    <string name="nav_network_save">Enregistrer</string>
+    <string name="nav_network_edit">Modifier la connexion</string>
+    <string name="nav_network_use_tls">Utiliser FTPS (TLS)</string>
+    <string name="nav_network_passive_mode">Mode passif</string>
+    <string name="nav_network_root_url">URL complète (remplacement optionnel)</string>
+    <string name="nav_network_accept_untrusted">Accepter les certificats auto-signés</string>
+    <string name="nav_network_test">Tester la connexion</string>
+    <string name="nav_network_display_name_placeholder">Mon NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x ou nas.local</string>
+    <string name="nav_network_username_placeholder">nom d\'utilisateur</string>
+    <string name="nav_network_username_anon_placeholder">Laisser vide pour anonyme</string>
+    <string name="nav_network_hide_password">Masquer le mot de passe</string>
+    <string name="nav_network_show_password">Afficher le mot de passe</string>
+    <string name="nav_network_sftp_key_uri">URI de la clé privée (optionnel)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Phrase de passe de la clé privée (optionnel)</string>
+    <string name="nav_network_hide_passphrase">Masquer la phrase de passe</string>
+    <string name="nav_network_show_passphrase">Afficher la phrase de passe</string>
+    <string name="nav_network_sftp_key_fallback">Clé privée en texte (optionnel)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Masquer la clé</string>
+    <string name="nav_network_show_key">Afficher la clé</string>
+    <string name="nav_network_smb_domain">Domaine / Groupe de travail (optionnel)</string>
+    <string name="nav_network_smb_path_hint">Le premier segment est le nom du partage (ex. /Documents)</string>
+    <string name="nav_network_sftp_path_hint">Chemin absolu sur le serveur. Laisser / pour le dossier personnel ou la racine.</string>
+    <string name="nav_network_webdav_path_hint">Préfixe de chemin sur le serveur. Laisser / pour la racine.</string>
+    <string name="nav_network_test_success">Connecté</string>
+    <string name="nav_network_test_failed">Échec</string>
+
+    <string name="nav_ftp_server">Serveur FTP</string>
+    <string name="nav_start_ftp">Démarrer le serveur FTP</string>
+    <string name="nav_stop_ftp">Arrêter le serveur FTP</string>
+    <string name="nav_stop_ftp_game_manager">Arrêter le serveur FTP du gestionnaire de jeux</string>
+    <string name="nav_start_ftp_game_manager">Démarrer le serveur FTP du gestionnaire de jeux</string>
 
     <!-- Item Types -->
     <string name="archive">Archive</string>
@@ -378,6 +455,9 @@
     <string name="msg_already_at_saf_root">Déjà à la racine du dossier sélectionné</string>
     <string name="msg_empty_clipboard">Le presse-papiers est vide</string>
     <string name="msg_compression_failed">Échec de la compression : %1$s</string>
+    <string name="msg_unknown_compression_error">Erreur de compression inconnue</string>
+    <string name="menu_set_wallpaper_failed">Échec de la définition du fond d\'écran</string>
+    <string name="media_share_image_failed">Échec du partage de l\'image</string>
 
     <!-- Dialog Titles -->
     <string name="dialog_new_folder">Nouveau dossier</string>
@@ -397,19 +477,10 @@
     <string name="unknown_resolution">Résolution inconnue</string>
     <string name="media_playing">Lecture en cours</string>
     <string name="media_paused">En pause</string>
-
-    <!-- Details Headers -->
-    <string name="details_header_name">Nom</string>
-    <string name="details_header_size">Taille</string>
-    <string name="details_header_date">Date</string>
-    <string name="details_header_date_deleted">Date de suppression</string>
-    <string name="details_header_deleted_from">Emplacement</string>
-    <string name="msg_unknown_compression_error">Erreur de compression inconnue</string>
     <string name="media_loop_on">Boucle : Activée</string>
     <string name="media_loop_off">Boucle : Désactivée</string>
     <string name="media_speed_normal">Normal (1x)</string>
     <string name="media_no_audio_tracks">Aucune piste audio trouvée</string>
-    <string name="off">Désactivé</string>
     <string name="media_fit">Ajuster (par défaut)</string>
     <string name="media_fill">Remplir</string>
     <string name="media_zoom">Zoom (rogner)</string>
@@ -417,14 +488,17 @@
     <string name="media_fixed_h">Hauteur fixe</string>
     <string name="media_audio_track">Piste audio %1$d</string>
     <string name="media_subtitle_track">Piste de sous-titres %1$d</string>
-    <string name="previous">Précédent</string>
-    <string name="next">Suivant</string>
     <string name="media_volume">Volume</string>
     <string name="media_loop">Boucle</string>
     <string name="media_viewed">Image vue</string>
-    <string name="menu_set_wallpaper_failed">Échec de la définition du fond d\'écran</string>
-    <string name="media_share_image_failed">Échec du partage de l\'image</string>
     <string name="media_thumbnail">Miniature</string>
+
+    <!-- Details Headers -->
+    <string name="details_header_name">Nom</string>
+    <string name="details_header_size">Taille</string>
+    <string name="details_header_date">Date</string>
+    <string name="details_header_date_deleted">Date de suppression</string>
+    <string name="details_header_deleted_from">Emplacement</string>
 
     <string name="menu_move">Déplacer</string>
     <string name="move_or_copy_title">Déplacer ou copier ?</string>
@@ -438,37 +512,7 @@
     <string name="msg_deletion">%1$d fichiers supprimés</string>
     <string name="details_header_type">Type</string>
     <string name="menu_by_type">Par type</string>
-    <string name="nav_network">Réseau</string>
-    <string name="nav_add_local_storage">Ajouter un stockage local</string>
-    <string name="nav_add_network_storage">Ajouter un stockage réseau</string>
-    <string name="nav_network_protocol">Protocole</string>
-    <string name="nav_network_display_name">Nom d\'affichage</string>
-    <string name="nav_network_host">Hôte</string>
-    <string name="nav_network_port">Port</string>
-    <string name="nav_network_username">Nom d\'utilisateur</string>
-    <string name="nav_network_password">Mot de passe</string>
-    <string name="nav_network_remote_path">Chemin distant</string>
-    <string name="nav_network_save">Enregistrer</string>
-    <string name="nav_network_edit">Modifier la connexion</string>
-    <string name="nav_network_use_tls">Utiliser FTPS (TLS)</string>
-    <string name="nav_network_passive_mode">Mode passif</string>
-    <string name="nav_network_root_url">URL complète (remplacement optionnel)</string>
-    <string name="nav_network_accept_untrusted">Accepter les certificats auto-signés</string>
-    <string name="nav_network_test">Tester la connexion</string>
 
-    <string name="nav_ftp_server">Serveur FTP</string>
-    <string name="nav_start_ftp">Démarrer le serveur FTP</string>
-    <string name="nav_stop_ftp">Arrêter le serveur FTP</string>
-    <string name="nav_stop_ftp_game_manager">Arrêter le serveur FTP du gestionnaire de jeux</string>
-    <string name="nav_start_ftp_game_manager">Démarrer le serveur FTP du gestionnaire de jeux</string>
-    <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
-    <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
-    <string name="settings_icon_theme">Thème d\'icônes</string>
-    <string name="settings_icon_theme_colourful">Coloré</string>
-    <string name="settings_icon_theme_colourful_duotone">Bichromie colorée</string>
-    <string name="settings_icon_theme_material">Material</string>
-    <string name="settings_default_folder_color">Couleur de dossier par défaut</string>
-    <string name="settings_choose_icon_theme">Choisir le thème d\'icônes</string>
     <string name="msg_remote_permanent_warning">Les fichiers réseau seront supprimés définitivement (impossible de les déplacer vers la corbeille).</string>
     <string name="msg_archive_remote_unsupported">L\'archivage n\'est pas encore pris en charge pour les emplacements réseau.</string>
     <string name="msg_remote_trash_skipped">Impossible de déplacer les fichiers réseau vers la corbeille. Ils seront supprimés définitivement.</string>

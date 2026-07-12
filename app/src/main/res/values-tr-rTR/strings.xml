@@ -26,6 +26,16 @@
     <string name="options">Seçenekler</string>
     <string name="menu_clear_thumbnails">Küçük resimleri temizle</string>
     <string name="msg_thumbnails_cleared">Küçük resimler temizlendi</string>
+    <string name="off">Kapalı</string>
+    <string name="previous">Önceki</string>
+    <string name="next">Sonraki</string>
+    <string name="pause">Duraklat</string>
+    <string name="play">Oynat</string>
+    <string name="shuffle">Karıştır</string>
+    <string name="repeat">Tekrarla</string>
+    <string name="playlist">Oynatma Listesi</string>
+    <string name="audio_expand_player">Oynatıcıyı Genişlet</string>
+
     <string name="properties">Özellikler</string>
     <string name="prop_name">Ad:</string>
     <string name="prop_type">Tür:</string>
@@ -53,6 +63,7 @@
     <string name="details_size">Boyut: %1$s</string>
     <string name="details_resolution">Çözünürlük: %1$s</string>
     <string name="details_duration">Süre: %1$s</string>
+
     <string name="shortcuts_title">Klavye kısayolları</string>
     <string name="shortcuts_nav_selection">Navigasyon ve Seçim</string>
     <string name="shortcuts_arrow_keys">Ok Tuşları</string>
@@ -89,7 +100,7 @@
     <string name="shortcuts_ctrl_zy_desc">Geri al / Yinele</string>
     <string name="shortcuts_ctrl_wheel">Ctrl + Fare Tekerleği</string>
     <string name="shortcuts_ctrl_wheel_desc">Yakınlaştır / Uzaklaştır</string>
-    <string name="shortcuts_ctrl_slash">Ctrl + .</string>
+    <string name="shortcuts_ctrl_slash">Ctrl + /</string>
     <string name="shortcuts_ctrl_slash_desc">Klavye kısayolları</string>
     <string name="shortcuts_mouse">Fare</string>
     <string name="shortcuts_right_click">Sağ Tık</string>
@@ -102,6 +113,7 @@
     <string name="shortcuts_drag_desc">Kopyala</string>
     <string name="shortcuts_shift_drag">Shift + Sürükleme</string>
     <string name="shortcuts_shift_drag_desc">Taşı</string>
+
     <string name="archive_create">Arşiv Oluştur</string>
     <string name="archive_name">Arşiv Adı</string>
     <string name="archive_comp_method">Sıkıştırma Yöntemi</string>
@@ -119,8 +131,9 @@
     <string name="archive_button">Arşiv oluştur</string>
     <string name="extract_button">Çıkart</string>
     <string name="archive_inner_error">Henüz arşiv içerisindeki dosyalar açılamıyor</string>
+
     <string name="conflict_title">Dosya Çakışması</string>
-    <string name="conflict_message">\"%1$s\" adlı dosya zaten mevcut</string>
+    <string name="conflict_message">\"%1$s\" adlı dosya zaten mevcut. Ne yapmak istersiniz?</string>
     <string name="conflict_remember">Bu oturum için seçimi hatırla</string>
     <string name="conflict_merge">Birleştir</string>
     <string name="conflict_keep_both">İkisini de Sakla</string>
@@ -133,6 +146,7 @@
     <string name="delete_permanently">Kalıcı Sil</string>
     <string name="delete_permanent_title">Kalıcı Sil</string>
     <string name="delete_permanent_message">%1$s kalıcı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+
     <string name="op_deleting">Öğeler siliniyor…</string>
     <string name="op_extracting">Arşiv çıkartılıyor…</string>
     <string name="op_compressing">Öğeler sıkıştırılıyor…</string>
@@ -145,21 +159,20 @@
     <string name="op_min_remaining">Yaklaşık %1$d dk. kaldı</string>
     <string name="op_sec_remaining">Yaklaşık %1$d sn. kaldı</string>
     <string name="op_renaming">%1$s Yeniden adlandırılıyor…</string>
-    <string name="op_copying">1 öğe kopyalanıyor</string>
-    <string name="op_trashing">1 öğe Geri Dönüşüm Kutusuna taşınıyor</string>
-    <string name="op_extracting_an_archive">1 öğe çıkartılıyor</string>
+    <string name="op_copying">1 öğe kopyalanıyor…</string>
+    <string name="op_copying_items">%1$d öğe kopyalanıyor…</string>
+    <string name="op_extracting_an_archive">1 öğe çıkartılıyor…</string>
     <string name="op_extracting_archives">%1$d arşivden çıkartılıyor…</string>
     <string name="op_compressing_an_item">1 öğe sıkıştırılıyor…</string>
     <string name="op_compressing_items">%1$d öğe sıkıştırılıyor…</string>
-    <string name="op_copying_items">%1$d öğe kopyalanıyor…</string>
     <string name="op_deleting_an_item">1 öğe siliniyor…</string>
     <string name="op_deleting_items">%1$d öğe siliniyor…</string>
+    <string name="op_trashing">1 öğe Geri Dönüşüm Kutusuna taşınıyor…</string>
     <string name="op_trashing_items">%1$d öğe Geri Dönüşüm Kutusuna taşınıyor…</string>
     <string name="op_restoring">1 öğe geri yükleniyor…</string>
     <string name="op_restoring_items">%1$d öğe geri yükleniyor…</string>
     <string name="op_sec">sn</string>
 
-    <!-- Notifications -->
     <string name="notif_description">Dosya işlemlerinin ilerleyişi</string>
 
     <string name="settings">Ayarlar</string>
@@ -183,6 +196,14 @@
     <string name="settings_tab_bar_background">Sekme Çubuğu Arka Plan Resmi</string>
     <string name="settings_tab_bar_background_none">Yok</string>
     <string name="settings_clear">Temizle</string>
+    <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
+    <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
+    <string name="settings_icon_theme">Simge Teması</string>
+    <string name="settings_icon_theme_colourful">Renkli</string>
+    <string name="settings_icon_theme_colourful_duotone">Renkli Çift Tonlu</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Varsayılan Klasör Rengi</string>
+    <string name="settings_choose_icon_theme">Simge Teması Seç</string>
     <string name="settings_details_large">Ayrıntılar (Sadece büyük ekranlar için geçerli)</string>
     <string name="settings_details_hidden">Gizli</string>
     <string name="settings_details_pane">Yan Panel</string>
@@ -208,6 +229,8 @@
     <string name="settings_choose_del_behavior">Silme Davranışını Seç</string>
     <string name="settings_choose_theme">Tema Seç</string>
     <string name="settings_choose_details_mode">Ayrıntılar Modunu Seç</string>
+    <string name="settings_starting_page">Başlangıç Sayfası</string>
+    <string name="settings_choose_starting_page">Başlangıç Sayfası Seç</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem varsayılanı</string>
     <string name="settings_language_english">İngilizce</string>
@@ -222,6 +245,7 @@
     <string name="settings_language_ukrainian">Ukraynaca</string>
     <string name="settings_language_korean">Korece</string>
     <string name="settings_choose_language">Dil Seç</string>
+
     <string name="menu_restore">Geri Yükle</string>
     <string name="menu_delete_permanently">Kalıcı Sil</string>
     <string name="menu_properties">Özellikler</string>
@@ -246,7 +270,6 @@
     <string name="menu_view">Görünüm</string>
     <string name="menu_empty_recycle_bin">Geri Dönüşüm Kutusunu Boşalt</string>
     <string name="menu_refresh">Yenile</string>
-    <string name="folder">Klasör</string>
     <string name="menu_text_document">Metin Belgesi</string>
     <string name="menu_by_name">Ada Göre</string>
     <string name="menu_by_date">Tarihe Göre</string>
@@ -256,6 +279,11 @@
     <string name="menu_details">Ayrıntılı</string>
     <string name="menu_grid">Izgara</string>
     <string name="menu_gallery">Galeri</string>
+    <string name="menu_music">Müzik</string>
+    <string name="menu_sync_list">Listeyi Senkronize Et</string>
+    <string name="menu_music_playlists">Oynatma Listeleri</string>
+    <string name="menu_music_favourites">Favoriler</string>
+    <string name="menu_new_playlist">Yeni Oynatma Listesi</string>
     <string name="menu_content">İçindekiler</string>
     <string name="menu_subtitles">Altyazı</string>
     <string name="menu_audio_track">Ses Parçası</string>
@@ -277,14 +305,23 @@
     <string name="menu_redo">Yinele</string>
     <string name="menu_folder_color">Klasör rengi</string>
     <string name="menu_select_folder_color">Klasör rengini seç</string>
+
     <string name="nav_library_items">Kütüphane öğeleri</string>
     <string name="nav_recent">Son Kullanılanlar</string>
     <string name="nav_gallery">Galeri</string>
+    <string name="nav_music">Müzik</string>
     <string name="nav_downloads">İndirilenler</string>
     <string name="nav_documents">Belgeler</string>
     <string name="nav_game_saves">Oyun Yöneticisi</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
+    <string name="menu_music_albums">Albümler</string>
+    <string name="menu_music_folders">Müzik Klasörleri</string>
+    <string name="menu_create_playlist">Oynatma Listesi Oluştur</string>
+    <string name="default_playlist_name">Yeni Oynatma Listesi</string>
+    <string name="menu_add_to_playlist">Oynatma Listesine Ekle</string>
+    <string name="msg_no_playlists">Oynatma listesi bulunamadı. Önce bir tane oluşturun.</string>
+    <string name="msg_added_to_playlist">%1$s listesine eklendi</string>
     <string name="gallery_filter_off_msg">Filtreleme şu anda KAPALI. Tüm medya gösteriliyor.</string>
     <string name="gallery_no_folders_msg">Hiçbir klasör eklenmedi. Filtreleme etkinleştirilirse standart medya konumları kullanılacaktır.</string>
     <string name="gallery_managed_folders">Yönetilen Klasörler:</string>
@@ -292,24 +329,77 @@
     <string name="menu_gallery_show_all">Tüm Medyayı Göster</string>
     <string name="menu_documents_folder">Klasör</string>
     <string name="menu_documents_show_folders">Klasörleri Göster</string>
+    <string name="menu_favourite">Favori</string>
     <string name="nav_add_storage">Depolama Ekle</string>
     <string name="nav_internal_storage">Dahili Depolama</string>
     <string name="nav_trash">Geri Dönüşüm Kutusu</string>
     <string name="nav_external_drive">Harici Sürücü</string>
     <string name="nav_favorites">Favoriler</string>
     <string name="nav_no_favorites">Favori eklenmemiştir</string>
-    <string name="nav_library">Kütüphane</string>
+    <string name="nav_library">Biblioteca</string>
     <string name="nav_recycle_bin">Geri Dönüşüm Kutusu</string>
     <string name="nav_storage">Depolama</string>
     <string name="nav_added_locations">Eklenmiş Konumlar</string>
     <string name="nav_sd_card">SD Kart</string>
     <string name="nav_external_location">Harici Konum</string>
     <string name="nav_unknown_folder">Bilinmeyen Klasör</string>
-    <string name="archive">Arşiv</string>
     <string name="nav_collapse">Katla</string>
     <string name="nav_expand">Genişlet</string>
     <string name="nav_storage_usage_label">%2$s içinde %1$s boş</string>
+
+    <string name="nav_network">Ağ</string>
+    <string name="nav_add_local_storage">Yerel Depolama Ekle</string>
+    <string name="nav_add_network_storage">Ağ Depolama Ekle</string>
+    <string name="nav_network_protocol">Protokol</string>
+    <string name="nav_network_display_name">Görünen Ad</string>
+    <string name="nav_network_host">Ana Bilgisayar</string>
+    <string name="nav_network_port">Port</string>
+    <string name="nav_network_username">Kullanıcı Adı</string>
+    <string name="nav_network_password">Şifre</string>
+    <string name="nav_network_remote_path">Uzak Yol</string>
+    <string name="nav_network_save">Kaydet</string>
+    <string name="nav_network_edit">Bağlantıyı Düzenle</string>
+    <string name="nav_network_use_tls">FTPS (TLS) Kullan</string>
+    <string name="nav_network_passive_mode">Pasif mod</string>
+    <string name="nav_network_root_url">Tam URL (isteğe bağlı geçersiz kılma)</string>
+    <string name="nav_network_accept_untrusted">Güvenilmeyen sertifikaları kabul et</string>
+    <string name="nav_network_test">Bağlantıyı Test Et</string>
+    <string name="nav_network_display_name_placeholder">Benim NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x veya nas.local</string>
+    <string name="nav_network_username_placeholder">kullanıcı adı</string>
+    <string name="nav_network_username_anon_placeholder">Anonim için boş bırakın</string>
+    <string name="nav_network_hide_password">Şifreyi gizle</string>
+    <string name="nav_network_show_password">Şifreyi göster</string>
+    <string name="nav_network_sftp_key_uri">Özel anahtar URI (isteğe bağlı)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Özel anahtar parolası (isteğe bağlı)</string>
+    <string name="nav_network_hide_passphrase">Parolayı gizle</string>
+    <string name="nav_network_show_passphrase">Parolayı göster</string>
+    <string name="nav_network_sftp_key_fallback">Özel anahtar metni (isteğe bağlı)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Anahtarı gizle</string>
+    <string name="nav_network_show_key">Anahtarı göster</string>
+    <string name="nav_network_smb_domain">Etki Alanı / Çalışma Grubu (isteğe bağlı)</string>
+    <string name="nav_network_smb_path_hint">İlk bölüm paylaşım adıdır (ör. /Belgeler)</string>
+    <string name="nav_network_sftp_path_hint">Sunucudaki mutlak yol. Ev dizini veya kök için / bırakın.</string>
+    <string name="nav_network_webdav_path_hint">Sunucudaki yol ön eki. Kök için / bırakın.</string>
+    <string name="nav_network_test_success">Bağlandı</string>
+    <string name="nav_network_test_failed">Başarısız oldu</string>
+
+    <string name="nav_ftp_server">FTP Sunucusu</string>
+    <string name="nav_start_ftp">FTP Sunucusunu Başlat</string>
+    <string name="nav_stop_ftp">FTP Sunucusunu Durdur</string>
+    <string name="nav_stop_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Durdur</string>
+    <string name="nav_start_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Başlat</string>
+
+    <string name="archive">Arşiv</string>
+    <string name="image">Görsel</string>
+    <string name="video">Video</string>
+    <string name="audio">Ses</string>
+    <string name="document">Doküman</string>
     <string name="file">Dosya</string>
+    <string name="folder">Klasör</string>
+
     <string name="msg_preparing">Hazırlanıyor…</string>
     <string name="msg_starting">Başlatılıyor…</string>
     <string name="msg_cancelling">İptal ediliyor…</string>
@@ -350,30 +440,29 @@
     <string name="msg_already_at_saf_root">Zaten seçilen klasörün kök dizinindesiniz</string>
     <string name="msg_empty_clipboard">Pano boş</string>
     <string name="msg_compression_failed">Sıkıştırma başarısız oldu: %1$s</string>
+    <string name="msg_unknown_compression_error">Bilinmeyen sıkıştırma hatası</string>
+    <string name="menu_set_wallpaper_failed">Arka plan ayarlanamadı</string>
+    <string name="media_share_image_failed">Görsel paylaşılamadı</string>
+
     <string name="dialog_new_folder">Yeni Klasör</string>
     <string name="dialog_new_file">Yeni Metin Belgesi</string>
     <string name="dialog_rename">Yeniden adlandır</string>
     <string name="dialog_search_options">Arama Seçenekleri</string>
+
     <string name="search_subfolders">Bütün alt klasörleri ara</string>
-    <string name="search_kind">kind: (Dosya türü)</string>
+    <string name="search_kind">tür: (Dosya türü)</string>
     <string name="search_and" translatable="false">AND</string>
     <string name="search_or" translatable="false">OR</string>
     <string name="search_not" translatable="false">NOT</string>
     <string name="search_ext">*.ext (Uzantı)</string>
+
     <string name="unknown_resolution">Bilinmeyen çözünürlük</string>
     <string name="media_playing">Oynatılıyor</string>
     <string name="media_paused">Duraklatıldı</string>
-    <string name="details_header_name">Ad</string>
-    <string name="details_header_size">Boyut</string>
-    <string name="details_header_date">Tarih</string>
-    <string name="details_header_date_deleted">Silinme tarihi</string>
-    <string name="details_header_deleted_from">Konum</string>
-    <string name="msg_unknown_compression_error">Bilinmeyen sıkıştırma hatası</string>
     <string name="media_loop_on">Döngü: Açık</string>
     <string name="media_loop_off">Döngü: Kapalı</string>
     <string name="media_speed_normal">Normal (1x)</string>
     <string name="media_no_audio_tracks">Ses parçası bulunamadı</string>
-    <string name="off">Kapalı</string>
     <string name="media_fit">Sığdır (Varsayılan)</string>
     <string name="media_fill">Doldur</string>
     <string name="media_zoom">Yakınlaştır (Kırp)</string>
@@ -381,19 +470,20 @@
     <string name="media_fixed_h">Sabit yükseklik</string>
     <string name="media_audio_track">Ses parçası %1$d</string>
     <string name="media_subtitle_track">Altyazı parçası %1$d</string>
-    <string name="previous">Önceki</string>
-    <string name="next">Sonraki</string>
     <string name="media_volume">Ses Seviyesi</string>
     <string name="media_loop">Döngü</string>
     <string name="media_viewed">Görüntülenen resim</string>
-    <string name="menu_set_wallpaper_failed">Duvar kağıdı ayarlanamadı</string>
-    <string name="media_share_image_failed">Resim paylaşılamadı</string>
     <string name="media_thumbnail">Küçük resim</string>
-    <string name="image">Görsel</string>
-    <string name="video">Video</string>
-    <string name="audio">Ses</string>
-    <string name="document">Doküman</string>
+
+    <string name="details_header_name">Ad</string>
+    <string name="details_header_size">Boyut</string>
+    <string name="details_header_date">Tarih</string>
+    <string name="details_header_date_deleted">Silinme tarihi</string>
+    <string name="details_header_deleted_from">Konum</string>
+    <string name="details_header_type">Tür</string>
+
     <string name="menu_move">Taşı</string>
+    <string name="menu_by_type">Türe Göre</string>
     <string name="move_or_copy_title">Taşı mı Kopyala mı?</string>
     <string name="move_or_copy_message">Sürüklenen dosyaları buraya taşımak mı yoksa kopyalamak mı istersiniz?</string>
     <string name="settings_touch_drag">Dokunmatik sürükleme davranışı</string>
@@ -402,43 +492,11 @@
     <string name="settings_touch_drag_copy">Her zaman kopyala</string>
     <string name="settings_touch_drag_move">Her zaman taşı</string>
     <string name="msg_cancelled_deletion">Silme İptal Edildi</string>
-    <string name="msg_deletion">%1$d dosya silindi</string>
-    <string name="details_header_type">Tür</string>
-    <string name="menu_by_type">Türe Göre</string>
-    <string name="nav_network">Ağ</string>
-    <string name="nav_add_local_storage">Yerel Depolama Ekle</string>
-    <string name="nav_add_network_storage">Ağ Depolama Ekle</string>
-    <string name="nav_network_protocol">Protokol</string>
-    <string name="nav_network_display_name">Görünen Ad</string>
-    <string name="nav_network_host">Ana Bilgisayar</string>
-    <string name="nav_network_port">Port</string>
-    <string name="nav_network_username">Kullanıcı Adı</string>
-    <string name="nav_network_password">Şifre</string>
-    <string name="nav_network_remote_path">Uzak Yol</string>
-    <string name="nav_network_save">Kaydet</string>
-    <string name="nav_network_edit">Bağlantıyı Düzenle</string>
-    <string name="nav_network_use_tls">FTPS (TLS) Kullan</string>
-    <string name="nav_network_passive_mode">Pasif mod</string>
-    <string name="nav_network_root_url">Tam URL (isteğe bağlı geçersiz kılma)</string>
-    <string name="nav_network_accept_untrusted">Otomatik imzalı sertifikaları kabul et</string>
-    <string name="nav_network_test">Bağlantıyı Test Et</string>
+    <string name="msg_deletion">Silindi: %1$d dosya</string>
 
-    <string name="nav_ftp_server">FTP Sunucusu</string>
-    <string name="nav_start_ftp">FTP Sunucusunu Başlat</string>
-    <string name="nav_stop_ftp">FTP Sunucusunu Durdur</string>
-    <string name="nav_stop_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Durdur</string>
-    <string name="nav_start_ftp_game_manager">Oyun Yöneticisi FTP Sunucusunu Başlat</string>
-    <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
-    <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
-    <string name="settings_icon_theme">Simge Teması</string>
-    <string name="settings_icon_theme_colourful">Renkli</string>
-    <string name="settings_icon_theme_colourful_duotone">Renkli Çift Tonlu</string>
-    <string name="settings_icon_theme_material">Material</string>
-    <string name="settings_default_folder_color">Varsayılan Klasör Rengi</string>
-    <string name="settings_choose_icon_theme">Simge Teması Seç</string>
-    <string name="msg_remote_permanent_warning">Ağ dosyaları kalıcı olarak silinecek (çöp kutusuna taşınamaz).</string>
-    <string name="msg_archive_remote_unsupported">Arşivleme henüz ağ konumları için desteklenmiyor.</string>
-    <string name="msg_remote_trash_skipped">Ağ dosyaları çöp kutusuna taşınamaz. Kalıcı olarak silinecekler.</string>
+    <string name="msg_remote_permanent_warning">Ağ dosyaları kalıcı olarak silinecek.</string>
+    <string name="msg_archive_remote_unsupported">Arşivleme ağ konumları için henüz desteklenmiyor.</string>
+    <string name="msg_remote_trash_skipped">Ağ dosyaları çöp kutusuna taşınamaz.</string>
     <string name="settings_about">Hakkında</string>
 
     <string name="shizuku_status">Shizuku Durumu</string>
@@ -463,10 +521,11 @@
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistem ve Pil</string>
-    <string name="settings_ftp_inactivity_timeout">FTP Zaman Aşımı</string>
-    <string name="settings_app_inactivity_timeout">Uygulama Zaman Aşımı</string>
+    <string name="settings_ftp_inactivity_timeout">FTP İnaktivite Zaman Aşımı</string>
+    <string name="settings_app_inactivity_timeout">Uygulama İnaktivite Zaman Aşımı</string>
     <string name="settings_timeout_minutes">%1$d dakika</string>
     <string name="settings_timeout_disabled">Asla</string>
+
     <string name="settings_custom_theme">Tema Özelleştirme</string>
     <string name="settings_custom_theme_mode">Özel Tema Modu</string>
     <string name="settings_load_theme_pack">Tema Paketi Yükle (.zip)</string>
@@ -474,7 +533,6 @@
     <string name="msg_theme_pack_loaded">Tema paketi \"%1$s\" yüklendi</string>
     <string name="msg_theme_pack_failed">Tema paketi yüklenemedi</string>
 
-    <!-- Unresponsive Server -->
     <string name="dialog_unresponsive_server_title">Sunucu Yanıt Vermiyor</string>
     <string name="dialog_unresponsive_server_message">\"%1$s\" sunucusunun yanıt vermesi uzun sürüyor. Beklemeye devam mı etmek istersiniz yoksa işlemi iptal mi etmek istersiniz?</string>
     <string name="dialog_wait">Bekle</string>

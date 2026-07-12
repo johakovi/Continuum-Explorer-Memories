@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
 
@@ -32,6 +33,12 @@
     <string name="off">Выкл</string>
     <string name="previous">Назад</string>
     <string name="next">Вперед</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Воспроизведение</string>
+    <string name="shuffle">Случайно</string>
+    <string name="repeat">Повтор</string>
+    <string name="playlist">Плейлист</string>
+    <string name="audio_expand_player">Развернуть плеер</string>
 
     <!-- Properties / Details -->
     <string name="properties">Свойства</string>
@@ -233,6 +240,8 @@
     <string name="settings_choose_del_behavior">Выберите способ удаления</string>
     <string name="settings_choose_theme">Выберите тему</string>
     <string name="settings_choose_details_mode">Выберите режим деталей</string>
+    <string name="settings_starting_page">Стартовая страница</string>
+    <string name="settings_choose_starting_page">Выберите стартовую страницу</string>
     <string name="settings_language">Язык</string>
     <string name="settings_language_system">Системный</string>
     <string name="settings_language_english">Английский</string>
@@ -282,6 +291,11 @@
     <string name="menu_details">Таблица</string>
     <string name="menu_grid">Плитка</string>
     <string name="menu_gallery">Галерея</string>
+    <string name="menu_music">Музыка</string>
+    <string name="menu_sync_list">Синхронизировать список</string>
+    <string name="menu_music_playlists">Плейлисты</string>
+    <string name="menu_music_favourites">Избранное</string>
+    <string name="menu_new_playlist">Новый плейлист</string>
     <string name="menu_content">Контент</string>
     <string name="menu_subtitles">Субтитры</string>
     <string name="menu_audio_track">Аудиодорожка</string>
@@ -308,18 +322,27 @@
     <string name="nav_library_items">Элементы библиотеки</string>
     <string name="nav_recent">Недавние</string>
     <string name="nav_gallery">Галерея</string>
+    <string name="nav_music">Музыка</string>
     <string name="nav_downloads">Загрузки</string>
     <string name="nav_documents">Документы</string>
     <string name="nav_game_saves">Диспетчер игр</string>
     <string name="menu_gallery_albums">Альбомы</string>
     <string name="menu_gallery_folders">Папки галереи</string>
-    <string name="gallery_filter_off_msg">Фильтрация в данный момент ВЫКЛЮЧЕНА. Отображаются все медиафайлы.</string>
-    <string name="gallery_no_folders_msg">Папки не добавлены. Будут использованы стандартные расположения медиафайлов, если фильтрация включена.</string>
+    <string name="menu_music_albums">Альбомы</string>
+    <string name="menu_music_folders">Музыкальные папки</string>
+    <string name="menu_create_playlist">Создать плейлист</string>
+    <string name="default_playlist_name">Новый плейлист</string>
+    <string name="menu_add_to_playlist">Добавить в плейлист</string>
+    <string name="msg_no_playlists">Плейлисты не найдены. Сначала создайте один.</string>
+    <string name="msg_added_to_playlist">Добавлено в %1$s</string>
+    <string name="gallery_filter_off_msg">Фильтрация выключена. Отображаются все медиафайлы.</string>
+    <string name="gallery_no_folders_msg">Папки не добавлены. Будут использованы стандартные расположения медиафайлов.</string>
     <string name="gallery_managed_folders">Управляемые папки:</string>
     <string name="gallery_add_folder">Добавить папку</string>
     <string name="menu_gallery_show_all">Показать все медиа</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="menu_documents_show_folders">Показать папки</string>
+    <string name="menu_favourite">Избранное</string>
     <string name="nav_add_storage">Добавить хранилище</string>
     <string name="nav_internal_storage">Внутренняя память</string>
     <string name="nav_trash">Корзина</string>
@@ -353,6 +376,27 @@
     <string name="nav_network_root_url">Полный URL (опционально)</string>
     <string name="nav_network_accept_untrusted">Принимать самоподписанные сертификаты</string>
     <string name="nav_network_test">Проверить подключение</string>
+    <string name="nav_network_display_name_placeholder">Мой NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x или nas.local</string>
+    <string name="nav_network_username_placeholder">имя пользователя</string>
+    <string name="nav_network_username_anon_placeholder">Оставьте пустым для анонимного входа</string>
+    <string name="nav_network_hide_password">Скрыть пароль</string>
+    <string name="nav_network_show_password">Показать пароль</string>
+    <string name="nav_network_sftp_key_uri">URI закрытого ключа (опционально)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Пароль закрытого ключа (опционально)</string>
+    <string name="nav_network_hide_passphrase">Скрыть пароль</string>
+    <string name="nav_network_show_passphrase">Показать пароль</string>
+    <string name="nav_network_sftp_key_fallback">Закрытый ключ текстом (опционально)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Скрыть ключ</string>
+    <string name="nav_network_show_key">Показать ключ</string>
+    <string name="nav_network_smb_domain">Домен / Рабочая группа (опционально)</string>
+    <string name="nav_network_smb_path_hint">Первый сегмент — это имя общего ресурса (напр. /Documents)</string>
+    <string name="nav_network_sftp_path_hint">Абсолютный путь на сервере. Оставьте / для домашнего каталога или корня.</string>
+    <string name="nav_network_webdav_path_hint">Префикс пути на сервере. Оставьте / для корня.</string>
+    <string name="nav_network_test_success">Подключено</string>
+    <string name="nav_network_test_failed">Ошибка</string>
 
     <string name="nav_ftp_server">FTP-сервер</string>
     <string name="nav_start_ftp">Запустить FTP-сервер</string>

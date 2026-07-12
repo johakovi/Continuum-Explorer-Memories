@@ -43,7 +43,8 @@ enum class PopupType {
     MOVE_COPY_CHOICE,
     NETWORK_CONNECTION,
     TERMINAL_DEBUG,
-    UNRESPONSIVE_SERVER
+    UNRESPONSIVE_SERVER,
+    ADD_TO_PLAYLIST
 }
 
 enum class WaitResult {
@@ -179,6 +180,11 @@ object FileOperationsManager {
     // Terminal Debug State
     var terminalOutput = mutableStateOf("")
 
+    // Playlist Selection State
+    var songToAddToPlaylist = mutableStateOf<UniversalFile?>(null)
+    var playlistOptions = mutableStateListOf<UniversalFile>()
+    private var playlistDeferred: CompletableDeferred<UniversalFile?>? = null
+
     // Unresponsive Server State
     private var waitDeferred: CompletableDeferred<WaitResult>? = null
 
@@ -202,6 +208,23 @@ object FileOperationsManager {
         popupType.value = PopupType.TERMINAL_DEBUG
         isOperating.value = false
         notifyListeners()
+    }
+
+    fun requestPlaylistSelection(song: UniversalFile, playlists: List<UniversalFile>): CompletableDeferred<UniversalFile?> {
+        songToAddToPlaylist.value = song
+        playlistOptions.clear()
+        playlistOptions.addAll(playlists)
+        popupType.value = PopupType.ADD_TO_PLAYLIST
+        isOperating.value = false
+        val deferred = CompletableDeferred<UniversalFile?>()
+        playlistDeferred = deferred
+        notifyListeners()
+        return deferred
+    }
+
+    fun confirmPlaylistSelection(playlist: UniversalFile?) {
+        playlistDeferred?.complete(playlist)
+        playlistDeferred = null
     }
 
     fun getTitleText(context: Context): String {

@@ -11,43 +11,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -58,15 +28,12 @@ import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.model.UIAppearance
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -244,6 +211,9 @@ fun FileExplorerRO(
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val isInWindowMode = appearance == UIAppearance.WINDOWED
 
+    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+    val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -301,10 +271,7 @@ fun FileExplorerRO(
             Scaffold(
                 containerColor = extendedColors.background,
                 topBar = {
-                    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-                    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
-                    val isPhone = appearance == UIAppearance.PHONE
-                    val hideTopNav = isPhone && isPortrait
+                    val hideTopNav = appearance == UIAppearance.PHONE && isPortrait
 
                     ExplorerTopBar(
                         tabs = tabs,
@@ -351,6 +318,21 @@ fun FileExplorerRO(
                         onAddNetwork = onAddNetwork,
                         onEditNetwork = onEditNetwork
                     )
+
+                    if (appState.getCurrentStorageKey() == "virtual://music/playlists") {
+                        FloatingActionButton(
+                            onClick = { appState.createNewPlaylist() },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = innerPadding.calculateTopPadding() + 16.dp, end = 16.dp)
+                                .zIndex(5f)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.menu_create_playlist))
+                        }
+                    }
                 }
             }
         }
@@ -359,9 +341,6 @@ fun FileExplorerRO(
         val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
         val extraHeight = if (isGestureNav) 0.dp else 20.dp
         val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
-
-        val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
-        val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
 
         if (showBottomBar) {
             val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
@@ -424,6 +403,7 @@ fun FileExplorerRO(
         }
 
         AudioPlayerBar(
+            appState = appState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()

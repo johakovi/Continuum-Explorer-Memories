@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
 
@@ -12,10 +13,10 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="back">Zurück</string>
-    <string name="pdf_contents">Inhaltsverzeichnis</string>
+    <string name="pdf_contents">Inhalt</string>
     <string name="done">Fertig</string>
     <string name="loading">Wird geladen…</string>
-    <string name="calculating">Berechnung…</string>
+    <string name="calculating">Wird berechnet…</string>
     <string name="unknown">Unbekannt</string>
     <string name="home">Startseite</string>
     <string name="new_tab">Neuer Tab</string>
@@ -32,6 +33,12 @@
     <string name="off">Aus</string>
     <string name="previous">Vorherige</string>
     <string name="next">Nächste</string>
+    <string name="pause">Pause</string>
+    <string name="play">Wiedergabe</string>
+    <string name="shuffle">Zufällig</string>
+    <string name="repeat">Wiederholen</string>
+    <string name="playlist">Wiedergabeliste</string>
+    <string name="audio_expand_player">Player erweitern</string>
 
     <!-- Properties / Details -->
     <string name="properties">Eigenschaften</string>
@@ -158,8 +165,8 @@
     <string name="op_items_remaining">Verbleibende Elemente:</string>
     <string name="op_speed">Geschwindigkeit:</string>
     <string name="op_background">Hintergrund</string>
-    <string name="op_min_remaining">Noch etwa %1$d Min.</string>
-    <string name="op_sec_remaining">Noch etwa %1$d Sek.</string>
+    <string name="op_min_remaining">Noch etwa %1$d Min. verbleibend</string>
+    <string name="op_sec_remaining">Noch etwa %1$d Sek. verbleibend</string>
     <string name="op_renaming">%1$s wird umbenannt…</string>
     <string name="op_copying">1 Element wird kopiert…</string>
     <string name="op_copying_items">%1$d Elemente werden kopiert…</string>
@@ -176,7 +183,7 @@
     <string name="op_sec">Sek.</string>
 
     <!-- Notifications -->
-    <string name="notif_description">Fortschritt der Datei operationen</string>
+    <string name="notif_description">Fortschritt der Dateioperationen</string>
 
     <!-- Settings -->
     <string name="settings">Einstellungen</string>
@@ -233,6 +240,8 @@
     <string name="settings_choose_del_behavior">Löschverhalten wählen</string>
     <string name="settings_choose_theme">Design wählen</string>
     <string name="settings_choose_details_mode">Detailmodus wählen</string>
+    <string name="settings_starting_page">Startseite</string>
+    <string name="settings_choose_starting_page">Startseite wählen</string>
     <string name="settings_language">Sprache</string>
     <string name="settings_language_system">Systemstandard</string>
     <string name="settings_language_english">Englisch</string>
@@ -282,6 +291,11 @@
     <string name="menu_details">Details</string>
     <string name="menu_grid">Raster</string>
     <string name="menu_gallery">Galerie</string>
+    <string name="menu_music">Musik</string>
+    <string name="menu_sync_list">Liste synchronisieren</string>
+    <string name="menu_music_playlists">Wiedergabelisten</string>
+    <string name="menu_music_favourites">Favoriten</string>
+    <string name="menu_new_playlist">Neue Wiedergabeliste</string>
     <string name="menu_content">Inhalt</string>
     <string name="menu_subtitles">Untertitel</string>
     <string name="menu_audio_track">Tonspur</string>
@@ -317,6 +331,10 @@
     <string name="menu_music_albums">Alben</string>
     <string name="menu_music_folders">Musik-Ordner</string>
     <string name="menu_create_playlist">Playlist erstellen</string>
+    <string name="default_playlist_name">Neue Playlist</string>
+    <string name="menu_add_to_playlist">Zur Playlist hinzufügen</string>
+    <string name="msg_no_playlists">Keine Playlists gefunden. Erstellen Sie zuerst eine.</string>
+    <string name="msg_added_to_playlist">Zu %1$s hinzugefügt</string>
     <string name="gallery_filter_off_msg">Filterung ist momentan AUS. Alle Medien werden angezeigt.</string>
     <string name="gallery_no_folders_msg">Keine Ordner hinzugefügt. Standard-Medienorte werden verwendet, wenn die Filterung aktiviert ist.</string>
     <string name="gallery_managed_folders">Verwaltete Ordner:</string>
@@ -324,6 +342,7 @@
     <string name="menu_gallery_show_all">Alle Medien anzeigen</string>
     <string name="menu_documents_folder">Ordner</string>
     <string name="menu_documents_show_folders">Ordner anzeigen</string>
+    <string name="menu_favourite">Favorit</string>
     <string name="nav_add_storage">Speicher hinzufügen</string>
     <string name="nav_internal_storage">Interner Speicher</string>
     <string name="nav_trash">Papierkorb</string>
@@ -357,6 +376,27 @@
     <string name="nav_network_root_url">Vollständige URL (optionaler Override)</string>
     <string name="nav_network_accept_untrusted">Selbstsignierte Zertifikate akzeptieren</string>
     <string name="nav_network_test">Verbindung testen</string>
+    <string name="nav_network_display_name_placeholder">Mein NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x oder nas.local</string>
+    <string name="nav_network_username_placeholder">Benutzername</string>
+    <string name="nav_network_username_anon_placeholder">Für anonym leer lassen</string>
+    <string name="nav_network_hide_password">Passwort ausblenden</string>
+    <string name="nav_network_show_password">Passwort anzeigen</string>
+    <string name="nav_network_sftp_key_uri">URI des privaten Schlüssels (optional)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://...</string>
+    <string name="nav_network_sftp_key_passphrase">Passwort des privaten Schlüssels (optional)</string>
+    <string name="nav_network_hide_passphrase">Passwort ausblenden</string>
+    <string name="nav_network_show_passphrase">Passwort anzeigen</string>
+    <string name="nav_network_sftp_key_fallback">Privater Schlüssel als Text (optional)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Schlüssel ausblenden</string>
+    <string name="nav_network_show_key">Schlüssel anzeigen</string>
+    <string name="nav_network_smb_domain">Domain / Workgroup (optional)</string>
+    <string name="nav_network_smb_path_hint">Das erste Segment ist der Freigabename (z. B. /Dokumente)</string>
+    <string name="nav_network_sftp_path_hint">Absoluter Pfad auf dem Server. / für Home oder Root belassen.</string>
+    <string name="nav_network_webdav_path_hint">Pfad-Präfix auf dem Server. / für Root belassen.</string>
+    <string name="nav_network_test_success">Verbunden</string>
+    <string name="nav_network_test_failed">Fehlgeschlagen</string>
 
     <string name="nav_ftp_server">FTP-Server</string>
     <string name="nav_start_ftp">FTP-Server starten</string>
@@ -473,9 +513,9 @@
     <string name="details_header_type">Typ</string>
     <string name="menu_by_type">Nach Typ</string>
 
-    <string name="msg_remote_permanent_warning">Netzwerk dateien werden dauerhaft gelöscht.</string>
+    <string name="msg_remote_permanent_warning">Netzwerkdateien werden dauerhaft gelöscht.</string>
     <string name="msg_archive_remote_unsupported">Archivierung wird noch nicht unterstützt für Netzwerk.</string>
-    <string name="msg_remote_trash_skipped">Netzwerk dateien können nicht in den Papierkorb verschoben werden.</string>
+    <string name="msg_remote_trash_skipped">Netzwerkdateien können nicht in den Papierkorb verschoben werden.</string>
     <string name="settings_about">Über</string>
 
     <string name="shizuku_status">Shizuku-Status</string>
@@ -504,6 +544,7 @@
     <string name="settings_app_inactivity_timeout">App-Inaktivitäts-Timeout</string>
     <string name="settings_timeout_minutes">%1$d Minuten</string>
     <string name="settings_timeout_disabled">Nie</string>
+
     <string name="settings_custom_theme">Design-Anpassung</string>
     <string name="settings_custom_theme_mode">Benutzerdefinierter Design-Modus</string>
     <string name="settings_load_theme_pack">Design-Paket laden (.zip)</string>

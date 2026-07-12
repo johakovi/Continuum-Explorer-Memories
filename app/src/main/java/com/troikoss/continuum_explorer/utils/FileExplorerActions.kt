@@ -40,7 +40,7 @@ fun FileExplorerState.open(item: UniversalFile) {
             if (itemFileRef != null) {
                 when {
                     libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
-                    item.providerId.startsWith("virtual://music") || item.mimeType == "album" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
+                    item.providerId.startsWith("virtual://music") || item.mimeType == "album" || item.mimeType == "audio/x-mpegurl" || item.mimeType == "application/vnd.ms-wpl" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
                     else -> {
                         safStack.clear()
                         navigateTo(itemFileRef, null)
@@ -310,16 +310,26 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
         return
     }
 
+    var finalNewName = newName
+    if (target.parentId == "virtual://music/playlists") {
+        val originalFile = File(target.providerId)
+        val ext = originalFile.extension
+        if (ext.isNotEmpty() && !finalNewName.lowercase().endsWith(".${ext.lowercase()}")) {
+            finalNewName = "$finalNewName.$ext"
+        }
+    }
+
     FileOperationsManager.enqueue(OperationType.RENAME, context.getString(R.string.op_renaming, target.name)) {
         FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
         FileOperationsManager.currentFileName.value = target.name
 
-        val success = renameFile(target, newName, context)
+        val success = renameFile(target, finalNewName, context)
         withContext(Dispatchers.Main) {
             if (success) {
                 refresh()?.join()
                 selectionManager.clear()
-                val newFile = files.find { it.name == newName }
+                val displayNewName = if (target.parentId == "virtual://music/playlists") newName else finalNewName
+                val newFile = files.find { it.name == displayNewName }
                 if (newFile != null) selectionManager.select(newFile)
                 GlobalEvents.triggerRefresh()
             } else {
@@ -379,6 +389,70 @@ fun FileExplorerState.createNewFile() {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
+}
+
+fun FileExplorerState.createNewPlaylist() {
+    FileOperationsManager.openInput(
+        title = context.getString(R.string.menu_create_playlist),
+        initialText = context.getString(R.string.default_playlist_name) + ".m3u",
+        buttonText = context.getString(R.string.create),
+        onConfirm = { name ->
+            scope.launch(Dispatchers.IO) {
+                val success = com.troikoss.continuum_explorer.managers.PlaylistManager.createPlaylist(name)
+                withContext(Dispatchers.Main) {
+                    if (success) {
+                        refresh()?.join()
+                        GlobalEvents.triggerRefresh()
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.msg_failed_create_file), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    )
+    val intent = Intent(context, PopUpActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
+}
+
+fun FileExplorerState.addToPlaylist(item: UniversalFile) {
+    scope.launch {
+        val playlists = withContext(Dispatchers.IO) {
+            com.troikoss.continuum_explorer.managers.PlaylistManager.getPlaylists(context)
+        }
+        if (playlists.isEmpty()) {
+            Toast.makeText(context, context.getString(R.string.msg_no_playlists), Toast.LENGTH_SHORT).show()
+            return@launch
+        }
+
+        val intent = Intent(context, PopUpActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+
+        val selectedPlaylist = FileOperationsManager.requestPlaylistSelection(item, playlists).await()
+        if (selectedPlaylist != null) {
+            withContext(Dispatchers.IO) {
+                val songsToAdd = if (item.isDirectory) {
+                    if (item.providerId.startsWith("virtual://music/albums/")) {
+                        val albumName = item.name
+                        com.troikoss.continuum_explorer.managers.MusicMetadataManager.getSongsForAlbum(context, albumName)
+                    } else {
+                        item.provider.listChildren(item.providerId).filter { !it.isDirectory && it.mimeType?.startsWith("audio/") == true }
+                    }
+                } else {
+                    listOf(item)
+                }
+
+                val playlistFile = File(selectedPlaylist.providerId)
+                songsToAdd.forEach { song ->
+                    com.troikoss.continuum_explorer.managers.PlaylistManager.addSongToPlaylist(playlistFile, song.providerId)
+                }
+            }
+            Toast.makeText(context, context.getString(R.string.msg_added_to_playlist, selectedPlaylist.name), Toast.LENGTH_SHORT).show()
+        }
+    }
 }
 
 fun FileExplorerState.showProperties(items: List<UniversalFile>? = null) {

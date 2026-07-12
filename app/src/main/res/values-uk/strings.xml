@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
 
@@ -32,6 +33,12 @@
     <string name="off">Вимк</string>
     <string name="previous">Назад</string>
     <string name="next">Далі</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Відтворити</string>
+    <string name="shuffle">Випадково</string>
+    <string name="repeat">Повтор</string>
+    <string name="playlist">Плейліст</string>
+    <string name="audio_expand_player">Розгорнути плеєр</string>
 
     <!-- Properties / Details -->
     <string name="properties">Властивості</string>
@@ -233,6 +240,8 @@
     <string name="settings_choose_del_behavior">Виберіть спосіб видалення</string>
     <string name="settings_choose_theme">Виберіть тему</string>
     <string name="settings_choose_details_mode">Виберіть режим деталей</string>
+    <string name="settings_starting_page">Стартова сторінка</string>
+    <string name="settings_choose_starting_page">Виберіть стартову сторінку</string>
     <string name="settings_language">Мова</string>
     <string name="settings_language_system">Системна</string>
     <string name="settings_language_english">Англійська</string>
@@ -282,6 +291,11 @@
     <string name="menu_details">Таблиця</string>
     <string name="menu_grid">Плитка</string>
     <string name="menu_gallery">Галерея</string>
+    <string name="menu_music">Музика</string>
+    <string name="menu_sync_list">Синхронізувати список</string>
+    <string name="menu_music_playlists">Плейлісти</string>
+    <string name="menu_music_favourites">Обране</string>
+    <string name="menu_new_playlist">Новий плейліст</string>
     <string name="menu_content">Контент</string>
     <string name="menu_subtitles">Субтитри</string>
     <string name="menu_audio_track">Аудіодоріжка</string>
@@ -308,11 +322,19 @@
     <string name="nav_library_items">Елементи бібліотеки</string>
     <string name="nav_recent">Нещодавні</string>
     <string name="nav_gallery">Галерея</string>
+    <string name="nav_music">Музика</string>
     <string name="nav_downloads">Завантаження</string>
     <string name="nav_documents">Документи</string>
     <string name="nav_game_saves">Диспетчер ігор</string>
     <string name="menu_gallery_albums">Альбоми</string>
     <string name="menu_gallery_folders">Папки галереї</string>
+    <string name="menu_music_albums">Альбоми</string>
+    <string name="menu_music_folders">Музичні папки</string>
+    <string name="menu_create_playlist">Створити плейліст</string>
+    <string name="default_playlist_name">Новий плейліст</string>
+    <string name="menu_add_to_playlist">Додати до плейліста</string>
+    <string name="msg_no_playlists">Плейлістів не знайдено. Спочатку створіть один.</string>
+    <string name="msg_added_to_playlist">Додано до %1$s</string>
     <string name="gallery_filter_off_msg">Фільтрування наразі ВИМКНЕНО. Відображаються всі медіафайли.</string>
     <string name="gallery_no_folders_msg">Жодної папки не додано. Будуть використані стандартні розташування медіафайлів, якщо фільтрування увімкнено.</string>
     <string name="gallery_managed_folders">Керовані папки:</string>
@@ -320,6 +342,7 @@
     <string name="menu_gallery_show_all">Показати всі медіафайли</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="menu_documents_show_folders">Показати папки</string>
+    <string name="menu_favourite">Обране</string>
     <string name="nav_add_storage">Додати сховище</string>
     <string name="nav_internal_storage">Внутрішня пам\'ять</string>
     <string name="nav_trash">Кошик</string>
@@ -353,6 +376,27 @@
     <string name="nav_network_root_url">Повний URL (необов\'язково)</string>
     <string name="nav_network_accept_untrusted">Приймати самопідписані сертифікати</string>
     <string name="nav_network_test">Перевірити підключення</string>
+    <string name="nav_network_display_name_placeholder">Мій NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x або nas.local</string>
+    <string name="nav_network_username_placeholder">ім\'я користувача</string>
+    <string name="nav_network_username_anon_placeholder">Залиште порожнім для анонімного входу</string>
+    <string name="nav_network_hide_password">Приховати пароль</string>
+    <string name="nav_network_show_password">Показати пароль</string>
+    <string name="nav_network_sftp_key_uri">URI закритого ключа (необов\'язково)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Пароль закритого ключа (необов\'язково)</string>
+    <string name="nav_network_hide_passphrase">Приховати пароль</string>
+    <string name="nav_network_show_passphrase">Показати пароль</string>
+    <string name="nav_network_sftp_key_fallback">Закритий ключ текстом (необов\'язково)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Приховати ключ</string>
+    <string name="nav_network_show_key">Показати ключ</string>
+    <string name="nav_network_smb_domain">Домен / Робоча група (необов\'язково)</string>
+    <string name="nav_network_smb_path_hint">Перший сегмент — це назва спільного ресурсу (напр. /Documents)</string>
+    <string name="nav_network_sftp_path_hint">Абсолютний шлях на сервері. Залиште / для домашнього каталогу або кореня.</string>
+    <string name="nav_network_webdav_path_hint">Префікс шляху на сервері. Залиште / для кореня.</string>
+    <string name="nav_network_test_success">Підключено</string>
+    <string name="nav_network_test_failed">Помилка</string>
 
     <string name="nav_ftp_server">FTP-сервер</string>
     <string name="nav_start_ftp">Запустити FTP-сервер</string>
@@ -453,7 +497,7 @@
     <string name="details_header_name">Ім\'я</string>
     <string name="details_header_size">Розмір</string>
     <string name="details_header_date">Дата</string>
-    <string name="details_header_date_deleted">Дата видалення</string>
+    <string name="details_header_date_deleted">Дата вилучення</string>
     <string name="details_header_deleted_from">Розташування</string>
 
     <string name="menu_move">Перемістити</string>
@@ -478,7 +522,7 @@
     <string name="shizuku_status_authorized">Авторизовано</string>
     <string name="shizuku_status_not_authorized">Не авторизовано</string>
     <string name="shizuku_status_not_running">Не запущено</string>
-    <string name="shizuku_request_permission">Запросити дозвіл Shizuku</string>
+    <string name="shizuku_request_permission">Запитати дозвіл Shizuku</string>
 
     <string name="settings_network_services">Мережеві служби</string>
     <string name="settings_ftp_server">FTP-сервер</string>
@@ -500,6 +544,7 @@
     <string name="settings_app_inactivity_timeout">Таймаут бездіяльності програми</string>
     <string name="settings_timeout_minutes">%1$d хвилин</string>
     <string name="settings_timeout_disabled">Ніколи</string>
+
     <string name="settings_custom_theme">Налаштування теми</string>
     <string name="settings_custom_theme_mode">Режим користувацької теми</string>
     <string name="settings_load_theme_pack">Завантажити пакет теми (.zip)</string>

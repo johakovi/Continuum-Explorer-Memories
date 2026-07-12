@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Slideshow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material3.Icon
@@ -166,7 +167,8 @@ object IconHelper {
         path: String,
         providerId: String = "",
         iconSize: Dp = 24.dp,
-        tint: Color = LocalExtendedColors.current.folderIcon
+        tint: Color = LocalExtendedColors.current.folderIcon,
+        isFavorite: Boolean = false
     ) {
         val pack by ThemePackManager.currentPack
         val isCustomPack = pack != null
@@ -179,8 +181,9 @@ object IconHelper {
         } else iconTheme
 
         if (effectiveIconTheme == IconTheme.MATERIAL) {
+            val isFavFolder = isFavorite || name.equals("Favourites", ignoreCase = true) || providerId.contains("favourites", ignoreCase = true)
             Icon(
-                imageVector = Icons.Default.Folder,
+                imageVector = if (isFavFolder) Icons.Default.Star else Icons.Default.Folder,
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
                 tint = finalTint
@@ -281,7 +284,8 @@ object IconHelper {
             if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
-                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> MaterialTheme.colorScheme.primary
+                    file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" ||
+                            file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> MaterialTheme.colorScheme.primary
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
                     file.providerId == "virtual://downloads" -> extendedColors.downloadsIcon
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
@@ -406,12 +410,14 @@ object IconHelper {
                 } else {
                     val providerPath = file.providerId.ifEmpty { file.absolutePath }
                     val isMusicVirtual = providerPath.startsWith("virtual://music") || providerPath.startsWith("virtual://music_album:")
-                    if (isMusicVirtual) {
+                    val isPlaylistFile = providerPath.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") }
+
+                    if (isMusicVirtual || isPlaylistFile) {
                         val musicRes = when {
                             providerPath.endsWith("/songs") -> R.drawable.ic_music_music
                             providerPath.endsWith("/albums") -> R.drawable.ic_music_album
                             providerPath.endsWith("/favourites") -> R.drawable.ic_music_favourite
-                            providerPath.endsWith("/playlists") -> R.drawable.ic_music_playlist
+                            providerPath.endsWith("/playlists") || isPlaylistFile -> R.drawable.ic_music_playlist
                             else -> R.drawable.ic_music_logo
                         }
                         Icon(
@@ -510,6 +516,7 @@ object IconHelper {
      */
     fun getIconForItem(file: UniversalFile): ImageVector {
         if (file.isDirectory) {
+            val isFav = file.name.equals("Favourites", ignoreCase = true) || file.providerId.contains("favourites", ignoreCase = true)
             return when {
                 file.providerId == "virtual://recent" -> Icons.Default.History
                 file.providerId == "virtual://documents" -> Icons.Default.Description
@@ -517,10 +524,13 @@ object IconHelper {
                 file.providerId == "virtual://music" -> Icons.Default.MusicNote
                 file.providerId == "virtual://music/songs" -> Icons.Default.MusicNote
                 file.providerId == "virtual://music/albums" -> Icons.Default.Album
+                file.providerId == "virtual://music/favourites" -> Icons.Default.Star
                 file.providerId == "virtual://music/playlists" -> Icons.AutoMirrored.Filled.PlaylistPlay
+                file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> Icons.AutoMirrored.Filled.PlaylistPlay
                 file.providerId.startsWith("virtual://music_album:") -> Icons.Default.MusicNote
                 file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> Icons.Default.Delete
                 file.parentId == "virtual://games_manager" -> Icons.AutoMirrored.Filled.ListAlt
+                isFav -> Icons.Default.Star
                 else -> Icons.Default.Folder
             }
         }
@@ -578,6 +588,7 @@ object IconHelper {
                 file.providerId == "virtual://music/albums" -> R.drawable.ic_music_album
                 file.providerId == "virtual://music/favourites" -> R.drawable.ic_music_favourite
                 file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_playlist
+                file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> R.drawable.ic_music_playlist
                 file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> R.drawable.ic_music_album
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads

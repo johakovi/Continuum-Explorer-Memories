@@ -30,6 +30,15 @@
     <string name="options">Opciones</string>
     <string name="menu_clear_thumbnails">Limpiar miniaturas</string>
     <string name="msg_thumbnails_cleared">Miniaturas limpiadas</string>
+    <string name="off">Desactivado</string>
+    <string name="previous">Anterior</string>
+    <string name="next">Siguiente</string>
+    <string name="pause">Pausa</string>
+    <string name="play">Reproducir</string>
+    <string name="shuffle">Aleatorio</string>
+    <string name="repeat">Repetir</string>
+    <string name="playlist">Lista de reproducción</string>
+    <string name="audio_expand_player">Expandir reproductor</string>
 
     <!-- Properties / Details -->
     <string name="properties">Propiedades</string>
@@ -101,7 +110,7 @@
     <string name="shortcuts_ctrl_slash_desc">Guía de atajos</string>
     <string name="shortcuts_mouse">Ratón</string>
     <string name="shortcuts_right_click">Clic derecho</string>
-    <string name="shortcuts_right_click_desc">Menu contextual</string>
+    <string name="shortcuts_right_click_desc">Menú contextual</string>
     <string name="shortcuts_middle_click">Clic central</string>
     <string name="shortcuts_middle_click_desc">Abrir en nueva pestaña</string>
     <string name="shortcuts_shift_middle_click">Mayús + Clic central</string>
@@ -199,6 +208,14 @@
     <string name="settings_tab_bar_background">Imagen de fondo de la barra de pestañas</string>
     <string name="settings_tab_bar_background_none">Ninguno</string>
     <string name="settings_clear">Limpiar</string>
+    <string name="settings_colorful_bars">Barras superior y de pestañas coloridas</string>
+    <string name="settings_colorful_bars_desc">Activar colores de acento para la barra superior y la barra de pestañas.</string>
+    <string name="settings_icon_theme">Tema de iconos</string>
+    <string name="settings_icon_theme_colourful">Colorido</string>
+    <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>
+    <string name="settings_icon_theme_material">Material</string>
+    <string name="settings_default_folder_color">Color de carpeta predeterminado</string>
+    <string name="settings_choose_icon_theme">Elegir tema de iconos</string>
     <string name="settings_details_large">Detalles (Solo pantallas grandes)</string>
     <string name="settings_details_hidden">Oculto</string>
     <string name="settings_details_pane">Panel lateral</string>
@@ -266,7 +283,6 @@
     <string name="menu_view">Vista</string>
     <string name="menu_empty_recycle_bin">Vaciar papelera</string>
     <string name="menu_refresh">Actualizar</string>
-    <string name="folder">Carpeta</string>
     <string name="menu_text_document">Documento de texto</string>
     <string name="menu_by_name">Por nombre</string>
     <string name="menu_by_date">Por fecha</string>
@@ -276,6 +292,11 @@
     <string name="menu_details">Detalles</string>
     <string name="menu_grid">Cuadrícula</string>
     <string name="menu_gallery">Galería</string>
+    <string name="menu_music">Música</string>
+    <string name="menu_sync_list">Sincronizar lista</string>
+    <string name="menu_music_playlists">Listas de reproducción</string>
+    <string name="menu_music_favourites">Favoritos</string>
+    <string name="menu_new_playlist">Nueva lista de reproducción</string>
     <string name="menu_content">Contenido</string>
     <string name="menu_subtitles">Subtítulos</string>
     <string name="menu_audio_track">Pista de audio</string>
@@ -297,18 +318,24 @@
     <string name="menu_redo">Rehacer</string>
     <string name="menu_folder_color">Color de la carpeta</string>
     <string name="menu_select_folder_color">Seleccionar color de la carpeta</string>
-    <string name="menu_set_wallpaper_failed">Error al establecer fondo</string>
-    <string name="media_share_image_failed">Error al compartir imagen</string>
 
     <!-- Navigation -->
     <string name="nav_library_items">Elementos de biblioteca</string>
     <string name="nav_recent">Reciente</string>
     <string name="nav_gallery">Galería</string>
+    <string name="nav_music">Música</string>
     <string name="nav_downloads">Descargas</string>
     <string name="nav_documents">Documentos</string>
     <string name="nav_game_saves">Gestor de juegos</string>
     <string name="menu_gallery_albums">Álbumes</string>
     <string name="menu_gallery_folders">Carpetas de la galería</string>
+    <string name="menu_music_albums">Álbumes</string>
+    <string name="menu_music_folders">Carpetas de música</string>
+    <string name="menu_create_playlist">Crear lista de reproducción</string>
+    <string name="default_playlist_name">Nueva lista de reproducción</string>
+    <string name="menu_add_to_playlist">Añadir a lista de reproducción</string>
+    <string name="msg_no_playlists">No se han encontrado listas de reproducción. Crea una primero.</string>
+    <string name="msg_added_to_playlist">Añadido a %1$s</string>
     <string name="gallery_filter_off_msg">El filtrado está DESACTIVADO. Mostrando todos los archivos multimedia.</string>
     <string name="gallery_no_folders_msg">No se han añadido carpetas. Se usarán las ubicaciones multimedia estándar si el filtrado está activado.</string>
     <string name="gallery_managed_folders">Carpetas gestionadas:</string>
@@ -316,6 +343,7 @@
     <string name="menu_gallery_show_all">Mostrar todos los medios</string>
     <string name="menu_documents_folder">Carpeta</string>
     <string name="menu_documents_show_folders">Mostrar carpetas</string>
+    <string name="menu_favourite">Favorito</string>
     <string name="nav_add_storage">Añadir almacenamiento</string>
     <string name="nav_internal_storage">Almacenamiento interno</string>
     <string name="nav_trash">Papelera</string>
@@ -329,10 +357,62 @@
     <string name="nav_sd_card">Tarjeta SD</string>
     <string name="nav_external_location">Ubicación externa</string>
     <string name="nav_unknown_folder">Carpeta desconocida</string>
-    <string name="archive">Archivo</string>
     <string name="nav_collapse">Contraer</string>
     <string name="nav_expand">Expandir</string>
     <string name="nav_storage_usage_label">%1$s libres de %2$s</string>
+    <string name="nav_network">Red</string>
+    <string name="nav_add_local_storage">Añadir almacenamiento local</string>
+    <string name="nav_add_network_storage">Añadir almacenamiento de red</string>
+    <string name="nav_network_protocol">Protocolo</string>
+    <string name="nav_network_display_name">Nombre para mostrar</string>
+    <string name="nav_network_host">Host</string>
+    <string name="nav_network_port">Puerto</string>
+    <string name="nav_network_username">Nombre de usuario</string>
+    <string name="nav_network_password">Contraseña</string>
+    <string name="nav_network_remote_path">Ruta remota</string>
+    <string name="nav_network_save">Guardar</string>
+    <string name="nav_network_edit">Editar conexión</string>
+    <string name="nav_network_use_tls">Usar FTPS (TLS)</string>
+    <string name="nav_network_passive_mode">Modo pasivo</string>
+    <string name="nav_network_root_url">URL completa (anulación opcional)</string>
+    <string name="nav_network_accept_untrusted">Aceptar certificados autofirmados</string>
+    <string name="nav_network_test">Probar conexión</string>
+    <string name="nav_network_display_name_placeholder">Mi NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x o nas.local</string>
+    <string name="nav_network_username_placeholder">nombre de usuario</string>
+    <string name="nav_network_username_anon_placeholder">Dejar en blanco para anónimo</string>
+    <string name="nav_network_hide_password">Ocultar contraseña</string>
+    <string name="nav_network_show_password">Mostrar contraseña</string>
+    <string name="nav_network_sftp_key_uri">URI de clave privada (opcional)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Frase de paso de clave privada (opcional)</string>
+    <string name="nav_network_hide_passphrase">Ocultar frase de paso</string>
+    <string name="nav_network_show_passphrase">Mostrar frase de paso</string>
+    <string name="nav_network_sftp_key_fallback">Clave privada en texto (opcional)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Ocultar clave</string>
+    <string name="nav_network_show_key">Mostrar clave</string>
+    <string name="nav_network_smb_domain">Dominio / Grupo de trabajo (opcional)</string>
+    <string name="nav_network_smb_path_hint">El primer segmento es el nombre del recurso compartido (ej. /Documentos)</string>
+    <string name="nav_network_sftp_path_hint">Ruta absoluta en el servidor. Dejar / para inicio o raíz.</string>
+    <string name="nav_network_webdav_path_hint">Prefijo de ruta en el servidor. Dejar / para raíz.</string>
+    <string name="nav_network_test_success">Conectado</string>
+    <string name="nav_network_test_failed">Error</string>
+
+    <string name="nav_ftp_server">Servidor FTP</string>
+    <string name="nav_start_ftp">Iniciar servidor FTP</string>
+    <string name="nav_stop_ftp">Detener servidor FTP</string>
+    <string name="nav_stop_ftp_game_manager">Detener servidor FTP del gestor de juegos</string>
+    <string name="nav_start_ftp_game_manager">Iniciar servidor FTP del gestor de juegos</string>
+
+    <!-- Item Types -->
+    <string name="archive">Archivo</string>
+    <string name="image">Imagen</string>
+    <string name="video">Vídeo</string>
+    <string name="audio">Audio</string>
+    <string name="document">Documento</string>
+    <string name="file">Archivo</string>
+    <string name="folder">Carpeta</string>
 
     <!-- Actions/Operations Messages -->
     <string name="msg_preparing">Preparando…</string>
@@ -375,6 +455,10 @@
     <string name="msg_already_at_saf_root">Ya se encuentra en la raíz de la carpeta seleccionada</string>
     <string name="msg_empty_clipboard">El portapapeles está vacío</string>
     <string name="msg_compression_failed">Error de compresión: %1$s</string>
+    <string name="msg_unknown_compression_error">Error de compresión desconocido</string>
+    <string name="menu_set_wallpaper_failed">Error al establecer fondo</string>
+    <string name="media_share_image_failed">Error al compartir imagen</string>
+
 
     <!-- Dialog Titles -->
     <string name="dialog_new_folder">Nueva carpeta</string>
@@ -391,13 +475,13 @@
     <string name="search_ext">*.ext (Extensión)</string>
 
     <!-- Image Viewer/ Video Player -->
+    <string name="unknown_resolution">Resolución desconocida</string>
     <string name="media_playing">Reproduciendo</string>
     <string name="media_paused">Pausado</string>
     <string name="media_loop_on">Bucle: activado</string>
     <string name="media_loop_off">Bucle: desactivado</string>
     <string name="media_speed_normal">Normal (1x)</string>
     <string name="media_no_audio_tracks">No se han encontrado pistas de audio</string>
-    <string name="off">Desactivado</string>
     <string name="media_fit">Ajustar (predeterminado)</string>
     <string name="media_fill">Rellenar</string>
     <string name="media_zoom">Zoom (recortar)</string>
@@ -405,8 +489,6 @@
     <string name="media_fixed_h">Alto fijo</string>
     <string name="media_audio_track">Pista de audio %1$d</string>
     <string name="media_subtitle_track">Pista de subtítulos %1$d</string>
-    <string name="previous">Anterior</string>
-    <string name="next">Siguiente</string>
     <string name="media_volume">Volumen</string>
     <string name="media_loop">Bucle</string>
     <string name="media_viewed">Imagen vista</string>
@@ -418,15 +500,10 @@
     <string name="details_header_date">Fecha</string>
     <string name="details_header_date_deleted">Fecha de eliminación</string>
     <string name="details_header_deleted_from">Ubicación</string>
-    <string name="image">Imagen</string>
-    <string name="video">Vídeo</string>
-    <string name="audio">Audio</string>
-    <string name="document">Documento</string>
-    <string name="file">Archivo</string>
-    <string name="unknown_resolution">Resolución desconocida</string>
-    <string name="msg_unknown_compression_error">Error de compresión desconocido</string>
+    <string name="details_header_type">Tipo</string>
 
     <string name="menu_move">Mover</string>
+    <string name="menu_by_type">Por tipo</string>
     <string name="move_or_copy_title">¿Mover o copiar?</string>
     <string name="move_or_copy_message">¿Desea mover o copiar los archivos arrastrados a esta ubicación?</string>
     <string name="settings_touch_drag">Comportamiento de arrastre táctil</string>
@@ -436,43 +513,6 @@
     <string name="settings_touch_drag_move">Siempre mover</string>
     <string name="msg_cancelled_deletion">Eliminación cancelada</string>
     <string name="msg_deletion">Se han eliminado %1$d archivos</string>
-    <string name="details_header_type">Tipo</string>
-    <string name="menu_by_type">Por tipo</string>
-    <string name="nav_network">Red</string>
-    <string name="nav_add_local_storage">Añadir almacenamiento local</string>
-    <string name="nav_add_network_storage">Añadir almacenamiento de red</string>
-    <string name="nav_network_protocol">Protocolo</string>
-    <string name="nav_network_display_name">Nombre para mostrar</string>
-    <string name="nav_network_host">Host</string>
-    <string name="nav_network_port">Puerto</string>
-    <string name="nav_network_username">Nombre de usuario</string>
-    <string name="nav_network_password">Contraseña</string>
-    <string name="nav_network_remote_path">Ruta remota</string>
-    <string name="nav_network_save">Guardar</string>
-    <string name="nav_network_edit">Editar conexión</string>
-    <string name="nav_network_use_tls">Usar FTPS (TLS)</string>
-    <string name="nav_network_passive_mode">Modo pasivo</string>
-    <string name="nav_network_root_url">URL completa (anulación opcional)</string>
-    <string name="nav_network_accept_untrusted">Aceptar certificados autofirmados</string>
-    <string name="nav_network_test">Probar conexión</string>
-
-    <string name="nav_ftp_server">Servidor FTP</string>
-    <string name="nav_start_ftp">Iniciar servidor FTP</string>
-    <string name="nav_stop_ftp">Detener servidor FTP</string>
-    <string name="nav_stop_ftp_game_manager">Detener servidor FTP del gestor de juegos</string>
-    <string name="nav_start_ftp_game_manager">Iniciar servidor FTP del gestor de juegos</string>
-    <string name="settings_colorful_bars">Barras superior y de pestañas coloridas</string>
-    <string name="settings_colorful_bars_desc">Activar colores de acento para la barra superior y la barra de pestañas.</string>
-    <string name="settings_icon_theme">Tema de iconos</string>
-    <string name="settings_icon_theme_colourful">Colorido</string>
-    <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>
-    <string name="settings_icon_theme_material">Material</string>
-    <string name="settings_default_folder_color">Color de carpeta predeterminado</string>
-    <string name="settings_choose_icon_theme">Elegir tema de iconos</string>
-    <string name="msg_remote_permanent_warning">Los archivos de red se eliminarán permanentemente (no se pueden mover a la papelera).</string>
-    <string name="msg_archive_remote_unsupported">El archivado aún no es compatible con ubicaciones de red.</string>
-    <string name="msg_remote_trash_skipped">No se pueden mover los archivos de red a la papelera. Se eliminarán permanentemente.</string>
-    <string name="settings_about">Acerca de</string>
 
     <string name="shizuku_status">Estado de Shizuku</string>
     <string name="shizuku_status_authorized">Autorizado</string>
@@ -493,6 +533,11 @@
 
     <string name="error_restricted_access">Acceso restringido</string>
     <string name="msg_restricted_access_shizuku">Este directorio está restringido por Android. Por favor, active y autorice Shizuku para acceder a él.</string>
+
+    <string name="msg_remote_permanent_warning">Los archivos de red se eliminarán permanentemente (no se pueden mover a la papelera).</string>
+    <string name="msg_archive_remote_unsupported">El archivado aún no es compatible con ubicaciones de red.</string>
+    <string name="msg_remote_trash_skipped">No se pueden mover los archivos de red a la papelera. Se eliminarán permanentemente.</string>
+    <string name="settings_about">Acerca de</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistema y batería</string>

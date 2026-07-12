@@ -1705,7 +1705,7 @@ private fun NavFavoriteItem(
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
     val iconContent = @Composable {
-        IconHelper.FolderIcon(name = label, path = path)
+        IconHelper.FolderIcon(name = label, path = path, isFavorite = true)
     }
 
     Box(

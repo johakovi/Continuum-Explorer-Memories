@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Continuum Explorer</string>
 
@@ -32,6 +33,12 @@
     <string name="off">Av</string>
     <string name="previous">Föregående</string>
     <string name="next">Nästa</string>
+    <string name="pause">Paus</string>
+    <string name="play">Spela</string>
+    <string name="shuffle">Blanda</string>
+    <string name="repeat">Upprepa</string>
+    <string name="playlist">Spellista</string>
+    <string name="audio_expand_player">Expandera spelare</string>
 
     <!-- Properties / Details -->
     <string name="properties">Egenskaper</string>
@@ -86,9 +93,7 @@
     <string name="shortcuts_ctrl_cvx_desc">Kopiera / Klipp ut / Klistra in</string>
     <string name="shortcuts_delete">Delete</string>
     <string name="shortcuts_delete_desc">Ta bort (Shift + Delete för permanent)</string>
-    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">Byt namn</string>
-    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">Uppdatera</string>
     <string name="shortcuts_app_actions">App-åtgärder</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -233,6 +238,8 @@
     <string name="settings_choose_del_behavior">Välj borttagningsbeteende</string>
     <string name="settings_choose_theme">Välj tema</string>
     <string name="settings_choose_details_mode">Välj detaljläge</string>
+    <string name="settings_starting_page">Startsida</string>
+    <string name="settings_choose_starting_page">Välj startsida</string>
     <string name="settings_language">Språk</string>
     <string name="settings_language_system">Systemstandard</string>
     <string name="settings_language_english">Engelska</string>
@@ -282,6 +289,11 @@
     <string name="menu_details">Detaljer</string>
     <string name="menu_grid">Rutnät</string>
     <string name="menu_gallery">Galleri</string>
+    <string name="menu_music">Musik</string>
+    <string name="menu_sync_list">Synkronisera lista</string>
+    <string name="menu_music_playlists">Spellistor</string>
+    <string name="menu_music_favourites">Favoriter</string>
+    <string name="menu_new_playlist">Ny spellista</string>
     <string name="menu_content">Innehåll</string>
     <string name="menu_subtitles">Undertexter</string>
     <string name="menu_audio_track">Ljudspår</string>
@@ -308,11 +320,19 @@
     <string name="nav_library_items">Biblioteksobjekt</string>
     <string name="nav_recent">Senaste</string>
     <string name="nav_gallery">Galleri</string>
+    <string name="nav_music">Musik</string>
     <string name="nav_downloads">Hämtningar</string>
     <string name="nav_documents">Dokument</string>
     <string name="nav_game_saves">Spelhanterare</string>
     <string name="menu_gallery_albums">Album</string>
     <string name="menu_gallery_folders">Gallerimappar</string>
+    <string name="menu_music_albums">Album</string>
+    <string name="menu_music_folders">Musikmappar</string>
+    <string name="menu_create_playlist">Skapa spellista</string>
+    <string name="default_playlist_name">Ny spellista</string>
+    <string name="menu_add_to_playlist">Lägg till i spellista</string>
+    <string name="msg_no_playlists">Inga spellistor hittades. Skapa en först.</string>
+    <string name="msg_added_to_playlist">Tillagd i %1$s</string>
     <string name="gallery_filter_off_msg">Filtrering är för närvarande AV. Visar all media.</string>
     <string name="gallery_no_folders_msg">Inga mappar tillagda. Standardmediaplatser kommer att användas om filtrering är aktiverad.</string>
     <string name="gallery_managed_folders">Hanterade mappar:</string>
@@ -320,6 +340,7 @@
     <string name="menu_gallery_show_all">Visa alla media</string>
     <string name="menu_documents_folder">Mapp</string>
     <string name="menu_documents_show_folders">Visa mappar</string>
+    <string name="menu_favourite">Favorit</string>
     <string name="nav_add_storage">Lägg till lagring</string>
     <string name="nav_internal_storage">Intern lagring</string>
     <string name="nav_trash">Papperskorg</string>
@@ -353,6 +374,27 @@
     <string name="nav_network_root_url">Fullständig URL (valfri)</string>
     <string name="nav_network_accept_untrusted">Acceptera självsignerade certifikat</string>
     <string name="nav_network_test">Testa anslutning</string>
+    <string name="nav_network_display_name_placeholder">Min NAS</string>
+    <string name="nav_network_host_placeholder">192.168.1.x eller nas.local</string>
+    <string name="nav_network_username_placeholder">användarnamn</string>
+    <string name="nav_network_username_anon_placeholder">Lämna tomt för anonym</string>
+    <string name="nav_network_hide_password">Dölj lösenord</string>
+    <string name="nav_network_show_password">Visa lösenord</string>
+    <string name="nav_network_sftp_key_uri">URI för privat nyckel (valfritt)</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
+    <string name="nav_network_sftp_key_passphrase">Lösenfras för privat nyckel (valfritt)</string>
+    <string name="nav_network_hide_passphrase">Dölj lösenfras</string>
+    <string name="nav_network_show_passphrase">Visa lösenfras</string>
+    <string name="nav_network_sftp_key_fallback">Privat nyckel som text (valfritt)</string>
+    <string name="nav_network_sftp_key_fallback_placeholder">-----BEGIN OPENSSH PRIVATE KEY-----</string>
+    <string name="nav_network_hide_key">Dölj nyckel</string>
+    <string name="nav_network_show_key">Visa nyckel</string>
+    <string name="nav_network_smb_domain">Domän / Arbetsgrupp (valfritt)</string>
+    <string name="nav_network_smb_path_hint">Första delen är resursnamnet (t.ex. /Dokument)</string>
+    <string name="nav_network_sftp_path_hint">Absolut sökväg på servern. Lämna / för hem eller rot.</string>
+    <string name="nav_network_webdav_path_hint">Sökvägsprefix på servern. Lämna / för rot.</string>
+    <string name="nav_network_test_success">Ansluten</string>
+    <string name="nav_network_test_failed">Misslyckades</string>
 
     <string name="nav_ftp_server">FTP-server</string>
     <string name="nav_start_ftp">Starta FTP-server</string>
@@ -412,6 +454,7 @@
     <string name="msg_compression_failed">Komprimering misslyckades: %1$s</string>
     <string name="msg_unknown_compression_error">Okänt komprimeringsfel</string>
     <string name="menu_set_wallpaper_failed">Misslyckades med att ställa in bakgrund</string>
+    <string name="media_share_image_failed">Kunde inte dela bild</string>
 
 
     <!-- Dialog Titles -->
@@ -446,7 +489,6 @@
     <string name="media_volume">Volym</string>
     <string name="media_loop">Loop</string>
     <string name="media_viewed">Visad bild</string>
-    <string name="media_share_image_failed">Kunde inte dela bild</string>
     <string name="media_thumbnail">Miniatyr</string>
 
     <!-- Details Headers -->
