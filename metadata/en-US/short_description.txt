@@ -1,1 +1,1 @@
-
+Multifunctional file manager working with your files or just to play your media!
