@@ -1,1 +1,39 @@
 
+# Continuum Explorer (Memories)
+
+Multifunctional filemanager, for working with your files or just to play your media!
+Works with tablets, desktops and phones. UI Adapts to your device screen.
+
+_Note: This project is forked from troikoss / Continuum Explorer_
+
+## Key Features:
+### Multimedia:
+- Video player
+- Picture viewer
+- Audio player
+- PDF Viewer
+
+### File managament:
+- Internal text editor
+- Tabs & Multi-Window: Support for advanced multitasking.
+- Drag-and-Drop: Seamlessly move data between apps and windows.
+- Full Peripheral Support: Native mouse support (including right-click context menus) and standard Windows-style keyboard shortcuts.
+- Responsive Design: A UI that dynamically adapts to any screen or window dimensions.
+- Archive Support: Integrated .zip viewer
+- Network storage managment
+- Game Save Manager
+- Shizuku privilege
+- Termux privilege
+
+### Themes:
+- Custom theme packs
+- Customizable tab bar background
+- Customizable UI
+
+## More languages?
+If you want contribute to adding more languages to my fork or original troikoss app,
+then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml) or this [link (troikoss)](https://github.com/troikoss/Continuum-Explorer/blob/master/app/src/main/res/values/strings.xml) and send file to us! c:
+
+ ## More features?
+Let me know if there is something you want to this app!
+Like example theme integration for other android dekstop interfaces or other useful integrated apps/operations!
