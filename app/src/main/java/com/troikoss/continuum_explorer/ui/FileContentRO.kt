@@ -162,8 +162,8 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     // --- Side Effects ---
 
     // Focus management
-    LaunchedEffect(appState.isSearchUIActive) {
-        if (!appState.isSearchUIActive) {
+    LaunchedEffect(appState, appState.loadedPathKey, appState.isSearchUIActive, appState.isAddressBarActive) {
+        if (!appState.isSearchUIActive && !appState.isAddressBarActive) {
             try { focusRequester.requestFocus() } catch (_: Exception) {}
         }
     }
