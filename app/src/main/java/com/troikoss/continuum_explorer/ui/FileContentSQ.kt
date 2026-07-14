@@ -7,6 +7,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,10 +25,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridLayoutInfo
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -70,9 +73,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.FileColumnType
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
@@ -370,23 +376,34 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
             NetworkErrorBanner(message = networkErr, onRetry = { appState.triggerLoad(forceRefresh = true) })
         }
 
-        FileLayout(
-            appState = appState,
-            gridState = gridState,
-            itemPositions = itemPositions,
-            containerCoordinates = containerCoordinates,
-            mousePosition = { mousePosition },
-            focusRequester = focusRequester,
-            dragStart = dragStart,
-            dragEnd = dragEnd,
-            marquee = marquee,
-            detailsContentWidthPx = detailsContentWidthPx.value,
-            onGridPositioned = { top, height ->
-                gridContainerTopPx = top
-                gridContainerHeightPx = height
-            },
-            isInWindowMode = isInWindowMode
-        )
+        val accessErr = appState.accessError
+        val isMusicSubfolder = appState.libraryItem == LibraryItem.Music && appState.currentPath != null
+        val isGames = appState.libraryItem == LibraryItem.Games
+        val isEmptyState = !appState.isLoading && (isMusicSubfolder || isGames) && appState.files.isEmpty()
+
+        if (accessErr != null) {
+            AccessErrorView(message = accessErr)
+        } else if (isEmptyState) {
+            EmptyStateView()
+        } else {
+            FileLayout(
+                appState = appState,
+                gridState = gridState,
+                itemPositions = itemPositions,
+                containerCoordinates = containerCoordinates,
+                mousePosition = { mousePosition },
+                focusRequester = focusRequester,
+                dragStart = dragStart,
+                dragEnd = dragEnd,
+                marquee = marquee,
+                detailsContentWidthPx = detailsContentWidthPx.value,
+                onGridPositioned = { top, height ->
+                    gridContainerTopPx = top
+                    gridContainerHeightPx = height
+                },
+                isInWindowMode = isInWindowMode
+            )
+        }
 
         // Floating context menu
         Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
@@ -395,6 +412,68 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 onDismiss = { showMenu = false },
                 appState = appState,
                 onAddStorage = onAddStorage
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyStateView() {
+    val emoticons = remember { listOf("(ᵕ • ᴗ •)", "( •᷄ᴗ•́)", "(⇀‸↼‶)", "(ᵕ ó ᴗ ò)") }
+    val emoticon = remember { emoticons.random() }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(
+                text = "${stringResource(R.string.msg_nothing_here)} $emoticon",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun AccessErrorView(message: String) {
+    val emoticons = remember { listOf("(╥﹏╥)", "(• ᴖ •｡ )", "(╥ᆺ╥;)", "(｡•́︿•̀｡)") }
+    val emoticon = remember { emoticons.random() }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "${stringResource(R.string.msg_cant_access_directory)} $emoticon",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
             )
         }
     }

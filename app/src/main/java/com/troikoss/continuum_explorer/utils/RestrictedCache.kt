@@ -29,6 +29,8 @@ object RestrictedCache {
         val p = path.replace("//", "/").lowercase()
         
         // Common restricted paths across different Android versions/mount points
+        // We only restrict access to data, obb and system data folders.
+        // The /Android folder itself and /Android/media are generally accessible.
         val restrictedPatterns = listOf(
             "/android/data",
             "/android/obb",
@@ -37,12 +39,7 @@ object RestrictedCache {
             "/data/data/"
         )
         
-        if (restrictedPatterns.any { p.contains(it) }) return true
-        
-        // Also check for trailing /android or /android/ which can be restricted on some versions
-        if (p.endsWith("/android") || p.endsWith("/android/")) return true
-
-        return false
+        return restrictedPatterns.any { p.contains(it) }
     }
 
     fun getCachedFile(file: UniversalFile): File {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,18 +12,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -42,6 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.ui.components.HorizontalScrollbar
 import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
 import androidx.compose.ui.Modifier
@@ -66,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.FileColumnType
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
@@ -362,23 +371,34 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
             NetworkErrorBanner(message = networkErr, onRetry = { appState.triggerLoad(forceRefresh = true) })
         }
 
-        FileLayout(
-            appState = appState,
-            gridState = gridState,
-            itemPositions = itemPositions,
-            containerCoordinates = containerCoordinates,
-            mousePosition = { mousePosition },
-            focusRequester = focusRequester,
-            dragStart = dragStart,
-            dragEnd = dragEnd,
-            marquee = marquee,
-            detailsContentWidthPx = detailsContentWidthPx.value,
-            onGridPositioned = { top, height ->
-                gridContainerTopPx = top
-                gridContainerHeightPx = height
-            },
-            isInWindowMode = isInWindowMode
-        )
+        val accessErr = appState.accessError
+        val isMusicSubfolder = appState.libraryItem == LibraryItem.Music && appState.currentPath != null
+        val isGames = appState.libraryItem == LibraryItem.Games
+        val isEmptyState = !appState.isLoading && (isMusicSubfolder || isGames) && appState.files.isEmpty()
+
+        if (accessErr != null) {
+            AccessErrorView(message = accessErr)
+        } else if (isEmptyState) {
+            EmptyStateView()
+        } else {
+            FileLayout(
+                appState = appState,
+                gridState = gridState,
+                itemPositions = itemPositions,
+                containerCoordinates = containerCoordinates,
+                mousePosition = { mousePosition },
+                focusRequester = focusRequester,
+                dragStart = dragStart,
+                dragEnd = dragEnd,
+                marquee = marquee,
+                detailsContentWidthPx = detailsContentWidthPx.value,
+                onGridPositioned = { top, height ->
+                    gridContainerTopPx = top
+                    gridContainerHeightPx = height
+                },
+                isInWindowMode = isInWindowMode
+            )
+        }
 
         // Floating context menu
         Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
@@ -387,6 +407,68 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 onDismiss = { showMenu = false },
                 appState = appState,
                 onAddStorage = onAddStorage
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyStateView() {
+    val emoticons = remember { listOf("(ᵕ • ᴗ •)", "( •᷄ᴗ•́)", "(⇀‸↼‶)", "(ᵕ ó ᴗ ò)") }
+    val emoticon = remember { emoticons.random() }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(
+                text = "${stringResource(R.string.msg_nothing_here)} $emoticon",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun AccessErrorView(message: String) {
+    val emoticons = remember { listOf("(╥﹏╥)", "(• ᴖ •｡ )", "(╥ᆺ╥;)", "(｡•́︿•̀｡)") }
+    val emoticon = remember { emoticons.random() }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "${stringResource(R.string.msg_cant_access_directory)} $emoticon",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
             )
         }
     }

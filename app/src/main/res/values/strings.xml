@@ -536,6 +536,8 @@
     <string name="shizuku_request_permission">Request Shizuku Permission</string>
     <string name="error_restricted_access">Access Restricted</string>
     <string name="msg_restricted_access_shizuku">This directory is restricted by Android. Please enable and authorize Shizuku to access it.</string>
+    <string name="msg_cant_access_directory">Can\'t access to this directory</string>
+    <string name="msg_nothing_here">There isn\'t anything yet</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Battery</string>

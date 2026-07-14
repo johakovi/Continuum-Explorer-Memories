@@ -538,6 +538,8 @@
 
     <string name="error_restricted_access">Pääsy estetty</string>
     <string name="msg_restricted_access_shizuku">Android rajoittaa pääsyä tähän hakemistoon. Ota Shizuku käyttöön ja valtuuta se päästäksesi siihen.</string>
+    <string name="msg_cant_access_directory">Tähän kansioon ei päästä</string>
+    <string name="msg_nothing_here">Täällä ei ole vielä mitään</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Järjestelmä &amp; Akku</string>

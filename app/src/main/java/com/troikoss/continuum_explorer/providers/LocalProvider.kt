@@ -66,7 +66,32 @@ object LocalProvider : StorageProvider {
         }
 
         val files = File(id).listFiles()
-        return files?.map { it.toUniversalFile() } ?: emptyList()
+        val result = files?.map { it.toUniversalFile() }?.toMutableList() ?: mutableListOf()
+
+        // On Android 11+, the /Android folder itself is accessible, but its subfolders 
+        // like 'data' and 'obb' are often hidden from listFiles().
+        // We manually ensure they are shown in the list.
+        val p = id.replace("//", "/").removeSuffix("/").lowercase()
+        if (p.endsWith("/android")) {
+            val subfolders = listOf("data", "obb", "media")
+            for (sub in subfolders) {
+                if (result.none { it.name.lowercase() == sub }) {
+                    val subPath = if (id.endsWith(File.separator)) id + sub else id + File.separator + sub
+                    val subFile = File(subPath)
+                    result.add(UniversalFile(
+                        name = sub,
+                        isDirectory = true,
+                        lastModified = subFile.lastModified(),
+                        length = 0,
+                        provider = LocalProvider,
+                        providerId = subPath,
+                        parentId = id
+                    ))
+                }
+            }
+        }
+
+        return result
     }
 
     override fun getMetadata(id: String): FileMetadata {

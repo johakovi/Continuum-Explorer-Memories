@@ -220,27 +220,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
 
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_language)) },
-                supportingContent = {
-                    val text = when (language) {
-                        "tr" -> stringResource(R.string.settings_language_turkish)
-                        "en" -> stringResource(R.string.settings_language_english)
-                        "fi" -> stringResource(R.string.settings_language_finnish)
-                        "fr" -> stringResource(R.string.settings_language_french)
-                        "pt" -> stringResource(R.string.settings_language_portuguese)
-                        "es" -> stringResource(R.string.settings_language_spanish)
-                        "de" -> stringResource(R.string.settings_language_german)
-                        "ru" -> stringResource(R.string.settings_language_russian)
-                        "sv" -> stringResource(R.string.settings_language_swedish)
-                        "uk" -> stringResource(R.string.settings_language_ukrainian)
-                        "ko" -> stringResource(R.string.settings_language_korean)
-                        else -> stringResource(R.string.settings_language_system)
-                    }
-                    Text(text)
-                },
-                modifier = Modifier.clickable { showLanguageDialog = true }
-            )
+
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_details_large)) },
@@ -503,6 +483,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             )
 
+
             HorizontalDivider()
 
             Text(
@@ -516,6 +497,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                 headlineContent = { Text(stringResource(R.string.settings_ftp_credentials_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_ftp_credentials_desc)) },
                 modifier = Modifier.clickable { showFtpCredentialsDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_ftp_inactivity_timeout)) },
+                supportingContent = {
+                    val text = if (ftpInactivityTimeout > 0)
+                        stringResource(R.string.settings_timeout_minutes, ftpInactivityTimeout)
+                    else stringResource(R.string.settings_timeout_disabled)
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showFtpTimeoutDialog = true }
             )
 
             HorizontalDivider()
@@ -559,16 +551,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(16.dp)
             )
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_ftp_inactivity_timeout)) },
-                supportingContent = { 
-                    val text = if (ftpInactivityTimeout > 0) 
-                        stringResource(R.string.settings_timeout_minutes, ftpInactivityTimeout)
-                    else stringResource(R.string.settings_timeout_disabled)
-                    Text(text)
-                },
-                modifier = Modifier.clickable { showFtpTimeoutDialog = true }
-            )
+
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_app_inactivity_timeout)) },
@@ -579,6 +562,28 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Text(text)
                 },
                 modifier = Modifier.clickable { showAppTimeoutDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_language)) },
+                supportingContent = {
+                    val text = when (language) {
+                        "tr" -> stringResource(R.string.settings_language_turkish)
+                        "en" -> stringResource(R.string.settings_language_english)
+                        "fi" -> stringResource(R.string.settings_language_finnish)
+                        "fr" -> stringResource(R.string.settings_language_french)
+                        "pt" -> stringResource(R.string.settings_language_portuguese)
+                        "es" -> stringResource(R.string.settings_language_spanish)
+                        "de" -> stringResource(R.string.settings_language_german)
+                        "ru" -> stringResource(R.string.settings_language_russian)
+                        "sv" -> stringResource(R.string.settings_language_swedish)
+                        "uk" -> stringResource(R.string.settings_language_ukrainian)
+                        "ko" -> stringResource(R.string.settings_language_korean)
+                        else -> stringResource(R.string.settings_language_system)
+                    }
+                    Text(text)
+                },
+                modifier = Modifier.clickable { showLanguageDialog = true }
             )
 
             HorizontalDivider()
