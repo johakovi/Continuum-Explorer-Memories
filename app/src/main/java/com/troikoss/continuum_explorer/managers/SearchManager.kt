@@ -4,10 +4,13 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.SafProvider
+import com.troikoss.continuum_explorer.utils.AppConfigurations
+import com.troikoss.continuum_explorer.utils.RestrictedCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -25,7 +28,9 @@ object SearchManager {
         currentNetworkId: String? = null,
         searchSubfolders: Boolean,
         archiveCache: Map<String, List<UniversalFile>>?,
-        currentArchivePath: String
+        currentArchivePath: String,
+        libraryItem: LibraryItem = LibraryItem.None,
+        appConfigs: AppConfigurations? = null
     ): List<UniversalFile> = withContext(Dispatchers.IO) {
         val results = mutableListOf<UniversalFile>()
         val parsedQuery = parseQuery(query)
@@ -46,8 +51,53 @@ object SearchManager {
             }
         } else if (currentNetworkProvider != null && currentNetworkId != null) {
             searchRemote(currentNetworkProvider, currentNetworkId, parsedQuery.expression, if (searchSubfolders) 2 else 0, results)
+        } else if (libraryItem == LibraryItem.Music) {
+            val allMusic = MusicMetadataManager.getSongs(context)
+            for (song in allMusic) {
+                if (!isActive) break
+                if (matches(song, parsedQuery)) {
+                    results.add(song)
+                }
+            }
+        } else if (libraryItem == LibraryItem.Gallery) {
+            val allGallery = GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
+            for (media in allGallery) {
+                if (!isActive) break
+                if (matches(media, parsedQuery)) {
+                    results.add(media)
+                }
+            }
+        } else if (libraryItem == LibraryItem.Downloads) {
+            val allDownloads = DownloadsManager.getDownloadsFiles(context)
+            for (file in allDownloads) {
+                if (!isActive) break
+                if (matches(file, parsedQuery)) {
+                    results.add(file)
+                }
+            }
+        } else if (libraryItem == LibraryItem.Documents) {
+            val allDocuments = DocumentsManager.getDocumentsFiles(context)
+            for (file in allDocuments) {
+                if (!isActive) break
+                if (matches(file, parsedQuery)) {
+                    results.add(file)
+                }
+            }
+        } else if (libraryItem == LibraryItem.Games && appConfigs != null) {
+            val allGames = GamesManager.getGames(context, appConfigs)
+            for (game in allGames) {
+                if (!isActive) break
+                if (matches(game, parsedQuery)) {
+                    results.add(game)
+                }
+                if (searchSubfolders) {
+                    // Search inside each game folder
+                    if (game.providerId.startsWith("virtual://")) continue // Skip virtual entries
+                    searchDirectory(game.providerId, parsedQuery.expression, true, results)
+                }
+            }
         } else if (currentPath != null) {
-            searchDirectory(currentPath, parsedQuery.expression, searchSubfolders, results)
+            searchDirectory(currentPath.absolutePath, parsedQuery.expression, searchSubfolders, results)
         } else if (currentSafUri != null) {
             val docFile = DocumentFile.fromTreeUri(context, currentSafUri)
             if (docFile != null) {
@@ -74,16 +124,19 @@ object SearchManager {
         }
     }
 
-    private fun searchDirectory(dir: File, expr: SearchExpression, recursive: Boolean, results: MutableList<UniversalFile>) {
-        val files = dir.listFiles() ?: return
-        for (file in files) {
-            if (file.name == ".metadata") continue
-            val universalFile = file.toUniversal()
-            if (evaluateExpression(universalFile, expr)) {
-                results.add(universalFile)
+    private suspend fun searchDirectory(path: String, expr: SearchExpression, recursive: Boolean, results: MutableList<UniversalFile>) {
+        val children = try {
+            LocalProvider.listChildren(path)
+        } catch (_: Exception) {
+            return
+        }
+        for (child in children) {
+            if (child.name == ".metadata") continue
+            if (evaluateExpression(child, expr)) {
+                results.add(child)
             }
-            if (recursive && file.isDirectory) {
-                searchDirectory(file, expr, recursive, results)
+            if (recursive && child.isDirectory) {
+                searchDirectory(child.providerId, expr, recursive, results)
             }
         }
     }
@@ -148,6 +201,15 @@ object SearchManager {
 
     private fun getFileKind(file: UniversalFile): String {
         if (file.isDirectory) return "folder"
+
+        // Try using the mimeType if available (useful for virtual files like in Music Manager)
+        file.mimeType?.let { mime ->
+            val type = mime.split("/")[0].lowercase()
+            if (type in listOf("audio", "video", "image", "text")) return type
+            if (mime == "application/pdf" || mime.contains("msword") || mime.contains("officedocument")) return "document"
+            if (mime == "application/zip" || mime.contains("archive") || mime.contains("compressed")) return "archive"
+        }
+
         val ext = file.name.substringAfterLast('.', "").lowercase()
         
         // Custom broad categories
@@ -221,16 +283,6 @@ object SearchManager {
         }
         return currentExpr
     }
-
-    private fun File.toUniversal() = UniversalFile(
-        name = name,
-        isDirectory = isDirectory,
-        lastModified = lastModified(),
-        length = length(),
-        provider = LocalProvider,
-        providerId = absolutePath,
-        parentId = parentFile?.absolutePath,
-    )
 
     private fun DocumentFile.toUniversal() = UniversalFile(
         name = name ?: "Unknown",

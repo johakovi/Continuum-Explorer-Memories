@@ -483,7 +483,9 @@ class FileExplorerState(
                     currentNetworkId = currentNetworkId,
                     searchSubfolders = searchSubfolders,
                     archiveCache = archiveCache,
-                    currentArchivePath = currentArchivePath
+                    currentArchivePath = currentArchivePath,
+                    libraryItem = libraryItem,
+                    appConfigs = appConfigs
                 )
 
                 val filtered = results.filter { if (showHidden) true else !it.name.startsWith(".") }
