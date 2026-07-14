@@ -339,15 +339,28 @@ class AppConfigurations(private val context: Context) {
     private fun loadAddedSafUris() {
         val prefs = context.getSharedPreferences("saf_storage", Context.MODE_PRIVATE)
         addedSafUris.clear()
+        
+        // Filter out URIs for which we no longer have permission (e.g. app uninstalled)
+        val persistedPermissions = context.contentResolver.persistedUriPermissions
+        val validUris = persistedPermissions.map { it.uri.toString() }.toSet()
+
         val ordered = prefs.getString("ordered_uris", null)
         if (ordered != null) {
             if (ordered.isNotEmpty()) {
-                ordered.split("|").forEach { addedSafUris.add(Uri.parse(it)) }
+                ordered.split("|").forEach { uriString ->
+                    if (validUris.contains(uriString)) {
+                        addedSafUris.add(Uri.parse(uriString))
+                    }
+                }
             }
         } else {
             // Legacy: migrate from unordered Set
             val uris = prefs.getStringSet("uris", emptySet()) ?: emptySet()
-            uris.forEach { addedSafUris.add(Uri.parse(it)) }
+            uris.forEach { uriString ->
+                if (validUris.contains(uriString)) {
+                    addedSafUris.add(Uri.parse(uriString))
+                }
+            }
             saveAddedSafUris()
         }
     }
@@ -360,23 +373,34 @@ class AppConfigurations(private val context: Context) {
     private fun loadGameSafUris() {
         val prefs = context.getSharedPreferences("game_saf_storage", Context.MODE_PRIVATE)
         gameSafShortcuts.clear()
+
+        val persistedPermissions = context.contentResolver.persistedUriPermissions
+        val validUris = persistedPermissions.map { it.uri.toString() }.toSet()
+
         val jsonStr = prefs.getString("shortcuts_json", null)
         if (jsonStr != null && jsonStr.isNotEmpty()) {
             try {
                 val arr = JSONArray(jsonStr)
                 for (i in 0 until arr.length()) {
                     val obj = arr.getJSONObject(i)
-                    gameSafShortcuts.add(GameShortcut(
-                        uri = Uri.parse(obj.getString("uri")),
-                        name = if (obj.has("name")) obj.getString("name") else null
-                    ))
+                    val uriString = obj.getString("uri")
+                    if (validUris.contains(uriString)) {
+                        gameSafShortcuts.add(GameShortcut(
+                            uri = Uri.parse(uriString),
+                            name = if (obj.has("name")) obj.getString("name") else null
+                        ))
+                    }
                 }
             } catch (_: Exception) {}
         } else {
             // Migration from simple URI list
             val ordered = prefs.getString("ordered_uris", null)
             if (ordered != null && ordered.isNotEmpty()) {
-                ordered.split("|").forEach { gameSafShortcuts.add(GameShortcut(Uri.parse(it))) }
+                ordered.split("|").forEach { uriString ->
+                    if (validUris.contains(uriString)) {
+                        gameSafShortcuts.add(GameShortcut(Uri.parse(uriString)))
+                    }
+                }
                 saveGameSafUris()
             }
         }

@@ -164,39 +164,54 @@ class FileExplorerState(
 
 
     fun getSafDisplayName(uri: Uri): String {
-        if (uri.authority == "com.android.externalstorage.documents") {
-            val docId = DocumentsContract.getTreeDocumentId(uri)
-            val split = docId.split(":")
-            val rootId = split[0]
+        try {
+            if (uri.authority == "com.android.externalstorage.documents") {
+                val docId = try {
+                    DocumentsContract.getTreeDocumentId(uri)
+                } catch (_: Exception) {
+                    null
+                }
+                
+                if (docId != null) {
+                    val split = docId.split(":")
+                    val rootId = split[0]
 
-            val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                storageManager.storageVolumes.forEach { volume ->
-                    val volumeUuid = volume.uuid ?: "primary"
-                    if (volumeUuid == rootId) {
-                        return volume.getDescription(context)
+                    val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        storageManager.storageVolumes.forEach { volume ->
+                            val volumeUuid = volume.uuid ?: "primary"
+                            if (volumeUuid == rootId) {
+                                return volume.getDescription(context)
+                            }
+                        }
                     }
+                    return if (rootId == "primary") context.getString(R.string.nav_internal_storage) else rootId
                 }
             }
-            return if (rootId == "primary") context.getString(R.string.nav_internal_storage) else rootId
-        }
 
-        val pm = context.packageManager
-        val providerInfo = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.resolveContentProvider(uri.authority!!, PackageManager.ComponentInfoFlags.of(0))
-            } else {
-                pm.resolveContentProvider(uri.authority!!, 0)
+            val pm = context.packageManager
+            val providerInfo = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.resolveContentProvider(uri.authority ?: "", PackageManager.ComponentInfoFlags.of(0))
+                } else {
+                    pm.resolveContentProvider(uri.authority ?: "", 0)
+                }
+            } catch (_: Exception) {
+                null
             }
+
+            val appName = providerInfo?.loadLabel(pm)?.toString() ?: ""
+            if (appName.isNotEmpty()) return appName
+
+            val doc = try {
+                DocumentFile.fromTreeUri(context, uri)
+            } catch (_: Exception) {
+                null
+            }
+            return doc?.name ?: context.getString(R.string.nav_external_location)
         } catch (_: Exception) {
-            null
+            return context.getString(R.string.nav_external_location)
         }
-
-        val appName = providerInfo?.loadLabel(pm)?.toString() ?: ""
-        if (appName.isNotEmpty()) return appName
-
-        val doc = DocumentFile.fromTreeUri(context, currentSafUri!!)
-        return doc?.name ?: context.getString(R.string.nav_external_location)
     }
 
     val currentName: String
@@ -241,11 +256,16 @@ class FileExplorerState(
                 }
                 else currentPath?.name ?: context.getString(R.string.unknown)
             } else if (currentSafUri != null) {
+                val safUri = currentSafUri!!
                 if (safStack.isNotEmpty()) {
-                    val doc = DocumentFile.fromTreeUri(context, currentSafUri!!)
+                    val doc = try {
+                        DocumentFile.fromTreeUri(context, safUri)
+                    } catch (_: Exception) {
+                        null
+                    }
                     doc?.name ?: context.getString(R.string.nav_unknown_folder)
                 } else {
-                    getSafDisplayName(currentSafUri!!)
+                    getSafDisplayName(safUri)
                 }
             } else {
                 context.getString(R.string.new_tab)
@@ -282,7 +302,12 @@ class FileExplorerState(
             )
 
             currentSafUri != null -> {
-                val doc = DocumentFile.fromTreeUri(context, currentSafUri!!)
+                val safUri = currentSafUri!!
+                val doc = try {
+                    DocumentFile.fromTreeUri(context, safUri)
+                } catch (_: Exception) {
+                    null
+                }
                 doc?.toUniversal()
             }
 
@@ -647,8 +672,17 @@ class FileExplorerState(
                     } else if (currentPath != null) {
                         LocalProvider.listChildren(currentPath!!.absolutePath)
                     } else if (currentSafUri != null) {
-                        val docFile = DocumentFile.fromTreeUri(context, currentSafUri!!)
-                        val rawDocs = docFile?.listFiles()?.toList() ?: emptyList()
+                        val safUri = currentSafUri!!
+                        val docFile = try {
+                            DocumentFile.fromTreeUri(context, safUri)
+                        } catch (_: Exception) {
+                            null
+                        }
+                        val rawDocs = try {
+                            docFile?.listFiles()?.toList()
+                        } catch (_: Exception) {
+                            null
+                        } ?: emptyList()
                         rawDocs.map { it.toUniversal() }
                     } else {
                         emptyList()

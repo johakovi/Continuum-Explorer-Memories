@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app">
+      <SelectionState runConfigName="Continuum Explorer Memories">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2026-06-12T20:19:46.499667900Z">
           <Target type="DEFAULT_BOOT">

@@ -918,54 +918,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            if (showLanguageDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLanguageDialog = false },
-                    title = { Text(stringResource(R.string.settings_choose_language)) },
-                    text = {
-                        val languages = remember {
-                            listOf(
-                                "en" to R.string.settings_language_english,
-                                "fi" to R.string.settings_language_finnish,
-                                "fr" to R.string.settings_language_french,
-                                "de" to R.string.settings_language_german,
-                                "ko" to R.string.settings_language_korean,
-                                "pt" to R.string.settings_language_portuguese,
-                                "ru" to R.string.settings_language_russian,
-                                "es" to R.string.settings_language_spanish,
-                                "sv" to R.string.settings_language_swedish,
-                                "tr" to R.string.settings_language_turkish,
-                                "uk" to R.string.settings_language_ukrainian
-                            )
-                        }
-                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            OptionItem(
-                                label = stringResource(R.string.settings_language_system),
-                                selected = language == "system",
-                                onClick = {
-                                    SettingsManager.setLanguage(context, "system")
-                                    showLanguageDialog = false
-                                }
-                            )
-                            languages.forEach { (tag, resId) ->
-                                OptionItem(
-                                    label = stringResource(resId),
-                                    selected = language == tag,
-                                    onClick = {
-                                        SettingsManager.setLanguage(context, tag)
-                                        showLanguageDialog = false
-                                    }
-                                )
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showLanguageDialog = false }) {
-                            Text(stringResource(R.string.cancel))
-                        }
-                    }
-                )
-            }
+
 
             if (showDefaultFolderColorDialog) {
                 AlertDialog(
@@ -1131,6 +1084,54 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showDefaultViewModeDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+            if (showLanguageDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLanguageDialog = false },
+                    title = { Text(stringResource(R.string.settings_choose_language)) },
+                    text = {
+                        val languages = remember {
+                            listOf(
+                                "en" to R.string.settings_language_english,
+                                "fi" to R.string.settings_language_finnish,
+                                "fr" to R.string.settings_language_french,
+                                "de" to R.string.settings_language_german,
+                                "ko" to R.string.settings_language_korean,
+                                "pt" to R.string.settings_language_portuguese,
+                                "ru" to R.string.settings_language_russian,
+                                "es" to R.string.settings_language_spanish,
+                                "sv" to R.string.settings_language_swedish,
+                                "tr" to R.string.settings_language_turkish,
+                                "uk" to R.string.settings_language_ukrainian
+                            )
+                        }
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            OptionItem(
+                                label = stringResource(R.string.settings_language_system),
+                                selected = language == "system",
+                                onClick = {
+                                    SettingsManager.setLanguage(context, "system")
+                                    showLanguageDialog = false
+                                }
+                            )
+                            languages.forEach { (tag, resId) ->
+                                OptionItem(
+                                    label = stringResource(resId),
+                                    selected = language == tag,
+                                    onClick = {
+                                        SettingsManager.setLanguage(context, tag)
+                                        showLanguageDialog = false
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showLanguageDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }
