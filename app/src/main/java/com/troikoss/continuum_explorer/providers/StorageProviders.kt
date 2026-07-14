@@ -55,7 +55,8 @@ object StorageProviders {
                 NetworkProtocol.SFTP -> SftpProvider(connection, appContext)
                 NetworkProtocol.WEBDAV -> WebDavProvider(connection, appContext)
                 NetworkProtocol.SMB -> SmbProvider(connection, appContext)
-                else -> throw UnsupportedOperationException("Protocol ${connection.protocol} not implemented")
+                NetworkProtocol.GOOGLE_DRIVE -> throw UnsupportedOperationException("Google Drive not yet implemented")
+                NetworkProtocol.ONEDRIVE -> throw UnsupportedOperationException("OneDrive not yet implemented")
             }
         }
 
