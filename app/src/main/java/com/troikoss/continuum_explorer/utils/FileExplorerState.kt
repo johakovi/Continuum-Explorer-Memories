@@ -165,6 +165,9 @@ class FileExplorerState(
 
 
     fun getSafDisplayName(uri: Uri): String {
+        val customName = appConfigs.safNames[uri.toString()]
+        if (!customName.isNullOrEmpty()) return customName
+
         try {
             if (uri.authority == "com.android.externalstorage.documents") {
                 val docId = try {

@@ -283,6 +283,9 @@ fun NavigationPane(
     val lazyListState = rememberLazyListState()
 
     // Reordering state
+    var renamingFavorite by remember { mutableStateOf<String?>(null) }
+    var renamingSaf by remember { mutableStateOf<Uri?>(null) }
+    var renamingNetwork by remember { mutableStateOf<NetworkConnection?>(null) }
     var draggedItemId by remember { mutableStateOf<String?>(null) }
     var draggingOffset by remember { mutableFloatStateOf(0f) }
     val handleWidthPx = with(density) { 48.dp.toPx() }
@@ -470,11 +473,13 @@ fun NavigationPane(
                                 .fileDropTarget(appState, destPath = file),
                             contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                         ) {
+                            val customName = appState.appConfigs.favoriteNames[path]
                             NavFavoriteItem(
-                                label = file.name,
+                                label = customName ?: file.name,
                                 path = path,
                                 onClick = { appState.navigateTo(file, null); onNavigate() },
                                 onRemove = { appState.appConfigs.removeFavorite(path) },
+                                onRename = { renamingFavorite = path },
                                 appState = appState,
                                 textAlphaProvider = textAlphaProvider,
                                 isMinimized = isMinimized
@@ -803,6 +808,7 @@ fun NavigationPane(
                                 uri = uri,
                                 onClick = { onSafItemSelected(uri) },
                                 onRemove = { appState.removeSafUri(uri) },
+                                onRename = { renamingSaf = uri },
                                 modifier = Modifier.fileDropTarget(appState, destSafUri = uri),
                                 appState = appState,
                                 textAlphaProvider = textAlphaProvider,
@@ -891,14 +897,15 @@ fun NavigationPane(
                             contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                         ) {
                             NavNetworkItem(
-                                connection = connection,
-                                onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
-                                onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
-                                onEdit = { onEditNetworkClick(connection) },
-                                appState = appState,
-                                textAlphaProvider = textAlphaProvider,
-                                isMinimized = isMinimized
-                            )
+                            connection = connection,
+                            onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
+                            onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
+                            onEdit = { onEditNetworkClick(connection) },
+                            onRename = { renamingNetwork = connection },
+                            appState = appState,
+                            textAlphaProvider = textAlphaProvider,
+                            isMinimized = isMinimized
+                        )
                         }
                     }
                 }
@@ -924,6 +931,64 @@ fun NavigationPane(
     if (appState.isConfiguringMusicFolders) {
         MusicFoldersDialog(appState, onAddStorageClick)
     }
+
+    renamingFavorite?.let { path ->
+        RenameDialog(
+            initialValue = appState.appConfigs.favoriteNames[path] ?: File(path).name,
+            onDismiss = { renamingFavorite = null },
+            onConfirm = { newName -> appState.appConfigs.renameFavorite(path, newName) }
+        )
+    }
+
+    renamingSaf?.let { uri ->
+        RenameDialog(
+            initialValue = appState.getSafDisplayName(uri),
+            onDismiss = { renamingSaf = null },
+            onConfirm = { newName -> appState.appConfigs.renameSafUri(uri, newName) }
+        )
+    }
+
+    renamingNetwork?.let { connection ->
+        RenameDialog(
+            initialValue = connection.displayName,
+            onDismiss = { renamingNetwork = null },
+            onConfirm = { newName ->
+                appState.appConfigs.updateNetworkConnection(connection.copy(displayName = newName))
+            }
+        )
+    }
+}
+
+@Composable
+private fun RenameDialog(
+    initialValue: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(initialValue) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.menu_rename)) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(text); onDismiss() }) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable
@@ -1285,6 +1350,7 @@ private fun NavContextMenu(
     section: NavSection? = null,
     onRemove: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
+    onRename: (() -> Unit)? = null,
     onNavigate: (() -> Unit)? = null,
     onAddStorageClick: (() -> Unit)? = null
 ) {
@@ -1483,6 +1549,17 @@ private fun NavContextMenu(
                         onEdit()
                     },
                     leadingIcon = { Icon(Icons.Default.Edit, null) }
+                )
+            }
+
+            if (onRename != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_rename)) },
+                    onClick = {
+                        onDismissRequest()
+                        onRename()
+                    },
+                    leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) }
                 )
             }
 
@@ -1687,6 +1764,7 @@ private fun NavFavoriteItem(
     path: String,
     onClick: () -> Unit,
     onRemove: () -> Unit,
+    onRename: () -> Unit,
     appState: FileExplorerState,
     textAlphaProvider: State<Float>,
     isMinimized: Boolean,
@@ -1740,6 +1818,7 @@ private fun NavFavoriteItem(
                 appState = appState,
                 path = path,
                 onRemove = onRemove,
+                onRename = onRename,
                 onNavigate = onClick
             )
         }
@@ -1755,6 +1834,7 @@ private fun NavSafItem(
     uri: Uri,
     onClick: () -> Unit,
     onRemove: () -> Unit,
+    onRename: () -> Unit,
     appState: FileExplorerState,
     textAlphaProvider: State<Float>,
     isMinimized: Boolean,
@@ -1854,6 +1934,7 @@ private fun NavSafItem(
                 appState = appState,
                 uri = uri,
                 onRemove = onRemove,
+                onRename = onRename,
                 onNavigate = onClick
             )
         }
@@ -1866,6 +1947,7 @@ private fun NavNetworkItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     onEdit: () -> Unit,
+    onRename: () -> Unit,
     appState: FileExplorerState,
     textAlphaProvider: State<Float>,
     isMinimized: Boolean,
@@ -1991,6 +2073,7 @@ private fun NavNetworkItem(
                 section = NavSection.NetworkStorage(connection.id),
                 onRemove = onRemove,
                 onEdit = onEdit,
+                onRename = onRename,
                 onNavigate = onClick
             )
         }

@@ -272,6 +272,8 @@ class AppConfigurations(private val context: Context) {
     val addedSafUris = mutableStateListOf<Uri>()
     val gameSafShortcuts = mutableStateListOf<GameShortcut>()
     val favoritePaths = mutableStateListOf<String>()
+    val favoriteNames = mutableStateMapOf<String, String>()
+    val safNames = mutableStateMapOf<String, String>()
     val libraryOrder = mutableStateListOf("gallery", "music", "recent", "downloads", "documents", "games_manager", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
@@ -339,6 +341,7 @@ class AppConfigurations(private val context: Context) {
     private fun loadAddedSafUris() {
         val prefs = context.getSharedPreferences("saf_storage", Context.MODE_PRIVATE)
         addedSafUris.clear()
+        safNames.clear()
         
         // Filter out URIs for which we no longer have permission (e.g. app uninstalled)
         val persistedPermissions = context.contentResolver.persistedUriPermissions
@@ -363,11 +366,27 @@ class AppConfigurations(private val context: Context) {
             }
             saveAddedSafUris()
         }
+
+        val namesJson = prefs.getString("custom_names", null)
+        if (namesJson != null) {
+            try {
+                val obj = JSONObject(namesJson)
+                obj.keys().forEach { key ->
+                    safNames[key] = obj.getString(key)
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     fun saveAddedSafUris() {
         val prefs = context.getSharedPreferences("saf_storage", Context.MODE_PRIVATE)
-        prefs.edit().putString("ordered_uris", addedSafUris.joinToString("|") { it.toString() }).apply()
+        val editor = prefs.edit()
+        editor.putString("ordered_uris", addedSafUris.joinToString("|") { it.toString() })
+        
+        val namesObj = JSONObject()
+        safNames.forEach { (uri, name) -> namesObj.put(uri, name) }
+        editor.putString("custom_names", namesObj.toString())
+        editor.apply()
     }
 
     private fun loadGameSafUris() {
@@ -450,10 +469,17 @@ class AppConfigurations(private val context: Context) {
         GlobalEvents.triggerConfigUpdate()
     }
 
+    fun renameSafUri(uri: Uri, newName: String) {
+        safNames[uri.toString()] = newName
+        saveAddedSafUris()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
     private fun loadFavorites() {
         val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
         val favoritesList = prefs.getString("ordered_paths", "") ?: ""
         favoritePaths.clear()
+        favoriteNames.clear()
         if (favoritesList.isNotEmpty()) {
             favoritePaths.addAll(favoritesList.split("|"))
         } else {
@@ -461,15 +487,39 @@ class AppConfigurations(private val context: Context) {
             favoritePaths.addAll(favoritesSet.sorted())
             saveFavorites()
         }
+
+        val namesJson = prefs.getString("custom_names", null)
+        if (namesJson != null) {
+            try {
+                val obj = JSONObject(namesJson)
+                obj.keys().forEach { key ->
+                    favoriteNames[key] = obj.getString(key)
+                }
+            } catch (_: Exception) {}
+        }
+
         ShortcutHelper.updateFavoritesShortcuts(context, favoritePaths)
     }
     
     fun saveFavorites() {
         val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
         val orderedString = favoritePaths.joinToString("|")
-        prefs.edit().putString("ordered_paths", orderedString).apply()
-        prefs.edit().putStringSet("paths", favoritePaths.toSet()).apply()
+        editor.putString("ordered_paths", orderedString)
+        editor.putStringSet("paths", favoritePaths.toSet())
+
+        val namesObj = JSONObject()
+        favoriteNames.forEach { (path, name) -> namesObj.put(path, name) }
+        editor.putString("custom_names", namesObj.toString())
+        
+        editor.apply()
         ShortcutHelper.updateFavoritesShortcuts(context, favoritePaths)
+    }
+
+    fun renameFavorite(path: String, newName: String) {
+        favoriteNames[path] = newName
+        saveFavorites()
+        GlobalEvents.triggerConfigUpdate()
     }
 
     private fun loadLibrarySettings() {
