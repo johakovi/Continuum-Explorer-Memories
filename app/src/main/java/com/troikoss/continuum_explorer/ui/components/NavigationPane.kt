@@ -1616,7 +1616,7 @@ private fun NavContextMenu(
                     },
                     onClick = {
                         onDismissRequest()
-                        appState.appConfigs.isDocumentsFolderEnabled = !appState.appConfigs.isDocumentsFolderEnabled
+                        appState.appConfigs.toggleDocumentsFolder()
                     },
                     leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
                 )
