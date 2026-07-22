@@ -270,6 +270,7 @@
     <string name="menu_remove_favorites">Quitar de favoritos</string>
     <string name="menu_add_favorites">Añadir a favoritos</string>
     <string name="menu_add_home">Añadir a inicio</string>
+    <string name="menu_add_library">Añadir a la biblioteca</string>
     <string name="menu_extract">Extraer…</string>
     <string name="menu_compress">Comprimir…</string>
     <string name="menu_cut">Cortar</string>
@@ -321,11 +322,14 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">Elementos de biblioteca</string>
+    <string name="nav_home">Inicio</string>
     <string name="nav_recent">Reciente</string>
     <string name="nav_gallery">Galería</string>
     <string name="nav_music">Música</string>
     <string name="nav_downloads">Descargas</string>
     <string name="nav_documents">Documentos</string>
+    <string name="nav_archives">Archivos</string>
+    <string name="nav_apks">APKs</string>
     <string name="nav_game_saves">Gestor de juegos</string>
     <string name="menu_gallery_albums">Álbumes</string>
     <string name="menu_gallery_folders">Carpetas de la galería</string>

@@ -267,6 +267,7 @@
     <string name="menu_remove_favorites">Ta bort från favoriter</string>
     <string name="menu_add_favorites">Lägg till i favoriter</string>
     <string name="menu_add_home">Lägg till på startskärmen</string>
+    <string name="menu_add_library">Lägg till i bibliotek</string>
     <string name="menu_extract">Extrahera…</string>
     <string name="menu_compress">Komprimera…</string>
     <string name="menu_cut">Klipp ut</string>
@@ -318,11 +319,14 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">Biblioteksobjekt</string>
+    <string name="nav_home">Hem</string>
     <string name="nav_recent">Senaste</string>
     <string name="nav_gallery">Galleri</string>
     <string name="nav_music">Musik</string>
     <string name="nav_downloads">Hämtningar</string>
     <string name="nav_documents">Dokument</string>
+    <string name="nav_archives">Arkiv</string>
+    <string name="nav_apks">APK:er</string>
     <string name="nav_game_saves">Spelhanterare</string>
     <string name="menu_gallery_albums">Album</string>
     <string name="menu_gallery_folders">Gallerimappar</string>

@@ -274,7 +274,7 @@ class AppConfigurations(private val context: Context) {
     val favoritePaths = mutableStateListOf<String>()
     val favoriteNames = mutableStateMapOf<String, String>()
     val safNames = mutableStateMapOf<String, String>()
-    val libraryOrder = mutableStateListOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "trash")
+    val libraryOrder = mutableStateListOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
@@ -284,6 +284,7 @@ class AppConfigurations(private val context: Context) {
     var isArchivesVisible by mutableStateOf(false)
     var isApksVisible by mutableStateOf(false)
     var isGamesVisible by mutableStateOf(false)
+    var isInternalStorageVisible by mutableStateOf(false)
     var isTrashVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
     var isMusicAlbumsEnabled by mutableStateOf(false)
@@ -305,7 +306,7 @@ class AppConfigurations(private val context: Context) {
         loadNetworkConnections()
 
         // Ensure all library items are present in the order list
-        val required = listOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "trash")
+        val required = listOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash")
         required.forEach { id ->
             if (!libraryOrder.contains(id)) {
                 if (id == "home") {
@@ -327,6 +328,9 @@ class AppConfigurations(private val context: Context) {
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else if (id == "games_manager") {
                     val idx = libraryOrder.indexOf("apks")
+                    libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
+                } else if (id == "internal_storage") {
+                    val idx = libraryOrder.indexOf("games_manager")
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else {
                     libraryOrder.add(id)
@@ -581,6 +585,7 @@ class AppConfigurations(private val context: Context) {
         } else {
             prefs.getBoolean("is_game_saves_visible", false)
         }
+        isInternalStorageVisible = prefs.getBoolean("is_internal_storage_visible", false)
         isTrashVisible = prefs.getBoolean("is_trash_visible", true)
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
         isMusicAlbumsEnabled = prefs.getBoolean("is_music_albums_enabled", false)
@@ -599,6 +604,7 @@ class AppConfigurations(private val context: Context) {
             putBoolean("is_archives_visible", isArchivesVisible)
             putBoolean("is_apks_visible", isApksVisible)
             putBoolean("is_games_visible", isGamesVisible)
+            putBoolean("is_internal_storage_visible", isInternalStorageVisible)
             putBoolean("is_trash_visible", isTrashVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
             putBoolean("is_music_albums_enabled", isMusicAlbumsEnabled)
@@ -650,6 +656,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGamesVisibility() {
         isGamesVisible = !isGamesVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleInternalStorageVisibility() {
+        isInternalStorageVisible = !isInternalStorageVisible
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

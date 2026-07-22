@@ -267,6 +267,7 @@
     <string name="menu_remove_favorites">从收藏中移除</string>
     <string name="menu_add_favorites">添加到收藏</string>
     <string name="menu_add_home">添加到主屏幕</string>
+    <string name="menu_add_library">添加到库</string>
     <string name="menu_extract">解压…</string>
     <string name="menu_compress">压缩…</string>
     <string name="menu_cut">剪切</string>
@@ -318,11 +319,14 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">库项目</string>
+    <string name="nav_home">首页</string>
     <string name="nav_recent">最近</string>
     <string name="nav_gallery">画廊</string>
     <string name="nav_music">音乐</string>
     <string name="nav_downloads">下载</string>
     <string name="nav_documents">文档</string>
+    <string name="nav_archives">压缩包</string>
+    <string name="nav_apks">安装包</string>
     <string name="nav_game_saves">游戏管理</string>
     <string name="menu_gallery_albums">相册</string>
     <string name="menu_gallery_folders">画廊文件夹</string>

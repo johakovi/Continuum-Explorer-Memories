@@ -269,6 +269,7 @@
     <string name="menu_remove_favorites">즐겨찾기에서 제거</string>
     <string name="menu_add_favorites">즐겨찾기에 추가</string>
     <string name="menu_add_home">홈 화면에 추가</string>
+    <string name="menu_add_library">라이브러리에 추가</string>
     <string name="menu_extract">압축 풀기…</string>
     <string name="menu_compress">압축하기…</string>
     <string name="menu_cut">잘라내기</string>
@@ -320,11 +321,14 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">라이브러리 항목</string>
+    <string name="nav_home">홈</string>
     <string name="nav_recent">최근 항목</string>
     <string name="nav_gallery">갤러리</string>
     <string name="nav_music">음악</string>
     <string name="nav_downloads">다운로드</string>
     <string name="nav_documents">문서</string>
+    <string name="nav_archives">압축 파일</string>
+    <string name="nav_apks">APK</string>
     <string name="nav_game_saves">게임 관리자</string>
     <string name="menu_gallery_albums">앨범</string>
     <string name="menu_gallery_folders">갤러리 폴더</string>

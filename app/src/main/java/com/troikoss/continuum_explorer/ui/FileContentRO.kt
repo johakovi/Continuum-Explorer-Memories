@@ -355,6 +355,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 gridState = gridState
             )
             .contextMenuDetector(enableLongPress = true, aggressive = false) { offset ->
+                if (appState.libraryItem == LibraryItem.Home) return@contextMenuDetector
                 val isOverItem = itemPositions.values.any { rect -> rect.contains(offset) }
                 if (!isOverItem) {
                     menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }

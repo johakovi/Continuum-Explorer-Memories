@@ -257,6 +257,7 @@
     <string name="menu_remove_favorites">Favorilerden Çıkar</string>
     <string name="menu_add_favorites">Favorilere Ekle</string>
     <string name="menu_add_home">Ana Sayfaya Ekle</string>
+    <string name="menu_add_library">Kütüphaneye Ekle</string>
     <string name="menu_extract">Çıkar…</string>
     <string name="menu_compress">Sıkıştır…</string>
     <string name="menu_cut">Kes</string>
@@ -307,11 +308,14 @@
     <string name="menu_select_folder_color">Klasör rengini seç</string>
 
     <string name="nav_library_items">Kütüphane öğeleri</string>
+    <string name="nav_home">Ana Sayfa</string>
     <string name="nav_recent">Son Kullanılanlar</string>
     <string name="nav_gallery">Galeri</string>
     <string name="nav_music">Müzik</string>
     <string name="nav_downloads">İndirilenler</string>
     <string name="nav_documents">Belgeler</string>
+    <string name="nav_archives">Arşivler</string>
+    <string name="nav_apks">APK\'lar</string>
     <string name="nav_game_saves">Oyun Yöneticisi</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
@@ -336,7 +340,7 @@
     <string name="nav_external_drive">Harici Sürücü</string>
     <string name="nav_favorites">Favoriler</string>
     <string name="nav_no_favorites">Favori eklenmemiştir</string>
-    <string name="nav_library">Biblioteca</string>
+    <string name="nav_library">Kütüphane</string>
     <string name="nav_recycle_bin">Geri Dönüşüm Kutusu</string>
     <string name="nav_storage">Depolama</string>
     <string name="nav_added_locations">Eklenmiş Konumlar</string>

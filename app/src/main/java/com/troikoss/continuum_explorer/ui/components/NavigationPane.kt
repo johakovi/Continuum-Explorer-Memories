@@ -1486,6 +1486,31 @@ private fun NavContextMenu(
                     },
                     leadingIcon = { Icon(Icons.Default.Folder, null) }
                 )
+
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_gallery_albums))
+                            if (appState.appConfigs.isGalleryAlbumsEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        appState.appConfigs.toggleGalleryAlbums()
+                    },
+                    leadingIcon = {
+                        val iconTheme = SettingsManager.iconTheme.value
+                        if (iconTheme == IconTheme.MATERIAL) {
+                            Icon(Icons.Default.Folder, null)
+                        } else {
+                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                            Icon(IconHelper.rememberThemePainter(resId), null)
+                        }
+                    }
+                )
                 HorizontalDivider()
             }
 
@@ -1548,7 +1573,15 @@ private fun NavContextMenu(
                         onDismissRequest()
                         appState.appConfigs.toggleMusicAlbums()
                     },
-                    leadingIcon = { Icon(Icons.Default.Album, null) }
+                    leadingIcon = {
+                        val iconTheme = SettingsManager.iconTheme.value
+                        if (iconTheme == IconTheme.MATERIAL) {
+                            Icon(Icons.Default.Folder, null)
+                        } else {
+                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                            Icon(IconHelper.rememberThemePainter(resId), null)
+                        }
+                    }
                 )
                 
                 DropdownMenuItem(
@@ -1675,14 +1708,25 @@ private fun NavContextMenu(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(stringResource(R.string.menu_documents_show_folders))
-                            Spacer(Modifier.weight(1f))
+                            if (appState.appConfigs.isDocumentsFolderEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
                         }
                     },
                     onClick = {
                         onDismissRequest()
                         appState.appConfigs.toggleDocumentsFolder()
                     },
-                    leadingIcon = { if (appState.appConfigs.isDocumentsFolderEnabled) Icon(Icons.Default.Check, null) }
+                    leadingIcon = {
+                        val iconTheme = SettingsManager.iconTheme.value
+                        if (iconTheme == IconTheme.MATERIAL) {
+                            Icon(Icons.Default.Folder, null)
+                        } else {
+                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                            Icon(IconHelper.rememberThemePainter(resId), null)
+                        }
+                    }
                 )
             }
             if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.Music && section !is NavSection.NetworkStorage) {

@@ -269,6 +269,7 @@
     <string name="menu_remove_favorites">Видалити з обраного</string>
     <string name="menu_add_favorites">Додати в обране</string>
     <string name="menu_add_home">На головний екран</string>
+    <string name="menu_add_library">Додати в бібліотеку</string>
     <string name="menu_extract">Видобути…</string>
     <string name="menu_compress">Стиснути…</string>
     <string name="menu_cut">Вирізати</string>
@@ -320,11 +321,14 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">Елементи бібліотеки</string>
+    <string name="nav_home">Головна</string>
     <string name="nav_recent">Нещодавні</string>
     <string name="nav_gallery">Галерея</string>
     <string name="nav_music">Музика</string>
     <string name="nav_downloads">Завантаження</string>
     <string name="nav_documents">Документи</string>
+    <string name="nav_archives">Архіви</string>
+    <string name="nav_apks">APK</string>
     <string name="nav_game_saves">Диспетчер ігор</string>
     <string name="menu_gallery_albums">Альбоми</string>
     <string name="menu_gallery_folders">Папки галереї</string>

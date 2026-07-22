@@ -270,6 +270,7 @@
     <string name="menu_remove_favorites">Remover dos Favoritos</string>
     <string name="menu_add_favorites">Adicionar aos Favoritos</string>
     <string name="menu_add_home">Adicionar ao Início</string>
+    <string name="menu_add_library">Adicionar à biblioteca</string>
     <string name="menu_extract">Extrair…</string>
     <string name="menu_compress">Compactar…</string>
     <string name="menu_cut">Recortar</string>
@@ -324,14 +325,17 @@
 
     <!-- Navigation -->
     <string name="nav_library_items">Itens da biblioteca</string>
+    <string name="nav_home">Início</string>
     <string name="nav_recent">Recentes</string>
     <string name="nav_gallery">Galeria</string>
     <string name="nav_music">Música</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documentos</string>
+    <string name="nav_archives">Arquivos</string>
+    <string name="nav_apks">APKs</string>
     <string name="nav_game_saves">Gestor de jogos</string>
     <string name="menu_gallery_albums">Álbuns</string>
-    <string name="menu_gallery_folders">Carpetas da Galeria</string>
+    <string name="menu_gallery_folders">Pastas da Galeria</string>
     <string name="menu_music_albums">Álbuns</string>
     <string name="menu_music_folders">Pastas de Música</string>
     <string name="menu_create_playlist">Criar Lista de Reprodução</string>
@@ -345,7 +349,7 @@
     <string name="gallery_add_folder">Adicionar pasta</string>
     <string name="menu_gallery_show_all">Mostrar Todas as Mídias</string>
     <string name="menu_documents_folder">Pasta</string>
-    <string name="menu_documents_show_folders">Mostrar carpetas</string>
+    <string name="menu_documents_show_folders">Mostrar pastas</string>
     <string name="menu_favourite">Favorito</string>
     <string name="nav_add_storage">Adicionar Armazenamento</string>
     <string name="nav_internal_storage">Armazenamento Interno</string>

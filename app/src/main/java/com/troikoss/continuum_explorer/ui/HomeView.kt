@@ -3,13 +3,19 @@ package com.troikoss.continuum_explorer.ui
 import android.os.Environment
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -19,38 +25,46 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.*
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
-import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
     val configs = appState.appConfigs
     val extendedColors = LocalExtendedColors.current
     val gridState = rememberLazyGridState()
-    val density = LocalDensity.current
+    
+    // Track dragging state for reordering
+    var draggedItemId by remember { mutableStateOf<String?>(null) }
+    var draggingOffset by remember { mutableStateOf(Offset.Zero) }
 
     // Resolve persistent size for Home items
     LaunchedEffect(Unit) {
@@ -59,17 +73,10 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
     val itemSize = appState.folderConfigs.gridItemSize.dp
     
-    val items = listOf(
-        HomeItemData("recent", stringResource(R.string.nav_recent), Icons.Default.History, R.drawable.ic_nav_recent, R.drawable.ic_nav_recent_duo, configs.isRecentVisible, { configs.toggleRecentVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Recent) }, extendedColors.recentIcon),
-        HomeItemData("gallery", stringResource(R.string.nav_gallery), Icons.Default.Image, R.drawable.ic_nav_gallery, R.drawable.ic_nav_gallery_duo, configs.isGalleryVisible, { configs.toggleGalleryVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) }, extendedColors.galleryIcon),
-        HomeItemData("music", stringResource(R.string.nav_music), Icons.Default.MusicNote, R.drawable.ic_nav_music, R.drawable.ic_nav_music_duo, configs.isMusicVisible, { configs.toggleMusicVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Music) }, extendedColors.musicIcon),
-        HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads) }, extendedColors.downloadsIcon),
-        HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Documents) }, extendedColors.documentsIcon),
-        HomeItemData("archives", stringResource(R.string.nav_archives), Icons.Default.FolderZip, R.drawable.ic_zip, R.drawable.ic_zip_duo, configs.isArchivesVisible, { configs.toggleArchivesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Archives) }, extendedColors.zipIcon),
-        HomeItemData("apks", stringResource(R.string.nav_apks), Icons.Default.Android, R.drawable.ic_android_logo, R.drawable.ic_android_logo, configs.isApksVisible, { configs.toggleApksVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Apks) }, extendedColors.androidIcon),
-        HomeItemData("games_manager", stringResource(R.string.nav_game_saves), Icons.Default.Gamepad, R.drawable.ic_nav_game, R.drawable.ic_nav_game_duo, configs.isGamesVisible, { configs.toggleGamesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Games) }, extendedColors.gameIcon),
-        HomeItemData("trash", stringResource(R.string.nav_trash), Icons.Default.Delete, R.drawable.ic_nav_trash, R.drawable.ic_nav_trash_duo, configs.isTrashVisible, { configs.toggleTrashVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.RecycleBin) }, extendedColors.recycleBinIcon)
-    )
+    // Map the dynamic libraryOrder to HomeItemData, excluding "home" itself
+    val items = configs.libraryOrder.filter { it != "home" }.mapNotNull { id ->
+        getHomeItemData(id, configs, appState, extendedColors)
+    }
 
     Box(
         modifier = Modifier
@@ -79,7 +86,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                 selectionManager = appState.selectionManager,
                 focusRequester = remember { androidx.compose.ui.focus.FocusRequester() },
                 viewMode = com.troikoss.continuum_explorer.model.ViewMode.GRID,
-                columns = 1, // Not strictly used for Home zoom
+                columns = 1,
                 onZoom = { factor ->
                     val newSize = (appState.folderConfigs.gridItemSize * factor).toInt()
                     appState.folderConfigs.updateGridSize(
@@ -107,7 +114,142 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             items(items, key = { it.id }) { item ->
-                HomeShortcutItem(item, appState, itemSize, onAddStorage)
+                val isDragging = draggedItemId == item.id
+                val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "HomeItemElevation")
+
+                var showMenu by remember { mutableStateOf(false) }
+                var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
+                val density = LocalDensity.current
+
+                Box(
+                    modifier = Modifier
+                        .zIndex(if (isDragging) 1f else 0f)
+                        .graphicsLayer {
+                            if (isDragging) {
+                                translationX = draggingOffset.x
+                                translationY = draggingOffset.y
+                            }
+                        }
+                        .shadow(elevation, RoundedCornerShape(20.dp))
+                        .then(if (isDragging) Modifier else Modifier.animateItem())
+                        .pointerInput(item.id) {
+                            awaitEachGesture {
+                                val down = awaitFirstDown()
+                                val startTime = System.currentTimeMillis()
+                                var isLongPress = false
+                                var isDragStarted = false
+                                var dragTriggered = false
+
+                                // Right-click handled immediately
+                                if (currentEvent.isContextMenuTrigger()) {
+                                    menuOffset = DpOffset(down.position.x.toDp(), down.position.y.toDp())
+                                    showMenu = true
+                                    down.consume()
+                                    return@awaitEachGesture
+                                }
+
+                                while (true) {
+                                    val elapsed = System.currentTimeMillis() - startTime
+                                    
+                                    // Use withTimeoutOrNull to ensure we wake up at exactly 800ms
+                                    // If dragging, we don't need the timeout anymore
+                                    val event = if (dragTriggered) {
+                                        awaitPointerEvent()
+                                    } else {
+                                        withTimeoutOrNull((800 - elapsed).coerceAtLeast(0)) {
+                                            awaitPointerEvent()
+                                        }
+                                    }
+
+                                    if (event == null) {
+                                        // Timeout reached (800ms)
+                                        if (!dragTriggered) {
+                                            menuOffset = DpOffset(down.position.x.toDp(), down.position.y.toDp())
+                                            showMenu = true
+                                            isLongPress = true
+                                        }
+                                        break
+                                    }
+
+                                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                    val currentElapsed = System.currentTimeMillis() - startTime
+                                    
+                                    if (!change.pressed) {
+                                        // Click action
+                                        if (currentElapsed < 300 && (change.position - down.position).getDistance() < viewConfiguration.touchSlop) {
+                                            item.onClick()
+                                        }
+                                        break
+                                    }
+
+                                    val dist = (change.position - down.position).getDistance()
+
+                                    // Check for Drag start (300ms)
+                                    if (currentElapsed >= 300 && !dragTriggered && dist > viewConfiguration.touchSlop) {
+                                        dragTriggered = true
+                                        draggedItemId = item.id
+                                        draggingOffset = Offset.Zero
+                                    }
+
+                                    // Check for Context Menu (800ms)
+                                    if (currentElapsed >= 800 && !dragTriggered && dist < viewConfiguration.touchSlop) {
+                                        menuOffset = DpOffset(down.position.x.toDp(), down.position.y.toDp())
+                                        showMenu = true
+                                        isLongPress = true
+                                        
+                                        // Consume the rest of the gesture until release
+                                        // to prevent any click actions or secondary reactions
+                                        var e = currentEvent
+                                        while (true) {
+                                            e.changes.forEach { if (it.id == down.id) it.consume() }
+                                            if (!e.changes.any { it.pressed }) break
+                                            e = awaitPointerEvent()
+                                        }
+                                        break
+                                    }
+
+                                    if (dragTriggered) {
+                                        draggingOffset += change.positionChange()
+                                        
+                                        // Reordering logic
+                                        val currentIndex = configs.libraryOrder.indexOf(item.id)
+                                        val layoutInfo = gridState.layoutInfo
+                                        val visibleItems = layoutInfo.visibleItemsInfo
+                                        val draggedItemInfo = visibleItems.find { it.key == item.id }
+                                        
+                                        if (draggedItemInfo != null) {
+                                            val center = draggedItemInfo.offset.let { 
+                                                Offset(it.x + draggedItemInfo.size.width / 2f + draggingOffset.x, 
+                                                       it.y + draggedItemInfo.size.height / 2f + draggingOffset.y) 
+                                            }
+                                            
+                                            val targetItem = visibleItems.find { info ->
+                                                info.key != item.id && info.key != "home" &&
+                                                center.x in info.offset.x.toFloat()..(info.offset.x + info.size.width).toFloat() &&
+                                                center.y in info.offset.y.toFloat()..(info.offset.y + info.size.height).toFloat()
+                                            }
+                                            
+                                            if (targetItem != null) {
+                                                val targetIndex = configs.libraryOrder.indexOf(targetItem.key as String)
+                                                if (currentIndex != -1 && targetIndex != -1) {
+                                                    configs.moveLibraryItem(currentIndex, targetIndex)
+                                                    draggingOffset -= Offset(
+                                                        (targetItem.offset.x - draggedItemInfo.offset.x).toFloat(),
+                                                        (targetItem.offset.y - draggedItemInfo.offset.y).toFloat()
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        change.consume()
+                                    }
+                                }
+                                draggedItemId = null
+                                draggingOffset = Offset.Zero
+                            }
+                        }
+                ) {
+                    HomeShortcutItem(item, appState, itemSize, showMenu, menuOffset, { showMenu = false }, onAddStorage)
+                }
             }
         }
 
@@ -145,6 +287,23 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
     }
 }
 
+@Composable
+private fun getHomeItemData(id: String, configs: AppConfigurations, appState: FileExplorerState, extendedColors: com.troikoss.continuum_explorer.ui.theme.ExtendedColors): HomeItemData? {
+    return when (id) {
+        "recent" -> HomeItemData("recent", stringResource(R.string.nav_recent), Icons.Default.History, R.drawable.ic_nav_recent, R.drawable.ic_nav_recent_duo, configs.isRecentVisible, { configs.toggleRecentVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Recent) }, extendedColors.recentIcon)
+        "gallery" -> HomeItemData("gallery", stringResource(R.string.nav_gallery), Icons.Default.Image, R.drawable.ic_nav_gallery, R.drawable.ic_nav_gallery_duo, configs.isGalleryVisible, { configs.toggleGalleryVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) }, extendedColors.galleryIcon)
+        "music" -> HomeItemData("music", stringResource(R.string.nav_music), Icons.Default.MusicNote, R.drawable.ic_nav_music, R.drawable.ic_nav_music_duo, configs.isMusicVisible, { configs.toggleMusicVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Music) }, extendedColors.musicIcon)
+        "downloads" -> HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads) }, extendedColors.downloadsIcon)
+        "documents" -> HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Documents) }, extendedColors.documentsIcon)
+        "archives" -> HomeItemData("archives", stringResource(R.string.nav_archives), Icons.Default.FolderZip, R.drawable.ic_zip, R.drawable.ic_zip_duo, configs.isArchivesVisible, { configs.toggleArchivesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Archives) }, extendedColors.zipIcon)
+        "apks" -> HomeItemData("apks", stringResource(R.string.nav_apks), Icons.Default.Android, R.drawable.ic_android_logo, R.drawable.ic_android_logo, configs.isApksVisible, { configs.toggleApksVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Apks) }, extendedColors.androidIcon)
+        "games_manager" -> HomeItemData("games_manager", stringResource(R.string.nav_game_saves), Icons.Default.Gamepad, R.drawable.ic_nav_game, R.drawable.ic_nav_game_duo, configs.isGamesVisible, { configs.toggleGamesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Games) }, extendedColors.gameIcon)
+        "internal_storage" -> HomeItemData("internal_storage", stringResource(R.string.nav_internal_storage), Icons.Default.Storage, R.drawable.ic_storage, R.drawable.ic_storage, configs.isInternalStorageVisible, { configs.toggleInternalStorageVisibility() }, { appState.navigateTo(Environment.getExternalStorageDirectory(), null) }, extendedColors.sidebarIcons)
+        "trash" -> HomeItemData("trash", stringResource(R.string.nav_trash), Icons.Default.Delete, R.drawable.ic_nav_trash, R.drawable.ic_nav_trash_duo, configs.isTrashVisible, { configs.toggleTrashVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.RecycleBin) }, extendedColors.recycleBinIcon)
+        else -> null
+    }
+}
+
 data class HomeItemData(
     val id: String,
     val label: String,
@@ -158,10 +317,16 @@ data class HomeItemData(
 )
 
 @Composable
-fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: androidx.compose.ui.unit.Dp, onAddStorage: (() -> Unit)? = null) {
+fun HomeShortcutItem(
+    item: HomeItemData, 
+    appState: FileExplorerState, 
+    itemSize: androidx.compose.ui.unit.Dp,
+    showMenu: Boolean,
+    menuOffset: DpOffset,
+    onDismissMenu: () -> Unit,
+    onAddStorage: (() -> Unit)? = null
+) {
     val iconTheme = SettingsManager.iconTheme.value
-    var showMenu by remember { mutableStateOf(false) }
-    var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
     val density = LocalDensity.current
     
     // Scale card components based on itemSize
@@ -174,12 +339,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
             modifier = Modifier
                 .fillMaxWidth()
                 .height(cardHeight)
-                .clip(RoundedCornerShape(20.dp))
-                .clickable { item.onClick() }
-                .contextMenuDetector { offset ->
-                    menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
-                    showMenu = true
-                },
+                .clip(RoundedCornerShape(20.dp)),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
             ),
@@ -227,7 +387,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
 
         DropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false },
+            onDismissRequest = onDismissMenu,
             offset = menuOffset,
             containerColor = LocalExtendedColors.current.menuBackground
         ) {
@@ -244,7 +404,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.nav_add_storage)) },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (onAddStorage != null) {
                                 appState.isAddingGameShortcut = true
                                 onAddStorage()
@@ -256,7 +416,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                     DropdownMenuItem(
                         text = { Text(if (isGamesFtpActive) stringResource(R.string.nav_stop_ftp_game_manager) else stringResource(R.string.nav_start_ftp_game_manager)) },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (isGamesFtpActive) {
                                 SettingsManager.setFtpServerEnabled(context, false)
                             } else {
@@ -283,7 +443,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (isFilterEnabled) {
                                 SettingsManager.setGalleryFilterEnabled(context, false)
                                 appState.refresh()
@@ -303,7 +463,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (!isFilterEnabled) {
                                 SettingsManager.setGalleryFilterEnabled(context, true)
                                 appState.refresh()
@@ -311,6 +471,31 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             appState.isConfiguringGalleryFolders = true
                         },
                         leadingIcon = { Icon(Icons.Default.Folder, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.menu_gallery_albums))
+                                if (appState.appConfigs.isGalleryAlbumsEnabled) {
+                                    Spacer(Modifier.weight(1f))
+                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
+                        onClick = {
+                            onDismissMenu()
+                            appState.appConfigs.toggleGalleryAlbums()
+                        },
+                        leadingIcon = {
+                            val iconTheme = SettingsManager.iconTheme.value
+                            if (iconTheme == IconTheme.MATERIAL) {
+                                Icon(Icons.Default.Folder, null)
+                            } else {
+                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                Icon(IconHelper.rememberThemePainter(resId), null)
+                            }
+                        }
                     )
                     HorizontalDivider()
                 }
@@ -330,7 +515,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (isFilterEnabled) {
                                 SettingsManager.setMusicFilterEnabled(context, false)
                                 appState.refresh()
@@ -350,7 +535,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             if (!isFilterEnabled) {
                                 SettingsManager.setMusicFilterEnabled(context, true)
                                 appState.refresh()
@@ -371,16 +556,24 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             appState.appConfigs.toggleMusicAlbums()
                         },
-                        leadingIcon = { Icon(Icons.Default.Album, null) }
+                        leadingIcon = {
+                            val iconTheme = SettingsManager.iconTheme.value
+                            if (iconTheme == IconTheme.MATERIAL) {
+                                Icon(Icons.Default.Folder, null)
+                            } else {
+                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                Icon(IconHelper.rememberThemePainter(resId), null)
+                            }
+                        }
                     )
 
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_sync_list)) },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             appState.scope.launch(Dispatchers.IO) {
                                 MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
                                 GlobalEvents.triggerRefresh()
@@ -403,10 +596,18 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             }
                         },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             appState.appConfigs.toggleDocumentsFolder()
                         },
-                        leadingIcon = { Icon(Icons.Default.Folder, null) }
+                        leadingIcon = {
+                            val iconTheme = SettingsManager.iconTheme.value
+                            if (iconTheme == IconTheme.MATERIAL) {
+                                Icon(Icons.Default.Folder, null)
+                            } else {
+                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                Icon(IconHelper.rememberThemePainter(resId), null)
+                            }
+                        }
                     )
                     HorizontalDivider()
                 }
@@ -415,7 +616,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_open)) },
                     onClick = {
-                        showMenu = false
+                        onDismissMenu()
                         item.onClick()
                     },
                     leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
@@ -424,7 +625,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_open_new_window)) },
                     onClick = {
-                        showMenu = false
+                        onDismissMenu()
                         val virtualFile = when (item.id) {
                             "recent" -> UniversalFile(appState.context.getString(R.string.nav_recent), true, 0, 0, LocalProvider, "virtual://recent")
                             "gallery" -> UniversalFile(appState.context.getString(R.string.nav_gallery), true, 0, 0, LocalProvider, "virtual://gallery")
@@ -434,6 +635,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             "archives" -> UniversalFile(appState.context.getString(R.string.nav_archives), true, 0, 0, LocalProvider, "virtual://archives")
                             "apks" -> UniversalFile(appState.context.getString(R.string.nav_apks), true, 0, 0, LocalProvider, "virtual://apks")
                             "games_manager" -> UniversalFile(appState.context.getString(R.string.nav_game_saves), true, 0, 0, LocalProvider, "virtual://games_manager")
+                            "internal_storage" -> UniversalFile(appState.context.getString(R.string.nav_internal_storage), true, 0, 0, LocalProvider, Environment.getExternalStorageDirectory().absolutePath)
                             "trash" -> UniversalFile(appState.context.getString(R.string.nav_trash), true, 0, 0, LocalProvider, "virtual://recycle_bin")
                             else -> null
                         }
@@ -448,7 +650,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                 DropdownMenuItem(
                     text = { Text(if (item.isVisible) stringResource(R.string.menu_remove) else stringResource(R.string.menu_add_library)) },
                     onClick = {
-                        showMenu = false
+                        onDismissMenu()
                         item.onToggle()
                     },
                     leadingIcon = { Icon(if (item.isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) }
@@ -458,7 +660,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
                         onClick = {
-                            showMenu = false
+                            onDismissMenu()
                             appState.emptyRecycleBin()
                         },
                         leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
@@ -471,7 +673,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_properties)) },
                     onClick = {
-                        showMenu = false
+                        onDismissMenu()
                         val virtualFile = when (item.id) {
                             "recent" -> UniversalFile(appState.context.getString(R.string.nav_recent), true, 0, 0, LocalProvider, "virtual://recent")
                             "gallery" -> UniversalFile(appState.context.getString(R.string.nav_gallery), true, 0, 0, LocalProvider, "virtual://gallery")
@@ -481,6 +683,7 @@ fun HomeShortcutItem(item: HomeItemData, appState: FileExplorerState, itemSize: 
                             "archives" -> UniversalFile(appState.context.getString(R.string.nav_archives), true, 0, 0, LocalProvider, "virtual://archives")
                             "apks" -> UniversalFile(appState.context.getString(R.string.nav_apks), true, 0, 0, LocalProvider, "virtual://apks")
                             "games_manager" -> UniversalFile(appState.context.getString(R.string.nav_game_saves), true, 0, 0, LocalProvider, "virtual://games_manager")
+                            "internal_storage" -> UniversalFile(appState.context.getString(R.string.nav_internal_storage), true, 0, 0, LocalProvider, Environment.getExternalStorageDirectory().absolutePath)
                             "trash" -> {
                                 val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                                 UniversalFile(appState.context.getString(R.string.nav_trash), true, 0, 0, LocalProvider, trashDir.absolutePath)
