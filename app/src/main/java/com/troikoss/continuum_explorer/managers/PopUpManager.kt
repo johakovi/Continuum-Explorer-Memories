@@ -511,8 +511,6 @@ object FileOperationsManager {
                     NetworkProtocol.SFTP -> SftpProvider(connection, SafProvider.appContext())
                     NetworkProtocol.WEBDAV -> WebDavProvider(connection, SafProvider.appContext())
                     NetworkProtocol.SMB -> SmbProvider(connection, SafProvider.appContext())
-                    NetworkProtocol.GOOGLE_DRIVE -> throw UnsupportedOperationException("Google Drive implementation pending")
-                    NetworkProtocol.ONEDRIVE -> throw UnsupportedOperationException("OneDrive implementation pending")
                 }
                 try {
                     if (!provider.exists(provider.rootId())) throw IOException("Root not reachable")

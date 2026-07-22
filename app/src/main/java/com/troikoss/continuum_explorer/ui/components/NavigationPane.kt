@@ -1963,8 +1963,6 @@ private fun NavNetworkItem(
         NetworkProtocol.SFTP -> Icons.Default.Lan
         NetworkProtocol.WEBDAV -> Icons.Default.Lan
         NetworkProtocol.SMB -> Icons.Default.Lan
-        NetworkProtocol.GOOGLE_DRIVE -> Icons.Default.Cloud
-        NetworkProtocol.ONEDRIVE -> Icons.Default.Cloud
     }
 
     // Fetch disk info for SMB connections only

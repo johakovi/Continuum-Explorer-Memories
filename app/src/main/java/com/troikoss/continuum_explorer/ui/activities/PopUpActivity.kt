@@ -1406,9 +1406,6 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
     val isSftp = protocol == NetworkProtocol.SFTP
     val isWebDav = protocol == NetworkProtocol.WEBDAV
     val isSmb = protocol == NetworkProtocol.SMB
-    val isGoogleDrive = protocol == NetworkProtocol.GOOGLE_DRIVE
-    val isOneDrive = protocol == NetworkProtocol.ONEDRIVE
-    val isCloud = isGoogleDrive || isOneDrive
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -1509,86 +1506,56 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
 
-        if (!isCloud) {
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = host,
-                onValueChange = {
-                    host = it
-                    if (!displayNameEdited) displayName = it
-                },
-                label = { Text(stringResource(R.string.nav_network_host)) },
-                placeholder = { Text(stringResource(R.string.nav_network_host_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = port,
-                onValueChange = { port = it },
-                label = { Text(stringResource(R.string.nav_network_port)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text(stringResource(R.string.nav_network_username)) },
-                placeholder = { Text(if (isFtp) stringResource(R.string.nav_network_username_anon_placeholder) else stringResource(R.string.nav_network_username_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(stringResource(R.string.nav_network_password)) },
-                singleLine = true,
-                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { showPassword = !showPassword }) {
-                        Icon(
-                            imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = stringResource(if (showPassword) R.string.nav_network_hide_password else R.string.nav_network_show_password)
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-            )
-        } else {
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = if (isGoogleDrive) "Sign in with Google" else "Sign in with Microsoft",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { /* TODO: Implement OAuth Flow */ }) {
-                        Text("Connect Account")
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Implementation pending...",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = host,
+            onValueChange = {
+                host = it
+                if (!displayNameEdited) displayName = it
+            },
+            label = { Text(stringResource(R.string.nav_network_host)) },
+            placeholder = { Text(stringResource(R.string.nav_network_host_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = port,
+            onValueChange = { port = it },
+            label = { Text(stringResource(R.string.nav_network_port)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text(stringResource(R.string.nav_network_username)) },
+            placeholder = { Text(if (isFtp) stringResource(R.string.nav_network_username_anon_placeholder) else stringResource(R.string.nav_network_username_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text(stringResource(R.string.nav_network_password)) },
+            singleLine = true,
+            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Icon(
+                        imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = stringResource(if (showPassword) R.string.nav_network_hide_password else R.string.nav_network_show_password)
                     )
                 }
-            }
-        }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
         if (isSftp) {
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
@@ -1748,7 +1715,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onSave,
-                enabled = displayName.isNotBlank() && (host.isNotBlank() || isCloud)
+                enabled = displayName.isNotBlank() && (host.isNotBlank())
             ) {
                 Text(stringResource(R.string.nav_network_save))
             }

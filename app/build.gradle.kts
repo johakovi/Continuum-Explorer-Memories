@@ -12,7 +12,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 40
-        versionName = "Memories M7.1"
+        versionName = "Memories M7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
