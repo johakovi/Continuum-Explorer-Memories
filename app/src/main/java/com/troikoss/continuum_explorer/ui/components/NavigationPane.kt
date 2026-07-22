@@ -299,16 +299,22 @@ fun NavigationPane(
         appState.appConfigs.isMusicVisible,
         appState.appConfigs.isDownloadsVisible,
         appState.appConfigs.isDocumentsVisible,
-        appState.appConfigs.isGamesVisible
+        appState.appConfigs.isArchivesVisible,
+        appState.appConfigs.isApksVisible,
+        appState.appConfigs.isGamesVisible,
+        appState.appConfigs.isTrashVisible
     ) {
         appState.appConfigs.libraryOrder.filter { id ->
             when (id) {
-                "trash" -> isRecycleBinEnabled
+                "home" -> true // Permanent
+                "trash" -> isRecycleBinEnabled && appState.appConfigs.isTrashVisible
                 "recent" -> appState.appConfigs.isRecentVisible
                 "gallery" -> appState.appConfigs.isGalleryVisible
                 "music" -> appState.appConfigs.isMusicVisible
                 "downloads" -> appState.appConfigs.isDownloadsVisible
                 "documents" -> appState.appConfigs.isDocumentsVisible
+                "archives" -> appState.appConfigs.isArchivesVisible
+                "apks" -> appState.appConfigs.isApksVisible
                 "games_manager" -> appState.appConfigs.isGamesVisible
                 else -> true
             }
@@ -593,6 +599,16 @@ fun NavigationPane(
                             contentAlignment = if (isMinimized) Alignment.Center else Alignment.TopStart
                         ) {
                             when (id) {
+                                "home" -> NavItem(
+                                    label = stringResource(R.string.nav_home),
+                                    icon = Icons.Default.Home,
+                                    customIcon = R.drawable.ic_nav_home,
+                                    onClick = { onItemSelected(NavSection.Home) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Home,
+                                    isMinimized = isMinimized
+                                )
                                 "gallery" -> NavItem(
                                     label = stringResource(R.string.nav_gallery),
                                     icon = Icons.Default.Image,
@@ -607,7 +623,7 @@ fun NavigationPane(
                                 "music" -> NavItem(
                                     label = stringResource(R.string.nav_music),
                                     icon = Icons.Default.MusicNote,
-                                    customIcon = R.drawable.ic_music_logo,
+                                    customIcon = R.drawable.ic_nav_music,
                                     onClick = { onItemSelected(NavSection.Music) },
                                     appState = appState,
                                     textAlphaProvider = textAlphaProvider,
@@ -657,6 +673,26 @@ fun NavigationPane(
                                     appState = appState,
                                     textAlphaProvider = textAlphaProvider,
                                     section = NavSection.Documents,
+                                    isMinimized = isMinimized
+                                )
+                                "archives" -> NavItem(
+                                    label = stringResource(R.string.nav_archives),
+                                    icon = Icons.Default.FolderZip,
+                                    customIcon = R.drawable.ic_zip,
+                                    onClick = { onItemSelected(NavSection.Archives) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Archives,
+                                    isMinimized = isMinimized
+                                )
+                                "apks" -> NavItem(
+                                    label = stringResource(R.string.nav_apks),
+                                    icon = Icons.Default.Android,
+                                    customIcon = R.drawable.ic_android_logo,
+                                    onClick = { onItemSelected(NavSection.Apks) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Apks,
                                     isMinimized = isMinimized
                                 )
                                 "games_manager" -> NavItem(
@@ -1360,9 +1396,37 @@ private fun NavContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
+        val isLibrarySection = section is NavSection.Recent || section is NavSection.Gallery ||
+                section is NavSection.Music || section is NavSection.Downloads ||
+                section is NavSection.Documents || section is NavSection.Games ||
+                section is NavSection.RecycleBin
+
         Column(
             modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
         ) {
+            if (isLibrarySection && section !is NavSection.Home) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_remove)) },
+                    onClick = {
+                        onDismissRequest()
+                        when (section) {
+                            is NavSection.Recent -> appState.appConfigs.toggleRecentVisibility()
+                            is NavSection.Gallery -> appState.appConfigs.toggleGalleryVisibility()
+                            is NavSection.Music -> appState.appConfigs.toggleMusicVisibility()
+                            is NavSection.Downloads -> appState.appConfigs.toggleDownloadsVisibility()
+                            is NavSection.Documents -> appState.appConfigs.toggleDocumentsVisibility()
+                            is NavSection.Archives -> appState.appConfigs.toggleArchivesVisibility()
+                            is NavSection.Apks -> appState.appConfigs.toggleApksVisibility()
+                            is NavSection.Games -> appState.appConfigs.toggleGamesVisibility()
+                            is NavSection.RecycleBin -> appState.appConfigs.toggleTrashVisibility()
+                            else -> {}
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.VisibilityOff, null) }
+                )
+                HorizontalDivider()
+            }
+
             if (section == NavSection.Games) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.nav_add_storage)) },
@@ -1677,6 +1741,7 @@ private fun NavItem(
         val extendedColors = LocalExtendedColors.current
         val iconTheme = SettingsManager.iconTheme.value
         val tint = when (section) {
+            is NavSection.Home -> extendedColors.homeIcon
             is NavSection.Gallery -> extendedColors.galleryIcon
             is NavSection.Music -> extendedColors.musicIcon
             is NavSection.Recent -> extendedColors.recentIcon
@@ -1689,11 +1754,14 @@ private fun NavItem(
         if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
             val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
                 when (customIcon) {
+                    R.drawable.ic_nav_home -> R.drawable.ic_nav_home_duo
                     R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
-                    R.drawable.ic_music_logo -> R.drawable.ic_music_logo // Assuming we might want a duo version later
+                    R.drawable.ic_nav_music -> R.drawable.ic_nav_music_duo
                     R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                     R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                     R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                    R.drawable.ic_zip -> R.drawable.ic_zip_duo
+                    R.drawable.ic_android_logo -> R.drawable.ic_android_logo // Add duo if available
                     R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                     R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
                     else -> customIcon

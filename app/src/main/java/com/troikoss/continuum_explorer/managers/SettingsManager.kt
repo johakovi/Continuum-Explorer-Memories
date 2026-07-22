@@ -135,7 +135,7 @@ object SettingsManager {
     private val _detailsMode = mutableStateOf(DetailsMode.OFF)
     val detailsMode: State<DetailsMode> = _detailsMode
 
-    private val _startingPage = mutableStateOf(LibraryItem.Recent)
+    private val _startingPage = mutableStateOf(LibraryItem.Home)
     val startingPage: State<LibraryItem> = _startingPage
 
     private val _isCommandBarVisible = mutableStateOf(true)
@@ -298,11 +298,11 @@ object SettingsManager {
             DetailsMode.OFF
         }
 
-        val savedStartingPage = prefs.getString(KEY_STARTING_PAGE, LibraryItem.Recent.name)
+        val savedStartingPage = prefs.getString(KEY_STARTING_PAGE, LibraryItem.Home.name)
         _startingPage.value = try {
-            LibraryItem.valueOf(savedStartingPage ?: LibraryItem.Recent.name)
+            LibraryItem.valueOf(savedStartingPage ?: LibraryItem.Home.name)
         } catch (_: Exception) {
-            LibraryItem.Recent
+            LibraryItem.Home
         }
 
         _isCommandBarVisible.value = prefs.getBoolean(KEY_COMMAND_BAR_VISIBLE, true)

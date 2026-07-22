@@ -246,6 +246,7 @@ object IconHelper {
                         R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                         R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                         R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
+                        R.drawable.ic_zip -> R.drawable.ic_zip_duo
                         R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                         R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
                         else -> overlayRes
@@ -520,6 +521,8 @@ object IconHelper {
             return when {
                 file.providerId == "virtual://recent" -> Icons.Default.History
                 file.providerId == "virtual://documents" -> Icons.Default.Description
+                file.providerId == "virtual://archives" -> Icons.Default.FolderZip
+                file.providerId == "virtual://apks" -> Icons.Default.Android
                 file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> Icons.Default.Collections
                 file.providerId == "virtual://music" -> Icons.Default.MusicNote
                 file.providerId == "virtual://music/songs" -> Icons.Default.MusicNote
@@ -593,6 +596,8 @@ object IconHelper {
                 file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
                 file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
                 file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
+                file.providerId == "virtual://archives" -> R.drawable.ic_zip
+                file.providerId == "virtual://apks" -> R.drawable.ic_android_logo
                 file.providerId == "virtual://games_manager" -> R.drawable.ic_nav_game
                 file.parentId == "virtual://games_manager" -> R.drawable.ic_nav_game
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
@@ -664,6 +669,8 @@ object IconHelper {
                 //lPath.contains("music") -> R.drawable.ic_nav_music
                 lPath.contains("downloads") -> R.drawable.ic_nav_downloads
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
+                lPath.contains("archives") -> R.drawable.ic_zip
+                lPath.contains("apks") -> R.drawable.ic_android_logo
                 lPath.contains("games_manager") -> R.drawable.ic_nav_game
                 lPath.contains("trash") || lPath.contains("recycle_bin") -> R.drawable.ic_nav_trash
                 else -> null

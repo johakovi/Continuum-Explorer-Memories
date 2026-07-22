@@ -1,27 +1,22 @@
-<!--
-  ~ Copyright (C) 2026 The Android Open Source Project
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:pathData="m10.5,15.5l-1,-3.5m-1,-5.5l-2,3m9,-3l2,3m-4,6l1,-3.5m-10,-2.5c0.584,0 1.09,0.406 1.217,0.976l1.087,4.892c0.334,1.501 0.5,2.252 1.049,2.692s1.317,0.44 2.856,0.44h2.582c1.539,0 2.308,0 2.856,-0.44c0.549,-0.44 0.715,-1.19 1.05,-2.692l1.086,-4.892c0.127,-0.57 0.633,-0.976 1.217,-0.976m-16,0h17"
-        android:strokeWidth="1.5"
+        android:pathData="M4,7.5c0,-0.236 0,-0.354 0.073,-0.427S4.264,7 4.5,7h15c0.236,0 0.354,0 0.427,0.073S20,7.264 20,7.5v0.252c0,0.09 0,0.136 -0.014,0.176a0.25,0.25 0,0 1,-0.057 0.092c-0.03,0.03 -0.07,0.05 -0.151,0.091c-0.651,0.325 -0.976,0.488 -1.213,0.732a2,2 0,0 0,-0.453 0.733C18,9.896 18,10.26 18,10.988V16c0,1.886 0,2.828 -0.586,3.414S15.886,20 14,20h-4c-1.886,0 -2.828,0 -3.414,-0.586S6,17.886 6,16v-5.012c0,-0.728 0,-1.092 -0.112,-1.412a2,2 0,0 0,-0.453 -0.733c-0.237,-0.244 -0.562,-0.407 -1.213,-0.732a0.6,0.6 0,0 1,-0.151 -0.091a0.25,0.25 0,0 1,-0.057 -0.092C4,7.888 4,7.842 4,7.752z"
+        android:fillColor="@color/white"
+        android:fillAlpha="0.25"/>
+    <path
+        android:strokeWidth="1"
+        android:pathData="M10.068,4.37c0.114,-0.106 0.365,-0.2 0.715,-0.267A6.7,6.7 0,0 1,12 4c0.44,0 0.868,0.036 1.217,0.103s0.6,0.161 0.715,0.268"
         android:fillColor="#00000000"
-        android:strokeColor="#FFF"
+        android:strokeColor="@color/white"
         android:strokeLineCap="round"/>
+    <path
+        android:pathData="M14.5,11L14.5,11A0.5,0.5 0,0 1,15 11.5L15,16.5A0.5,0.5 0,0 1,14.5 17L14.5,17A0.5,0.5 0,0 1,14 16.5L14,11.5A0.5,0.5 0,0 1,14.5 11z"
+        android:fillColor="@color/white"/>
+    <path
+        android:pathData="M9.5,11L9.5,11A0.5,0.5 0,0 1,10 11.5L10,16.5A0.5,0.5 0,0 1,9.5 17L9.5,17A0.5,0.5 0,0 1,9 16.5L9,11.5A0.5,0.5 0,0 1,9.5 11z"
+        android:fillColor="@color/white"/>
 </vector>

@@ -1019,13 +1019,15 @@ fun SettingsScreen(onBack: () -> Unit) {
                     text = {
                         Column {
                             val items = listOf(
+                                LibraryItem.Home to R.string.nav_home,
                                 LibraryItem.InternalStorage to R.string.nav_internal_storage,
                                 LibraryItem.Recent to R.string.nav_recent,
                                 LibraryItem.Gallery to R.string.nav_gallery,
                                 LibraryItem.Music to R.string.nav_music,
                                 LibraryItem.Downloads to R.string.nav_downloads,
                                 LibraryItem.Documents to R.string.nav_documents,
-                                LibraryItem.Games to R.string.nav_game_saves
+                                LibraryItem.Games to R.string.nav_game_saves,
+                                LibraryItem.RecycleBin to R.string.nav_recycle_bin
                             )
                             items.forEach { (item, resId) ->
                                 OptionItem(
@@ -1296,15 +1298,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "- Fluent UI System Color Icons",
+                                    text = "- Phosphor by Phosphor Icons ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
-                                    text = "  by Microsoft Corporation",
+                                    text = "- Material Design Icons by Google",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
+
                                 Text(
                                     text = "- Lets Icons by Leonid Tsvetkov",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,

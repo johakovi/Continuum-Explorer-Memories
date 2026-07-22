@@ -225,12 +225,18 @@ class FileExplorerState(
             }
             return if (libraryItem == LibraryItem.InternalStorage) {
                 context.getString(R.string.nav_internal_storage)
+            } else if (libraryItem == LibraryItem.Home) {
+                context.getString(R.string.nav_home)
             } else if (libraryItem == LibraryItem.RecycleBin) {
                 context.getString(R.string.nav_recycle_bin)
             } else if (libraryItem == LibraryItem.Recent) {
                 context.getString(R.string.nav_recent)
             } else if (libraryItem == LibraryItem.Downloads) {
                 context.getString(R.string.nav_downloads)
+            } else if (libraryItem == LibraryItem.Archives) {
+                context.getString(R.string.nav_archives)
+            } else if (libraryItem == LibraryItem.Apks) {
+                context.getString(R.string.nav_apks)
             } else if (libraryItem == LibraryItem.Games) {
                 context.getString(R.string.nav_game_saves)
             } else if (libraryItem == LibraryItem.Documents) {
@@ -326,6 +332,15 @@ class FileExplorerState(
                 providerId = Environment.getExternalStorageDirectory().absolutePath
             )
 
+            libraryItem == LibraryItem.Home -> UniversalFile(
+                name = context.getString(R.string.nav_home),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://home"
+            )
+
             libraryItem == LibraryItem.Gallery -> UniversalFile(
                 name = if (currentPath != null) currentPath!!.name else context.getString(R.string.nav_gallery),
                 isDirectory = true,
@@ -406,6 +421,24 @@ class FileExplorerState(
                 length = 0L,
                 provider = LocalProvider,
                 providerId = "virtual://games_manager"
+            )
+
+            libraryItem == LibraryItem.Archives -> UniversalFile(
+                name = context.getString(R.string.nav_archives),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://archives"
+            )
+
+            libraryItem == LibraryItem.Apks -> UniversalFile(
+                name = context.getString(R.string.nav_apks),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://apks"
             )
 
             else -> null
@@ -615,7 +648,10 @@ class FileExplorerState(
                     LibraryItem.Recent -> RecentFilesManager.getRecentFiles(context)
                     LibraryItem.Downloads -> DownloadsManager.getDownloadsFiles(context)
                     LibraryItem.Documents -> DocumentsManager.getDocumentsFiles(context)
+                    LibraryItem.Archives -> com.troikoss.continuum_explorer.managers.ArchivesManager.getArchivesFiles(context)
+                    LibraryItem.Apks -> com.troikoss.continuum_explorer.managers.ApksManager.getApksFiles(context)
                     LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
+                    LibraryItem.Home -> emptyList()
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
@@ -742,10 +778,13 @@ class FileExplorerState(
 
                 loadedPathKey = key ?: when (libraryItem) {
                     LibraryItem.Recent -> "recent"
+                    LibraryItem.Home -> "home"
                     LibraryItem.Gallery -> "gallery"
                     LibraryItem.Music -> "music"
                     LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
+                    LibraryItem.Archives -> "archives"
+                    LibraryItem.Apks -> "apks"
                     LibraryItem.Games -> "games_manager"
                     LibraryItem.InternalStorage -> "internal_storage"
                     LibraryItem.None -> "root"
@@ -837,10 +876,16 @@ class FileExplorerState(
             }
         } else if (libraryItem == LibraryItem.Recent) {
             "virtual://recent"
+        } else if (libraryItem == LibraryItem.Home) {
+            "virtual://home"
         } else if (libraryItem == LibraryItem.Downloads) {
             "virtual://downloads"
         } else if (libraryItem == LibraryItem.Documents) {
             "virtual://documents"
+        } else if (libraryItem == LibraryItem.Archives) {
+            "virtual://archives"
+        } else if (libraryItem == LibraryItem.Apks) {
+            "virtual://apks"
         } else if (libraryItem == LibraryItem.Games) {
             "virtual://games_manager"
         } else if (libraryItem == LibraryItem.RecycleBin) {

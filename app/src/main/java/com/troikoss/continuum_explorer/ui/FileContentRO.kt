@@ -378,6 +378,8 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
 
         if (accessErr != null) {
             AccessErrorView(message = accessErr)
+        } else if (appState.libraryItem == LibraryItem.Home) {
+            HomeView(appState = appState, onAddStorage = onAddStorage)
         } else if (isEmptyState) {
             EmptyStateView()
         } else {

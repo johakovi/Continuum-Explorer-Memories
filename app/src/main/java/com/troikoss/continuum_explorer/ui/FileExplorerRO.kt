@@ -636,6 +636,7 @@ private fun navigateToSection(
 ) {
     val internalRoot = Environment.getExternalStorageDirectory()
     when (section) {
+        is NavSection.Home -> appState.navigateTo(null, null, libraryItem = LibraryItem.Home)
         is NavSection.InternalStorage -> appState.navigateTo(internalRoot, null, newRoot = internalRoot)
         is NavSection.RecycleBin -> {
             val trashDir = File(internalRoot, ".Trash")
@@ -646,6 +647,8 @@ private fun navigateToSection(
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Music -> appState.navigateTo(null, null, libraryItem = LibraryItem.Music)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
+        is NavSection.Archives -> appState.navigateTo(null, null, libraryItem = LibraryItem.Archives)
+        is NavSection.Apks -> appState.navigateTo(null, null, libraryItem = LibraryItem.Apks)
         is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)
         is NavSection.Documents -> {
             if (appState.appConfigs.isDocumentsFolderEnabled) {

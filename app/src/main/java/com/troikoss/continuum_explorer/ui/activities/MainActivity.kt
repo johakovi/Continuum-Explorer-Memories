@@ -174,6 +174,8 @@ open class MainActivity : AppCompatActivity() {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
             intent.getBooleanExtra("isGallery", false) -> LibraryItem.Gallery
             intent.getBooleanExtra("isDocuments", false) -> LibraryItem.Documents
+            intent.getBooleanExtra("isArchives", false) -> LibraryItem.Archives
+            intent.getBooleanExtra("isApks", false) -> LibraryItem.Apks
             intent.getBooleanExtra("isRecycleBin", false) -> LibraryItem.RecycleBin
             else -> LibraryItem.None
         }
