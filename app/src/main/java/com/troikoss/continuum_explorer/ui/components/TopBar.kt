@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
@@ -47,7 +49,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -241,501 +242,533 @@ fun TopBar(
                     ) {
                         if (!appState.isAddressBarActive && !appState.isSearchUIActive) appState.isAddressBarActive = true
                     },
-                color = LocalExtendedColors.current.searchBoxBackground,
+                color = if (!appState.isSearchUIActive && !appState.isAddressBarActive && 
+                           (appState.libraryItem == LibraryItem.Home || appState.libraryItem == LibraryItem.Music)) 
+                           Color.Transparent 
+                        else 
+                           LocalExtendedColors.current.searchBoxBackground,
                 shape = RoundedCornerShape(20.dp)
             ) {
-                if (appState.isSearchUIActive) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 12.dp),
-                        verticalAlignment = CenterVertically
-                    ) {
-                        BasicTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
+                    if (appState.isSearchUIActive) {
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(focusRequester)
-                                .onFocusChanged { 
-                                    if (it.isFocused) searchBarFocusedOnce = true
-                                    if (appState.isSearchUIActive && searchBarFocusedOnce && !it.isFocused) appState.isSearchUIActive = false 
-                                }
-                                .focusProperties {
-                                    down = FocusRequester.Cancel
-                                    up = FocusRequester.Cancel
-                                }
-                                .onPreviewKeyEvent { event ->
-                                    if (event.key == Key.DirectionUp || event.key == Key.DirectionDown) {
-                                        true // Consume Up/Down keys to prevent focus from leaving the search bar
-                                    } else {
-                                        false
+                                .fillMaxWidth()
+                                .padding(start = 12.dp),
+                            verticalAlignment = CenterVertically
+                        ) {
+                            BasicTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(focusRequester)
+                                    .onFocusChanged { 
+                                        if (it.isFocused) searchBarFocusedOnce = true
+                                        if (appState.isSearchUIActive && searchBarFocusedOnce && !it.isFocused) appState.isSearchUIActive = false 
                                     }
-                                },
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    appState.performSearch(searchQuery.text, searchSubfolders)
-                                }
-                            ),
-                            decorationBox = { innerTextField ->
-                                if (searchQuery.text.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.search_hint),
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 14.sp,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    .focusProperties {
+                                        down = FocusRequester.Cancel
+                                        up = FocusRequester.Cancel
+                                    }
+                                    .onPreviewKeyEvent { event ->
+                                        if (event.key == Key.DirectionUp || event.key == Key.DirectionDown) {
+                                            true // Consume Up/Down keys to prevent focus from leaving the search bar
+                                        } else {
+                                            false
+                                        }
+                                    },
+                                singleLine = true,
+                                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = {
+                                        appState.performSearch(searchQuery.text, searchSubfolders)
+                                    }
+                                ),
+                                decorationBox = { innerTextField ->
+                                    if (searchQuery.text.isEmpty()) {
+                                        Text(
+                                            text = stringResource(R.string.search_hint),
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                            )
                                         )
-                                    )
+                                    }
+                                    innerTextField()
                                 }
-                                innerTextField()
-                            }
-                        )
+                            )
 
-                        Box {
-                            IconButton(onClick = { searchOptionsMenuExpanded = true }) {
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.dialog_search_options))
-                            }
+                            Box {
+                                IconButton(onClick = { searchOptionsMenuExpanded = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.dialog_search_options))
+                                }
 
-                            DropdownMenu(
-                                expanded = searchOptionsMenuExpanded,
-                                onDismissRequest = {
-                                    searchOptionsMenuExpanded = false
-                                    searchKindMenuExpanded = false
-                                },
-                                shape = RoundedCornerShape(16.dp),
-                                containerColor = LocalExtendedColors.current.menuBackground
-                            ) {
-                                if (searchKindMenuExpanded) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.back)) },
-                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) },
-                                        onClick = { searchKindMenuExpanded = false }
-                                    )
-                                    HorizontalDivider()
-                                    val kinds = listOf("folder", "document", "image", "video", "audio", "archive")
-                                    kinds.forEach { kind ->
+                                DropdownMenu(
+                                    expanded = searchOptionsMenuExpanded,
+                                    onDismissRequest = {
+                                        searchOptionsMenuExpanded = false
+                                        searchKindMenuExpanded = false
+                                    },
+                                    shape = RoundedCornerShape(16.dp),
+                                    containerColor = LocalExtendedColors.current.menuBackground
+                                ) {
+                                    if (searchKindMenuExpanded) {
                                         DropdownMenuItem(
-                                            text = { Text("kind:$kind") },
+                                            text = { Text(stringResource(R.string.back)) },
+                                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) },
+                                            onClick = { searchKindMenuExpanded = false }
+                                        )
+                                        HorizontalDivider()
+                                        val kinds = listOf("folder", "document", "image", "video", "audio", "archive")
+                                        kinds.forEach { kind ->
+                                            DropdownMenuItem(
+                                                text = { Text("kind:$kind") },
+                                                onClick = {
+                                                    searchQuery = TextFieldValue(searchQuery.text + "kind:$kind ")
+                                                    searchOptionsMenuExpanded = false
+                                                    searchKindMenuExpanded = false
+                                                    focusRequester.requestFocus()
+                                                }
+                                            )
+                                        }
+                                    } else {
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_subfolders)) },
+                                            trailingIcon = {
+                                                Checkbox(checked = searchSubfolders, onCheckedChange = null)
+                                            },
+                                            onClick = { searchSubfolders = !searchSubfolders }
+                                        )
+                                        HorizontalDivider()
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_kind)) },
+                                            onClick = { searchKindMenuExpanded = true },
+                                            trailingIcon = { Icon(Icons.Default.ChevronRight, null) }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_and)) },
                                             onClick = {
-                                                searchQuery = TextFieldValue(searchQuery.text + "kind:$kind ")
+                                                searchQuery = TextFieldValue(searchQuery.text + " AND ")
                                                 searchOptionsMenuExpanded = false
-                                                searchKindMenuExpanded = false
+                                                focusRequester.requestFocus()
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_or)) },
+                                            onClick = {
+                                                searchQuery = TextFieldValue(searchQuery.text + " OR ")
+                                                searchOptionsMenuExpanded = false
+                                                focusRequester.requestFocus()
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_not)) },
+                                            onClick = {
+                                                searchQuery = TextFieldValue(searchQuery.text + " NOT ")
+                                                searchOptionsMenuExpanded = false
+                                                focusRequester.requestFocus()
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.search_ext)) },
+                                            onClick = {
+                                                searchQuery = TextFieldValue(searchQuery.text + "*.zip ")
+                                                searchOptionsMenuExpanded = false
                                                 focusRequester.requestFocus()
                                             }
                                         )
                                     }
-                                } else {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_subfolders)) },
-                                        trailingIcon = {
-                                            Checkbox(checked = searchSubfolders, onCheckedChange = null)
-                                        },
-                                        onClick = { searchSubfolders = !searchSubfolders }
-                                    )
-                                    HorizontalDivider()
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_kind)) },
-                                        onClick = { searchKindMenuExpanded = true },
-                                        trailingIcon = { Icon(Icons.Default.ChevronRight, null) }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_and)) },
-                                        onClick = {
-                                            searchQuery = TextFieldValue(searchQuery.text + " AND ")
-                                            searchOptionsMenuExpanded = false
-                                            focusRequester.requestFocus()
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_or)) },
-                                        onClick = {
-                                            searchQuery = TextFieldValue(searchQuery.text + " OR ")
-                                            searchOptionsMenuExpanded = false
-                                            focusRequester.requestFocus()
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_not)) },
-                                        onClick = {
-                                            searchQuery = TextFieldValue(searchQuery.text + " NOT ")
-                                            searchOptionsMenuExpanded = false
-                                            focusRequester.requestFocus()
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.search_ext)) },
-                                        onClick = {
-                                            searchQuery = TextFieldValue(searchQuery.text + "*.zip ")
-                                            searchOptionsMenuExpanded = false
-                                            focusRequester.requestFocus()
-                                        }
-                                    )
                                 }
+                            }
+
+                            IconButton(onClick = {
+                                appState.isSearchUIActive = false
+                                focusManager.clearFocus()
+                                if (appState.isSearchMode) {
+                                    appState.refresh() // Reset to normal view if search was closed
+                                }
+                            }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.close),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         }
-
-                        IconButton(onClick = {
-                            appState.isSearchUIActive = false
-                            focusManager.clearFocus()
-                            if (appState.isSearchMode) {
-                                appState.refresh() // Reset to normal view if search was closed
-                            }
-                        }) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = stringResource(R.string.close),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                } else if (!appState.isAddressBarActive) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .pointerInput(Unit) {
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        val event = awaitPointerEvent()
-                                        if (event.type == PointerEventType.Scroll) {
-                                            val delta = event.changes.first().scrollDelta
-                                            coroutineScope.launch {
-                                                breadcrumbScrollState.scrollBy(delta.y * 60f)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .horizontalScroll(breadcrumbScrollState),
-                        verticalAlignment = CenterVertically
-                    ) {
-                        if (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null) {
-                            // Gallery album breadcrumb: "Gallery > AlbumName"
-                            TextButton(
-                                onClick = { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) },
-                                contentPadding = PaddingValues(horizontal = 12.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.nav_gallery),
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
-                                    color = MaterialTheme.colorScheme.onSurface)
-                            }
-                            Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                            Text(
-                                text = appState.currentPath!!.name,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary)
-                        } else if (appState.libraryItem == LibraryItem.RecycleBin) {
-                            Text(
-                                text = stringResource(R.string.nav_recycle_bin),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.libraryItem == LibraryItem.Documents) {
-                            Text(
-                                text = stringResource(R.string.nav_documents),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.libraryItem == LibraryItem.Games) {
-                            Text(
-                                text = stringResource(R.string.nav_game_saves),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.currentPath != null || appState.currentArchiveFile != null) {
-                            visibleSegments.forEachIndexed { index, folderName ->
-                                val displayName = if (folderName == "0") stringResource(R.string.nav_internal_storage) else folderName
-
-                                val realIndex = if (zeroIndex != -1) zeroIndex + index else index
-                                val targetPathSegments = allSegments.take(realIndex + 1)
-                                val targetPathString = "/" + targetPathSegments.joinToString("/")
-                                val targetFile = File(targetPathString)
-
-                                val leavingFile = if (realIndex + 1 < allSegments.size) {
-                                    val leavingPathSegments = allSegments.take(realIndex + 2)
-                                    File("/" + leavingPathSegments.joinToString("/"))
-                                } else null
-
-                                TextButton(
-                                    onClick = {
-                                        if (appState.currentArchiveFile != null) {
-                                            val archiveFile = appState.currentArchiveFile!!
-                                            val archivePath = archiveFile.absolutePath
-                                            if (targetPathString == archivePath) {
-                                                // Navigating to the root of the archive
-                                                appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "")
-                                            } else if (targetPathString.startsWith("$archivePath/")) {
-                                                // Navigating to a folder inside the archive
-                                                val innerPath = targetPathString.removePrefix("$archivePath/")
-                                                appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "$innerPath/")
-                                            } else {
-                                                // Navigating outside the archive
-                                                appState.navigateTo(targetFile, null)
-                                            }
-                                        } else {
-                                            appState.navigateTo(targetFile, null)
-                                        }
-                                        appState.focusItemInList(leavingFile, null)
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp),
-                                    modifier = if (targetFile.isDirectory) Modifier.fileDropTarget(appState, destPath = targetFile) else Modifier
-                                ) {
-                                    val isLast = index == visibleSegments.size - 1
-                                    if (index == 0) {
-                                        Icon(
-                                            painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_folder),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp).padding(end = 4.dp),
-                                            tint = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
-                                    Text(
-                                        text = displayName,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 13.sp,
-                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
-                                        ),
-                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                                if (index < visibleSegments.size - 1) {
-                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                                }
-                            }
-                        } else if (appState.currentArchiveUri != null) {
-                            // Breadcrumbs for URI-based archives
-                            val archiveName = appState.currentName // This should be the archive file name
-                            val innerSegments = appState.currentArchivePath.split("/").filter { it.isNotEmpty() }
-                            val segments = listOf(archiveName) + innerSegments
-
-                            segments.forEachIndexed { index, segment ->
-                                TextButton(
-                                    onClick = {
-                                        if (index == 0) {
-                                            appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = "")
-                                        } else {
-                                            val targetInnerPath = innerSegments.take(index).joinToString("/") + "/"
-                                            appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = targetInnerPath)
-                                        }
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp)
-                                    // Drop target not supported for inside URI-based archives yet
-                                ) {
-                                    val isLast = index == segments.size - 1
-                                    Text(
-                                        text = segment,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 13.sp,
-                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
-                                        ),
-                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                                if (index < segments.size - 1) {
-                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                                }
-                            }
-                        } else if (appState.currentSafUri != null) {
-                            // Full breadcrumbs for SAF
-                            val safItems = appState.safStack.toList() + listOfNotNull(appState.currentSafUri)
-                            safItems.forEachIndexed { index, uri ->
-                                val doc = DocumentFile.fromTreeUri(context, uri)
-                                val displayName = doc?.name ?: stringResource(R.string.unknown)
-
-                                val leavingUri = if (index + 1 < safItems.size) safItems[index + 1] else null
-
-                                TextButton(
-                                    onClick = {
-                                        // Navigation in SAF breadcrumbs
-                                        if (index < appState.safStack.size) {
-                                            val targetUri = appState.safStack[index]
-                                            // We need to truncate the stack to this point
-                                            repeat(appState.safStack.size - index) {
-                                                appState.safStack.removeAt(appState.safStack.lastIndex)
-                                            }
-                                            appState.navigateTo(null, targetUri)
-                                            appState.focusItemInList(null, leavingUri)
-                                        }
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp),
-                                    modifier = Modifier.fileDropTarget(appState, destSafUri = uri)
-                                ) {
-                                    val isLast = index == safItems.size - 1
-                                    Text(
-                                        text = displayName,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 13.sp,
-                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
-                                        ),
-                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                                if (index < safItems.size - 1) {
-                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                                }
-                            }
-                        } else if (appState.currentNetworkProvider != null && appState.currentNetworkId != null) {
-                            val provider = appState.currentNetworkProvider!!
-                            val networkId = appState.currentNetworkId!!
-                            val breadcrumbIds = remember(networkId) {
-                                buildList {
-                                    var id: String? = networkId
-                                    val root = provider.rootId()
-                                    while (id != null) {
-                                        add(id)
-                                        if (id == root) break
-                                        id = provider.parentId(id)
-                                    }
-                                }.reversed()
-                            }
-                            breadcrumbIds.forEachIndexed { index, id ->
-                                TextButton(
-                                    onClick = {
-                                        if (id != networkId) {
-                                            appState.navigateTo(
-                                                null, null,
-                                                networkProvider = provider,
-                                                networkId = id,
-                                                networkConnectionId = appState.currentNetworkConnectionId
-                                            )
-                                        }
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp)
-                                ) {
-                                    val isLast = index == breadcrumbIds.lastIndex
-                                    Text(
-                                        text = provider.displayName(id),
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 13.sp,
-                                            fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
-                                        ),
-                                        color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                                if (index < breadcrumbIds.lastIndex) {
-                                    Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                                }
-                            }
-                        } else if (appState.libraryItem == LibraryItem.Gallery) {
-                            Text(
-                                text = stringResource(R.string.nav_gallery),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.libraryItem == LibraryItem.Recent) {
-                            Text(
-                                text = stringResource(R.string.nav_recent),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.libraryItem == LibraryItem.Documents) {
-                            Text(
-                                text = stringResource(R.string.nav_documents),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else if (appState.libraryItem == LibraryItem.Games) {
-                            Text(
-                                text = stringResource(R.string.nav_game_saves),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(R.string.home),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 12.dp),
-                        verticalAlignment = CenterVertically
-                    ) {
-                        BasicTextField(
-                            value = textPathValue,
-                            onValueChange = { textPathValue = it },
+                    } else if (!appState.isAddressBarActive) {
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(focusRequester)
-                                .onFocusChanged { 
-                                    if (it.isFocused) addressBarFocusedOnce = true
-                                    if (appState.isAddressBarActive && addressBarFocusedOnce && !it.isFocused) appState.isAddressBarActive = false
-                                },
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    val input = textPathValue.text
-                                    if (input.startsWith("/") || input.startsWith("content://")) {
-                                        if (input.startsWith("/")) {
-                                            val newFile = File(input)
-                                            if (newFile.exists()) {
-                                                if (newFile.isDirectory) {
-                                                    appState.navigateTo(newFile, null)
-                                                    appState.isAddressBarActive = false
-                                                    focusManager.clearFocus()
-                                                } else if (ZipUtils.isArchive(newFile.toUniversal())) {
-                                                    appState.navigateTo(null, null, archiveFile = newFile, archivePath = "")
-                                                    appState.isAddressBarActive = false
-                                                    focusManager.clearFocus()
+                                .padding(horizontal = 4.dp)
+                                .pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent()
+                                            if (event.type == PointerEventType.Scroll) {
+                                                val delta = event.changes.first().scrollDelta
+                                                coroutineScope.launch {
+                                                    breadcrumbScrollState.scrollBy(delta.y * 60f)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .horizontalScroll(breadcrumbScrollState),
+                            verticalAlignment = CenterVertically
+                        ) {
+                            if (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null) {
+                                // Gallery album breadcrumb: "Gallery > AlbumName"
+                                TextButton(
+                                    onClick = { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) },
+                                    contentPadding = PaddingValues(horizontal = 12.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.nav_gallery),
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                                        color = MaterialTheme.colorScheme.onSurface)
+                                }
+                                Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
+                                Text(
+                                    text = appState.currentPath!!.name,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary)
+                            } else if (appState.libraryItem == LibraryItem.RecycleBin) {
+                                Text(
+                                    text = stringResource(R.string.nav_recycle_bin),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Documents) {
+                                Text(
+                                    text = stringResource(R.string.nav_documents),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Games) {
+                                Text(
+                                    text = stringResource(R.string.nav_game_saves),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.currentPath != null || appState.currentArchiveFile != null) {
+                                visibleSegments.forEachIndexed { index, folderName ->
+                                    val displayName = if (folderName == "0") stringResource(R.string.nav_internal_storage) else folderName
+
+                                    val realIndex = if (zeroIndex != -1) zeroIndex + index else index
+                                    val targetPathSegments = allSegments.take(realIndex + 1)
+                                    val targetPathString = "/" + targetPathSegments.joinToString("/")
+                                    val targetFile = File(targetPathString)
+
+                                    val leavingFile = if (realIndex + 1 < allSegments.size) {
+                                        val leavingPathSegments = allSegments.take(realIndex + 2)
+                                        File("/" + leavingPathSegments.joinToString("/"))
+                                    } else null
+
+                                    TextButton(
+                                        onClick = {
+                                            if (appState.currentArchiveFile != null) {
+                                                val archiveFile = appState.currentArchiveFile!!
+                                                val archivePath = archiveFile.absolutePath
+                                                if (targetPathString == archivePath) {
+                                                    // Navigating to the root of the archive
+                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "")
+                                                } else if (targetPathString.startsWith("$archivePath/")) {
+                                                    // Navigating to a folder inside the archive
+                                                    val innerPath = targetPathString.removePrefix("$archivePath/")
+                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "$innerPath/")
                                                 } else {
-                                                    Toast.makeText(context, msgNotDirArchive, Toast.LENGTH_SHORT).show()
+                                                    // Navigating outside the archive
+                                                    appState.navigateTo(targetFile, null)
                                                 }
                                             } else {
-                                                Toast.makeText(context, msgFileNotFound, Toast.LENGTH_SHORT).show()
+                                                appState.navigateTo(targetFile, null)
                                             }
-                                        } else {
-                                            appState.isAddressBarActive = false
-                                            focusManager.clearFocus()
+                                            appState.focusItemInList(leavingFile, null)
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp),
+                                        modifier = if (targetFile.isDirectory) Modifier.fileDropTarget(appState, destPath = targetFile) else Modifier
+                                    ) {
+                                        val isLast = index == visibleSegments.size - 1
+                                        if (index == 0) {
+                                            Icon(
+                                                painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_folder),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp).padding(end = 4.dp),
+                                                tint = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                            )
                                         }
-                                    } else {
-                                        Toast.makeText(context, msgInvalidPath, Toast.LENGTH_SHORT).show()
-                                        textPathValue = TextFieldValue(currentPathString)
+                                        Text(
+                                            text = displayName,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 13.sp,
+                                                fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                            ),
+                                            color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    if (index < visibleSegments.size - 1) {
+                                        Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                     }
                                 }
-                            )
-                        )
+                            } else if (appState.currentArchiveUri != null) {
+                                // Breadcrumbs for URI-based archives
+                                val archiveName = appState.currentName // This should be the archive file name
+                                val innerSegments = appState.currentArchivePath.split("/").filter { it.isNotEmpty() }
+                                val segments = listOf(archiveName) + innerSegments
 
-                        IconButton(onClick = {
-                            appState.isAddressBarActive = false
-                            focusManager.clearFocus()
-                        }) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = stringResource(R.string.close),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                segments.forEachIndexed { index, segment ->
+                                    TextButton(
+                                        onClick = {
+                                            if (index == 0) {
+                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = "")
+                                            } else {
+                                                val targetInnerPath = innerSegments.take(index).joinToString("/") + "/"
+                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = targetInnerPath)
+                                            }
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp)
+                                        // Drop target not supported for inside URI-based archives yet
+                                    ) {
+                                        val isLast = index == segments.size - 1
+                                        Text(
+                                            text = segment,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 13.sp,
+                                                fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                            ),
+                                            color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    if (index < segments.size - 1) {
+                                        Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            } else if (appState.currentSafUri != null) {
+                                // Full breadcrumbs for SAF
+                                val safItems = appState.safStack.toList() + listOfNotNull(appState.currentSafUri)
+                                safItems.forEachIndexed { index, uri ->
+                                    val doc = DocumentFile.fromTreeUri(context, uri)
+                                    val displayName = doc?.name ?: stringResource(R.string.unknown)
+
+                                    val leavingUri = if (index + 1 < safItems.size) safItems[index + 1] else null
+
+                                    TextButton(
+                                        onClick = {
+                                            // Navigation in SAF breadcrumbs
+                                            if (index < appState.safStack.size) {
+                                                val targetUri = appState.safStack[index]
+                                                // We need to truncate the stack to this point
+                                                repeat(appState.safStack.size - index) {
+                                                    appState.safStack.removeAt(appState.safStack.lastIndex)
+                                                }
+                                                appState.navigateTo(null, targetUri)
+                                                appState.focusItemInList(null, leavingUri)
+                                            }
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp),
+                                        modifier = Modifier.fileDropTarget(appState, destSafUri = uri)
+                                    ) {
+                                        val isLast = index == safItems.size - 1
+                                        Text(
+                                            text = displayName,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 13.sp,
+                                                fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                            ),
+                                            color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    if (index < safItems.size - 1) {
+                                        Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            } else if (appState.currentNetworkProvider != null && appState.currentNetworkId != null) {
+                                val provider = appState.currentNetworkProvider!!
+                                val networkId = appState.currentNetworkId!!
+                                val breadcrumbIds = remember(networkId) {
+                                    buildList {
+                                        var id: String? = networkId
+                                        val root = provider.rootId()
+                                        while (id != null) {
+                                            add(id)
+                                            if (id == root) break
+                                            id = provider.parentId(id)
+                                        }
+                                    }.reversed()
+                                }
+                                breadcrumbIds.forEachIndexed { index, id ->
+                                    TextButton(
+                                        onClick = {
+                                            if (id != networkId) {
+                                                appState.navigateTo(
+                                                    null, null,
+                                                    networkProvider = provider,
+                                                    networkId = id,
+                                                    networkConnectionId = appState.currentNetworkConnectionId
+                                                )
+                                            }
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp)
+                                    ) {
+                                        val isLast = index == breadcrumbIds.lastIndex
+                                        Text(
+                                            text = provider.displayName(id),
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 13.sp,
+                                                fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                            ),
+                                            color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    if (index < breadcrumbIds.lastIndex) {
+                                        Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            } else if (appState.libraryItem == LibraryItem.Gallery) {
+                                Text(
+                                    text = stringResource(R.string.nav_gallery),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Recent) {
+                                Text(
+                                    text = stringResource(R.string.nav_recent),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Downloads) {
+                                Text(
+                                    text = stringResource(R.string.nav_downloads),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Documents) {
+                                Text(
+                                    text = stringResource(R.string.nav_documents),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Archives) {
+                                Text(
+                                    text = stringResource(R.string.nav_archives),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Apks) {
+                                Text(
+                                    text = stringResource(R.string.nav_apks),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Games) {
+                                Text(
+                                    text = stringResource(R.string.nav_game_saves),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else if (appState.libraryItem == LibraryItem.Music) {
+                                Text(
+                                    text = stringResource(R.string.menu_musicplayer),
+                                    modifier = Modifier.padding(horizontal = 15.dp),
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.nav_home),
+                                    modifier = Modifier.padding(horizontal = 15.dp),
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 12.dp),
+                            verticalAlignment = CenterVertically
+                        ) {
+                            BasicTextField(
+                                value = textPathValue,
+                                onValueChange = { textPathValue = it },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(focusRequester)
+                                    .onFocusChanged { 
+                                        if (it.isFocused) addressBarFocusedOnce = true
+                                        if (appState.isAddressBarActive && addressBarFocusedOnce && !it.isFocused) appState.isAddressBarActive = false
+                                    },
+                                singleLine = true,
+                                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        val input = textPathValue.text
+                                        if (input.startsWith("/") || input.startsWith("content://")) {
+                                            if (input.startsWith("/")) {
+                                                val newFile = File(input)
+                                                if (newFile.exists()) {
+                                                    if (newFile.isDirectory) {
+                                                        appState.navigateTo(newFile, null)
+                                                        appState.isAddressBarActive = false
+                                                        focusManager.clearFocus()
+                                                    } else if (ZipUtils.isArchive(newFile.toUniversal())) {
+                                                        appState.navigateTo(null, null, archiveFile = newFile, archivePath = "")
+                                                        appState.isAddressBarActive = false
+                                                        focusManager.clearFocus()
+                                                    } else {
+                                                        Toast.makeText(context, msgNotDirArchive, Toast.LENGTH_SHORT).show()
+                                                    }
+                                                } else {
+                                                    Toast.makeText(context, msgFileNotFound, Toast.LENGTH_SHORT).show()
+                                                }
+                                            } else {
+                                                appState.isAddressBarActive = false
+                                                focusManager.clearFocus()
+                                            }
+                                        } else {
+                                            Toast.makeText(context, msgInvalidPath, Toast.LENGTH_SHORT).show()
+                                            textPathValue = TextFieldValue(currentPathString)
+                                        }
+                                    }
+                                )
                             )
+
+                            IconButton(onClick = {
+                                appState.isAddressBarActive = false
+                                focusManager.clearFocus()
+                            }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.close),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
-            }
 
             if (!hideSearchButton) {
                 SearchButton(appState = appState, searchQuery = searchQuery, searchSubfolders = searchSubfolders)
@@ -765,7 +798,7 @@ fun TopBar(
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.menu_text_document)) },
-                                    leadingIcon = { Icon(Icons.Default.NoteAdd, null) },
+                                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, null) },
                                     onClick = {
                                         optionsMenuExpanded = false
                                         appState.createNewFile()

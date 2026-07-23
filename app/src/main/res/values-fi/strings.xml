@@ -330,6 +330,7 @@
     <string name="nav_archives">Arkistot</string>
     <string name="nav_apks">APK:t</string>
     <string name="nav_game_saves">Pelien hallinta</string>
+    <string name="menu_musicplayer">Musiikkisoitin</string>
     <string name="menu_gallery_albums">Albumit</string>
     <string name="menu_gallery_folders">Gallerian kansiot</string>
     <string name="menu_music_albums">Albumit</string>

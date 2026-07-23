@@ -328,6 +328,7 @@
     <string name="nav_archives">Arkiv</string>
     <string name="nav_apks">APK:er</string>
     <string name="nav_game_saves">Spelhanterare</string>
+    <string name="menu_musicplayer">Musikspelare</string>
     <string name="menu_gallery_albums">Album</string>
     <string name="menu_gallery_folders">Gallerimappar</string>
     <string name="menu_music_albums">Album</string>
@@ -540,6 +541,8 @@
 
     <string name="error_restricted_access">Åtkomst begränsad</string>
     <string name="msg_restricted_access_shizuku">Denna mapp är begränsad av Android. Aktivera och auktorisera Shizuku för att få åtkomst.</string>
+    <string name="msg_cant_access_directory">Kan inte komma åt denna mapp</string>
+    <string name="msg_nothing_here">Det finns inget här än</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Batteri</string>

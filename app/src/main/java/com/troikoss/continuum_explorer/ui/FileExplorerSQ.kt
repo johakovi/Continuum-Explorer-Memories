@@ -53,6 +53,7 @@ import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
+import androidx.core.net.toUri
 
 /**
  * The main layout container for the File Explorer.
@@ -142,7 +143,8 @@ fun FileExplorerSQ(
                 }
                 initialLibraryItem != LibraryItem.None -> firstState.navigateTo(null, null, addToHistory = false, libraryItem = initialLibraryItem)
                 initialPath != null -> firstState.navigateTo(File(initialPath), null, addToHistory = false)
-                initialUri != null -> firstState.navigateTo(null, Uri.parse(initialUri), addToHistory = false)
+                initialUri != null -> firstState.navigateTo(null,
+                    initialUri.toUri(), addToHistory = false)
             }
             tabs.add(firstState)
         }
@@ -534,7 +536,7 @@ private fun ExplorerBody(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(end = 8.dp, start = 8.dp)
+                        .padding(start = 8.dp)
                         .then(if (appearance == UIAppearance.PHONE) Modifier.padding(vertical = 8.dp).statusBarsPadding().navigationBarsPadding() else Modifier.padding(top = 2.dp).navigationBarsPadding())
                         .zIndex(2f)
                 ) {
@@ -559,12 +561,28 @@ private fun ExplorerBody(
                             onAddNetworkClick = onAddNetwork,
                             onEditNetworkClick = onEditNetwork,
                             widthProvider = { navPaneWidth },
-                            isInWindowMode = isInWindowMode
+                            isInWindowMode = isInWindowMode,
+                            onResize = { delta ->
+                                appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
+                            },
+                            onResizeStarted = { isResizingNav = true },
+                            onResizeFinished = {
+                                isResizingNav = false
+                                val currentWidth = appState.appConfigs.navPaneWidth
+                                if (currentWidth > 80.dp && currentWidth < 160.dp) {
+                                    appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                                }
+                                appState.appConfigs.savePaneWidths()
+                            }
                         )
                     }
                 }
                 VerticalResizeHandle(
-                    modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(16.dp) // The "empty space" resizing area
+                        .navigationBarsPadding()
+                        .padding(bottom = 8.dp),
                     showDivider = !contentIsRounded,
                     onResizeStarted = { isResizingNav = true },
                     onResize = { delta ->

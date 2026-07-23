@@ -330,6 +330,7 @@
     <string name="nav_archives">Archive</string>
     <string name="nav_apks">APKs</string>
     <string name="nav_game_saves">Spiele-Manager</string>
+    <string name="menu_musicplayer">Musik-Player</string>
     <string name="menu_gallery_albums">Alben</string>
     <string name="menu_gallery_folders">Galerie-Ordner</string>
     <string name="menu_music_albums">Alben</string>
@@ -541,6 +542,8 @@
 
     <string name="error_restricted_access">Zugriff eingeschränkt</string>
     <string name="msg_restricted_access_shizuku">Dieses Verzeichnis ist von Android eingeschränkt. Bitte aktiviere und autorisiere Shizuku, um darauf zuzugreifen.</string>
+    <string name="msg_cant_access_directory">Zugriff auf dieses Verzeichnis nicht möglich</string>
+    <string name="msg_nothing_here">Hier gibt es noch nichts</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Akku</string>

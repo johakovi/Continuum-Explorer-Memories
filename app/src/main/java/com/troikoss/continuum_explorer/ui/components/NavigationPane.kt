@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -78,6 +79,7 @@ import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.emptyRecycleBin
 import com.troikoss.continuum_explorer.utils.fadingEdge
 import com.troikoss.continuum_explorer.utils.fileDropTarget
+import com.troikoss.continuum_explorer.utils.horizontalResizeHandle
 import com.troikoss.continuum_explorer.utils.navigateTo
 import com.troikoss.continuum_explorer.utils.openInNewWindow
 import com.troikoss.continuum_explorer.utils.showProperties
@@ -147,7 +149,10 @@ fun NavigationPane(
     onEditNetworkClick: (NetworkConnection) -> Unit = {},
     onNavigate: () -> Unit = {},
     widthProvider: () -> Dp,
-    isInWindowMode: Boolean = false
+    isInWindowMode: Boolean = false,
+    onResize: ((Dp) -> Unit)? = null,
+    onResizeStarted: (() -> Unit)? = null,
+    onResizeFinished: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -158,6 +163,20 @@ fun NavigationPane(
         derivedStateOf {
             val w = widthProvider()
             if (w < MINIMIZED_SIDEBAR_WIDTH) 0f else ((w - 160.dp) / 40.dp).coerceIn(0f, 1f)
+        }
+    }
+
+    // Common divider with horizontal resizing capability
+    @Composable
+    fun SidebarDivider(modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(8.dp) // Larger hit area for easier "on divider" resizing
+                .horizontalResizeHandle(onResize, onResizeStarted, onResizeFinished),
+            contentAlignment = Alignment.Center
+        ) {
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
         }
     }
 
@@ -498,9 +517,9 @@ fun NavigationPane(
             if (visibleLibraryItems.isNotEmpty()) {
                 if (!isMinimized) {
                     item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         NavSectionHeader(
                             stringResource(R.string.nav_library),
                             textAlphaProvider,
@@ -714,9 +733,9 @@ fun NavigationPane(
 
             if (!isMinimized) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
 
@@ -756,6 +775,7 @@ fun NavigationPane(
                             customIcon = volume.customIcon,
                             isMinimized = isMinimized
                         )
+
                     }
                 }
             }
@@ -764,15 +784,16 @@ fun NavigationPane(
             if (appState.appConfigs.addedSafUris.isNotEmpty()) {
                 if (!isMinimized) {
                     item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         NavSectionHeader(
                             stringResource(R.string.nav_added_locations),
                             textAlphaProvider,
                             isExpanded = isAddedLocationsExpanded,
                             onToggle = { SettingsManager.setAddedLocationsExpanded(context, !isAddedLocationsExpanded) }
                         )
+
                     }
                 }
 
@@ -855,13 +876,14 @@ fun NavigationPane(
                 }
             }
 
+
             // Section: Network
             if (appState.appConfigs.networkConnections.isNotEmpty()) {
                 if (!isMinimized) {
                     item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         NavSectionHeader(
                             stringResource(R.string.nav_network),
                             textAlphaProvider,
@@ -947,7 +969,7 @@ fun NavigationPane(
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(50.dp)) }
         }
 
         // Background context menu
@@ -1590,7 +1612,7 @@ private fun NavContextMenu(
                         onDismissRequest()
                         // Playlist creation logic could go here
                     },
-                    leadingIcon = { Icon(Icons.Default.PlaylistAdd, null) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
                 )
 
                 DropdownMenuItem(
@@ -2063,8 +2085,7 @@ private fun NavNetworkItem(
     onRename: () -> Unit,
     appState: FileExplorerState,
     textAlphaProvider: State<Float>,
-    isMinimized: Boolean,
-    modifier: Modifier = Modifier
+    isMinimized: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }

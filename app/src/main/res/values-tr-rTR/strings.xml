@@ -317,6 +317,7 @@
     <string name="nav_archives">Arşivler</string>
     <string name="nav_apks">APK\'lar</string>
     <string name="nav_game_saves">Oyun Yöneticisi</string>
+    <string name="menu_musicplayer">Müzik çalar</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
     <string name="menu_music_albums">Albümler</string>
@@ -522,6 +523,8 @@
 
     <string name="error_restricted_access">Erişim Kısıtlandı</string>
     <string name="msg_restricted_access_shizuku">Bu dizin Android tarafından kısıtlanmıştır. Lütfen erişmek için Shizuku\'yu etkinleştirin ve yetkilendirin.</string>
+    <string name="msg_cant_access_directory">Bu dizine erişilemiyor</string>
+    <string name="msg_nothing_here">Henüz burada bir şey yok</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistem ve Pil</string>

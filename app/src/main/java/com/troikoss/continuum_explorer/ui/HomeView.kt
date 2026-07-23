@@ -5,7 +5,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
@@ -24,13 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +40,6 @@ import com.troikoss.continuum_explorer.managers.*
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
-import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -103,7 +99,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
                 .fadingEdge(gridState, showBottom = false),
-            contentPadding = PaddingValues(top = 80.dp, bottom = 24.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -113,7 +109,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
                 var showMenu by remember { mutableStateOf(false) }
                 var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
-                val density = LocalDensity.current
+
 
                 Box(
                     modifier = Modifier
@@ -131,7 +127,6 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                                 val down = awaitFirstDown()
                                 val startTime = System.currentTimeMillis()
                                 var isLongPress = false
-                                var isDragStarted = false
                                 var dragTriggered = false
 
                                 // Right-click handled immediately
@@ -146,7 +141,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                                     val elapsed = System.currentTimeMillis() - startTime
                                     
                                     // Use withTimeoutOrNull to ensure we wake up at exactly 800ms
-                                    // If dragging, we don't need the timeout anymore
+                                    // If dragging, we don't need the timeout any more
                                     val event = if (dragTriggered) {
                                         awaitPointerEvent()
                                     } else {
@@ -160,7 +155,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                                         if (!dragTriggered) {
                                             menuOffset = DpOffset(down.position.x.toDp(), down.position.y.toDp())
                                             showMenu = true
-                                            isLongPress = true
+
                                         }
                                         break
                                     }
@@ -246,38 +241,6 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                 }
             }
         }
-
-        // Fading Header
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp),
-            color = Color.Transparent
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                FileExplorerTheme.extendedColors.background,
-                                FileExplorerTheme.extendedColors.background,
-                                FileExplorerTheme.extendedColors.background.copy(alpha = 0.9f),
-                                Color.Transparent
-                            )
-                        )
-                    )
-                    .padding(horizontal = 24.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = stringResource(R.string.nav_home),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
     }
 }
 
@@ -330,8 +293,7 @@ fun HomeShortcutItem(
     onAddStorage: (() -> Unit)? = null
 ) {
     val iconTheme = SettingsManager.iconTheme.value
-    val density = LocalDensity.current
-    
+
     // Scale card components based on itemSize
     val cardHeight = (itemSize * 0.875f).coerceAtLeast(100.dp)
     val iconSize = (itemSize * 0.3f).coerceIn(24.dp, 64.dp)

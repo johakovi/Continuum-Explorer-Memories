@@ -1,4 +1,5 @@
 package com.troikoss.continuum_explorer.utils
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Intent
 import android.os.Environment
@@ -14,7 +15,6 @@ import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
@@ -47,9 +47,6 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
@@ -876,23 +873,22 @@ fun VerticalResizeHandle(
         )
     }
 
-    // Outer Box takes only 1dp of layout space — no gap between panes.
+    // Outer Box takes layout space provided by modifier — usually a small gap or divider.
     Box(
         modifier = modifier
-            .width(1.dp)
             .fillMaxHeight()
             .wrapContentWidth(unbounded = true),
         contentAlignment = Alignment.Center
     ) {
         if (showDivider) VerticalDivider(
-            thickness = 2.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .requiredWidth(30.dp)
+                .requiredWidth(48.dp) // Increased for easier grabbing as "empty space"
                 .pointerHoverIcon(resizeIcon)
                 .pointerInput(density) { // Use density as key to update if it changes
                     awaitEachGesture {
@@ -917,19 +913,52 @@ fun VerticalResizeHandle(
                 },
             contentAlignment = Alignment.Center
         ) {
-            // Visible grab handle - thicker and taller for easier grabbing
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .fillMaxHeight(0.15f)
-                    .heightIn(min = 32.dp, max = 64.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0f),
-                        shape = RoundedCornerShape(3.dp)
-                    )
-            )
+            // The "pill" is removed to satisfy the request for "empty space" resizing.
+            // The entire 48dp width is now a transparent hit-test area.
         }
     }
+}
+
+/**
+ * A modifier that enables horizontal resizing logic for any component.
+ * Useful for making horizontal dividers or empty areas act as width-resize handles.
+ */
+fun Modifier.horizontalResizeHandle(
+    onResize: ((Dp) -> Unit)?,
+    onResizeStarted: (() -> Unit)? = null,
+    onResizeFinished: (() -> Unit)? = null
+): Modifier = composed {
+    if (onResize == null) return@composed this
+    
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    val resizeIcon = remember(context) {
+        androidx.compose.ui.input.pointer.PointerIcon(
+            PointerIcon.getSystemIcon(context, PointerIcon.TYPE_HORIZONTAL_DOUBLE_ARROW)
+        )
+    }
+
+    this.pointerHoverIcon(resizeIcon)
+        .pointerInput(density) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                onResizeStarted?.invoke()
+                
+                while (true) {
+                    val event = awaitPointerEvent()
+                    val dragChange = event.changes.firstOrNull { it.id == down.id } ?: break
+                    if (!dragChange.pressed) {
+                        onResizeFinished?.invoke()
+                        break
+                    }
+                    val deltaPx = dragChange.positionChange().x
+                    if (deltaPx != 0f) {
+                        onResize(deltaPx.toDp())
+                        dragChange.consume()
+                    }
+                }
+            }
+        }
 }
 
 /**
@@ -949,10 +978,11 @@ fun Modifier.trackPosition(
  * Detects touch/stylus taps on file icons to toggle selection.
  * Consuming the event prevents the parent itemGestures from opening the file.
  */
+@SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.iconTouchToggle(
     file: UniversalFile,
     selectionManager: SelectionManager
-): Modifier = composed {
+): Modifier = @SuppressLint("UnnecessaryComposedModifier") composed {
     this.pointerInput(file, selectionManager) {
         awaitPointerEventScope {
             while (true) {

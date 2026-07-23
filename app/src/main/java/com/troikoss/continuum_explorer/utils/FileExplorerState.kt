@@ -1,5 +1,6 @@
 package com.troikoss.continuum_explorer.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -245,7 +246,7 @@ class FileExplorerState(
                 val pathStr = currentPath?.path ?: ""
                 val normalized = pathStr.replace("//", "/").removeSuffix("/")
                 when {
-                    normalized.endsWith("/music/songs") -> context.getString(R.string.audio)
+                    normalized.endsWith("/music/songs") -> context.getString(R.string.menu_music)
                     normalized.endsWith("/music/albums") -> context.getString(R.string.menu_music_albums)
                     normalized.endsWith("/music/favourites") -> context.getString(R.string.menu_music_favourites)
                     normalized.endsWith("/music/playlists") -> context.getString(R.string.menu_music_playlists)
@@ -369,10 +370,10 @@ class FileExplorerState(
                 
                 UniversalFile(
                     name = when {
-                        isSongs -> context.getString(R.string.audio)
+                        isSongs -> context.getString(R.string.menu_music)
                         isAlbumsRoot -> context.getString(R.string.menu_music_albums)
-                        isFavourites -> "Favourites"
-                        isPlaylists -> "Playlists"
+                        isFavourites -> context.getString(R.string.menu_music_favourites)
+                        isPlaylists -> context.getString(R.string.menu_music_playlists)
                         isSpecificPlaylist -> currentPath?.nameWithoutExtension ?: ""
                         isSpecificAlbum -> albumName
                         currentPath != null -> currentPath!!.name
@@ -662,10 +663,10 @@ class FileExplorerState(
                         val normalized = pathStr.replace("//", "/").removeSuffix("/")
                         when {
                             currentPath == null -> listOf(
-                                UniversalFile("Songs", true, 0, 0, LocalProvider, "virtual://music/songs", "virtual://music"),
-                                UniversalFile("Albums", true, 0, 0, LocalProvider, "virtual://music/albums", "virtual://music"),
-                                UniversalFile("Favourites", true, 0, 0, LocalProvider, "virtual://music/favourites", "virtual://music"),
-                                UniversalFile("Playlists", true, 0, 0, LocalProvider, "virtual://music/playlists", "virtual://music")
+                                UniversalFile(context.getString(R.string.menu_music), true, 0, 0, LocalProvider, "virtual://music/songs", "virtual://music"),
+                                UniversalFile(context.getString(R.string.menu_music_albums), true, 0, 0, LocalProvider, "virtual://music/albums", "virtual://music"),
+                                UniversalFile(context.getString(R.string.menu_music_favourites), true, 0, 0, LocalProvider, "virtual://music/favourites", "virtual://music"),
+                                UniversalFile(context.getString(R.string.menu_music_playlists), true, 0, 0, LocalProvider, "virtual://music/playlists", "virtual://music")
                             )
                             normalized.endsWith("/music/songs") -> MusicMetadataManager.getSongs(context)
                             normalized.endsWith("/music/albums") -> MusicMetadataManager.getAlbums(context)
@@ -899,6 +900,7 @@ class FileExplorerState(
         }
     }
 
+    @SuppressLint("ConfigurationScreenWidthHeight")
     @Composable
     fun getScreenSize(): ScreenSize? {
         val configuration = LocalConfiguration.current

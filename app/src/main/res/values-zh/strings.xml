@@ -328,6 +328,7 @@
     <string name="nav_archives">压缩包</string>
     <string name="nav_apks">安装包</string>
     <string name="nav_game_saves">游戏管理</string>
+    <string name="menu_musicplayer">音乐播放器</string>
     <string name="menu_gallery_albums">相册</string>
     <string name="menu_gallery_folders">画廊文件夹</string>
     <string name="menu_music_albums">专辑</string>
@@ -539,6 +540,8 @@
     <string name="shizuku_request_permission">请求 Shizuku 权限</string>
     <string name="error_restricted_access">访问受限</string>
     <string name="msg_restricted_access_shizuku">此目录受 Android 限制。请启用并授权 Shizuku 以访问它。</string>
+    <string name="msg_cant_access_directory">无法访问此目录</string>
+    <string name="msg_nothing_here">这里还没有任何东西</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">系统与电池</string>

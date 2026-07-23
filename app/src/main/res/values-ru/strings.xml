@@ -330,6 +330,7 @@
     <string name="nav_archives">Архивы</string>
     <string name="nav_apks">APK</string>
     <string name="nav_game_saves">Диспетчер игр</string>
+    <string name="menu_musicplayer">Музыкальный плеер</string>
     <string name="menu_gallery_albums">Альбомы</string>
     <string name="menu_gallery_folders">Папки галереи</string>
     <string name="menu_music_albums">Альбомы</string>
@@ -541,6 +542,8 @@
 
     <string name="error_restricted_access">Доступ ограничен</string>
     <string name="msg_restricted_access_shizuku">Этот каталог ограничен Android. Пожалуйста, включите и авторизуйте Shizuku для доступа к нему.</string>
+    <string name="msg_cant_access_directory">Нет доступа к этой директории</string>
+    <string name="msg_nothing_here">Здесь пока ничего нет</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Система и батарея</string>

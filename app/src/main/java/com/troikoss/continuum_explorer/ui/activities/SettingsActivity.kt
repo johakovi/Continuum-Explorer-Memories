@@ -410,6 +410,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 headlineContent = { Text(stringResource(R.string.settings_starting_page)) },
                 supportingContent = {
                     val text = when (startingPage) {
+                        LibraryItem.Home -> stringResource(R.string.nav_home)
                         LibraryItem.Recent -> stringResource(R.string.nav_recent)
                         LibraryItem.Gallery -> stringResource(R.string.nav_gallery)
                         LibraryItem.Music -> stringResource(R.string.nav_music)

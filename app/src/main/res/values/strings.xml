@@ -331,6 +331,7 @@
     <string name="nav_game_saves">Game Manager</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_gallery_folders">Gallery Folders</string>
+    <string name="menu_musicplayer">Music player</string>
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Music Folders</string>
     <string name="menu_create_playlist">Create Playlist</string>
