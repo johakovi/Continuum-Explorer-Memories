@@ -6,11 +6,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -38,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -51,10 +47,8 @@ import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.math.roundToInt
 
 @Composable
 fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
@@ -294,7 +288,16 @@ private fun getHomeItemData(id: String, configs: AppConfigurations, appState: Fi
         "gallery" -> HomeItemData("gallery", stringResource(R.string.nav_gallery), Icons.Default.Image, R.drawable.ic_nav_gallery, R.drawable.ic_nav_gallery_duo, configs.isGalleryVisible, { configs.toggleGalleryVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) }, extendedColors.galleryIcon)
         "music" -> HomeItemData("music", stringResource(R.string.nav_music), Icons.Default.MusicNote, R.drawable.ic_nav_music, R.drawable.ic_nav_music_duo, configs.isMusicVisible, { configs.toggleMusicVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Music) }, extendedColors.musicIcon)
         "downloads" -> HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads) }, extendedColors.downloadsIcon)
-        "documents" -> HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Documents) }, extendedColors.documentsIcon)
+        "documents" -> HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, {
+            if (configs.isDocumentsFolderEnabled) {
+                val internalRoot = Environment.getExternalStorageDirectory()
+                val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                if (!docsDir.exists()) docsDir.mkdirs()
+                appState.navigateTo(docsDir, null, newRoot = internalRoot)
+            } else {
+                appState.navigateTo(null, null, libraryItem = LibraryItem.Documents)
+            }
+        }, extendedColors.documentsIcon)
         "archives" -> HomeItemData("archives", stringResource(R.string.nav_archives), Icons.Default.FolderZip, R.drawable.ic_zip, R.drawable.ic_zip_duo, configs.isArchivesVisible, { configs.toggleArchivesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Archives) }, extendedColors.zipIcon)
         "apks" -> HomeItemData("apks", stringResource(R.string.nav_apks), Icons.Default.Android, R.drawable.ic_android_logo, R.drawable.ic_android_logo, configs.isApksVisible, { configs.toggleApksVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Apks) }, extendedColors.androidIcon)
         "games_manager" -> HomeItemData("games_manager", stringResource(R.string.nav_game_saves), Icons.Default.Gamepad, R.drawable.ic_nav_game, R.drawable.ic_nav_game_duo, configs.isGamesVisible, { configs.toggleGamesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Games) }, extendedColors.gameIcon)
@@ -598,6 +601,7 @@ fun HomeShortcutItem(
                         onClick = {
                             onDismissMenu()
                             appState.appConfigs.toggleDocumentsFolder()
+                            item.onClick()
                         },
                         leadingIcon = {
                             val iconTheme = SettingsManager.iconTheme.value

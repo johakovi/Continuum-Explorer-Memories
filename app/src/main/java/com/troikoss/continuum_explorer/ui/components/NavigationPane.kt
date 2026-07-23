@@ -1717,6 +1717,7 @@ private fun NavContextMenu(
                     onClick = {
                         onDismissRequest()
                         appState.appConfigs.toggleDocumentsFolder()
+                        onNavigate?.invoke()
                     },
                     leadingIcon = {
                         val iconTheme = SettingsManager.iconTheme.value
