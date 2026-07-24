@@ -1259,30 +1259,35 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 Text(
                                     "$version",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.bodySmall,
+                                    lineHeight = 0.sp
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "App is made under GPL-3.0 license",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "and based on troikoss/continuum_explorer",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
 
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Wave animation:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "wavy-slider by mahozad",
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
+                                    lineHeight = 0.sp,
                                     modifier = Modifier
                                         .clickable {
                                             uriHandler.openUri("https://github.com/mahozad/wavy-slider")
@@ -1295,51 +1300,60 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 Text(
                                     text = "Icons used:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "- Phosphor by Phosphor Icons ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "- Material Design Icons by Google",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
 
                                 Text(
                                     text = "- Lets Icons by Leonid Tsvetkov",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "- IconPark Outline by ByteDance",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
 
                                 Text(
                                     text = "- Bootstrap Icons by The Bootstrap Authors",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Font:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Text(
                                     text = "- Inter Designed by Rasmus Andersson ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Links:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
                                 )
 
                                 Text(
