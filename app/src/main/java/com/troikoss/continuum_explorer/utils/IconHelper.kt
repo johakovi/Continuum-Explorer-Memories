@@ -11,11 +11,15 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.content.pm.PackageManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
@@ -48,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -91,20 +96,25 @@ import java.io.FileOutputStream
 object IconHelper {
 
     @Composable
-    fun rememberThemePainter(resId: Int): Painter {
+    fun rememberThemePainter(resId: Int, isDuoExempt: Boolean = false): Painter {
         val context = LocalContext.current
         val pack by ThemePackManager.currentPack
         val name = remember(resId) { context.resources.getResourceEntryName(resId) }
-        
+
         var customBitmap = remember(name, pack) { ThemePackManager.getCustomIcon(name) }
-        
+
         // Fallback: if we are looking for a "_duo" icon but only have the base one
         if (customBitmap == null && name.endsWith("_duo")) {
             customBitmap = remember(name, pack) { ThemePackManager.getCustomIcon(name.removeSuffix("_duo")) }
         }
 
+        val iconTheme = SettingsManager.iconTheme.value
+        val isDuo = iconTheme == IconTheme.COLOURFULDUO
+
         return if (customBitmap != null) {
             remember(customBitmap) { BitmapPainter(customBitmap.asImageBitmap()) }
+        } else if (isDuo && isDuoExempt) {
+            painterResource(id = resId)
         } else {
             painterResource(id = resId)
         }
@@ -218,7 +228,7 @@ object IconHelper {
 
             val extendedColors = LocalExtendedColors.current
             val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
-            
+
             if (rootCustomIcon != null) {
                 val iconTint = getRootFolderColor(rootCustomIconName!!, extendedColors, isDuo)
                 Icon(
@@ -249,6 +259,8 @@ object IconHelper {
                         R.drawable.ic_zip -> R.drawable.ic_zip_duo
                         R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                         R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                        R.drawable.ic_music_logo -> R.drawable.ic_music_logo_duo
+                        R.drawable.ic_storage -> R.drawable.ic_storage_duo
                         else -> overlayRes
                     }
                 } else overlayRes
@@ -281,8 +293,17 @@ object IconHelper {
             if (iconTheme == IconTheme.COLOURFULDUO) IconTheme.COLOURFULDUO else IconTheme.COLOURFUL
         } else iconTheme
 
+        val isExempt = !file.isDirectory && (
+            file.name.lowercase().endsWith(".pdf") || 
+            file.name.lowercase().endsWith(".sh") || 
+            file.name.lowercase().endsWith(".bash") || 
+            file.name.lowercase().endsWith(".zsh")
+        )
+
         val finalTint = if (!selected) {
-            if (file.isDirectory) {
+            if (isExempt && effectiveIconTheme == IconTheme.COLOURFULDUO) {
+                Color.Unspecified
+            } else if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
                     file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" ||
@@ -312,19 +333,19 @@ object IconHelper {
                 val name = file.name.lowercase()
                 when {
                     name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
-                    name.endsWith(".tar") || name.endsWith(".gz") -> extendedColors.zipIcon
+                            name.endsWith(".tar") || name.endsWith(".gz") -> extendedColors.zipIcon
                     name.endsWith(".pdf") -> extendedColors.pdfIcon
                     name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") ||
-                    name.endsWith(".csv") -> extendedColors.xlsIcon
+                            name.endsWith(".csv") -> extendedColors.xlsIcon
                     name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> extendedColors.docxIcon
                     name.endsWith(".txt") -> extendedColors.txtIcon
                     name.endsWith(".sh") || name.endsWith(".bash") || name.endsWith(".zsh") -> extendedColors.terminalIcon
                     name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                    name.endsWith(".m4a") || name.endsWith(".flac") -> extendedColors.musicIcon
+                            name.endsWith(".m4a") || name.endsWith(".flac") -> extendedColors.musicIcon
                     name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
-                    name.endsWith(".mov") || name.endsWith(".webm") -> extendedColors.videoIcon
+                            name.endsWith(".mov") || name.endsWith(".webm") -> extendedColors.videoIcon
                     name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") ||
-                    name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp") -> extendedColors.imageIcon
+                            name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp") -> extendedColors.imageIcon
                     else -> extendedColors.filesIcon
                 }
             }
@@ -334,7 +355,13 @@ object IconHelper {
 
         if (file.isDirectory) {
             val isAlbum = file.mimeType == "album" || file.providerId.startsWith("virtual://music_album:")
-            
+            val isGalleryAlbum = file.parentId == "virtual://gallery"
+
+            if (isGalleryAlbum && effectiveIconTheme != IconTheme.MATERIAL) {
+                Grid2x2FolderIcon(file, modifier, iconSize)
+                return
+            }
+
             if (isAlbum) {
                 val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
                 Box(contentAlignment = Alignment.Center, modifier = modifier.size(iconSize)) {
@@ -347,7 +374,7 @@ object IconHelper {
                         if (painter.state is AsyncImagePainter.State.Success) {
                             SubcomposeAsyncImageContent()
                         } else {
-                            val albumRes = if (isDuo) R.drawable.ic_music_album else R.drawable.ic_music_album
+                            val albumRes = if (isDuo) R.drawable.ic_music_album_duo else R.drawable.ic_music_album
                             Icon(
                                 painter = rememberThemePainter(resId = albumRes),
                                 contentDescription = null,
@@ -363,7 +390,7 @@ object IconHelper {
             val overlayRes = getOverlayIconRes(file)
             val rootCustomIconName = getRootFolderCustomIconName(file.name, file.providerId)
             val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
-            
+
             val rootCustomIcon = if (rootCustomIconName != null) {
                 val baseName = rootCustomIconName
                 val fullName = if (isDuo) "${baseName}_duo" else baseName
@@ -397,7 +424,7 @@ object IconHelper {
                 }
 
                 val isShowingAppIcon = packageName != null && effectiveIconTheme != IconTheme.MATERIAL
-                
+
                 if (rootCustomIcon != null) {
                     val iconTint = getRootFolderColor(rootCustomIconName!!, extendedColors, isDuo)
                     Icon(
@@ -415,11 +442,11 @@ object IconHelper {
 
                     if (isMusicVirtual || isPlaylistFile) {
                         val musicRes = when {
-                            providerPath.endsWith("/songs") -> R.drawable.ic_music_music
-                            providerPath.endsWith("/albums") -> R.drawable.ic_music_album
-                            providerPath.endsWith("/favourites") -> R.drawable.ic_music_favourite
-                            providerPath.endsWith("/playlists") || isPlaylistFile -> R.drawable.ic_music_playlist
-                            else -> R.drawable.ic_music_logo
+                            providerPath.endsWith("/songs") -> if (isDuo) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
+                            providerPath.endsWith("/albums") -> if (isDuo) R.drawable.ic_music_album_duo else R.drawable.ic_music_album
+                            providerPath.endsWith("/favourites") -> if (isDuo) R.drawable.ic_music_favourite_duo else R.drawable.ic_music_favourite
+                            providerPath.endsWith("/playlists") || isPlaylistFile -> if (isDuo) R.drawable.ic_music_playlist_duo else R.drawable.ic_music_playlist
+                            else -> if (isDuo) R.drawable.ic_music_logo_duo else R.drawable.ic_music_logo
                         }
                         Icon(
                             painter = rememberThemePainter(resId = musicRes),
@@ -447,6 +474,8 @@ object IconHelper {
                             R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
                             R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                             R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                            R.drawable.ic_music_logo -> R.drawable.ic_music_logo_duo
+                            R.drawable.ic_storage -> R.drawable.ic_storage_duo
                             else -> overlayRes
                         }
                     } else overlayRes
@@ -462,8 +491,10 @@ object IconHelper {
             return
         }
 
+
+
         val fallbackPainter = if (effectiveIconTheme == IconTheme.COLOURFUL || effectiveIconTheme == IconTheme.COLOURFULDUO) {
-            rememberThemePainter(resId = getDrawableForItem(file, effectiveIconTheme))
+            rememberThemePainter(resId = getDrawableForItem(file, effectiveIconTheme), isDuoExempt = isExempt)
         } else {
             rememberVectorPainter(getIconForItem(file))
         }
@@ -491,7 +522,11 @@ object IconHelper {
                                 val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
                                 painterResource(audioRes)
                             } else fallbackPainter
-                            Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
+                            if (finalTint == Color.Unspecified) {
+                                androidx.compose.foundation.Image(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize))
+                            } else {
+                                Icon(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize), tint = finalTint)
+                            }
                         }
                     }
                 }
@@ -501,12 +536,20 @@ object IconHelper {
                 val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
                 painterResource(audioRes)
             } else fallbackPainter
-            Icon(
-                painter = painterToUse,
-                contentDescription = null,
-                modifier = modifier.size(iconSize),
-                tint = finalTint
-            )
+            if (finalTint == Color.Unspecified) {
+                androidx.compose.foundation.Image(
+                    painter = painterToUse,
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize)
+                )
+            } else {
+                Icon(
+                    painter = painterToUse,
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize),
+                    tint = finalTint
+                )
+            }
         }
     }
 
@@ -549,26 +592,26 @@ object IconHelper {
         return when {
             // Archives
             name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
-            name.endsWith(".tar") || name.endsWith(".gz") -> Icons.Default.FolderZip
+                    name.endsWith(".tar") || name.endsWith(".gz") -> Icons.Default.FolderZip
 
             // Images
             name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") ||
-            name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp") -> Icons.Default.Image
+                    name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp") -> Icons.Default.Image
 
             // Videos
             name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
-            name.endsWith(".mov") || name.endsWith(".webm") -> Icons.Default.VideoFile
+                    name.endsWith(".mov") || name.endsWith(".webm") -> Icons.Default.VideoFile
 
             // Audio
             name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-            name.endsWith(".m4a") || name.endsWith(".flac") -> Icons.Default.AudioFile
+                    name.endsWith(".m4a") || name.endsWith(".flac") -> Icons.Default.AudioFile
 
             // Documents
             name.endsWith(".pdf") -> Icons.Default.PictureAsPdf
             name.endsWith(".csv") || name.endsWith(".xls") || name.endsWith(".xlsx") ||
-            name.endsWith(".ods") -> Icons.AutoMirrored.Filled.ListAlt
+                    name.endsWith(".ods") -> Icons.AutoMirrored.Filled.ListAlt
             name.endsWith(".txt") || name.endsWith(".doc") || name.endsWith(".docx") ||
-            name.endsWith(".odt") -> Icons.Default.Description
+                    name.endsWith(".odt") -> Icons.Default.Description
             name.endsWith(".ppt") || name.endsWith(".pptx") || name.endsWith(".odp") -> Icons.Default.Slideshow
 
             name.endsWith(".apk") -> Icons.Default.Android
@@ -583,25 +626,26 @@ object IconHelper {
      * Internal helper to determine drawable based on file extension for COLOURFUL theme.
      */
     fun getDrawableForItem(file: UniversalFile, iconTheme: IconTheme = IconTheme.COLOURFUL): Int {
+        val isDuo = iconTheme == IconTheme.COLOURFULDUO
         if (file.isDirectory) {
             return when {
-                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> R.drawable.ic_nav_gallery
-                file.providerId == "virtual://music" -> R.drawable.ic_music_logo
-                file.providerId == "virtual://music/songs" -> R.drawable.ic_music_music
-                file.providerId == "virtual://music/albums" -> R.drawable.ic_music_album
-                file.providerId == "virtual://music/favourites" -> R.drawable.ic_music_favourite
-                file.providerId == "virtual://music/playlists" -> R.drawable.ic_music_playlist
-                file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> R.drawable.ic_music_playlist
-                file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> R.drawable.ic_music_album
-                file.providerId == "virtual://recent" -> R.drawable.ic_nav_recent
-                file.providerId == "virtual://downloads" -> R.drawable.ic_nav_downloads
-                file.providerId == "virtual://documents" -> R.drawable.ic_nav_documents
-                file.providerId == "virtual://archives" -> R.drawable.ic_zip
+                file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> if (isDuo) R.drawable.ic_nav_gallery_duo else R.drawable.ic_nav_gallery
+                file.providerId == "virtual://music" -> if (isDuo) R.drawable.ic_music_logo_duo else R.drawable.ic_music_logo
+                file.providerId == "virtual://music/songs" -> if (isDuo) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
+                file.providerId == "virtual://music/albums" -> if (isDuo) R.drawable.ic_music_album_duo else R.drawable.ic_music_album
+                file.providerId == "virtual://music/favourites" -> if (isDuo) R.drawable.ic_music_favourite_duo else R.drawable.ic_music_favourite
+                file.providerId == "virtual://music/playlists" -> if (isDuo) R.drawable.ic_music_playlist_duo else R.drawable.ic_music_playlist
+                file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> if (isDuo) R.drawable.ic_music_playlist_duo else R.drawable.ic_music_playlist
+                file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" -> if (isDuo) R.drawable.ic_music_album_duo else R.drawable.ic_music_album
+                file.providerId == "virtual://recent" -> if (isDuo) R.drawable.ic_nav_recent_duo else R.drawable.ic_nav_recent
+                file.providerId == "virtual://downloads" -> if (isDuo) R.drawable.ic_nav_downloads_duo else R.drawable.ic_nav_downloads
+                file.providerId == "virtual://documents" -> if (isDuo) R.drawable.ic_nav_documents_duo else R.drawable.ic_nav_documents
+                file.providerId == "virtual://archives" -> if (isDuo) R.drawable.ic_zip_duo else R.drawable.ic_zip
                 file.providerId == "virtual://apks" -> R.drawable.ic_android_logo
-                file.providerId == "virtual://games_manager" -> R.drawable.ic_nav_game
-                file.parentId == "virtual://games_manager" -> R.drawable.ic_nav_game
-                file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> R.drawable.ic_nav_trash
-                else -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                file.providerId == "virtual://games_manager" -> if (isDuo) R.drawable.ic_nav_game_duo else R.drawable.ic_nav_game
+                file.parentId == "virtual://games_manager" -> if (isDuo) R.drawable.ic_nav_game_duo else R.drawable.ic_nav_game
+                file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> if (isDuo) R.drawable.ic_nav_trash_duo else R.drawable.ic_nav_trash
+                else -> if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
             }
         }
         if (file.mimeType?.startsWith("audio/") == true) {
@@ -630,7 +674,7 @@ object IconHelper {
             name.endsWith(".txt") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_txt_duo else R.drawable.ic_txt
             name.endsWith(".sh") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_terminal_duo else R.drawable.ic_terminal
             name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                     name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
+                    name.endsWith(".flac") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
             name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") ||
                     name.endsWith(".mov") || name.endsWith(".webm") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_video_duo else R.drawable.ic_video
             name.endsWith(".m4a") -> if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_audio_rec_duo else R.drawable.ic_audio_rec
@@ -702,7 +746,7 @@ object IconHelper {
             lProviderId.startsWith("content://") -> {
                 // For SAF, if there's no parent-like structure in the ID, it's likely a root child
                 !lProviderId.substringAfterLast("%2f", "").contains("%2f") &&
-                !lProviderId.substringAfterLast("/", "").contains("/")
+                        !lProviderId.substringAfterLast("/", "").contains("/")
             }
             else -> false
         }
@@ -745,7 +789,7 @@ object IconHelper {
     }
 
 
-        fun isMimeTypePreviewable(file: UniversalFile): Boolean {
+    fun isMimeTypePreviewable(file: UniversalFile): Boolean {
         val name = file.name.lowercase()
         return PREVIEWABLE_EXTENSIONS.any { name.endsWith(it) } || file.mimeType?.startsWith("audio/") == true
     }
@@ -757,6 +801,71 @@ object IconHelper {
     )
 
     // --- Internal Thumbnail Helpers ---
+
+    @Composable
+    fun Grid2x2FolderIcon(
+        folder: UniversalFile,
+        modifier: Modifier = Modifier,
+        iconSize: Dp
+    ) {
+        var previewFiles by remember(folder) {
+            mutableStateOf<List<UniversalFile>>(emptyList())
+        }
+
+        LaunchedEffect(folder) {
+            withContext(Dispatchers.IO) {
+                val files = when {
+                    folder.fileRef != null ->
+                        folder.fileRef!!.listFiles()?.asSequence()?.map { it.toUniversal() }
+                            ?.filter { !it.isDirectory && isMimeTypePreviewable(it) && !it.name.lowercase().endsWith(".txt") }
+                            ?.take(4)?.toList()
+                    folder.documentFileRef != null ->
+                        folder.documentFileRef!!.listFiles().asSequence().map { it.toUniversal() }
+                            .filter { !it.isDirectory && isMimeTypePreviewable(it) && !it.name.lowercase().endsWith(".txt") }
+                            .take(4).toList()
+                    else -> try {
+                        folder.provider.listChildren(folder.providerId)
+                            .filter { !it.isDirectory && isMimeTypePreviewable(it) && !it.name.lowercase().endsWith(".txt") }
+                            .take(4)
+                    } catch (_: Exception) { null }
+                } ?: emptyList()
+                previewFiles = files
+            }
+        }
+
+        if (previewFiles.isEmpty()) {
+            val iconTheme = SettingsManager.iconTheme.value
+            val isDuo = iconTheme == IconTheme.COLOURFULDUO
+            val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
+            Icon(
+                painter = rememberThemePainter(resId = baseFolderRes),
+                contentDescription = null,
+                modifier = modifier.size(iconSize),
+                tint = LocalExtendedColors.current.folderIcon
+            )
+        } else {
+            Box(modifier = modifier.size(iconSize).clip(RoundedCornerShape(8.dp))) {
+                Column {
+                    Row(modifier = Modifier.weight(1f)) {
+                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
+                            previewFiles.getOrNull(0)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                        }
+                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
+                            previewFiles.getOrNull(1)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                        }
+                    }
+                    Row(modifier = Modifier.weight(1f)) {
+                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
+                            previewFiles.getOrNull(2)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                        }
+                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
+                            previewFiles.getOrNull(3)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private val folderPreviewCache = android.util.LruCache<String, java.util.Optional<UniversalFile>>(256)
 
@@ -864,11 +973,19 @@ object IconHelper {
                 if (painter.state is AsyncImagePainter.State.Success) {
                     SubcomposeAsyncImageContent()
                 } else {
-                    Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+                    if (tint == Color.Unspecified) {
+                        androidx.compose.foundation.Image(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize))
+                    } else {
+                        Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+                    }
                 }
             }
         } else {
-            Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+            if (tint == Color.Unspecified) {
+                androidx.compose.foundation.Image(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize))
+            } else {
+                Icon(painter = fallbackPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
+            }
         }
     }
 
@@ -1062,13 +1179,15 @@ object IconHelper {
 
         // Draw overlay
         if (overlayRes != null && iconTheme != IconTheme.MATERIAL) {
-            val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
+                    val finalOverlayRes = if (iconTheme == IconTheme.COLOURFULDUO) {
                 when (overlayRes) {
                     R.drawable.ic_nav_gallery -> R.drawable.ic_nav_gallery_duo
                     R.drawable.ic_nav_recent -> R.drawable.ic_nav_recent_duo
                     R.drawable.ic_nav_downloads -> R.drawable.ic_nav_downloads_duo
                     R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
                     R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                    R.drawable.ic_music_logo -> R.drawable.ic_music_logo_duo
+                    R.drawable.ic_storage -> R.drawable.ic_storage_duo
                     else -> overlayRes
                 }
             } else overlayRes

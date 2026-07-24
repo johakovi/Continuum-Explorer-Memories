@@ -135,7 +135,10 @@ class FolderConfigurations(private val context: Context) {
         }
         val fallback = when {
             key == "virtual://gallery" || key?.startsWith("virtual://gallery_album:") == true -> ViewMode.GALLERY
-            key == "virtual://music" || key?.startsWith("virtual://music/") == true || key?.startsWith("virtual://music_album:") == true || key?.startsWith("virtual://playlist:") == true -> ViewMode.MUSIC
+            key == "virtual://music" -> ViewMode.GRID
+            key?.startsWith("virtual://music/") == true || key?.startsWith("virtual://music_album:") == true || key?.startsWith("virtual://playlist:") == true -> {
+                if (key == "virtual://music/albums") ViewMode.GALLERY else ViewMode.MUSIC
+            }
             else -> SettingsManager.defaultViewMode.value
         }
         updateViewMode(fallback, null)

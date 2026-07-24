@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.res.painterResource
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol
@@ -60,6 +59,9 @@ import com.troikoss.continuum_explorer.managers.ExtractSettings
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.MoveCopyResult
 import com.troikoss.continuum_explorer.managers.PopupType
+import com.troikoss.continuum_explorer.utils.IconHelper
+import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.utils.calculateSizeRecursively
 import com.troikoss.continuum_explorer.utils.getDeletedAt
 import com.troikoss.continuum_explorer.utils.getDeletedFrom
@@ -202,8 +204,10 @@ fun AddToPlaylistContent(onDismiss: () -> Unit) {
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val iconTheme = SettingsManager.iconTheme.value
+                        val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_playlist_duo else R.drawable.ic_music_playlist
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_music_playlist),
+                            painter = IconHelper.rememberThemePainter(resId = resId),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary

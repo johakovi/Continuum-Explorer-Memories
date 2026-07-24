@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,8 +35,11 @@ import ir.mahozad.multiplatform.wavyslider.material.WavySlider
 import ir.mahozad.multiplatform.wavyslider.WaveDirection
 import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
+import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.utils.FileExplorerState
+import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.addToPlaylist
 import androidx.compose.ui.res.stringResource
 
@@ -129,8 +131,10 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
+                            val iconTheme = SettingsManager.iconTheme.value
+                            val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_logo_duo else R.drawable.ic_music_logo
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_music_logo),
+                                painter = IconHelper.rememberThemePainter(resId = logoRes),
                                 contentDescription = stringResource(R.string.audio_expand_player),
                                 modifier = Modifier.size(32.dp),
                                 tint = if (isPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
@@ -280,8 +284,14 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                                         )
                                                     }
                                                     IconButton(onClick = { MusicMetadataManager.toggleFavourite(context, file.providerId) }) {
+                                                        val iconTheme = SettingsManager.iconTheme.value
+                                                        val favRes = if (isFavourite) {
+                                                            if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_favourite else R.drawable.ic_music_favourite
+                                                        } else {
+                                                            R.drawable.ic_music_not_favourite
+                                                        }
                                                         Icon(
-                                                            painter = painterResource(id = if (isFavourite) R.drawable.ic_music_favourite else R.drawable.ic_music_not_favourite),
+                                                            painter = IconHelper.rememberThemePainter(resId = favRes),
                                                             contentDescription = stringResource(R.string.menu_favourite),
                                                             tint = if (isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                                             modifier = Modifier.size(24.dp)

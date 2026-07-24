@@ -11,16 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -718,34 +712,49 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true
-
-                if (isMusic) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.nav_music)) },
-                        leadingIcon = { Icon(Icons.Default.MusicNote, null) },
-                        trailingIcon = { if (appState.activeViewMode == ViewMode.MUSIC) { Icon(Icons.Default.Done, null) } },
-                        onClick = {
-                            appState.folderConfigs.updateViewMode(ViewMode.MUSIC, appState.getCurrentStorageKey())
-                            onDismiss()
-                        }
-                    )
-                } else {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.menu_details)) },
-                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ListAlt, null) },
-                        trailingIcon = { if (appState.activeViewMode == ViewMode.DETAILS) { Icon(Icons.Default.Done, null) } },
-                        onClick = {
-                            appState.folderConfigs.updateViewMode(ViewMode.DETAILS, appState.getCurrentStorageKey())
-                            onDismiss()
-                        }
-                    )
+                val storageKey = appState.getCurrentStorageKey() ?: ""
+                val isMusicRoot = storageKey == "virtual://music"
+                val isMusicSub = storageKey.startsWith("virtual://music/") || 
+                                 storageKey.startsWith("virtual://music_album:") || 
+                                 storageKey.startsWith("virtual://playlist:")
+                
+                if (isMusicRoot) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_grid)) },
                         leadingIcon = { Icon(Icons.Default.ViewModule, null) },
                         trailingIcon = { if (appState.activeViewMode == ViewMode.GRID) { Icon(Icons.Default.Done, null) } },
                         onClick = {
-                            appState.folderConfigs.updateViewMode(ViewMode.GRID, appState.getCurrentStorageKey())
+                            appState.folderConfigs.updateViewMode(ViewMode.GRID, storageKey)
+                            onDismiss()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_music)) },
+                        leadingIcon = { Icon(Icons.Default.MusicNote, null) },
+                        trailingIcon = { if (appState.activeViewMode == ViewMode.MUSIC) { Icon(Icons.Default.Done, null) } },
+                        onClick = {
+                            appState.folderConfigs.updateViewMode(ViewMode.MUSIC, storageKey)
+                            onDismiss()
+                        }
+                    )
+                } else {
+                    if (!isMusicSub) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_details)) },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.ListAlt, null) },
+                            trailingIcon = { if (appState.activeViewMode == ViewMode.DETAILS) { Icon(Icons.Default.Done, null) } },
+                            onClick = {
+                                appState.folderConfigs.updateViewMode(ViewMode.DETAILS, storageKey)
+                                onDismiss()
+                            }
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_grid)) },
+                        leadingIcon = { Icon(Icons.Default.ViewModule, null) },
+                        trailingIcon = { if (appState.activeViewMode == ViewMode.GRID) { Icon(Icons.Default.Done, null) } },
+                        onClick = {
+                            appState.folderConfigs.updateViewMode(ViewMode.GRID, storageKey)
                             onDismiss()
                         }
                     )
@@ -754,19 +763,32 @@ fun BackgroundContextMenu(
                         leadingIcon = { Icon(Icons.Default.PhotoLibrary, null) },
                         trailingIcon = { if (appState.activeViewMode == ViewMode.GALLERY) { Icon(Icons.Default.Done, null) } },
                         onClick = {
-                            appState.folderConfigs.updateViewMode(ViewMode.GALLERY, appState.getCurrentStorageKey())
+                            appState.folderConfigs.updateViewMode(ViewMode.GALLERY, storageKey)
                             onDismiss()
                         }
                     )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.menu_content)) },
-                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
-                        trailingIcon = { if (appState.activeViewMode == ViewMode.CONTENT) { Icon(Icons.Default.Done, null) } },
-                        onClick = {
-                            appState.folderConfigs.updateViewMode(ViewMode.CONTENT, appState.getCurrentStorageKey())
-                            onDismiss()
-                        }
-                    )
+                    if (!isMusicSub) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_content)) },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                            trailingIcon = { if (appState.activeViewMode == ViewMode.CONTENT) { Icon(Icons.Default.Done, null) } },
+                            onClick = {
+                                appState.folderConfigs.updateViewMode(ViewMode.CONTENT, storageKey)
+                                onDismiss()
+                            }
+                        )
+                    }
+                    if (isMusicSub) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_music)) },
+                            leadingIcon = { Icon(Icons.Default.MusicNote, null) },
+                            trailingIcon = { if (appState.activeViewMode == ViewMode.MUSIC) { Icon(Icons.Default.Done, null) } },
+                            onClick = {
+                                appState.folderConfigs.updateViewMode(ViewMode.MUSIC, storageKey)
+                                onDismiss()
+                            }
+                        )
+                    }
                 }
 
                 HorizontalDivider()

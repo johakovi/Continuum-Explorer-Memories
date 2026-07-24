@@ -189,7 +189,7 @@ object GalleryManager {
                 length = 0,
                 provider = LocalProvider,
                 providerId = dir.absolutePath,
-                parentId = dir.parentFile?.absolutePath,
+                parentId = "virtual://gallery",
             )
         }
     }

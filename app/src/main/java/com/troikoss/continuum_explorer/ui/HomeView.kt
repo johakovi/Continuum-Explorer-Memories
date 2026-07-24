@@ -51,7 +51,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
     val configs = appState.appConfigs
     val extendedColors = LocalExtendedColors.current
     val gridState = rememberLazyGridState()
-    
+
     // Track dragging state for reordering
     var draggedItemId by remember { mutableStateOf<String?>(null) }
     var draggingOffset by remember { mutableStateOf(Offset.Zero) }
@@ -62,7 +62,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
     }
 
     val itemSize = appState.folderConfigs.gridItemSize.dp
-    
+
     // Map the dynamic libraryOrder to HomeItemData, excluding "home" itself
     val items = configs.libraryOrder.filter { it != "home" }.mapNotNull { id ->
         getHomeItemData(id, configs, appState, extendedColors)
@@ -139,7 +139,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
                                 while (true) {
                                     val elapsed = System.currentTimeMillis() - startTime
-                                    
+
                                     // Use withTimeoutOrNull to ensure we wake up at exactly 800ms
                                     // If dragging, we don't need the timeout any more
                                     val event = if (dragTriggered) {
@@ -162,7 +162,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
                                     val change = event.changes.firstOrNull { it.id == down.id } ?: break
                                     val currentElapsed = System.currentTimeMillis() - startTime
-                                    
+
                                     if (!change.pressed) {
                                         // Click action
                                         if (currentElapsed < 300 && (change.position - down.position).getDistance() < viewConfiguration.touchSlop) {
@@ -185,7 +185,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
                                         menuOffset = DpOffset(down.position.x.toDp(), down.position.y.toDp())
                                         showMenu = true
                                         isLongPress = true
-                                        
+
                                         // Consume the rest of the gesture until release
                                         // to prevent any click actions or secondary reactions
                                         var e = currentEvent
@@ -199,25 +199,25 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
                                     if (dragTriggered) {
                                         draggingOffset += change.positionChange()
-                                        
+
                                         // Reordering logic
                                         val currentIndex = configs.libraryOrder.indexOf(item.id)
                                         val layoutInfo = gridState.layoutInfo
                                         val visibleItems = layoutInfo.visibleItemsInfo
                                         val draggedItemInfo = visibleItems.find { it.key == item.id }
-                                        
+
                                         if (draggedItemInfo != null) {
-                                            val center = draggedItemInfo.offset.let { 
-                                                Offset(it.x + draggedItemInfo.size.width / 2f + draggingOffset.x, 
-                                                       it.y + draggedItemInfo.size.height / 2f + draggingOffset.y) 
+                                            val center = draggedItemInfo.offset.let {
+                                                Offset(it.x + draggedItemInfo.size.width / 2f + draggingOffset.x,
+                                                    it.y + draggedItemInfo.size.height / 2f + draggingOffset.y)
                                             }
-                                            
+
                                             val targetItem = visibleItems.find { info ->
                                                 info.key != item.id && info.key != "home" &&
-                                                center.x in info.offset.x.toFloat()..(info.offset.x + info.size.width).toFloat() &&
-                                                center.y in info.offset.y.toFloat()..(info.offset.y + info.size.height).toFloat()
+                                                        center.x in info.offset.x.toFloat()..(info.offset.x + info.size.width).toFloat() &&
+                                                        center.y in info.offset.y.toFloat()..(info.offset.y + info.size.height).toFloat()
                                             }
-                                            
+
                                             if (targetItem != null) {
                                                 val targetIndex = configs.libraryOrder.indexOf(targetItem.key as String)
                                                 if (currentIndex != -1 && targetIndex != -1) {
@@ -264,7 +264,7 @@ private fun getHomeItemData(id: String, configs: AppConfigurations, appState: Fi
         "archives" -> HomeItemData("archives", stringResource(R.string.nav_archives), Icons.Default.FolderZip, R.drawable.ic_zip, R.drawable.ic_zip_duo, configs.isArchivesVisible, { configs.toggleArchivesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Archives) }, extendedColors.zipIcon)
         "apks" -> HomeItemData("apks", stringResource(R.string.nav_apks), Icons.Default.Android, R.drawable.ic_android_logo, R.drawable.ic_android_logo, configs.isApksVisible, { configs.toggleApksVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Apks) }, extendedColors.androidIcon)
         "games_manager" -> HomeItemData("games_manager", stringResource(R.string.nav_game_saves), Icons.Default.Gamepad, R.drawable.ic_nav_game, R.drawable.ic_nav_game_duo, configs.isGamesVisible, { configs.toggleGamesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Games) }, extendedColors.gameIcon)
-        "internal_storage" -> HomeItemData("internal_storage", stringResource(R.string.nav_internal_storage), Icons.Default.Storage, R.drawable.ic_storage, R.drawable.ic_storage, configs.isInternalStorageVisible, { configs.toggleInternalStorageVisibility() }, { appState.navigateTo(Environment.getExternalStorageDirectory(), null) }, extendedColors.sidebarIcons)
+        "internal_storage" -> HomeItemData("internal_storage", stringResource(R.string.nav_internal_storage), Icons.Default.Storage, R.drawable.ic_storage, R.drawable.ic_storage_duo, configs.isInternalStorageVisible, { configs.toggleInternalStorageVisibility() }, { appState.navigateTo(Environment.getExternalStorageDirectory(), null) }, extendedColors.sidebarIcons)
         "trash" -> HomeItemData("trash", stringResource(R.string.nav_trash), Icons.Default.Delete, R.drawable.ic_nav_trash, R.drawable.ic_nav_trash_duo, configs.isTrashVisible, { configs.toggleTrashVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.RecycleBin) }, extendedColors.recycleBinIcon)
         else -> null
     }
@@ -284,8 +284,8 @@ data class HomeItemData(
 
 @Composable
 fun HomeShortcutItem(
-    item: HomeItemData, 
-    appState: FileExplorerState, 
+    item: HomeItemData,
+    appState: FileExplorerState,
     itemSize: androidx.compose.ui.unit.Dp,
     showMenu: Boolean,
     menuOffset: DpOffset,
@@ -318,7 +318,7 @@ fun HomeShortcutItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 val iconRes = if (iconTheme == IconTheme.COLOURFULDUO) item.customIconDuo else item.customIcon
-                
+
                 if (iconTheme == IconTheme.MATERIAL) {
                     Icon(
                         imageVector = item.icon,
@@ -334,9 +334,9 @@ fun HomeShortcutItem(
                         tint = item.iconTint
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = item.label,
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -377,7 +377,7 @@ fun HomeShortcutItem(
                         },
                         leadingIcon = { Icon(Icons.Default.Add, null) }
                     )
-                    
+
                     DropdownMenuItem(
                         text = { Text(if (isGamesFtpActive) stringResource(R.string.nav_stop_ftp_game_manager) else stringResource(R.string.nav_start_ftp_game_manager)) },
                         onClick = {
@@ -587,7 +587,7 @@ fun HomeShortcutItem(
                     },
                     leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
                 )
-                
+
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_open_new_window)) },
                     onClick = {
@@ -609,7 +609,7 @@ fun HomeShortcutItem(
                     },
                     leadingIcon = { Icon(Icons.Default.Tab, null) }
                 )
-                
+
                 HorizontalDivider()
 
                 // Library visibility toggle
@@ -632,9 +632,9 @@ fun HomeShortcutItem(
                         leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
                     )
                 }
-                
+
                 HorizontalDivider()
-                
+
                 // Properties
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_properties)) },

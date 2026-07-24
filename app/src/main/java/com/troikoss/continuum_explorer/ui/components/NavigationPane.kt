@@ -1831,6 +1831,7 @@ private fun NavItem(
                     R.drawable.ic_android_logo -> R.drawable.ic_android_logo // Add duo if available
                     R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                     R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
+                    R.drawable.ic_storage -> R.drawable.ic_storage_duo
                     else -> customIcon
                 }
             } else customIcon
@@ -2270,7 +2271,7 @@ private fun NavStorageItem(
             val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
                 when (customIcon) {
                     R.drawable.ic_folder -> R.drawable.ic_folder_duo
-                    // Add other mappings if storage icons can vary
+                    R.drawable.ic_storage -> R.drawable.ic_storage_duo
                     else -> customIcon
                 }
             } else customIcon

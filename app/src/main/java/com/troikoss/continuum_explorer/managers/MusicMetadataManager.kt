@@ -2,6 +2,7 @@ package com.troikoss.continuum_explorer.managers
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
+import androidx.compose.runtime.*
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import org.json.JSONArray
@@ -36,7 +37,7 @@ object MusicMetadataManager {
 
     private var albums: List<MusicAlbumMetadata> = emptyList()
     private var songs: List<MusicSongMetadata> = emptyList()
-    private var favouritePaths: MutableSet<String> = mutableSetOf()
+    private val favouriteState = mutableStateMapOf<String, Boolean>()
 
     fun init(context: Context) {
         loadMetadata(context)
@@ -48,9 +49,9 @@ object MusicMetadataManager {
         if (file.exists()) {
             try {
                 val jsonArray = JSONArray(file.readText())
-                favouritePaths.clear()
+                favouriteState.clear()
                 for (i in 0 until jsonArray.length()) {
-                    favouritePaths.add(jsonArray.getString(i))
+                    favouriteState[jsonArray.getString(i)] = true
                 }
             } catch (e: Exception) { e.printStackTrace() }
         }
@@ -59,22 +60,22 @@ object MusicMetadataManager {
     private fun saveFavourites(context: Context) {
         try {
             val jsonArray = JSONArray()
-            favouritePaths.forEach { jsonArray.put(it) }
+            favouriteState.keys.forEach { jsonArray.put(it) }
             File(getMetadataFolder(context), FAVOURITES_FILE).writeText(jsonArray.toString())
         } catch (e: Exception) { e.printStackTrace() }
     }
 
-    fun isFavourite(path: String): Boolean = favouritePaths.contains(path)
+    fun isFavourite(path: String): Boolean = favouriteState[path] == true
 
     fun getSongMetadata(filePath: String): MusicSongMetadata? {
         return songs.find { it.filePath == filePath }
     }
 
     fun toggleFavourite(context: Context, path: String) {
-        if (favouritePaths.contains(path)) {
-            favouritePaths.remove(path)
+        if (favouriteState.containsKey(path)) {
+            favouriteState.remove(path)
         } else {
-            favouritePaths.add(path)
+            favouriteState[path] = true
         }
         saveFavourites(context)
     }
@@ -83,7 +84,7 @@ object MusicMetadataManager {
         if (songs.isEmpty()) {
             loadMetadata(context)
         }
-        return songs.filter { favouritePaths.contains(it.filePath) }.map { song ->
+        return songs.filter { favouriteState.containsKey(it.filePath) }.map { song ->
             val file = File(song.filePath)
             UniversalFile(
                 name = song.title,

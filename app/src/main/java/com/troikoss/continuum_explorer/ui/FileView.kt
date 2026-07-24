@@ -381,21 +381,23 @@ private fun FileContentView(
                     }
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth().offset(y = (-8).dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = formattedDate,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (!file.isDirectory) {
+                if (appState.getCurrentStorageKey() != "virtual://music") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().offset(y = (-8).dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = formattedSize,
+                            text = formattedDate,
                             style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.End
+                            modifier = Modifier.weight(1f)
                         )
+                        if (!file.isDirectory) {
+                            Text(
+                                text = formattedSize,
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.End
+                            )
+                        }
                     }
                 }
             }
@@ -487,25 +489,27 @@ private fun FileMusicView(
                     )
                 }
 
-                Row {
-                    Text(
-                        text = formattedDate,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    if (!file.isDirectory) {
+                if (appState.getCurrentStorageKey() != "virtual://music") {
+                    Row {
                         Text(
-                            text = "•",
+                            text = formattedDate,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = formattedSize,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (!file.isDirectory) {
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = formattedSize,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

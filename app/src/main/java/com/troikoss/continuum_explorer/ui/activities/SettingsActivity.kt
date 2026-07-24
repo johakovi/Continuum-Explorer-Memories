@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.compose.ui.unit.sp
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.troikoss.continuum_explorer.managers.ThemePackManager
@@ -1261,106 +1262,87 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     "$version",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodySmall,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "App is made under GPL-3.0 license",
+                                    text = "App is made under GPL-3.0 license" + "and based on troikoss/continuum_explorer",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
-                                )
-                                Text(
-                                    text = "and based on troikoss/continuum_explorer",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
 
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    text = "Wave animation:",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
-                                )
-                                Text(
-                                    text = "wavy-slider by mahozad",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
-                                    lineHeight = 0.sp,
-                                    modifier = Modifier
-                                        .clickable {
-                                            uriHandler.openUri("https://github.com/mahozad/wavy-slider")
-                                        }
-                                        .padding(top = 4.dp)
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(20.dp))
 
 
                                 Text(
                                     text = "Icons used:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- Phosphor by Phosphor Icons ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- Material Design Icons by Google",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
-
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- Lets Icons by Leonid Tsvetkov",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- IconPark Outline by ByteDance",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
-
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- Bootstrap Icons by The Bootstrap Authors",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "- Solar by 480 Design",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Spacer(modifier = Modifier.height(20.dp))
                                 Text(
                                     text = "Font:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
                                 Text(
                                     text = "- Inter Designed by Rasmus Andersson ",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(20.dp))
                                 Text(
                                     text = "Links:",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 0.sp
+                                    lineHeight = 16.sp
                                 )
 
                                 Text(
@@ -1384,6 +1366,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                                             uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories")
                                         }
                                         .padding(top = 4.dp))
+                                Text(
+                                    text = "wavy-slider by mahozad",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
+                                    lineHeight = 16.sp,
+                                    modifier = Modifier
+                                        .clickable {
+                                            uriHandler.openUri("https://github.com/mahozad/wavy-slider")
+                                        }
+                                        .padding(top = 4.dp)
+                                )
 
 
                             }
