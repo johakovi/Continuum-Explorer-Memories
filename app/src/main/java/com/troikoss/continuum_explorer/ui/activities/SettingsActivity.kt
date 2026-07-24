@@ -1335,6 +1335,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.bodyMedium,
                                     lineHeight = 0.sp
                                 )
+                                Text(
+                                    text = "- Solar by 480 Design",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    lineHeight = 0.sp
+                                )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Font:",
