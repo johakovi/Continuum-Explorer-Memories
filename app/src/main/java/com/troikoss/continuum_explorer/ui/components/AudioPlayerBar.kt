@@ -132,12 +132,12 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 )
                             }
                             val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
-                            val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_logo_duo else R.drawable.ic_music_logo
+                            val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music else R.drawable.ic_music_music
                             Icon(
                                 painter = IconHelper.rememberThemePainter(resId = logoRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
                                 contentDescription = stringResource(R.string.audio_expand_player),
                                 modifier = Modifier.size(32.dp),
-                                tint = if (isPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                                tint = if (isPlaying) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceTint
                             )
                         }
                     }
