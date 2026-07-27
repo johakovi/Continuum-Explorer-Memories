@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Peruuta</string>
+    <string name="revert">Palauta</string>
     <string name="ok">OK</string>
     <string name="close">Sulje</string>
     <string name="yes">Kyllä</string>
@@ -553,6 +554,12 @@
     <string name="settings_timeout_minutes">%1$d minuuttia</string>
     <string name="settings_timeout_disabled">Ei koskaan</string>
     <string name="settings_custom_theme">Teeman mukauttaminen</string>
+    <string name="settings_icon_style">Kuvaketyyli</string>
+    <string name="settings_icon_style_custom">Oma</string>
+    <string name="settings_music_player">Musiikkisoitin</string>
+    <string name="settings_sidebar">Sivupalkki</string>
+    <string name="settings_home_page">Aloitussivu</string>
+    <string name="settings_folders_files">Kansiot ja tiedostot</string>
     <string name="settings_custom_theme_mode">Mukautetun teeman tila</string>
     <string name="settings_load_theme_pack">Lataa teemapaketti (.zip)</string>
     <string name="settings_clear_theme_pack">Tyhjennä mukautettu teema</string>

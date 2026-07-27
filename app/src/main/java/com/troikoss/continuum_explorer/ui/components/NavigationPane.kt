@@ -1524,12 +1524,12 @@ private fun NavContextMenu(
                         appState.appConfigs.toggleGalleryAlbums()
                     },
                     leadingIcon = {
-                        val iconTheme = SettingsManager.iconTheme.value
+                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
                         if (iconTheme == IconTheme.MATERIAL) {
                             Icon(Icons.Default.Folder, null)
                         } else {
                             val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId), null)
+                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
                         }
                     }
                 )
@@ -1596,12 +1596,12 @@ private fun NavContextMenu(
                         appState.appConfigs.toggleMusicAlbums()
                     },
                     leadingIcon = {
-                        val iconTheme = SettingsManager.iconTheme.value
+                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
                         if (iconTheme == IconTheme.MATERIAL) {
                             Icon(Icons.Default.Folder, null)
                         } else {
                             val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId), null)
+                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
                         }
                     }
                 )
@@ -1742,12 +1742,12 @@ private fun NavContextMenu(
                         onNavigate?.invoke()
                     },
                     leadingIcon = {
-                        val iconTheme = SettingsManager.iconTheme.value
+                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
                         if (iconTheme == IconTheme.MATERIAL) {
                             Icon(Icons.Default.Folder, null)
                         } else {
                             val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId), null)
+                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
                         }
                     }
                 )
@@ -1806,7 +1806,7 @@ private fun NavItem(
 
     val iconContent = @Composable {
         val extendedColors = LocalExtendedColors.current
-        val iconTheme = SettingsManager.iconTheme.value
+        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
         val tint = when (section) {
             is NavSection.Home -> extendedColors.homeIcon
             is NavSection.Gallery -> extendedColors.galleryIcon
@@ -1836,14 +1836,14 @@ private fun NavItem(
                 }
             } else customIcon
             Icon(
-                painter = IconHelper.rememberThemePainter(resId = finalIcon),
+                painter = IconHelper.rememberThemePainter(resId = finalIcon, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR),
                 contentDescription = null,
                 tint = tint,
                 modifier = Modifier.size(24.dp)
             )
         } else if (section == NavSection.Games) {
             Icon(
-                painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_nav_game_material),
+                painter = IconHelper.rememberThemePainter(resId = R.drawable.ic_nav_game_material, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR),
                 contentDescription = null,
                 tint = tint
             )
@@ -1919,7 +1919,7 @@ private fun NavFavoriteItem(
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
     val iconContent = @Composable {
-        IconHelper.FolderIcon(name = label, path = path, isFavorite = true)
+        IconHelper.FolderIcon(name = label, path = path, isFavorite = true, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
     }
 
     Box(
@@ -1997,7 +1997,7 @@ private fun NavSafItem(
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
     val iconContent = @Composable {
-        IconHelper.FolderIcon(name = label, path = uri.toString(), tint = LocalExtendedColors.current.sidebarIcons)
+        IconHelper.FolderIcon(name = label, path = uri.toString(), tint = LocalExtendedColors.current.sidebarIcons, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
     }
 
     Box(
@@ -2123,11 +2123,11 @@ private fun NavNetworkItem(
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
     val iconContent = @Composable {
-        val iconTheme = SettingsManager.iconTheme.value
+        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
         if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {
             val drawableId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_network_duo else R.drawable.ic_network
             Icon(
-                painter = IconHelper.rememberThemePainter(resId = drawableId),
+                painter = IconHelper.rememberThemePainter(resId = drawableId, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR),
                 contentDescription = null,
                 tint = LocalExtendedColors.current.sidebarIcons,
                 modifier = Modifier.size(24.dp)
@@ -2266,7 +2266,7 @@ private fun NavStorageItem(
     val itemPadding = if (isMinimized) PaddingValues(horizontal = 0.dp) else if (themeBar == ThemeShape.SQUARE) PaddingValues(horizontal = 8.dp) else NavigationDrawerItemDefaults.ItemPadding
 
     val iconContent = @Composable {
-        val iconTheme = SettingsManager.iconTheme.value
+        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
         if (customIcon != null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
             val finalIcon = if (iconTheme == IconTheme.COLOURFULDUO) {
                 when (customIcon) {
@@ -2276,7 +2276,7 @@ private fun NavStorageItem(
                 }
             } else customIcon
             Icon(
-                painter = IconHelper.rememberThemePainter(resId = finalIcon),
+                painter = IconHelper.rememberThemePainter(resId = finalIcon, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR),
                 contentDescription = null,
                 tint = LocalExtendedColors.current.sidebarIcons,
                 modifier = Modifier.size(24.dp)
@@ -2415,7 +2415,7 @@ private fun StorageFolderTreeItem(
             },
             icon = {
                 Spacer(modifier = Modifier.width((level * 16).dp))
-                IconHelper.FolderIcon(name = folder.name, path = folder.absolutePath, iconSize = 20.dp)
+                IconHelper.FolderIcon(name = folder.name, path = folder.absolutePath, iconSize = 20.dp, category = com.troikoss.continuum_explorer.managers.IconCategory.SIDEBAR)
             },
             badge = {
                 IconButton(

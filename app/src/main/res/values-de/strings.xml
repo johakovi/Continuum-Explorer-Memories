@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Abbrechen</string>
+    <string name="revert">Wiederherstellen</string>
     <string name="ok">OK</string>
     <string name="close">Schließen</string>
     <string name="yes">Ja</string>
@@ -388,7 +389,7 @@
     <string name="nav_network_hide_password">Passwort ausblenden</string>
     <string name="nav_network_show_password">Passwort anzeigen</string>
     <string name="nav_network_sftp_key_uri">URI des privaten Schlüssels (optional)</string>
-    <string name="nav_network_sftp_key_uri_placeholder">content://...</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://…</string>
     <string name="nav_network_sftp_key_passphrase">Passwort des privaten Schlüssels (optional)</string>
     <string name="nav_network_hide_passphrase">Passwort ausblenden</string>
     <string name="nav_network_show_passphrase">Passwort anzeigen</string>
@@ -553,6 +554,12 @@
     <string name="settings_timeout_disabled">Nie</string>
 
     <string name="settings_custom_theme">Design-Anpassung</string>
+    <string name="settings_icon_style">Symbolstil</string>
+    <string name="settings_icon_style_custom">Benutzerdefiniert</string>
+    <string name="settings_music_player">Musikplayer</string>
+    <string name="settings_sidebar">Seitenleiste</string>
+    <string name="settings_home_page">Startseite</string>
+    <string name="settings_folders_files">Ordner und Dateien</string>
     <string name="settings_custom_theme_mode">Benutzerdefinierter Design-Modus</string>
     <string name="settings_load_theme_pack">Design-Paket laden (.zip)</string>
     <string name="settings_clear_theme_pack">Benutzerdefiniertes Design löschen</string>

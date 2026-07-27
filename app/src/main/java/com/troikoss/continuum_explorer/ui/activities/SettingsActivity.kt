@@ -45,6 +45,7 @@ import com.troikoss.continuum_explorer.ui.theme.ThemeFolderColors
 import com.troikoss.continuum_explorer.managers.DeleteBehavior
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
+import com.troikoss.continuum_explorer.managers.IconStyle
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeMode
@@ -60,7 +61,7 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FileExplorerTheme {
-                SettingsScreen(onBack = { finish() })
+                SettingsScreen { finish() }
             }
         }
     }
@@ -86,7 +87,11 @@ fun SettingsScreen(onBack: () -> Unit) {
     val defaultViewMode = SettingsManager.defaultViewMode.value
     val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
     val termuxSupport = SettingsManager.termuxSupport.value
-    val iconTheme = SettingsManager.iconTheme.value
+    val iconStyle = SettingsManager.iconStyle.value
+    val musicIconTheme = SettingsManager.musicIconTheme.value
+    val sidebarIconTheme = SettingsManager.sidebarIconTheme.value
+    val homeIconTheme = SettingsManager.homeIconTheme.value
+    val folderIconTheme = SettingsManager.folderIconTheme.value
     val customThemeMode = SettingsManager.customThemeMode.value
     val ftpInactivityTimeout = SettingsManager.ftpInactivityTimeout.value
     val appInactivityTimeout = SettingsManager.appInactivityTimeout.value
@@ -135,7 +140,11 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showThemeBarDialog by remember { mutableStateOf(false) }
     var showThemeContentDialog by remember { mutableStateOf(false) }
     var showThemeTopDialog by remember { mutableStateOf(false) }
-    var showIconThemeDialog by remember { mutableStateOf(false) }
+    var showIconStyleDialog by remember { mutableStateOf(false) }
+    var showMusicIconDialog by remember { mutableStateOf(false) }
+    var showSidebarIconDialog by remember { mutableStateOf(false) }
+    var showHomeIconDialog by remember { mutableStateOf(false) }
+    var showFolderIconDialog by remember { mutableStateOf(false) }
     var showCustomThemeModeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showDefaultFolderColorDialog by remember { mutableStateOf(false) }
@@ -310,25 +319,84 @@ fun SettingsScreen(onBack: () -> Unit) {
             ListItem(
                 headlineContent = { 
                     Text(
-                        stringResource(R.string.settings_icon_theme),
+                        stringResource(R.string.settings_icon_style),
                         color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
                     )
                 },
                 supportingContent = {
-                    val text = when (iconTheme) {
-                        IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
-                        IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
-                        IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                    val text = when (iconStyle) {
+                        IconStyle.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                        IconStyle.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                        IconStyle.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        IconStyle.CUSTOM -> stringResource(R.string.settings_icon_style_custom)
                     }
                     Text(
                         text,
                         color = if (currentThemePack != null) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                modifier = Modifier.clickable(enabled = currentThemePack == null) { showIconThemeDialog = true }
+                modifier = Modifier.clickable(enabled = currentThemePack == null) { showIconStyleDialog = true }
             )
 
-            if (currentThemePack == null && (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO)) {
+            if (currentThemePack == null && (iconStyle == IconStyle.CUSTOM)) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_music_player)) },
+                    supportingContent = {
+                        val text = when (musicIconTheme) {
+                            IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                            IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                            IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        }
+                        Text(text)
+                    },
+                    modifier = Modifier.padding(start = 16.dp).clickable { showMusicIconDialog = true }
+                )
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_sidebar)) },
+                    supportingContent = {
+                        val text = when (sidebarIconTheme) {
+                            IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                            IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                            IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        }
+                        Text(text)
+                    },
+                    modifier = Modifier.padding(start = 16.dp).clickable { showSidebarIconDialog = true }
+                )
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_home_page)) },
+                    supportingContent = {
+                        val text = when (homeIconTheme) {
+                            IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                            IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                            IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        }
+                        Text(text)
+                    },
+                    modifier = Modifier.padding(start = 16.dp).clickable { showHomeIconDialog = true }
+                )
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_folders_files)) },
+                    supportingContent = {
+                        val text = when (folderIconTheme) {
+                            IconTheme.MATERIAL -> stringResource(R.string.settings_icon_theme_material)
+                            IconTheme.COLOURFUL -> stringResource(R.string.settings_icon_theme_colourful)
+                            IconTheme.COLOURFULDUO -> stringResource(R.string.settings_icon_theme_colourful_duotone)
+                        }
+                        Text(text)
+                    },
+                    modifier = Modifier.padding(start = 16.dp).clickable { showFolderIconDialog = true }
+                )
+            }
+
+            val effectiveFolderTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
+            val isFolderColorVisible = currentThemePack == null && (
+                iconStyle == IconStyle.COLOURFUL || 
+                iconStyle == IconStyle.COLOURFULDUO || 
+                (iconStyle == IconStyle.CUSTOM && effectiveFolderTheme != IconTheme.MATERIAL)
+            )
+
+            if (isFolderColorVisible) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_default_folder_color)) },
                     trailingContent = {
@@ -780,41 +848,208 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            if (showIconThemeDialog) {
+            if (showIconStyleDialog) {
                 AlertDialog(
-                    onDismissRequest = { showIconThemeDialog = false },
-                    title = { Text(stringResource(R.string.settings_choose_icon_theme)) },
+                    onDismissRequest = { showIconStyleDialog = false },
+                    title = { Text(stringResource(R.string.settings_icon_style)) },
                     text = {
                         Column {
                             OptionItem(
-                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
-                                selected = iconTheme == IconTheme.COLOURFULDUO,
+                                label = stringResource(R.string.settings_icon_theme_material),
+                                selected = iconStyle == IconStyle.MATERIAL,
                                 onClick = {
-                                    SettingsManager.setIconTheme(context, IconTheme.COLOURFULDUO)
-                                    showIconThemeDialog = false
+                                    SettingsManager.setIconStyle(context, IconStyle.MATERIAL)
+                                    showIconStyleDialog = false
                                 }
                             )
                             OptionItem(
                                 label = stringResource(R.string.settings_icon_theme_colourful),
-                                selected = iconTheme == IconTheme.COLOURFUL,
+                                selected = iconStyle == IconStyle.COLOURFUL,
                                 onClick = {
-                                    SettingsManager.setIconTheme(context, IconTheme.COLOURFUL)
-                                    showIconThemeDialog = false
+                                    SettingsManager.setIconStyle(context, IconStyle.COLOURFUL)
+                                    showIconStyleDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = iconStyle == IconStyle.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setIconStyle(context, IconStyle.COLOURFULDUO)
+                                    showIconStyleDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_style_custom),
+                                selected = iconStyle == IconStyle.CUSTOM,
+                                onClick = {
+                                    SettingsManager.setIconStyle(context, IconStyle.CUSTOM)
+                                    showIconStyleDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showIconStyleDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showMusicIconDialog) {
+                AlertDialog(
+                    onDismissRequest = { showMusicIconDialog = false },
+                    title = { Text(stringResource(R.string.settings_music_player)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful),
+                                selected = musicIconTheme == IconTheme.COLOURFUL,
+                                onClick = {
+                                    SettingsManager.setMusicIconTheme(context, IconTheme.COLOURFUL)
+                                    showMusicIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = musicIconTheme == IconTheme.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setMusicIconTheme(context, IconTheme.COLOURFULDUO)
+                                    showMusicIconDialog = false
                                 }
                             )
                             OptionItem(
                                 label = stringResource(R.string.settings_icon_theme_material),
-                                selected = iconTheme == IconTheme.MATERIAL,
+                                selected = musicIconTheme == IconTheme.MATERIAL,
                                 onClick = {
-                                    SettingsManager.setIconTheme(context, IconTheme.MATERIAL)
-                                    showIconThemeDialog = false
+                                    SettingsManager.setMusicIconTheme(context, IconTheme.MATERIAL)
+                                    showMusicIconDialog = false
                                 }
                             )
-
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { showIconThemeDialog = false }) {
+                        TextButton(onClick = { showMusicIconDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showSidebarIconDialog) {
+                AlertDialog(
+                    onDismissRequest = { showSidebarIconDialog = false },
+                    title = { Text(stringResource(R.string.settings_sidebar)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful),
+                                selected = sidebarIconTheme == IconTheme.COLOURFUL,
+                                onClick = {
+                                    SettingsManager.setSidebarIconTheme(context, IconTheme.COLOURFUL)
+                                    showSidebarIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = sidebarIconTheme == IconTheme.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setSidebarIconTheme(context, IconTheme.COLOURFULDUO)
+                                    showSidebarIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_material),
+                                selected = sidebarIconTheme == IconTheme.MATERIAL,
+                                onClick = {
+                                    SettingsManager.setSidebarIconTheme(context, IconTheme.MATERIAL)
+                                    showSidebarIconDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showSidebarIconDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showHomeIconDialog) {
+                AlertDialog(
+                    onDismissRequest = { showHomeIconDialog = false },
+                    title = { Text(stringResource(R.string.settings_home_page)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful),
+                                selected = homeIconTheme == IconTheme.COLOURFUL,
+                                onClick = {
+                                    SettingsManager.setHomeIconTheme(context, IconTheme.COLOURFUL)
+                                    showHomeIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = homeIconTheme == IconTheme.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setHomeIconTheme(context, IconTheme.COLOURFULDUO)
+                                    showHomeIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_material),
+                                selected = homeIconTheme == IconTheme.MATERIAL,
+                                onClick = {
+                                    SettingsManager.setHomeIconTheme(context, IconTheme.MATERIAL)
+                                    showHomeIconDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showHomeIconDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showFolderIconDialog) {
+                AlertDialog(
+                    onDismissRequest = { showFolderIconDialog = false },
+                    title = { Text(stringResource(R.string.settings_folders_files)) },
+                    text = {
+                        Column {
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful),
+                                selected = folderIconTheme == IconTheme.COLOURFUL,
+                                onClick = {
+                                    SettingsManager.setFolderIconTheme(context, IconTheme.COLOURFUL)
+                                    showFolderIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_colourful_duotone),
+                                selected = folderIconTheme == IconTheme.COLOURFULDUO,
+                                onClick = {
+                                    SettingsManager.setFolderIconTheme(context, IconTheme.COLOURFULDUO)
+                                    showFolderIconDialog = false
+                                }
+                            )
+                            OptionItem(
+                                label = stringResource(R.string.settings_icon_theme_material),
+                                selected = folderIconTheme == IconTheme.MATERIAL,
+                                onClick = {
+                                    SettingsManager.setFolderIconTheme(context, IconTheme.MATERIAL)
+                                    showFolderIconDialog = false
+                                }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showFolderIconDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }
@@ -967,8 +1202,19 @@ fun SettingsScreen(onBack: () -> Unit) {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { showDefaultFolderColorDialog = false }) {
-                            Text(stringResource(R.string.cancel))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            TextButton(onClick = {
+                                SettingsManager.setDefaultFolderColor(context, 0xFF2196F3)
+                                showDefaultFolderColorDialog = false
+                            }) {
+                                Text(stringResource(R.string.revert))
+                            }
+                            TextButton(onClick = { showDefaultFolderColorDialog = false }) {
+                                Text(stringResource(R.string.cancel))
+                            }
                         }
                     }
                 )
@@ -1259,7 +1505,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
-                                    "$version",
+                                    version ?: "1.0",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodySmall,
                                     lineHeight = 16.sp

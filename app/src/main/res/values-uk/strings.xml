@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Скасувати</string>
+    <string name="revert">Повернути</string>
     <string name="ok">ОК</string>
     <string name="close">Закрити</string>
     <string name="yes">Так</string>
@@ -553,6 +554,12 @@
     <string name="settings_timeout_disabled">Ніколи</string>
 
     <string name="settings_custom_theme">Налаштування теми</string>
+    <string name="settings_icon_style">Стиль значків</string>
+    <string name="settings_icon_style_custom">Свій</string>
+    <string name="settings_music_player">Музичний плеєр</string>
+    <string name="settings_sidebar">Бічна панель</string>
+    <string name="settings_home_page">Головна сторінка</string>
+    <string name="settings_folders_files">Папки та файли</string>
     <string name="settings_custom_theme_mode">Режим користувацької теми</string>
     <string name="settings_load_theme_pack">Завантажити пакет теми (.zip)</string>
     <string name="settings_clear_theme_pack">Очистити користувацьку тему</string>

@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Annuler</string>
+    <string name="revert">Rétablir</string>
     <string name="ok">OK</string>
     <string name="close">Fermer</string>
     <string name="yes">Oui</string>
@@ -552,6 +553,12 @@
     <string name="settings_timeout_minutes">%1$d minutes</string>
     <string name="settings_timeout_disabled">Jamais</string>
     <string name="settings_custom_theme">Personnalisation du thème</string>
+    <string name="settings_icon_style">Style d\'icônes</string>
+    <string name="settings_icon_style_custom">Personnalisé</string>
+    <string name="settings_music_player">Lecteur de musique</string>
+    <string name="settings_sidebar">Barre latérale</string>
+    <string name="settings_home_page">Page d\'accueil</string>
+    <string name="settings_folders_files">Dossiers et fichiers</string>
     <string name="settings_custom_theme_mode">Mode de thème personnalisé</string>
     <string name="settings_load_theme_pack">Charger un pack de thèmes (.zip)</string>
     <string name="settings_clear_theme_pack">Effacer le thème personnalisé</string>

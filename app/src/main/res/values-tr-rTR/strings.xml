@@ -4,6 +4,7 @@
     <string name="shortcut_new_window_short">Yeni Pencere</string>
     <string name="shortcut_new_window_long">Yeni Pencere</string>
     <string name="cancel">İptal Et</string>
+    <string name="revert">Geri al</string>
     <string name="ok">Tamam</string>
     <string name="close">Kapat</string>
     <string name="yes">Evet</string>
@@ -534,6 +535,12 @@
     <string name="settings_timeout_disabled">Asla</string>
 
     <string name="settings_custom_theme">Tema Özelleştirme</string>
+    <string name="settings_icon_style">Simge stili</string>
+    <string name="settings_icon_style_custom">Özel</string>
+    <string name="settings_music_player">Müzik çalar</string>
+    <string name="settings_sidebar">Kenar çubuğu</string>
+    <string name="settings_home_page">Ana sayfa</string>
+    <string name="settings_folders_files">Klasör ve dosyalar</string>
     <string name="settings_custom_theme_mode">Özel Tema Modu</string>
     <string name="settings_load_theme_pack">Tema Paketi Yükle (.zip)</string>
     <string name="settings_clear_theme_pack">Özel Temayı Temizle</string>

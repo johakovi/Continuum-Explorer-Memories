@@ -226,7 +226,7 @@ fun TabBar(
                 tabStates.forEachIndexed { index, state ->
                     key(state) {
                         val universalFile = state.currentUniversalPath
-                        val iconTheme = SettingsManager.iconTheme.value
+                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
 
                         val painter = if (universalFile != null) {
                             if (iconTheme == IconTheme.COLOURFUL || iconTheme == IconTheme.COLOURFULDUO) {

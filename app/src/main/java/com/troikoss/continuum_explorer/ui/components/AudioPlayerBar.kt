@@ -131,10 +131,10 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            val iconTheme = SettingsManager.iconTheme.value
+                            val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
                             val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_logo_duo else R.drawable.ic_music_logo
                             Icon(
-                                painter = IconHelper.rememberThemePainter(resId = logoRes),
+                                painter = IconHelper.rememberThemePainter(resId = logoRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
                                 contentDescription = stringResource(R.string.audio_expand_player),
                                 modifier = Modifier.size(32.dp),
                                 tint = if (isPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
@@ -161,10 +161,10 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                     val horizontalPadding = if (availableWidth < 480.dp) 28.dp else 40.dp
 
                     // Drawer (Playlist) behind the pill
-                    if (isExpanded || isDragging) {
+                    if (animatedHeight > 120.dp) {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
-                            shape = RoundedCornerShape(32.dp),
+                            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 60.dp, bottomEnd = 60.dp),
                             color = MaterialTheme.colorScheme.surfaceContainerHigh,
                             tonalElevation = 4.dp,
                             shadowElevation = 2.dp
@@ -284,14 +284,14 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                                         )
                                                     }
                                                     IconButton(onClick = { MusicMetadataManager.toggleFavourite(context, file.providerId) }) {
-                                                        val iconTheme = SettingsManager.iconTheme.value
+                                                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
                                                         val favRes = if (isFavourite) {
                                                             if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_favourite else R.drawable.ic_music_favourite
                                                         } else {
                                                             R.drawable.ic_music_not_favourite
                                                         }
                                                         Icon(
-                                                            painter = IconHelper.rememberThemePainter(resId = favRes),
+                                                            painter = IconHelper.rememberThemePainter(resId = favRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
                                                             contentDescription = stringResource(R.string.menu_favourite),
                                                             tint = if (isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                                             modifier = Modifier.size(24.dp)
@@ -316,30 +316,54 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                     }
 
                     // Pill (Controls) in front
+                    val showDrawer = animatedHeight > 120.dp
                     Surface(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .height(120.dp),
-                        shape = RoundedCornerShape(60.dp),
+                        shape = if (showDrawer) {
+                            RoundedCornerShape(bottomStart = 60.dp, bottomEnd = 60.dp)
+                        } else {
+                            RoundedCornerShape(60.dp)
+                        },
                         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        tonalElevation = 8.dp,
-                        shadowElevation = 4.dp
+                        tonalElevation = if (showDrawer) 4.dp else 8.dp,
+                        shadowElevation = if (showDrawer) 0.dp else 4.dp
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .pointerInput(Unit) {
+                                    var lockedAxis = 0 // 0: None, 1: Vertical, 2: Horizontal
                                     detectDragGestures(
                                         onDragStart = { 
                                             isDragging = true
                                             verticalDragOffset = 0f
                                             horizontalDragOffset = 0f
+                                            lockedAxis = 0
                                         },
                                         onDrag = { change, dragAmount ->
                                             change.consume()
-                                            verticalDragOffset += dragAmount.y
-                                            horizontalDragOffset += dragAmount.x
+                                            if (lockedAxis == 0) {
+                                                horizontalDragOffset += dragAmount.x
+                                                verticalDragOffset += dragAmount.y
+                                                if (kotlin.math.abs(horizontalDragOffset) > 15f || kotlin.math.abs(verticalDragOffset) > 15f) {
+                                                    if (kotlin.math.abs(verticalDragOffset) > kotlin.math.abs(horizontalDragOffset)) {
+                                                        lockedAxis = 1
+                                                        horizontalDragOffset = 0f
+                                                    } else {
+                                                        lockedAxis = 2
+                                                        verticalDragOffset = 0f
+                                                    }
+                                                }
+                                            } else if (lockedAxis == 1) {
+                                                verticalDragOffset += dragAmount.y
+                                                horizontalDragOffset = 0f
+                                            } else {
+                                                horizontalDragOffset += dragAmount.x
+                                                verticalDragOffset = 0f
+                                            }
                                         },
                                         onDragEnd = {
                                             isDragging = false

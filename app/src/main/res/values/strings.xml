@@ -7,6 +7,7 @@
 
     <!-- General -->
     <string name="cancel">Cancel</string>
+    <string name="revert">Revert</string>
     <string name="ok">OK</string>
     <string name="close">Close</string>
     <string name="yes">Yes</string>
@@ -387,7 +388,7 @@
     <string name="nav_network_hide_password">Hide password</string>
     <string name="nav_network_show_password">Show password</string>
     <string name="nav_network_sftp_key_uri">Private key URI (optional)</string>
-    <string name="nav_network_sftp_key_uri_placeholder">content://...</string>
+    <string name="nav_network_sftp_key_uri_placeholder">content://&#8230;</string>
     <string name="nav_network_sftp_key_passphrase">Private key passphrase (optional)</string>
     <string name="nav_network_hide_passphrase">Hide passphrase</string>
     <string name="nav_network_show_passphrase">Show passphrase</string>
@@ -551,7 +552,13 @@
     <string name="settings_timeout_minutes">%1$d minutes</string>
     <string name="settings_timeout_disabled">Never</string>
 
-    <string name="settings_custom_theme">Theme Customization</string>
+    <string name="settings_custom_theme">Theme customizing</string>
+    <string name="settings_icon_style">Icon style</string>
+    <string name="settings_icon_style_custom">Custom</string>
+    <string name="settings_music_player">Music player</string>
+    <string name="settings_sidebar">Sidebar</string>
+    <string name="settings_home_page">Home page</string>
+    <string name="settings_folders_files">Folder and files</string>
     <string name="settings_custom_theme_mode">Custom Theme Mode</string>
     <string name="settings_load_theme_pack">Load Theme Pack (.zip)</string>
     <string name="settings_clear_theme_pack">Clear Custom Theme</string>

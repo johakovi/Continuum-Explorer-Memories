@@ -292,7 +292,7 @@ fun HomeShortcutItem(
     onDismissMenu: () -> Unit,
     onAddStorage: (() -> Unit)? = null
 ) {
-    val iconTheme = SettingsManager.iconTheme.value
+    val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
 
     // Scale card components based on itemSize
     val cardHeight = (itemSize * 0.875f).coerceAtLeast(100.dp)
@@ -328,7 +328,7 @@ fun HomeShortcutItem(
                     )
                 } else {
                     Icon(
-                        painter = IconHelper.rememberThemePainter(resId = iconRes),
+                        painter = IconHelper.rememberThemePainter(resId = iconRes, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME),
                         contentDescription = null,
                         modifier = Modifier.size(iconSize),
                         tint = item.iconTint
@@ -453,12 +453,12 @@ fun HomeShortcutItem(
                             appState.appConfigs.toggleGalleryAlbums()
                         },
                         leadingIcon = {
-                            val iconTheme = SettingsManager.iconTheme.value
+                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
                             if (iconTheme == IconTheme.MATERIAL) {
                                 Icon(Icons.Default.Folder, null)
                             } else {
                                 val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                                Icon(IconHelper.rememberThemePainter(resId), null)
+                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
                             }
                         }
                     )
@@ -525,12 +525,12 @@ fun HomeShortcutItem(
                             appState.appConfigs.toggleMusicAlbums()
                         },
                         leadingIcon = {
-                            val iconTheme = SettingsManager.iconTheme.value
+                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
                             if (iconTheme == IconTheme.MATERIAL) {
                                 Icon(Icons.Default.Folder, null)
                             } else {
                                 val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                                Icon(IconHelper.rememberThemePainter(resId), null)
+                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
                             }
                         }
                     )
@@ -566,12 +566,12 @@ fun HomeShortcutItem(
                             item.onClick()
                         },
                         leadingIcon = {
-                            val iconTheme = SettingsManager.iconTheme.value
+                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
                             if (iconTheme == IconTheme.MATERIAL) {
                                 Icon(Icons.Default.Folder, null)
                             } else {
                                 val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                                Icon(IconHelper.rememberThemePainter(resId), null)
+                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
                             }
                         }
                     )

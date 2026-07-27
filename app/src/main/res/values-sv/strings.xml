@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Avbryt</string>
+    <string name="revert">Återställ</string>
     <string name="ok">OK</string>
     <string name="close">Stäng</string>
     <string name="yes">Ja</string>
@@ -551,6 +552,12 @@
     <string name="settings_timeout_minutes">%1$d minuter</string>
     <string name="settings_timeout_disabled">Aldrig</string>
     <string name="settings_custom_theme">Temanpassning</string>
+    <string name="settings_icon_style">Ikonstil</string>
+    <string name="settings_icon_style_custom">Anpassad</string>
+    <string name="settings_music_player">Musikspelare</string>
+    <string name="settings_sidebar">Sidofält</string>
+    <string name="settings_home_page">Startsida</string>
+    <string name="settings_folders_files">Mappar och filer</string>
     <string name="settings_custom_theme_mode">Läge för anpassat tema</string>
     <string name="settings_load_theme_pack">Ladda temapaket (.zip)</string>
     <string name="settings_clear_theme_pack">Rensa anpassat tema</string>

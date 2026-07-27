@@ -204,10 +204,10 @@ fun AddToPlaylistContent(onDismiss: () -> Unit) {
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val iconTheme = SettingsManager.iconTheme.value
+                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
                         val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_playlist_duo else R.drawable.ic_music_playlist
                         Icon(
-                            painter = IconHelper.rememberThemePainter(resId = resId),
+                            painter = IconHelper.rememberThemePainter(resId = resId, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary

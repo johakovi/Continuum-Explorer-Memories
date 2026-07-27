@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Отмена</string>
+    <string name="revert">Вернуть</string>
     <string name="ok">ОК</string>
     <string name="close">Закрыть</string>
     <string name="yes">Да</string>
@@ -552,6 +553,12 @@
     <string name="settings_timeout_minutes">%1$d минут</string>
     <string name="settings_timeout_disabled">Никогда</string>
     <string name="settings_custom_theme">Настройка темы</string>
+    <string name="settings_icon_style">Стиль иконок</string>
+    <string name="settings_icon_style_custom">Пользовательский</string>
+    <string name="settings_music_player">Музыкальный плеер</string>
+    <string name="settings_sidebar">Боковая панель</string>
+    <string name="settings_home_page">Главная страница</string>
+    <string name="settings_folders_files">Папки и файлы</string>
     <string name="settings_custom_theme_mode">Режим пользовательской темы</string>
     <string name="settings_load_theme_pack">Загрузить пакет темы (.zip)</string>
     <string name="settings_clear_theme_pack">Очистить пользовательскую тему</string>

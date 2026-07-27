@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">Cancelar</string>
+    <string name="revert">Reverter</string>
     <string name="ok">OK</string>
     <string name="close">Fechar</string>
     <string name="yes">Sim</string>
@@ -553,6 +554,12 @@
     <string name="settings_timeout_minutes">%1$d minutos</string>
     <string name="settings_timeout_disabled">Nunca</string>
     <string name="settings_custom_theme">Personalização do tema</string>
+    <string name="settings_icon_style">Estilo de ícone</string>
+    <string name="settings_icon_style_custom">Personalizado</string>
+    <string name="settings_music_player">Reprodutor de música</string>
+    <string name="settings_sidebar">Barra lateral</string>
+    <string name="settings_home_page">Página inicial</string>
+    <string name="settings_folders_files">Pastas e arquivos</string>
     <string name="settings_custom_theme_mode">Modo de tema personalizado</string>
     <string name="settings_load_theme_pack">Carregar pacote de tema (.zip)</string>
     <string name="settings_clear_theme_pack">Limpar tema personalizado</string>

@@ -52,6 +52,13 @@ enum class IconTheme {
     MATERIAL
 }
 
+enum class IconStyle {
+    MATERIAL,
+    COLOURFUL,
+    COLOURFULDUO,
+    CUSTOM
+}
+
 object SettingsManager {
     private const val PREFS_NAME = "explorer_settings"
     private const val KEY_DELETE_BEHAVIOR = "delete_behavior"
@@ -63,6 +70,11 @@ object SettingsManager {
     private const val KEY_THEME_CONTENT = "theme_content"
     private const val KEY_THEME_TOP = "theme_top"
     private const val KEY_ICON_THEME = "icon_theme"
+    private const val KEY_ICON_STYLE = "icon_style"
+    private const val KEY_MUSIC_ICON_THEME = "music_icon_theme"
+    private const val KEY_SIDEBAR_ICON_THEME = "sidebar_icon_theme"
+    private const val KEY_FOLDER_ICON_THEME = "folder_icon_theme"
+    private const val KEY_HOME_ICON_THEME = "home_icon_theme"
     private const val KEY_CUSTOM_THEME_MODE = "custom_theme_mode"
 
     private const val KEY_LANGUAGE = "language"
@@ -122,6 +134,21 @@ object SettingsManager {
 
     private val _iconTheme = mutableStateOf(IconTheme.COLOURFUL)
     val iconTheme: State<IconTheme> = _iconTheme
+
+    private val _iconStyle = mutableStateOf(IconStyle.COLOURFUL)
+    val iconStyle: State<IconStyle> = _iconStyle
+
+    private val _musicIconTheme = mutableStateOf(IconTheme.COLOURFUL)
+    val musicIconTheme: State<IconTheme> = _musicIconTheme
+
+    private val _sidebarIconTheme = mutableStateOf(IconTheme.COLOURFUL)
+    val sidebarIconTheme: State<IconTheme> = _sidebarIconTheme
+
+    private val _folderIconTheme = mutableStateOf(IconTheme.COLOURFUL)
+    val folderIconTheme: State<IconTheme> = _folderIconTheme
+
+    private val _homeIconTheme = mutableStateOf(IconTheme.COLOURFUL)
+    val homeIconTheme: State<IconTheme> = _homeIconTheme
 
     private val _customThemeMode = mutableStateOf(ThemeMode.SYSTEM)
     val customThemeMode: State<ThemeMode> = _customThemeMode
@@ -274,6 +301,41 @@ object SettingsManager {
         val savedIconTheme = prefs.getString(KEY_ICON_THEME, IconTheme.COLOURFUL.name)
         _iconTheme.value = try {
             IconTheme.valueOf(savedIconTheme ?: IconTheme.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconTheme.COLOURFUL
+        }
+
+        val savedIconStyle = prefs.getString(KEY_ICON_STYLE, IconStyle.COLOURFUL.name)
+        _iconStyle.value = try {
+            IconStyle.valueOf(savedIconStyle ?: IconStyle.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconStyle.COLOURFUL
+        }
+
+        val savedMusicIconTheme = prefs.getString(KEY_MUSIC_ICON_THEME, IconTheme.COLOURFUL.name)
+        _musicIconTheme.value = try {
+            IconTheme.valueOf(savedMusicIconTheme ?: IconTheme.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconTheme.COLOURFUL
+        }
+
+        val savedSidebarIconTheme = prefs.getString(KEY_SIDEBAR_ICON_THEME, IconTheme.COLOURFUL.name)
+        _sidebarIconTheme.value = try {
+            IconTheme.valueOf(savedSidebarIconTheme ?: IconTheme.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconTheme.COLOURFUL
+        }
+
+        val savedFolderIconTheme = prefs.getString(KEY_FOLDER_ICON_THEME, IconTheme.COLOURFUL.name)
+        _folderIconTheme.value = try {
+            IconTheme.valueOf(savedFolderIconTheme ?: IconTheme.COLOURFUL.name)
+        } catch (_: Exception) {
+            IconTheme.COLOURFUL
+        }
+
+        val savedHomeIconTheme = prefs.getString(KEY_HOME_ICON_THEME, IconTheme.COLOURFUL.name)
+        _homeIconTheme.value = try {
+            IconTheme.valueOf(savedHomeIconTheme ?: IconTheme.COLOURFUL.name)
         } catch (_: Exception) {
             IconTheme.COLOURFUL
         }
@@ -480,6 +542,59 @@ object SettingsManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_ICON_THEME, mode.name).apply()
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setIconStyle(context: Context, style: IconStyle) {
+        _iconStyle.value = style
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_ICON_STYLE, style.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setMusicIconTheme(context: Context, theme: IconTheme) {
+        _musicIconTheme.value = theme
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_MUSIC_ICON_THEME, theme.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setSidebarIconTheme(context: Context, theme: IconTheme) {
+        _sidebarIconTheme.value = theme
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_SIDEBAR_ICON_THEME, theme.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setFolderIconTheme(context: Context, theme: IconTheme) {
+        _folderIconTheme.value = theme
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_FOLDER_ICON_THEME, theme.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setHomeIconTheme(context: Context, theme: IconTheme) {
+        _homeIconTheme.value = theme
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_HOME_ICON_THEME, theme.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun getEffectiveIconTheme(category: IconCategory): IconTheme {
+        val style = _iconStyle.value
+        if (style == IconStyle.CUSTOM) {
+            return when (category) {
+                IconCategory.SIDEBAR -> _sidebarIconTheme.value
+                IconCategory.MUSIC -> _musicIconTheme.value
+                IconCategory.FILES_FOLDERS -> _folderIconTheme.value
+                IconCategory.HOME -> _homeIconTheme.value
+            }
+        }
+        return when (style) {
+            IconStyle.MATERIAL -> IconTheme.MATERIAL
+            IconStyle.COLOURFUL -> IconTheme.COLOURFUL
+            IconStyle.COLOURFULDUO -> IconTheme.COLOURFULDUO
+            else -> IconTheme.COLOURFUL
+        }
     }
 
     fun setCustomThemeMode(context: Context, mode: ThemeMode) {
@@ -698,4 +813,11 @@ object SettingsManager {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_NAV_NETWORK_EXPANDED, expanded).apply()
     }
+}
+
+enum class IconCategory {
+    SIDEBAR,
+    MUSIC,
+    FILES_FOLDERS,
+    HOME
 }

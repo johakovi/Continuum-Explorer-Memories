@@ -96,7 +96,11 @@ import java.io.FileOutputStream
 object IconHelper {
 
     @Composable
-    fun rememberThemePainter(resId: Int, isDuoExempt: Boolean = false): Painter {
+    fun rememberThemePainter(
+        resId: Int,
+        isDuoExempt: Boolean = false,
+        category: com.troikoss.continuum_explorer.managers.IconCategory = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS
+    ): Painter {
         val context = LocalContext.current
         val pack by ThemePackManager.currentPack
         val name = remember(resId) { context.resources.getResourceEntryName(resId) }
@@ -108,7 +112,7 @@ object IconHelper {
             customBitmap = remember(name, pack) { ThemePackManager.getCustomIcon(name.removeSuffix("_duo")) }
         }
 
-        val iconTheme = SettingsManager.iconTheme.value
+        val iconTheme = SettingsManager.getEffectiveIconTheme(category)
         val isDuo = iconTheme == IconTheme.COLOURFULDUO
 
         return if (customBitmap != null) {
@@ -178,17 +182,18 @@ object IconHelper {
         providerId: String = "",
         iconSize: Dp = 24.dp,
         tint: Color = LocalExtendedColors.current.folderIcon,
-        isFavorite: Boolean = false
+        isFavorite: Boolean = false,
+        category: com.troikoss.continuum_explorer.managers.IconCategory = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS
     ) {
         val pack by ThemePackManager.currentPack
         val isCustomPack = pack != null
         val customColor = SettingsManager.getFolderColor(providerId.ifEmpty { path })
-        val finalTint = if (customColor != null) Color(customColor) else tint
+        val finalTint = customColor?.let { Color(it) } ?: tint
 
-        val iconTheme = SettingsManager.iconTheme.value
         val effectiveIconTheme = if (isCustomPack) {
-            if (iconTheme == IconTheme.COLOURFULDUO) IconTheme.COLOURFULDUO else IconTheme.COLOURFUL
-        } else iconTheme
+            val theme = SettingsManager.getEffectiveIconTheme(category)
+            if (theme == IconTheme.COLOURFULDUO) IconTheme.COLOURFULDUO else IconTheme.COLOURFUL
+        } else SettingsManager.getEffectiveIconTheme(category)
 
         if (effectiveIconTheme == IconTheme.MATERIAL) {
             val isFavFolder = isFavorite || name.equals("Favourites", ignoreCase = true) || providerId.contains("favourites", ignoreCase = true)
@@ -204,12 +209,11 @@ object IconHelper {
         val overlayRes = getOverlayIconRes(name, path, providerId)
         val rootCustomIconName = getRootFolderCustomIconName(name, providerId.ifEmpty { path })
         val rootCustomIcon = if (rootCustomIconName != null) {
-            val baseName = rootCustomIconName
             val isDuo = effectiveIconTheme == IconTheme.COLOURFULDUO
-            val fullName = if (isDuo) "${baseName}_duo" else baseName
+            val fullName = if (isDuo) "${rootCustomIconName}_duo" else rootCustomIconName
             var bmp = remember(fullName, pack) { ThemePackManager.getCustomIcon(fullName) }
             if (bmp == null && isDuo) {
-                bmp = remember(baseName, pack) { ThemePackManager.getCustomIcon(baseName) }
+                bmp = remember(rootCustomIconName, pack) { ThemePackManager.getCustomIcon(rootCustomIconName) }
             }
             bmp
         } else null
@@ -237,12 +241,12 @@ object IconHelper {
                     modifier = Modifier.fillMaxSize(),
                     tint = iconTint
                 )
-            } else if (packageName != null && effectiveIconTheme != IconTheme.MATERIAL) {
-                AppIcon(packageName, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_folder), modifier = modifier, iconSize = iconSize, tint = finalTint)
+            } else if (packageName != null) {
+                AppIcon(packageName, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_folder, category = category), modifier = modifier, iconSize = iconSize, tint = finalTint)
             } else {
                 val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
                 Icon(
-                    painter = rememberThemePainter(resId = baseFolderRes),
+                    painter = rememberThemePainter(resId = baseFolderRes, category = category),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     tint = finalTint
@@ -266,7 +270,7 @@ object IconHelper {
                 } else overlayRes
 
                 Icon(
-                    painter = rememberThemePainter(resId = finalOverlayRes),
+                    painter = rememberThemePainter(resId = finalOverlayRes, category = category),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.40f).offset(y = iconSize * 0.1f),
                     tint = Color.White
@@ -288,7 +292,16 @@ object IconHelper {
         val pack by ThemePackManager.currentPack
         val isCustomPack = pack != null
         val extendedColors = LocalExtendedColors.current
-        val iconTheme = SettingsManager.iconTheme.value
+        
+        val isAudio = file.name.lowercase().let { 
+            it.endsWith(".mp3") || it.endsWith(".wav") || it.endsWith(".ogg") ||
+            it.endsWith(".m4a") || it.endsWith(".flac") || file.mimeType?.startsWith("audio/") == true
+        }
+        
+        val category = if (isAudio) com.troikoss.continuum_explorer.managers.IconCategory.MUSIC 
+                       else com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS
+        
+        val iconTheme = SettingsManager.getEffectiveIconTheme(category)
         val effectiveIconTheme = if (isCustomPack) {
             if (iconTheme == IconTheme.COLOURFULDUO) IconTheme.COLOURFULDUO else IconTheme.COLOURFUL
         } else iconTheme
@@ -434,7 +447,7 @@ object IconHelper {
                         tint = iconTint
                     )
                 } else if (isShowingAppIcon) {
-                    AppIcon(packageName!!, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
+                    AppIcon(packageName, fallbackPainter = rememberThemePainter(resId = R.drawable.ic_nav_game_material), modifier = modifier, iconSize = iconSize, tint = finalTint)
                 } else {
                     val providerPath = file.providerId.ifEmpty { file.absolutePath }
                     val isMusicVirtual = providerPath.startsWith("virtual://music") || providerPath.startsWith("virtual://music_album:")
@@ -474,7 +487,7 @@ object IconHelper {
                             R.drawable.ic_nav_documents -> R.drawable.ic_nav_documents_duo
                             R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
                             R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
-                            R.drawable.ic_music_logo -> R.drawable.ic_music_logo_duo
+                            R.drawable.ic_music_logo -> R.drawable.ic_music_logo
                             R.drawable.ic_storage -> R.drawable.ic_storage_duo
                             else -> overlayRes
                         }
@@ -494,14 +507,12 @@ object IconHelper {
 
 
         val fallbackPainter = if (effectiveIconTheme == IconTheme.COLOURFUL || effectiveIconTheme == IconTheme.COLOURFULDUO) {
-            rememberThemePainter(resId = getDrawableForItem(file, effectiveIconTheme), isDuoExempt = isExempt)
+            rememberThemePainter(resId = getDrawableForItem(file, effectiveIconTheme), isDuoExempt = isExempt, category = category)
         } else {
             rememberVectorPainter(getIconForItem(file))
         }
 
         val name = file.name.lowercase()
-        val isAudio = name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") ||
-                name.endsWith(".m4a") || name.endsWith(".flac") || file.mimeType?.startsWith("audio/") == true
 
         if (!file.isDirectory && isMimeTypePreviewable(file)) {
             when {
@@ -520,7 +531,7 @@ object IconHelper {
                         } else {
                             val painterToUse = if (isAudio) {
                                 val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
-                                painterResource(audioRes)
+                                rememberThemePainter(resId = audioRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
                             } else fallbackPainter
                             if (finalTint == Color.Unspecified) {
                                 androidx.compose.foundation.Image(painter = painterToUse, contentDescription = null, modifier = Modifier.size(iconSize))
@@ -534,7 +545,7 @@ object IconHelper {
         } else {
             val painterToUse = if (isAudio) {
                 val audioRes = if (effectiveIconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music_duo else R.drawable.ic_music_music
-                painterResource(audioRes)
+                rememberThemePainter(resId = audioRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
             } else fallbackPainter
             if (finalTint == Color.Unspecified) {
                 androidx.compose.foundation.Image(
@@ -834,11 +845,11 @@ object IconHelper {
         }
 
         if (previewFiles.isEmpty()) {
-            val iconTheme = SettingsManager.iconTheme.value
+            val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
             val isDuo = iconTheme == IconTheme.COLOURFULDUO
             val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
             Icon(
-                painter = rememberThemePainter(resId = baseFolderRes),
+                painter = rememberThemePainter(resId = baseFolderRes, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS),
                 contentDescription = null,
                 modifier = modifier.size(iconSize),
                 tint = LocalExtendedColors.current.folderIcon
@@ -1156,7 +1167,7 @@ object IconHelper {
     }
 
     fun getFolderBitmap(context: Context, path: String, name: String): Bitmap {
-        val iconTheme = SettingsManager.iconTheme.value
+        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
         val folderRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
         val overlayRes = getOverlayIconRes(name, path, "")
 

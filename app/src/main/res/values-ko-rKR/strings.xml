@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">취소</string>
+    <string name="revert">되돌리기</string>
     <string name="ok">확인</string>
     <string name="close">닫기</string>
     <string name="yes">예</string>
@@ -552,6 +553,12 @@
     <string name="settings_timeout_minutes">%1$d분</string>
     <string name="settings_timeout_disabled">사용 안 함</string>
     <string name="settings_custom_theme">테마 사용자 지정</string>
+    <string name="settings_icon_style">아이콘 스타일</string>
+    <string name="settings_icon_style_custom">사용자 지정</string>
+    <string name="settings_music_player">음악 플레이어</string>
+    <string name="settings_sidebar">사이드바</string>
+    <string name="settings_home_page">홈 페이지</string>
+    <string name="settings_folders_files">폴더 및 파일</string>
     <string name="settings_custom_theme_mode">사용자 지정 테마 모드</string>
     <string name="settings_load_theme_pack">테마 팩 불러오기 (.zip)</string>
     <string name="settings_clear_theme_pack">맞춤 테마 지우기</string>

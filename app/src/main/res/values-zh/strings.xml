@@ -8,6 +8,7 @@
 
     <!-- General -->
     <string name="cancel">取消</string>
+    <string name="revert">还原</string>
     <string name="ok">确定</string>
     <string name="close">关闭</string>
     <string name="yes">是</string>
@@ -551,6 +552,12 @@
     <string name="settings_timeout_disabled">从不</string>
 
     <string name="settings_custom_theme">主题自定义</string>
+    <string name="settings_icon_style">图标样式</string>
+    <string name="settings_icon_style_custom">自定义</string>
+    <string name="settings_music_player">音乐播放器</string>
+    <string name="settings_sidebar">侧边栏</string>
+    <string name="settings_home_page">主页</string>
+    <string name="settings_folders_files">文件夹和文件</string>
     <string name="settings_custom_theme_mode">自定义主题模式</string>
     <string name="settings_load_theme_pack">加载主题包 (.zip)</string>
     <string name="settings_clear_theme_pack">清除自定义主题</string>
