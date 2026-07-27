@@ -529,7 +529,7 @@ fun BackgroundContextMenu(
                     HorizontalDivider()
                 }
 
-                if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                if (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_new)) },
                         leadingIcon = { Icon(Icons.Default.Add, null) },

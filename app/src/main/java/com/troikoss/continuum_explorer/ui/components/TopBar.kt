@@ -787,7 +787,7 @@ fun TopBar(
                 ) {
                     when (currentOptionsScreen) {
                         "MAIN" -> {
-                            if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                            if (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.folder)) },
                                     leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },

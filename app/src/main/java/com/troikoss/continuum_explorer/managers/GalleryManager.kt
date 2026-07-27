@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.managers
 import android.content.ContentResolver
 import android.content.Context
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
@@ -11,7 +12,7 @@ import java.io.File
 object GalleryManager {
     // Returns only the media files directly in dirPath (no subdirectories).
     fun getAlbumContents(context: Context, dirPath: String): List<UniversalFile> {
-        val mediaFiles = mutableListOf<UniversalFile>()
+        val items = mutableListOf<UniversalFile>()
 
         val projection = arrayOf(
             MediaStore.Files.FileColumns.DATA,
@@ -46,7 +47,7 @@ object GalleryManager {
 
                 while (c.moveToNext()) {
                     val path = c.getString(dataIndex) ?: continue
-                    mediaFiles.add(
+                    items.add(
                         UniversalFile(
                             name = c.getString(nameIndex) ?: File(path).name,
                             isDirectory = false,
@@ -63,7 +64,7 @@ object GalleryManager {
             e.printStackTrace()
         }
 
-        return mediaFiles
+        return items
     }
 
     fun getGalleryFiles(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
@@ -135,9 +136,39 @@ object GalleryManager {
     }
 
     fun getGalleryAlbums(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
-        // Flat list of all folders containing media, keyed by bucket name.
+        // Flat list of all folders containing media or subfolders, keyed by path to avoid duplicates.
         val albums = linkedMapOf<String, File>()
 
+        fun scanForAlbums(folder: File) {
+            if (!folder.exists() || !folder.isDirectory || folder.name.startsWith(".")) return
+            
+            // Add this folder as an album
+            albums[folder.absolutePath] = folder
+            
+            // Recursively scan subdirectories
+            folder.listFiles()?.forEach { sub ->
+                if (sub.isDirectory) {
+                    scanForAlbums(sub)
+                }
+            }
+        }
+
+        // 1. Scan allowed folders or default roots
+        if (allowedFolders.isNotEmpty()) {
+            allowedFolders.forEach { path ->
+                scanForAlbums(File(path))
+            }
+        } else {
+            val roots = listOf(
+                File(Environment.getExternalStorageDirectory(), "DCIM"),
+                File(Environment.getExternalStorageDirectory(), "Pictures")
+            )
+            roots.forEach { root ->
+                scanForAlbums(root)
+            }
+        }
+
+        // 2. Also query MediaStore to catch albums outside our common roots
         val projection = arrayOf(
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME
@@ -164,16 +195,12 @@ object GalleryManager {
 
             context.contentResolver.query(queryUri, projection, queryArgs, null)?.use { c ->
                 val dataIndex = c.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)
-                val bucketIndex = c.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
                 while (c.moveToNext()) {
                     val path = c.getString(dataIndex) ?: continue
-                    val bucketName = c.getString(bucketIndex) ?: continue
-                    if (bucketName !in albums) {
-                        val parentDir = File(path).parentFile
-                        if (parentDir != null) {
-                            albums[bucketName] = parentDir
-                        }
+                    val parentDir = File(path).parentFile
+                    if (parentDir != null && parentDir.absolutePath !in albums) {
+                        albums[parentDir.absolutePath] = parentDir
                     }
                 }
             }
@@ -181,14 +208,14 @@ object GalleryManager {
             e.printStackTrace()
         }
 
-        return albums.entries.sortedBy { it.key.lowercase() }.map { (name, dir) ->
+        return albums.entries.sortedBy { it.value.name.lowercase() }.map { (path, dir) ->
             UniversalFile(
-                name = name,
+                name = dir.name,
                 isDirectory = true,
                 lastModified = dir.lastModified(),
                 length = 0,
                 provider = LocalProvider,
-                providerId = dir.absolutePath,
+                providerId = path,
                 parentId = "virtual://gallery",
             )
         }

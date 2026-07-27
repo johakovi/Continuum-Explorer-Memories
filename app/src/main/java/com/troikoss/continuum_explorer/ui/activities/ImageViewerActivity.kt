@@ -21,6 +21,9 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,6 +37,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -44,19 +50,26 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.RotateRight
+import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import kotlin.math.abs
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -157,9 +170,11 @@ fun ImageViewerScreen(
 
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    var imageSize by remember { mutableStateOf(Size.Zero) }
+    var rotation by remember { mutableFloatStateOf(0f) }
 
     var currentUri by remember { mutableStateOf<Any?>(initialImageUri) }
+    val imageSizes = remember { mutableStateMapOf<Any, Size>() }
+    val imageSize: Size = currentUri?.let { imageSizes[it] } ?: Size.Zero
     var siblingImages by remember { mutableStateOf<List<Any>>(emptyList()) }
     var isProgrammaticPagerScroll by remember { mutableStateOf(false) }
     var isProgrammaticListScroll by remember { mutableStateOf(false) }
@@ -291,6 +306,7 @@ fun ImageViewerScreen(
     LaunchedEffect(currentUri) {
         scale = 1f
         offset = Offset.Zero
+        rotation = 0f
     }
 
     Scaffold { innerPadding ->
@@ -348,7 +364,12 @@ fun ImageViewerScreen(
                 if (imageSize == Size.Zero || imageSize.width == 0f || imageSize.height == 0f) {
                     return Pair(0f, 0f)
                 }
-                val imageAspect = imageSize.width / imageSize.height
+
+                val isRotated = (rotation.toInt() % 180 != 0)
+                val currentWidth = if (isRotated) imageSize.height else imageSize.width
+                val currentHeight = if (isRotated) imageSize.width else imageSize.height
+
+                val imageAspect = currentWidth / currentHeight
                 val screenAspect = screenWidthPx / screenHeightPx
                 val fittedWidth: Float
                 val fittedHeight: Float
@@ -379,10 +400,26 @@ fun ImageViewerScreen(
                             .fillMaxSize()
                             .then(if (isCurrent) {
                                 Modifier
-                                    .pointerInput(Unit) {
+                                    .pointerInput(screenWidthPx, screenHeightPx) {
                                         detectTapGestures(
                                             onTap = { onToggleFullscreen() },
-                                            onDoubleTap = { onToggleFullscreen() }
+                                            onDoubleTap = { tapOffset ->
+                                                if (scale > 1f) {
+                                                    scale = 1f
+                                                    offset = Offset.Zero
+                                                } else {
+                                                    val targetScale = 1.3f
+                                                    val zoomRatio = targetScale / scale
+                                                    val focalPoint = tapOffset - screenCenter
+                                                    val targetOffset = offset * zoomRatio + focalPoint * (1f - zoomRatio)
+                                                    scale = targetScale
+                                                    val (maxX, maxY) = calculatePanLimits()
+                                                    offset = Offset(
+                                                        x = targetOffset.x.coerceIn(-maxX, maxX),
+                                                        y = targetOffset.y.coerceIn(-maxY, maxY)
+                                                    )
+                                                }
+                                            }
                                         )
                                     }
                                     .contextMenuDetector { clickOffset ->
@@ -483,14 +520,17 @@ fun ImageViewerScreen(
                             model = item,
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
-                            onSuccess = { if (isCurrent) imageSize = it.painter.intrinsicSize },
+                            onSuccess = { 
+                                imageSizes[item] = it.painter.intrinsicSize
+                            },
                             modifier = Modifier
                                 .fillMaxSize()
                                 .graphicsLayer(
                                     scaleX = if (isCurrent) scale else 1f,
                                     scaleY = if (isCurrent) scale else 1f,
                                     translationX = if (isCurrent) offset.x else 0f,
-                                    translationY = if (isCurrent) offset.y else 0f
+                                    translationY = if (isCurrent) offset.y else 0f,
+                                    rotationZ = if (isCurrent) rotation else 0f
                                 )
                         )
                     }
@@ -720,7 +760,7 @@ fun ImageViewerScreen(
 
                 // Filmstrip overlay at the bottom
                 AnimatedVisibility(
-                    visible = siblingImages.size > 1 && !isFullscreen,
+                    visible = !isFullscreen,
                     enter = fadeIn() + slideInVertically { it },
                     exit = fadeOut() + slideOutVertically { it },
                     modifier = Modifier.align(Alignment.BottomCenter)
@@ -728,60 +768,144 @@ fun ImageViewerScreen(
                     val itemSizeDp = 64.dp
                     val horizontalPadding = (screenWidthDp - itemSizeDp) / 2
 
-                    LaunchedEffect(listState, isFilmstripDragged) {
-                        snapshotFlow {
-                            // We only update currentUri from the filmstrip if the user is explicitly dragging it
-                            // OR if the list is scrolling and it's NOT a programmatic scroll (e.g. mouse wheel)
-                            if (!isFilmstripDragged && isProgrammaticListScroll) return@snapshotFlow -1
-                            if (!listState.isScrollInProgress) return@snapshotFlow -1
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (siblingImages.size > 1) {
+                            LaunchedEffect(listState, isFilmstripDragged) {
+                                snapshotFlow {
+                                    // We only update currentUri from the filmstrip if the user is explicitly dragging it
+                                    // OR if the list is scrolling and it's NOT a programmatic scroll (e.g. mouse wheel)
+                                    if (!isFilmstripDragged && isProgrammaticListScroll) return@snapshotFlow -1
+                                    if (!listState.isScrollInProgress) return@snapshotFlow -1
 
-                            val layoutInfo = listState.layoutInfo
-                            if (layoutInfo.visibleItemsInfo.isEmpty()) return@snapshotFlow -1
-                            val centerOffset = layoutInfo.viewportStartOffset + (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
-                            var closestIndex = -1
-                            var minDistance = Int.MAX_VALUE
-                            for (item in layoutInfo.visibleItemsInfo) {
-                                val distance = abs(item.offset + item.size / 2 - centerOffset)
-                                if (distance < minDistance) {
-                                    minDistance = distance
-                                    closestIndex = item.index
+                                    val layoutInfo = listState.layoutInfo
+                                    if (layoutInfo.visibleItemsInfo.isEmpty()) return@snapshotFlow -1
+                                    val centerOffset = layoutInfo.viewportStartOffset + (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
+                                    var closestIndex = -1
+                                    var minDistance = Int.MAX_VALUE
+                                    for (item in layoutInfo.visibleItemsInfo) {
+                                        val distance = abs(item.offset + item.size / 2 - centerOffset)
+                                        if (distance < minDistance) {
+                                            minDistance = distance
+                                            closestIndex = item.index
+                                        }
+                                    }
+                                    closestIndex
+                                }.collect { index ->
+                                    if (index in siblingImages.indices) {
+                                        val newUri = siblingImages[index]
+                                        if (currentUri != newUri) {
+                                            currentUri = newUri
+                                        }
+                                    }
                                 }
                             }
-                            closestIndex
-                        }.collect { index ->
-                            if (index in siblingImages.indices) {
-                                val newUri = siblingImages[index]
-                                if (currentUri != newUri) {
-                                    currentUri = newUri
+
+                            LazyRow(
+                                state = listState,
+                                flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
+                                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                items(siblingImages) { imgUri ->
+                                    val isSelected = imgUri == currentUri
+                                    AsyncImage(
+                                        model = imgUri,
+                                        contentDescription = stringResource(R.string.media_thumbnail),
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(itemSizeDp)
+                                            .border(
+                                                width = if (isSelected) 1.dp else 0.dp,
+                                                color = if (isSelected) Color.White else Color.Transparent
+                                            )
+                                            .clickable { currentUri = imgUri }
+                                    )
                                 }
                             }
                         }
-                    }
 
-                    LazyRow(
-                        state = listState,
-                        flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
-                        contentPadding = PaddingValues(horizontal = horizontalPadding),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Black.copy(alpha = 0.6f))
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        items(siblingImages) { imgUri ->
-                            val isSelected = imgUri == currentUri
-                            AsyncImage(
-                                model = imgUri,
-                                contentDescription = stringResource(R.string.media_thumbnail),
-                                contentScale = ContentScale.Crop,
+                        // Control panel
+                        Surface(
+                            modifier = Modifier
+                                .padding(bottom = 24.dp, top = 8.dp)
+                                .height(56.dp),
+                            shape = CircleShape,
+                            color = Color(0xFF1E1E1E).copy(alpha = 0.85f),
+                        ) {
+                            Row(
                                 modifier = Modifier
-                                    .size(itemSizeDp)
-                                    .border(
-                                        width = if (isSelected) 1.dp else 0.dp,
-                                        color = if (isSelected) Color.White else Color.Transparent
-                                    )
-                            )
+                                    .padding(horizontal = 24.dp)
+                                    .fillMaxHeight(),
+                                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(onClick = { rotation = (rotation + 90f) % 360f }) {
+                                    Icon(Icons.AutoMirrored.Filled.RotateRight, contentDescription = "Rotate", tint = Color.White)
+                                }
+                                IconButton(onClick = {
+                                    currentUri?.let { data ->
+                                        try {
+                                            val contentUri = getSecureContentUri(context, data)
+                                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                type = "image/*"
+                                                putExtra(Intent.EXTRA_STREAM, contentUri)
+                                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                            }
+                                            context.startActivity(Intent.createChooser(shareIntent, resources.getString(R.string.msg_share_image_via)))
+                                        } catch (_: Exception) {
+                                            Toast.makeText(context, resources.getString(R.string.media_share_image_failed), Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Share, contentDescription = stringResource(R.string.menu_share), tint = Color.White)
+                                }
+                                IconButton(onClick = {
+                                    withImageFile(currentUri) { file ->
+                                        FileOperationsManager.start()
+                                        startPopUpActivity(context)
+                                        coroutineScope.launch {
+                                            deleteFiles(context, listOf(file.toUniversal()))
+                                            if (!file.exists()) {
+                                                val index = siblingImages.indexOf(currentUri)
+                                                val newList = siblingImages.filter { it != currentUri }
+                                                if (newList.isEmpty()) {
+                                                    activity?.finish()
+                                                } else {
+                                                    siblingImages = newList
+                                                    currentUri = if (index < newList.size) newList[index] else newList.last()
+                                                }
+                                                GlobalEvents.triggerRefresh()
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.menu_delete), tint = Color.White)
+                                }
+                                IconButton(onClick = {
+                                    currentUri?.let { data ->
+                                        try {
+                                            val contentUri = getSecureContentUri(context, data)
+                                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                                setDataAndType(contentUri, "image/*")
+                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                                            }
+                                            context.startActivity(Intent.createChooser(intent, resources.getString(R.string.menu_open_with)))
+                                        } catch (_: Exception) {
+                                            Toast.makeText(context, resources.getString(R.string.msg_failed_open_image), Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }) {
+                                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.menu_open_with), tint = Color.White)
+                                }
+                            }
                         }
                     }
                 }

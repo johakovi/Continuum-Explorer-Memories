@@ -214,11 +214,15 @@ private fun FileGalleryView(
                 contentScale = ContentScale.Crop
             )
 
-            FolderPreview(
-                folder = file,
-                thumbSize = contentSize/1.5f,
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
+            // Skip folder preview overlay in gallery mode if it's already a gallery album (which uses 2x2 grid)
+            val isGalleryAlbum = file.parentId == "virtual://gallery"
+            if (!isGalleryAlbum) {
+                FolderPreview(
+                    folder = file,
+                    thumbSize = contentSize / 1.5f,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                )
+            }
 
 
             if (!isMimeTypePreviewable(file) || file.isDirectory) {
@@ -285,11 +289,16 @@ private fun FileGridView(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                 iconSize = contentSize
             )
-            FolderPreview(
-                folder = file,
-                thumbSize = contentSize/2,
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
+
+            // Skip folder preview overlay if it's already a gallery album (which uses 2x2 grid)
+            val isGalleryAlbum = file.parentId == "virtual://gallery"
+            if (!isGalleryAlbum) {
+                FolderPreview(
+                    folder = file,
+                    thumbSize = contentSize / 2,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                )
+            }
         }
         TooltipBox(
             positionProvider = toolTipProvider,

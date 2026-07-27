@@ -844,34 +844,24 @@ object IconHelper {
             }
         }
 
-        if (previewFiles.isEmpty()) {
-            val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
-            val isDuo = iconTheme == IconTheme.COLOURFULDUO
-            val baseFolderRes = if (isDuo) R.drawable.ic_folder_duo else R.drawable.ic_folder
-            Icon(
-                painter = rememberThemePainter(resId = baseFolderRes, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS),
-                contentDescription = null,
-                modifier = modifier.size(iconSize),
-                tint = LocalExtendedColors.current.folderIcon
-            )
-        } else {
-            Box(modifier = modifier.size(iconSize).clip(RoundedCornerShape(8.dp))) {
-                Column {
-                    Row(modifier = Modifier.weight(1f)) {
-                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
-                            previewFiles.getOrNull(0)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
-                        }
-                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
-                            previewFiles.getOrNull(1)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
-                        }
+        val placeholderColor = Color.Black.copy(alpha = 0.3f)
+
+        Box(modifier = modifier.size(iconSize).clip(RoundedCornerShape(8.dp))) {
+            Column {
+                Row(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(placeholderColor)) {
+                        previewFiles.getOrNull(0)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
                     }
-                    Row(modifier = Modifier.weight(1f)) {
-                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
-                            previewFiles.getOrNull(2)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
-                        }
-                        Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(Color.Gray.copy(alpha = 0.1f))) {
-                            previewFiles.getOrNull(3)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
-                        }
+                    Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(placeholderColor)) {
+                        previewFiles.getOrNull(1)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                    }
+                }
+                Row(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(placeholderColor)) {
+                        previewFiles.getOrNull(2)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
+                    }
+                    Box(modifier = Modifier.weight(1f).fillMaxSize().padding(0.5.dp).background(placeholderColor)) {
+                        previewFiles.getOrNull(3)?.let { FileThumbnail(it, Modifier.fillMaxSize(), iconSize / 2, contentScale = ContentScale.Crop) }
                     }
                 }
             }
@@ -888,9 +878,9 @@ object IconHelper {
     ) {
         if (!folder.isDirectory) return
 
-        // Skip previews for folders in the root of internal storage or those with custom overlays
+        // Skip previews for folders in the root of internal storage, gallery albums (which use 2x2 grids), or those with custom overlays
         val internalRoot = android.os.Environment.getExternalStorageDirectory().absolutePath
-        if (folder.parentId == internalRoot || getOverlayIconRes(folder) != null) return
+        if (folder.parentId == internalRoot || folder.parentId == "virtual://gallery" || getOverlayIconRes(folder) != null) return
 
         val cacheKey = "${folder.provider.kind}:${folder.absolutePath}"
         var previewFile by remember(folder) {

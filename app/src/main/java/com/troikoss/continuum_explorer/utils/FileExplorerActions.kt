@@ -340,11 +340,29 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
 }
 
 fun FileExplorerState.createNewFolder() {
+    val targetPath = when {
+        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        }
+        else -> currentPath
+    }
+
     FileOperationsManager.openCreateFolder(context) { name ->
         FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.dialog_new_folder)) {
-            val success = createDirectory(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
+            val success = createDirectory(context, targetPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
+                    // If we created a folder at the Gallery root, ensure it's indexed/visible
+                    if (libraryItem == LibraryItem.Gallery && currentPath == null && targetPath != null) {
+                        val newFolderPath = File(targetPath, name).absolutePath
+                        val currentFolders = SettingsManager.galleryFolders.value
+                        val isAlreadyIndexed = currentFolders.any { newFolderPath.startsWith(it) }
+                        if (!isAlreadyIndexed) {
+                            val updatedFolders = currentFolders.toMutableSet().apply { add(newFolderPath) }
+                            SettingsManager.setGalleryFolders(context, updatedFolders)
+                        }
+                    }
+
                     refresh()?.join()
                     val newFile = files.find { it.name == name }
                     if (newFile != null) selectionManager.select(newFile)
