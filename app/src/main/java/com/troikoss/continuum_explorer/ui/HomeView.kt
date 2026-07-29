@@ -469,25 +469,6 @@ fun HomeShortcutItem(
                     val isFilterEnabled by SettingsManager.isMusicFilterEnabled
                     val context = LocalContext.current
 
-                    DropdownMenuItem(
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(stringResource(R.string.menu_gallery_show_all))
-                                if (!isFilterEnabled) {
-                                    Spacer(Modifier.weight(1f))
-                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                                }
-                            }
-                        },
-                        onClick = {
-                            onDismissMenu()
-                            if (isFilterEnabled) {
-                                SettingsManager.setMusicFilterEnabled(context, false)
-                                appState.refresh()
-                            }
-                        },
-                        leadingIcon = { Icon(Icons.Default.LibraryMusic, null) }
-                    )
 
                     DropdownMenuItem(
                         text = {
@@ -510,30 +491,6 @@ fun HomeShortcutItem(
                         leadingIcon = { Icon(Icons.Default.Folder, null) }
                     )
 
-                    DropdownMenuItem(
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(stringResource(R.string.menu_music_albums))
-                                if (appState.appConfigs.isMusicAlbumsEnabled) {
-                                    Spacer(Modifier.weight(1f))
-                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                                }
-                            }
-                        },
-                        onClick = {
-                            onDismissMenu()
-                            appState.appConfigs.toggleMusicAlbums()
-                        },
-                        leadingIcon = {
-                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
-                            if (iconTheme == IconTheme.MATERIAL) {
-                                Icon(Icons.Default.Folder, null)
-                            } else {
-                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
-                            }
-                        }
-                    )
 
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_sync_list)) },

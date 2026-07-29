@@ -176,7 +176,7 @@ class FileExplorerState(
                 } catch (_: Exception) {
                     null
                 }
-                
+
                 if (docId != null) {
                     val split = docId.split(":")
                     val rootId = split[0]
@@ -354,20 +354,20 @@ class FileExplorerState(
             libraryItem == LibraryItem.Music -> {
                 val pathStr = currentPath?.path ?: ""
                 val normalized = pathStr.replace("//", "/").removeSuffix("/")
-                
+
                 val isSongs = normalized.endsWith("/music/songs")
                 val isAlbumsRoot = normalized.endsWith("/music/albums")
                 val isFavourites = normalized.endsWith("/music/favourites")
                 val isPlaylists = normalized.endsWith("/music/playlists")
                 val isSpecificPlaylist = normalized.endsWith(".m3u") || normalized.endsWith(".m3u8") || normalized.endsWith(".wpl")
                 val isSpecificAlbum = normalized.contains("/music/albums/") || pathStr.contains("#album:")
-                
+
                 val albumName = when {
                     pathStr.contains("#album:") -> pathStr.substringAfterLast("#album:")
                     isSpecificAlbum -> pathStr.substringAfterLast("/")
                     else -> currentPath?.name ?: ""
                 }
-                
+
                 UniversalFile(
                     name = when {
                         isSongs -> context.getString(R.string.menu_music)

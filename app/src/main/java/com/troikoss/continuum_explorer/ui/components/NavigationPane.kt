@@ -1540,25 +1540,7 @@ private fun NavContextMenu(
                 val isFilterEnabled by SettingsManager.isMusicFilterEnabled
                 val context = LocalContext.current
 
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_gallery_show_all))
-                            if (!isFilterEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        if (isFilterEnabled) {
-                            SettingsManager.setMusicFilterEnabled(context, false)
-                            appState.refresh()
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.LibraryMusic, null) }
-                )
+
 
                 DropdownMenuItem(
                     text = {
@@ -1581,31 +1563,6 @@ private fun NavContextMenu(
                     leadingIcon = { Icon(Icons.Default.Folder, null) }
                 )
 
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_music_albums))
-                            if (appState.appConfigs.isMusicAlbumsEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        appState.appConfigs.toggleMusicAlbums()
-                    },
-                    leadingIcon = {
-                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
-                        if (iconTheme == IconTheme.MATERIAL) {
-                            Icon(Icons.Default.Folder, null)
-                        } else {
-                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
-                        }
-                    }
-                )
-                
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_create_playlist)) },
                     onClick = {
