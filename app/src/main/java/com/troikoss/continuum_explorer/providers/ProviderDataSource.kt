@@ -23,28 +23,33 @@ class ProviderDataSource @OptIn(UnstableApi::class) constructor
     override fun open(dataSpec: DataSpec): Long {
         uri = dataSpec.uri
         transferInitializing(dataSpec)
-        stream = when {
-            dataSpec.position > 0 && file.provider is WebDavProvider ->
-                file.provider.openRangeInput(file.providerId, dataSpec.position)
-            dataSpec.position > 0 && file.provider is FtpProvider ->
-                file.provider.openRangeInput(file.providerId, dataSpec.position)
-            dataSpec.position > 0 ->
-                file.provider.openInput(file.providerId).apply { skip(dataSpec.position) }
-            else ->
-                file.provider.openInput(file.providerId)
-        }
+        
+        val inputStream = file.provider.openInput(file.providerId, dataSpec.position)
+        stream = inputStream
+        
+        val totalLength = if (file.length > 0) file.length else C.LENGTH_UNSET.toLong()
+
         bytesRemaining = if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length
-        else if (file.length > 0) file.length - dataSpec.position
+        else if (totalLength != C.LENGTH_UNSET.toLong()) totalLength - dataSpec.position
         else C.LENGTH_UNSET.toLong()
+        
+        val responseLength = if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
+
         transferStarted(dataSpec)
-        return bytesRemaining
+        return responseLength
     }
 
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (bytesRemaining == 0L) return C.RESULT_END_OF_INPUT
         val toRead = if (bytesRemaining == C.LENGTH_UNSET.toLong()) length
         else minOf(length.toLong(), bytesRemaining).toInt()
-        val read = stream!!.read(buffer, offset, toRead)
+        
+        val read = try {
+            stream?.read(buffer, offset, toRead) ?: -1
+        } catch (_: Exception) {
+            -1
+        }
+
         if (read == -1) return C.RESULT_END_OF_INPUT
         if (bytesRemaining != C.LENGTH_UNSET.toLong()) bytesRemaining -= read
         bytesTransferred(read)

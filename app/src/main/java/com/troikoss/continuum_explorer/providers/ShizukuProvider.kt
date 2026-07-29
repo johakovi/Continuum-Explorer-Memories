@@ -76,9 +76,13 @@ object ShizukuProvider : StorageProvider {
         )
     }
 
-    override fun openInput(id: String): InputStream {
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
+
+    override fun openInput(id: String, offset: Long): InputStream {
         val fd = openReadFd(id) ?: throw java.io.IOException("Failed to open $id")
-        return ParcelFileDescriptor.AutoCloseInputStream(fd)
+        val stream = ParcelFileDescriptor.AutoCloseInputStream(fd)
+        if (offset > 0) stream.channel.position(offset)
+        return stream
     }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? = 

@@ -7,7 +7,9 @@ import android.os.Build
 import android.provider.Settings
 import android.webkit.MimeTypeMap
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.core.content.FileProvider
+import androidx.media3.common.util.UnstableApi
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -179,6 +181,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
 
     val isImage = mime?.startsWith("image/") == true || setOf("jpg", "jpeg", "png", "gif", "webp", "bmp").contains(extension)
     val isAudio = mime?.startsWith("audio/") == true || setOf("mp3", "wav", "ogg", "m4a", "aac", "flac").contains(extension)
+    val isVideo = mime?.startsWith("video/") == true || setOf("mp4", "mkv", "webm", "avi", "mov").contains(extension)
 
     scope.launch {
         try {
@@ -190,6 +193,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
                     putExtra("CURRENT_ID", file.providerId)
                     if (siblings.isNotEmpty()) {
                         putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+                        putExtra("SIBLING_LENGTHS", siblings.map { it.length }.toLongArray())
                     }
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
@@ -199,6 +203,21 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
 
             if (isAudio) {
                 AudioManager.play(context, file, siblings)
+                return@launch
+            }
+
+            if (isVideo) {
+                val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.VideoPlayerActivity::class.java).apply {
+                    putExtra("VIDEO_URI", file.providerId)
+                    putExtra("PROVIDER_KIND", file.provider.kind.name)
+                    putExtra("CONNECTION_ID", file.provider.connectionId)
+                    if (siblings.isNotEmpty()) {
+                        putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+                        putExtra("SIBLING_LENGTHS", siblings.map { it.length }.toLongArray())
+                    }
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
                 return@launch
             }
 
@@ -245,6 +264,7 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
 /**
  * Opens a restricted file (e.g. Android/data) by caching it to .temp first.
  */
+@OptIn(UnstableApi::class)
 fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
     scope.launch {
         try {
@@ -288,6 +308,7 @@ fun openRestrictedFile(context: Context, scope: CoroutineScope, file: UniversalF
  * Opens a file with the default system app.
  * Falls back to the "Open with" chooser if no default handles the type.
  */
+@OptIn(UnstableApi::class)
 fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile? = null, siblings: List<UniversalFile> = emptyList()) {
     if (file.provider.capabilities.isRemote) return // Must use openRemoteFile with a scope instead
 
@@ -309,6 +330,7 @@ fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile?
             putExtra("CURRENT_ID", if (originalFile != null) originalFile.providerId else file.providerId)
             if (siblings.isNotEmpty()) {
                 putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+                putExtra("SIBLING_LENGTHS", siblings.map { it.length }.toLongArray())
             }
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -345,6 +367,26 @@ fun openFile(context: Context, file: UniversalFile, originalFile: UniversalFile?
     val audioExtensions = setOf("mp3", "wav", "ogg", "m4a", "aac", "flac")
     if (audioExtensions.contains(extension) || mimeType.startsWith("audio/")) {
         AudioManager.play(context, file, siblings)
+        return
+    }
+
+    // Use internal Video Player
+    val videoExtensions = setOf("mp4", "mkv", "webm", "avi", "mov")
+    if (videoExtensions.contains(extension) || mimeType.startsWith("video/")) {
+        val intent = Intent(context, com.troikoss.continuum_explorer.ui.activities.VideoPlayerActivity::class.java).apply {
+            setData(uri)
+            putExtra("VIDEO_URI", if (originalFile != null) originalFile.providerId else file.providerId)
+            putExtra("VIDEO_LENGTH", file.length) // Pass main file length
+            putExtra("PROVIDER_KIND", file.provider.kind.name)
+            putExtra("CONNECTION_ID", file.provider.connectionId)
+            if (siblings.isNotEmpty()) {
+                putStringArrayListExtra("SIBLING_IDS", ArrayList(siblings.map { it.providerId }))
+                putExtra("SIBLING_LENGTHS", siblings.map { it.length }.toLongArray())
+            }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
         return
     }
 

@@ -67,8 +67,17 @@ object SafProvider : StorageProvider {
         return doc.findFile(name)?.toUniversalFile()
     }
 
-    override fun openInput(id: String): InputStream =
-        appContext.contentResolver.openInputStream(Uri.parse(id))!!
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
+
+    override fun openInput(id: String, offset: Long): InputStream {
+        val uri = Uri.parse(id)
+        if (offset <= 0) return appContext.contentResolver.openInputStream(uri)!!
+        
+        val pfd = appContext.contentResolver.openFileDescriptor(uri, "r") ?: throw java.io.IOException("Failed to open PFD")
+        return ParcelFileDescriptor.AutoCloseInputStream(pfd).apply {
+            if (offset > 0) channel.position(offset)
+        }
+    }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? =
         appContext.contentResolver.openFileDescriptor(Uri.parse(id), "r")

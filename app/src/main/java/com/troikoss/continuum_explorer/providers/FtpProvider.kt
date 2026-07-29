@@ -208,25 +208,14 @@ class FtpProvider(
         }
     }
 
-    override fun openInput(id: String): InputStream = runBlocking(Dispatchers.IO) {
-        mutex.lock()
-        try {
-            val stream = withDataConnection { c ->
-                c.retrieveFileStream(pathOf(id)) ?: throw NetworkProviderException("Cannot open stream for ${pathOf(id)}")
-            }
-            FtpManagedInputStream(client!!, mutex, stream, lockHeld = true)
-        } catch (e: Exception) {
-            mutex.unlock()
-            throw e
-        }
-    }
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
 
-    fun openRangeInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
+    override fun openInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
         mutex.lock()
         try {
             val stream = withDataConnection { c ->
                 c.restartOffset = offset
-                c.retrieveFileStream(pathOf(id)) ?: throw NetworkProviderException("Cannot open range stream for ${pathOf(id)}")
+                c.retrieveFileStream(pathOf(id)) ?: throw NetworkProviderException("Cannot open stream for ${pathOf(id)}")
             }
             FtpManagedInputStream(client!!, mutex, stream, lockHeld = true)
         } catch (e: Exception) {

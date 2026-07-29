@@ -26,7 +26,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.Closeable
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
@@ -43,9 +42,6 @@ import okio.BufferedSink
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.WaitResult
 import okhttp3.Call
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeoutOrNull
 
 class WebDavProvider(
     private val connection: NetworkConnection,
@@ -241,21 +237,17 @@ class WebDavProvider(
         } catch (_: Exception) { null }
     }
 
-    override fun openInput(id: String): InputStream = runBlocking(Dispatchers.IO) {
-        val req = Request.Builder().url(urlOf(id)).get().build()
-        val resp = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }
-        if (!resp.isSuccessful) throw NetworkProviderException("GET failed: ${resp.code}")
-        val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
-        WatchdogInputStream(stream)
-    }
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
 
-    fun openRangeInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
+    override fun openInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
         val req = Request.Builder().url(urlOf(id))
-            .header("Range", "bytes=$offset-").get().build()
+            .let { if (offset > 0) it.header("Range", "bytes=$offset-") else it }
+            .get().build()
         val resp = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }
-        if (resp.code != 206 && !resp.isSuccessful) {
+        if (offset > 0 && resp.code != 206 && !resp.isSuccessful) {
             throw NetworkProviderException("Range GET failed: ${resp.code}")
         }
+        if (offset == 0L && !resp.isSuccessful) throw NetworkProviderException("GET failed: ${resp.code}")
         val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
         WatchdogInputStream(stream)
     }

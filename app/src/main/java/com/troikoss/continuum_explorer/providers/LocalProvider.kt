@@ -114,11 +114,15 @@ object LocalProvider : StorageProvider {
         return null
     }
 
-    override fun openInput(id: String): InputStream {
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
+
+    override fun openInput(id: String, offset: Long): InputStream {
         if (isRestrictedPath(id) && ShizukuManager.hasPermission()) {
-            return ShizukuProvider.openInput(id)
+            return ShizukuProvider.openInput(id, offset)
         }
-        return FileInputStream(id)
+        val fis = FileInputStream(id)
+        if (offset > 0) fis.channel.position(offset)
+        return fis
     }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? {

@@ -51,7 +51,6 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.RotateRight
-import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.DropdownMenu
@@ -59,7 +58,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -106,7 +104,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.content.FileProvider
 import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -129,7 +126,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 class ImageViewerActivity : FullscreenActivity() {
 
@@ -191,6 +187,7 @@ fun ImageViewerScreen(
                 val providerKind = intent?.getStringExtra("PROVIDER_KIND")
                 val connectionId = intent?.getStringExtra("CONNECTION_ID")
                 val siblingIds = intent?.getStringArrayListExtra("SIBLING_IDS")
+                val siblingLengths = intent?.getLongArrayExtra("SIBLING_LENGTHS")
 
                 if (providerKind != null && siblingIds != null) {
                     val kind = try { ProviderKind.valueOf(providerKind) } catch (_: Exception) { null }
@@ -207,12 +204,13 @@ fun ImageViewerScreen(
                     } else null
 
                     if (provider != null) {
-                        val images = siblingIds.map { id ->
+                        val images = siblingIds.mapIndexed { i, id ->
+                            val length = siblingLengths?.getOrNull(i) ?: 0L
                             UniversalFile(
                                 name = id.substringAfterLast('/'),
                                 isDirectory = false,
                                 lastModified = 0L,
-                                length = 0L,
+                                length = length,
                                 provider = provider,
                                 providerId = id,
                                 mimeType = null

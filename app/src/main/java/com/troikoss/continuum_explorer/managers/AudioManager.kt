@@ -3,20 +3,23 @@ package com.troikoss.continuum_explorer.managers
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.compose.runtime.*
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.ProviderDataSource
 import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 
 object AudioManager {
     private var exoPlayer: ExoPlayer? = null
@@ -89,6 +92,7 @@ object AudioManager {
         }
     }
 
+    @OptIn(UnstableApi::class)
     fun play(context: Context, file: UniversalFile, siblings: List<UniversalFile> = emptyList()) {
         init(context)
         isMinimized = false
@@ -116,7 +120,7 @@ object AudioManager {
             player.stop()
             player.clearMediaItems()
             
-            val mediaItems = playlist.map { track ->
+            val mediaSources = playlist.map { track ->
                 val songMetadata = MusicMetadataManager.getSongMetadata(track.providerId)
                 val metadata = MediaMetadata.Builder()
                     .setTitle(songMetadata?.title ?: track.name)
@@ -125,20 +129,27 @@ object AudioManager {
                     .setAlbumTitle(songMetadata?.album)
                     .setArtworkUri(songMetadata?.album?.let { albumName ->
                         MusicMetadataManager.getCoverPath(albumName, context)?.let { path ->
-                            Uri.fromFile(File(path))
+                            Uri.fromFile(java.io.File(path))
                         }
                     })
                     .build()
 
-                MediaItem.Builder()
-                    .setUri(getUriForUniversalFile(context, track))
-                    .setMediaId(track.providerId)
-                    .setMediaMetadata(metadata)
-                    .setTag(track)
-                    .build()
+                val dataSourceFactory = ProviderDataSource.Factory(track)
+                
+                val extension = track.name.substringAfterLast('.', "").lowercase()
+                val mimeType = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(MediaItem.Builder()
+                        .setUri(getUriForUniversalFile(context, track))
+                        .setMimeType(mimeType)
+                        .setMediaId(track.providerId)
+                        .setMediaMetadata(metadata)
+                        .setTag(track)
+                        .build())
             }
             
-            player.setMediaItems(mediaItems, index, 0L)
+            player.setMediaSources(mediaSources, index, 0L)
             player.prepare()
             player.play()
             currentTrack = playlist[index]

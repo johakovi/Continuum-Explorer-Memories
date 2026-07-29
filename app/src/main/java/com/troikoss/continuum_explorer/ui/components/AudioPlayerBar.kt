@@ -1,5 +1,6 @@
 package com.troikoss.continuum_explorer.ui.components
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -42,7 +43,9 @@ import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.addToPlaylist
 import androidx.compose.ui.res.stringResource
+import androidx.media3.common.util.UnstableApi
 
+@OptIn(UnstableApi::class)
 @Composable
 fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
     val currentTrack = AudioManager.currentTrack
@@ -302,7 +305,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(30.dp))
                                                 .clickable {
-                                                    AudioManager.play(context, file, playlist)
+                                                    AudioManager. play(context, file, playlist)
                                                 },
                                             colors = ListItemDefaults.colors(
                                                 containerColor = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color.Transparent
@@ -494,7 +497,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             shape = CircleShape,
                                             colors = IconButtonDefaults.filledIconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
-                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                                contentColor = MaterialTheme.colorScheme.surface
                                             )
                                         ) {
                                             AnimatedContent(
@@ -529,10 +532,10 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 onValueChange = { AudioManager.seekTo((it * duration).toLong()) },
                                 enabled = true,
                                 waveLength = 45.dp,
-                                waveHeight = if (isPlaying) 12.dp else 0.dp,
-                                waveVelocity = 20.dp to WaveDirection.TAIL,
+                                waveHeight = if (isPlaying) 11.dp else 0.dp,
+                                waveVelocity = 18.dp to WaveDirection.TAIL,
                                 waveThickness = 4.dp,
-                                trackThickness = 10.dp,
+                                trackThickness = 6.dp,
                                 incremental = true,
                                 colors = SliderDefaults2.colors(
                                     thumbColor = MaterialTheme.colorScheme.primary,

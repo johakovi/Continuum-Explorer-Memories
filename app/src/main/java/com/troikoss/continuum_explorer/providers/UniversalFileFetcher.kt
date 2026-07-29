@@ -9,7 +9,6 @@ import coil.fetch.SourceResult
 import coil.request.Options
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.model.UniversalFile
-import com.troikoss.continuum_explorer.utils.RemoteCache
 import okio.buffer
 import okio.source
 import okio.Path.Companion.toPath
@@ -48,24 +47,15 @@ class UniversalFileFetcher(
             }
         }
 
-        val useCache = file.provider.capabilities.isRemote
-        val source = if (useCache) {
-            val cachedFile = RemoteCache.cache(options.context, file)
-            ImageSource(
-                file = cachedFile.absolutePath.toPath(),
-                fileSystem = okio.FileSystem.SYSTEM
-            )
-        } else {
-            ImageSource(
-                source = file.provider.openInput(file.providerId).source().buffer(),
-                context = options.context,
-            )
-        }
+        val source = ImageSource(
+            source = file.provider.openInput(file.providerId).source().buffer(),
+            context = options.context,
+        )
 
         return SourceResult(
             source = source,
             mimeType = file.mimeType,
-            dataSource = if (useCache) DataSource.NETWORK else DataSource.DISK,
+            dataSource = if (file.provider.capabilities.isRemote) DataSource.NETWORK else DataSource.DISK,
         )
     }
 

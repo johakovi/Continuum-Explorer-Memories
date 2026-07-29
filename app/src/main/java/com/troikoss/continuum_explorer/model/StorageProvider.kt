@@ -43,6 +43,7 @@ interface StorageProvider {
     fun findChild(parentId: String, name: String): UniversalFile?
 
     fun openInput(id: String): InputStream
+    fun openInput(id: String, offset: Long): InputStream = openInput(id).apply { skip(offset) }
     fun openReadFd(id: String): ParcelFileDescriptor?
     fun getShareableUri(id: String): Uri?
 

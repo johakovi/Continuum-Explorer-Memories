@@ -284,10 +284,12 @@ class SftpProvider(
         }
     }
 
-    override fun openInput(id: String): InputStream = runBlocking(Dispatchers.IO) {
+    override fun openInput(id: String): InputStream = openInput(id, 0L)
+
+    override fun openInput(id: String, offset: Long): InputStream = runBlocking(Dispatchers.IO) {
         mutex.lock()
         try {
-            val stream = withSftpConnection { c -> c.get(pathOf(id)) }
+            val stream = withSftpConnection { c -> c.get(pathOf(id), null, offset) }
             SftpManagedInputStream(mutex, stream, lockHeld = true)
         } catch (e: Exception) {
             mutex.unlock()

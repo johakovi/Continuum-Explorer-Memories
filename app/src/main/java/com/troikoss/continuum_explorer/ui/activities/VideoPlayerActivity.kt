@@ -2,6 +2,7 @@ package com.troikoss.continuum_explorer.ui.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.net.Uri
 import android.media.MediaMetadataRetriever
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -46,7 +47,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
@@ -110,11 +110,17 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.model.ProviderKind
+import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
+import com.troikoss.continuum_explorer.utils.AppConfigurations
+import com.troikoss.continuum_explorer.providers.ProviderDataSource
 import com.troikoss.continuum_explorer.utils.getSiblingFiles
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -149,6 +155,7 @@ enum class ResizeMode(val labelRes: Int, val value: Int) {
 // ── Activity ──────────────────────────────────────────────────────────────────
 
 class VideoPlayerActivity : FullscreenActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -186,6 +193,7 @@ fun VideoPlayerScreen(
 
     // ── Playback state ──────────────────────────────────────────────────────
     var isPlaying by remember { mutableStateOf(value = false) }
+    var playbackState by remember { mutableIntStateOf(Player.STATE_IDLE) }
     var hasNext  by remember { mutableStateOf(value = false) }
     var hasPrev  by remember { mutableStateOf(value = false) }
     var currentPosition by remember { mutableLongStateOf(0L) }
@@ -266,9 +274,14 @@ fun VideoPlayerScreen(
     }
 
     // ── Player listeners ────────────────────────────────────────────────────
+    var playerError by remember { mutableStateOf<String?>(null) }
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(playing: Boolean) { isPlaying = playing }
+            override fun onPlaybackStateChanged(state: Int) { playbackState = state }
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                playerError = error.message
+            }
             override fun onEvents(player: Player, events: Player.Events) {
                 hasNext = player.hasNextMediaItem()
                 hasPrev = player.hasPreviousMediaItem()
@@ -305,16 +318,86 @@ fun VideoPlayerScreen(
     // ── Load sibling videos ─────────────────────────────────────────────────
     LaunchedEffect(initialVideoUri) {
         if (initialVideoUri != null) {
-            val videoExtensions = setOf("mp4", "mkv", "webm", "avi", "mov")
-            val allVideos = getSiblingFiles(context, initialVideoUri, videoExtensions)
-            allVideos.forEach { uri -> exoPlayer.addMediaItem(MediaItem.fromUri(uri)) }
-            val targetName = initialVideoUri.toUri().lastPathSegment
-            val startIndex = if (targetName != null)
-                allVideos.indexOfFirst { it.toUri().lastPathSegment == targetName }.coerceAtLeast(0)
-            else 0
-            exoPlayer.seekTo(startIndex, 0L)
+            val intent = activity?.intent
+            val providerKindStr = intent?.getStringExtra("PROVIDER_KIND")
+            val connectionId = intent?.getStringExtra("CONNECTION_ID")
+            val siblingIds = intent?.getStringArrayListExtra("SIBLING_IDS")
+            val siblingLengths = intent?.getLongArrayExtra("SIBLING_LENGTHS")
+            val videoLength = intent?.getLongExtra("VIDEO_LENGTH", 0L) ?: 0L
+            val mediaSources = mutableListOf<androidx.media3.exoplayer.source.MediaSource>()
+            var startIndex = 0
+
+            if (providerKindStr != null) {
+                val kind = try { ProviderKind.valueOf(providerKindStr) } catch (_: Exception) { null }
+                if (kind != null) {
+                    val provider = if (kind.name.startsWith("NETWORK_") && connectionId != null) {
+                        val configs = AppConfigurations(context)
+                        val conn = configs.networkConnections.find { it.id == connectionId }
+                        if (conn != null) StorageProviders.network(conn) else null
+                    } else {
+                        try { StorageProviders.providerFor(kind) } catch (_: Exception) { null }
+                    }
+
+                    if (provider != null) {
+                        val idsToProcess = siblingIds ?: listOfNotNull(initialVideoUri)
+                        idsToProcess.forEachIndexed { i, id ->
+                            val name = id.substringAfterLast('/')
+                            val length = siblingLengths?.getOrNull(i) ?: if (id == initialVideoUri) videoLength else 0L
+                            val track = UniversalFile(
+                                name = name,
+                                isDirectory = false,
+                                lastModified = 0L,
+                                length = length,
+                                provider = provider,
+                                providerId = id
+                            )
+                            val dataSourceFactory = ProviderDataSource.Factory(track)
+                            
+                            val extension = id.substringAfterLast('.', "").lowercase()
+                            val mimeType = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+                            
+                            // Ensure valid URI for MediaItem
+                            val uri = if (id.contains("://")) Uri.parse(id) else Uri.fromFile(java.io.File(id))
+
+                            val mediaItem = MediaItem.Builder()
+                                .setUri(uri)
+                                .setMimeType(mimeType)
+                                .setMediaId(id)
+                                .setTag(track)
+                                .build()
+                            mediaSources.add(
+                                ProgressiveMediaSource.Factory(dataSourceFactory)
+                                    .createMediaSource(mediaItem)
+                            )
+                            // Compare IDs or URI strings
+                            if (id == initialVideoUri || uri.toString() == initialVideoUri || 
+                                id.substringAfterLast('/') == initialVideoUri?.substringAfterLast('/')) {
+                                startIndex = i
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (mediaSources.isEmpty()) {
+                val videoExtensions = setOf("mp4", "mkv", "webm", "avi", "mov")
+                val allVideos = getSiblingFiles(context, initialVideoUri, videoExtensions)
+                allVideos.forEach { uri -> exoPlayer.addMediaItem(MediaItem.fromUri(uri)) }
+                
+                // Better matching for local content:// URIs or paths
+                val targetUri = initialVideoUri.toUri()
+                startIndex = allVideos.indexOfFirst { 
+                    val itUri = it.toUri()
+                    itUri == targetUri || itUri.lastPathSegment == targetUri.lastPathSegment 
+                }.coerceAtLeast(0)
+                
+                exoPlayer.seekTo(startIndex, 0L)
+            } else {
+                exoPlayer.setMediaSources(mediaSources, startIndex, 0L)
+            }
+            
             exoPlayer.prepare()
-            exoPlayer.playWhenReady = true
+            exoPlayer.play() // Explicitly call play
             hasNext = exoPlayer.hasNextMediaItem()
             hasPrev = exoPlayer.hasPreviousMediaItem()
         }
@@ -350,12 +433,21 @@ fun VideoPlayerScreen(
     LaunchedEffect(showPauseIndicator)       { if (showPauseIndicator)       { delay(600); showPauseIndicator       = false } }
     LaunchedEffect(showPlayIndicator)        { if (showPlayIndicator)        { delay(600); showPlayIndicator        = false } }
 
+    var isRetrieverLoading by remember { mutableStateOf(false) }
+
     // ── Thumbnail generation ────────────────────────────────────────────────
     // Re-runs whenever the active media item changes (next/prev skip).
     LaunchedEffect(currentVideoUri) {
         thumbnailCache.clear()
         thumbnailAspectRatio = 16f / 9f
         val uri = currentVideoUri ?: return@LaunchedEffect
+        
+        // Don't run metadata retriever for remote files as it's slow and causes stalling
+        if (uri.startsWith("http") || uri.contains("://") && !uri.startsWith("file://") && !uri.startsWith("content://")) {
+            return@LaunchedEffect
+        }
+        
+        isRetrieverLoading = true
         // Wait for ExoPlayer to report a valid duration (works paused or playing).
         while (exoPlayer.duration <= 0L) { delay(200) }
         val duration = exoPlayer.duration
@@ -456,6 +548,22 @@ fun VideoPlayerScreen(
                     },
                     modifier = Modifier.fillMaxSize()
                 )
+
+                if (playbackState == Player.STATE_BUFFERING) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.White
+                    )
+                }
+
+                playerError?.let { err ->
+                    Text(
+                        text = err,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
             }
 
             // ── Indicators ──────────────────────────────────────────────────
@@ -640,7 +748,7 @@ fun VideoPlayerScreen(
                             val activeX = (fraction * size.width).coerceIn(0f, size.width)
                             val thumbR = if (seekbarHoverFraction != null) 6.dp.toPx() else 4.dp.toPx()
                             drawLine(Color.White.copy(alpha = 0.3f), Offset(0f, cy), Offset(size.width, cy), trackH, cap = StrokeCap.Round)
-                            if (activeX > 0f) drawLine(Color.Red, Offset(0f, cy), Offset(activeX, cy), trackH, cap = StrokeCap.Round)
+                            if (activeX > 0f) drawLine(color = Color.White, Offset(0f, cy), Offset(activeX, cy), trackH, cap = StrokeCap.Round)
                             drawCircle(Color.White, thumbR, Offset(activeX, cy))
                         }
                     }
@@ -730,7 +838,7 @@ fun VideoPlayerScreen(
                         // Loop indicator
                         if (loopEnabled) {
                             Icon(Icons.Default.Repeat, stringResource(R.string.media_loop),
-                                tint     = Color.Red,
+                                tint     = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
                                     .size(20.dp)
                                     .align(Alignment.CenterVertically)
@@ -753,7 +861,7 @@ fun VideoPlayerScreen(
                         if (playbackSpeed != 1f) {
                             Text(
                                 text  = "${playbackSpeed}×",
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(end = 8.dp)
@@ -843,7 +951,7 @@ fun VideoPlayerScreen(
                                         // Loop toggle
                                         DropdownMenuItem(
                                             leadingIcon  = { Icon(Icons.Default.Repeat, null,
-                                                tint = if (loopEnabled) Color.Red else Color.Gray) },
+                                                tint = if (loopEnabled) MaterialTheme.colorScheme.primary else Color.Gray) },
                                             text = { Text(if (loopEnabled) stringResource(R.string.media_loop_on) else stringResource(R.string.media_loop_off)) },
                                             trailingIcon = {
                                                 if (loopEnabled) Icon(Icons.Default.Check, null)
