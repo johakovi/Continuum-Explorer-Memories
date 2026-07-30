@@ -438,30 +438,6 @@ fun HomeShortcutItem(
                         leadingIcon = { Icon(Icons.Default.Folder, null) }
                     )
 
-                    DropdownMenuItem(
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(stringResource(R.string.menu_gallery_albums))
-                                if (appState.appConfigs.isGalleryAlbumsEnabled) {
-                                    Spacer(Modifier.weight(1f))
-                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                                }
-                            }
-                        },
-                        onClick = {
-                            onDismissMenu()
-                            appState.appConfigs.toggleGalleryAlbums()
-                        },
-                        leadingIcon = {
-                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
-                            if (iconTheme == IconTheme.MATERIAL) {
-                                Icon(Icons.Default.Folder, null)
-                            } else {
-                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
-                            }
-                        }
-                    )
                     HorizontalDivider()
                 }
 
