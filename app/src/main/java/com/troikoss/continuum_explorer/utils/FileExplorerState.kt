@@ -628,22 +628,38 @@ class FileExplorerState(
         isLoading = true
         accessError = null
 
+        val key = getCurrentStorageKey()
+        withContext(Dispatchers.Main) {
+            folderConfigs.resolveViewMode(key, libraryItem)
+            folderConfigs.resolveSortParams(key)
+            folderConfigs.resolveGridSize(key)
+            folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
+            folderConfigs.resolveColumnWidths(key)
+        }
+
+        val onIncrementalUpdate: (List<UniversalFile>) -> Unit = { partial ->
+            scope.launch(Dispatchers.Main) {
+                if (libraryItem == LibraryItem.Gallery) {
+                    val sorted = sortFiles(partial, folderConfigs.sortParams)
+                    files = sorted
+                    selectionManager.allFiles = files
+                }
+            }
+        }
+
         if (libraryItem == LibraryItem.Gallery && !forceRefresh) {
             val cachedList = withContext(Dispatchers.IO) {
                 when {
-                    currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = false, useCacheOnly = true)
-                    appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true)
-                    else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true)
+                    currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
+                    appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
+                    else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
                 }
             }
             if (cachedList.isNotEmpty()) {
-                val key = getCurrentStorageKey()
-                val sortParams = folderConfigs.sortParams
-                val sorted = sortFiles(cachedList, sortParams)
+                val sorted = sortFiles(cachedList, folderConfigs.sortParams)
                 withContext(Dispatchers.Main) {
                     files = sorted
                     selectionManager.allFiles = files
-                    // We don't set isLoading = false here as we want to continue loading fresh data
                 }
             }
         }
@@ -658,9 +674,6 @@ class FileExplorerState(
         // Resolve sort params early so files are sorted correctly during IO work.
         // ViewMode/gridSize/columnVisibility are resolved together with the file list
         // assignment so they never change before the new list is visible.
-        val key = getCurrentStorageKey()
-        folderConfigs.resolveSortParams(key)
-
         val sortParams = folderConfigs.sortParams
         val showHidden = SettingsManager.showHiddenFiles.value
 
@@ -675,9 +688,9 @@ class FileExplorerState(
                     LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
                     LibraryItem.Home -> emptyList()
                     LibraryItem.Gallery -> when {
-                        currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh)
-                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh)
-                        else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh)
+                        currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
+                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
+                        else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
                     }
                     LibraryItem.Music -> {
                         val pathStr = currentPath?.path ?: ""
@@ -771,10 +784,6 @@ class FileExplorerState(
             }
 
             withContext(Dispatchers.Main) {
-                folderConfigs.resolveViewMode(key, libraryItem)
-                folderConfigs.resolveGridSize(key)
-                folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
-                folderConfigs.resolveColumnWidths(key)
                 recycleBinMetadata = newMeta
                 files = sortedList
 
