@@ -294,6 +294,17 @@ fun FileExplorerRO(
                                 }
                             }
                         },
+                        onMoveTab = { from, to ->
+                            val movingState = tabs.removeAt(from)
+                            tabs.add(to, movingState)
+                            if (selectedTabIndex == from) {
+                                selectedTabIndex = to
+                            } else if (from < selectedTabIndex && to >= selectedTabIndex) {
+                                selectedTabIndex--
+                            } else if (from > selectedTabIndex && to <= selectedTabIndex) {
+                                selectedTabIndex++
+                            }
+                        },
                         onMenuClick = { scope.launch { drawerState.open() } },
                         appState = appState,
                         hideNavButtons = hideTopNav,
@@ -461,6 +472,7 @@ private fun ExplorerTopBar(
     onTabSelected: (Int) -> Unit,
     onAddTab: () -> Unit,
     onCloseTab: (FileExplorerState) -> Unit,
+    onMoveTab: (Int, Int) -> Unit,
     onMenuClick: () -> Unit,
     appState: FileExplorerState,
     hideNavButtons: Boolean = false,
@@ -481,7 +493,8 @@ private fun ExplorerTopBar(
                 selectedTabIndex = selectedTabIndex,
                 onTabSelected = onTabSelected,
                 onAddTab = onAddTab,
-                onCloseTab = onCloseTab
+                onCloseTab = onCloseTab,
+                onMoveTab = onMoveTab
             )
 
             TopBar(

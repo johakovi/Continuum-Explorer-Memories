@@ -1,8 +1,11 @@
 package com.troikoss.continuum_explorer.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -11,6 +14,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.asPaddingValues
@@ -22,6 +26,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -41,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,9 +70,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.IconTheme
@@ -78,6 +86,7 @@ import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private val TAB_SLOT_MIN = 100.dp  // minimum total slot width per tab (inc. 4dp side padding)
 private val TAB_SLOT_MAX = 204.dp  // maximum total slot width per tab (inc. 4dp side padding)
@@ -90,6 +99,7 @@ fun TabBar(
     onTabSelected: (Int) -> Unit,
     onAddTab: () -> Unit,
     onCloseTab: (FileExplorerState) -> Unit,
+    onMoveTab: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -98,6 +108,9 @@ fun TabBar(
     val density = LocalDensity.current
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    var draggingState by remember { mutableStateOf<FileExplorerState?>(null) }
+    var dragOffset by remember { mutableFloatStateOf(0f) }
 
     val isInWindowMode = remember(configuration) {
         val isMulti = try {
@@ -238,24 +251,38 @@ fun TabBar(
                             rememberVectorPainter(Icons.Default.Folder)
                         }
 
-                        // Visibility logic: Immediate for the first tab of a window to avoid DeX startup races
+                        val isDragging = draggingState == state
+                        val itemOffset = if (isDragging) dragOffset else 0f
+                        
+                        val animatedOffset = remember { Animatable(0f) }
+                        LaunchedEffect(index, isDragging) {
+                            if (!isDragging) {
+                                animatedOffset.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                                )
+                            }
+                        }
+
+                        // Visibility logic
                         var isActuallyClosing by remember(state) { mutableStateOf(false) }
                         val isInitialTab = remember { index == 0 && tabStates.size == 1 }
                         var isVisible by remember(state) { mutableStateOf(isInitialTab) }
 
-                        val isLayoutReady = currentMaxWidth > 0.dp
-                        LaunchedEffect(state, isLayoutReady) {
-                            if (isLayoutReady && !isVisible) {
-                                if (!isInitialTab) delay(1)
+                        LaunchedEffect(state) {
+                            if (!isVisible) {
+                                if (!isInitialTab) delay(10)
                                 isVisible = true
                             }
                         }
 
                         AnimatedVisibility(
                             visible = isVisible && !isActuallyClosing,
-                            enter = if (isInitialTab) androidx.compose.animation.EnterTransition.None else (expandHorizontally(animationSpec = tween(200)) + fadeIn(tween(200))),
+                            enter = if (isInitialTab) androidx.compose.animation.EnterTransition.None else (expandHorizontally(animationSpec = tween(250)) + fadeIn(tween(250))),
                             exit = shrinkHorizontally(animationSpec = tween(200)) + fadeOut(tween(200)),
-                            modifier = if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier
+                            modifier = Modifier
+                                .offset { IntOffset((itemOffset + animatedOffset.value).roundToInt(), 0) }
+                                .zIndex(if (isDragging) 1f else 0f)
                         ) {
                             TabItem(
                                 text = state.currentName,
@@ -263,14 +290,64 @@ fun TabBar(
                                 slotWidth = slotWidth,
                                 selected = (selectedTabIndex == index),
                                 canClose = tabStates.size > 1,
+                                isDragging = isDragging,
                                 onClick = { onTabSelected(index) },
                                 onClose = {
                                     isActuallyClosing = true
                                     coroutineScope.launch {
-                                        delay(200) // Match exit animation duration
+                                        delay(200)
                                         onCloseTab(state)
                                     }
-                                }
+                                },
+                                modifier = Modifier
+                                    .pointerInput(state) {
+                                        detectHorizontalDragGestures(
+                                            onDragStart = {
+                                                draggingState = state
+                                                dragOffset = 0f
+                                                coroutineScope.launch { animatedOffset.snapTo(0f) }
+                                            },
+                                            onDragEnd = {
+                                                draggingState = null
+                                                coroutineScope.launch {
+                                                    animatedOffset.snapTo(dragOffset)
+                                                    dragOffset = 0f
+                                                    animatedOffset.animateTo(
+                                                        0f,
+                                                        spring(stiffness = Spring.StiffnessMediumLow)
+                                                    )
+                                                }
+                                            },
+                                            onDragCancel = {
+                                                draggingState = null
+                                                coroutineScope.launch {
+                                                    animatedOffset.snapTo(dragOffset)
+                                                    dragOffset = 0f
+                                                    animatedOffset.animateTo(
+                                                        0f,
+                                                        spring(stiffness = Spring.StiffnessMediumLow)
+                                                    )
+                                                }
+                                            },
+                                            onHorizontalDrag = { change, dragAmount ->
+                                                change.consume()
+                                                dragOffset += dragAmount
+
+                                                val currentIndex = tabStates.indexOf(state)
+                                                if (currentIndex != -1) {
+                                                    val threshold = with(density) { slotWidth.toPx() }
+                                                    if (dragOffset > threshold / 2 && currentIndex < tabStates.size - 1) {
+                                                        onMoveTab(currentIndex, currentIndex + 1)
+                                                        dragOffset -= threshold
+                                                    } else if (dragOffset < -threshold / 2 && currentIndex > 0) {
+                                                        onMoveTab(currentIndex, currentIndex - 1)
+                                                        dragOffset += threshold
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                                    .then(if (useInCaptionTabs) Modifier.systemGestureExclusion() else Modifier)
                             )
                         }
                     }
@@ -305,6 +382,7 @@ private fun TabItem(
     slotWidth: Dp,
     selected: Boolean,
     canClose: Boolean,
+    isDragging: Boolean = false,
     onClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -336,8 +414,8 @@ private fun TabItem(
                 bottom = if (themeTop == ThemeTopMode.FLOAT) 6.dp else 0.dp
             )
             .let {
-                if (themeTop == ThemeTopMode.FLOAT) {
-                    it.shadow(if (selected) 4.dp else 2.dp, shape)
+                if (isDragging || (selected && themeTop == ThemeTopMode.FLOAT)) {
+                    it.shadow(if (isDragging) 8.dp else 4.dp, shape)
                 } else {
                     it
                 }
