@@ -9,6 +9,9 @@ import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.OperationType
@@ -29,8 +32,8 @@ import java.util.ArrayDeque
  * Global state to track files that have been "Cut" so they can be moved (deleted) after pasting.
  */
 object PendingCut {
-    var files: List<UniversalFile> = emptyList()
-    var isActive: Boolean = false
+    var files by mutableStateOf<List<UniversalFile>>(emptyList())
+    var isActive by mutableStateOf(false)
     fun clear() {
         files = emptyList()
         isActive = false

@@ -424,6 +424,15 @@ fun FileExplorerSQ(
                 .navigationBarsPadding()
                 .padding(bottom = if (showBottomBar) 84.dp else 16.dp)
         )
+
+        ClipboardIndicator(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(bottom = if (showBottomBar) 140.dp else 80.dp),
+            backgroundColor = LocalExtendedColors.current.sidebarBackground,
+            contentColor = LocalExtendedColors.current.textColor
+        )
     }
 }
 
