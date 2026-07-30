@@ -161,7 +161,7 @@ class VideoPlayerActivity : FullscreenActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val videoUri = intent.data?.toString() ?: intent.getStringExtra("VIDEO_URI")
+        val videoUri = intent.getStringExtra("VIDEO_URI") ?: intent.data?.toString()
 
         setContent {
             FileExplorerTheme {

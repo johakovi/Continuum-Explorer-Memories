@@ -132,7 +132,7 @@ class ImageViewerActivity : FullscreenActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val imageUri = intent.data?.toString() ?: intent.getStringExtra("IMAGE_URI")
+        val imageUri = intent.getStringExtra("IMAGE_URI") ?: intent.data?.toString()
 
         setContent {
             FileExplorerTheme {
