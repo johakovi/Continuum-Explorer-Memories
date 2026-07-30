@@ -36,7 +36,14 @@ class UniversalFileFetcher(
                 }
             }
         } else if (isAudio) {
-            val coverPath = MusicMetadataManager.getCoverPathForSong(options.context, file)
+            var coverPath = MusicMetadataManager.getCoverPathForSong(options.context, file)
+            
+            // Incremental caching: if remote and not in cache, try to extract it now
+            if (coverPath == null && file.provider.capabilities.isRemote) {
+                MusicMetadataManager.extractAndCacheMetadata(options.context, file)
+                coverPath = MusicMetadataManager.getCoverPathForSong(options.context, file)
+            }
+
             if (coverPath != null) {
                 val coverFile = java.io.File(coverPath)
                 if (coverFile.exists()) {

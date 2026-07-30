@@ -12,6 +12,7 @@ import com.troikoss.continuum_explorer.providers.SafProvider
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.providers.ShizukuProvider
 import com.troikoss.continuum_explorer.utils.AppConfigurations
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -91,6 +92,7 @@ object MusicMetadataManager {
     private var albums: List<MusicAlbumMetadata> = emptyList()
     private var songs: List<MusicSongMetadata> = emptyList()
     private val favouriteState = mutableStateMapOf<String, Boolean>()
+    private val metadataMutex = kotlinx.coroutines.sync.Mutex()
 
     fun init(context: Context) {
         loadMetadata(context)
@@ -348,6 +350,27 @@ object MusicMetadataManager {
                         }
                     }
                 }
+                folderKey.startsWith("webdav://") || folderKey.startsWith("ftp://") || 
+                folderKey.startsWith("sftp://") || folderKey.startsWith("smb://") -> {
+                    val scheme = folderKey.substringBefore("://")
+                    val remaining = folderKey.substringAfter("://")
+                    val connId = remaining.substringBefore("/")
+                    val path = "/" + remaining.substringAfter("/", "")
+                    
+                    val kindName = when (scheme) {
+                        "webdav" -> ProviderKind.NETWORK_WEBDAV.name
+                        "ftp" -> ProviderKind.NETWORK_FTP.name
+                        "sftp" -> ProviderKind.NETWORK_SFTP.name
+                        "smb" -> ProviderKind.NETWORK_SMB.name
+                        else -> ""
+                    }
+
+                    val conn = appConfigs.networkConnections.find { it.id == connId }
+                    if (conn != null) {
+                        val provider = StorageProviders.network(conn)
+                        scanRemoteFolder(context, provider, path, kindName, connId, newAlbums, newSongs, retriever, coversFolder)
+                    }
+                }
                 folderKey.startsWith("content://") -> {
                     scanRemoteFolder(context, SafProvider, folderKey, ProviderKind.SAF.name, null, newAlbums, newSongs, retriever, coversFolder)
                 }
@@ -360,9 +383,11 @@ object MusicMetadataManager {
             }
         }
 
-        albums = newAlbums
-        songs = newSongs
-        saveMetadata(context)
+        metadataMutex.withLock {
+            albums = newAlbums
+            songs = newSongs
+            saveMetadata(context)
+        }
         try {
             retriever.release()
         } catch (e: Exception) {
@@ -569,6 +594,61 @@ object MusicMetadataManager {
                 length = 0L, provider = provider, providerId = song.filePath,
                 parentId = provider.parentId(song.filePath), mimeType = "audio/*"
             )
+        }
+    }
+
+    suspend fun extractAndCacheMetadata(context: Context, file: UniversalFile): MusicSongMetadata? {
+        val retriever = MediaMetadataRetriever()
+        val coversFolder = getCoversFolder(context)
+        return try {
+            retriever.setDataSource(UniversalMediaDataSource(file.provider, file.providerId, file.length))
+            
+            val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.name.substringBeforeLast('.')
+            val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+            val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: file.provider.displayName(file.parentId ?: "")
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
+            val trackNumber = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)?.toIntOrNull()
+
+            val song = MusicSongMetadata(
+                title = title, artist = artist, album = album, filePath = file.providerId,
+                duration = duration, trackNumber = trackNumber, lastSync = System.currentTimeMillis(),
+                providerKind = file.provider.kind.name, connectionId = file.provider.connectionId
+            )
+
+            metadataMutex.withLock {
+                // Update in-memory lists
+                val updatedSongs = songs.toMutableList()
+                updatedSongs.removeAll { it.filePath == file.providerId }
+                updatedSongs.add(song)
+                songs = updatedSongs
+
+                // Handle album and cover
+                val existingAlbum = albums.find { it.albumName == album }
+                if (existingAlbum == null) {
+                    var coverPath: String? = null
+                    val embeddedPicture = retriever.embeddedPicture
+                    if (embeddedPicture != null) {
+                        val coverFile = File(coversFolder, "${album.hashCode()}.jpg")
+                        if (!coverFile.exists()) coverFile.writeBytes(embeddedPicture)
+                        coverPath = coverFile.absolutePath
+                    }
+
+                    val newAlbum = MusicAlbumMetadata(
+                        albumName = album, artistName = artist, folderPath = file.parentId ?: "",
+                        trackCount = 1, lastSync = System.currentTimeMillis(),
+                        coverPath = coverPath, providerKind = file.provider.kind.name,
+                        connectionId = file.provider.connectionId
+                    )
+                    albums = albums + newAlbum
+                }
+                saveMetadata(context)
+            }
+            song
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        } finally {
+            try { retriever.release() } catch (_: Exception) {}
         }
     }
 }

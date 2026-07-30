@@ -244,10 +244,14 @@ class WebDavProvider(
             .let { if (offset > 0) it.header("Range", "bytes=$offset-") else it }
             .get().build()
         val resp = executeWithWatchdog(httpClient.newCall(req)) { it.execute() }
-        if (offset > 0 && resp.code != 206 && !resp.isSuccessful) {
-            throw NetworkProviderException("Range GET failed: ${resp.code}")
+        if (offset > 0 && resp.code != 206) {
+            resp.close()
+            throw NetworkProviderException("Range GET failed: ${resp.code}. Server must support 206 Partial Content for random access.")
         }
-        if (offset == 0L && !resp.isSuccessful) throw NetworkProviderException("GET failed: ${resp.code}")
+        if (offset == 0L && !resp.isSuccessful) {
+            resp.close()
+            throw NetworkProviderException("GET failed: ${resp.code}")
+        }
         val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
         WatchdogInputStream(stream)
     }
