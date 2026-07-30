@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.CopyAll
@@ -49,6 +51,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Splitscreen
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.TextFormat
@@ -76,6 +79,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
@@ -83,6 +87,8 @@ import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.ui.theme.ThemeFolderColors
 import com.troikoss.continuum_explorer.utils.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -553,6 +559,15 @@ fun BackgroundContextMenu(
                     onClick = { currentScreen = "VIEW" }
                 )
 
+                if (appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_music)) },
+                        leadingIcon = { Icon(Icons.Default.MusicNote, null) },
+                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                        onClick = { currentScreen = "MUSIC_MANAGER" }
+                    )
+                }
+
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_select_all)) },
                     leadingIcon = { Icon(Icons.Default.SelectAll, null) },
@@ -621,17 +636,6 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                if (appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.menu_create_playlist)) },
-                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) },
-                        onClick = {
-                            appState.createNewPlaylist()
-                            onDismiss()
-                        }
-                    )
-                }
-
                 if (appState.currentPath != null) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.folder)) },
@@ -650,6 +654,58 @@ fun BackgroundContextMenu(
                         }
                     )
                 }
+            }
+
+            "MUSIC_MANAGER" -> {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                    onClick = { currentScreen = "MAIN" }
+                )
+                HorizontalDivider()
+
+                val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.menu_music_folders))
+                            if (isFilterEnabled) {
+                                Spacer(Modifier.weight(1f))
+                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick = {
+                        onDismiss()
+                        if (!isFilterEnabled) {
+                            SettingsManager.setMusicFilterEnabled(context, true)
+                            appState.refresh()
+                        }
+                        appState.isConfiguringMusicFolders = true
+                    },
+                    leadingIcon = { Icon(Icons.Default.Folder, null) }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_create_playlist)) },
+                    onClick = {
+                        appState.createNewPlaylist()
+                        onDismiss()
+                    },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_sync_list)) },
+                    onClick = {
+                        onDismiss()
+                        appState.scope.launch(Dispatchers.IO) {
+                            MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
+                            GlobalEvents.triggerRefresh()
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Default.Sync, null) }
+                )
             }
 
             "SORT" -> {

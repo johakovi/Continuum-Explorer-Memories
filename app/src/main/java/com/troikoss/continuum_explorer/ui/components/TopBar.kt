@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import com.troikoss.continuum_explorer.managers.CleanupManager
+import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import androidx.compose.ui.unit.dp
@@ -69,6 +72,7 @@ import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.utils.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -807,6 +811,16 @@ fun TopBar(
                                 HorizontalDivider()
                             }
 
+                            if (appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.menu_music)) },
+                                    leadingIcon = { Icon(Icons.Default.MusicNote, null) },
+                                    trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                                    onClick = { currentOptionsScreen = "MUSIC_MANAGER" }
+                                )
+                                HorizontalDivider()
+                            }
+
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_view)) },
                                 leadingIcon = { Icon(Icons.Default.ViewModule, null) },
@@ -987,6 +1001,58 @@ fun TopBar(
                                     }
                                 )
                             }
+                        }
+
+                        "MUSIC_MANAGER" -> {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = { currentOptionsScreen = "MAIN" }
+                            )
+                            HorizontalDivider()
+
+                            val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = CenterVertically) {
+                                        Text(stringResource(R.string.menu_music_folders))
+                                        if (isFilterEnabled) {
+                                            Spacer(Modifier.weight(1f))
+                                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    if (!isFilterEnabled) {
+                                        SettingsManager.setMusicFilterEnabled(context, true)
+                                        appState.refresh()
+                                    }
+                                    appState.isConfiguringMusicFolders = true
+                                },
+                                leadingIcon = { Icon(Icons.Default.Folder, null) }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_create_playlist)) },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    appState.createNewPlaylist()
+                                },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_sync_list)) },
+                                onClick = {
+                                    optionsMenuExpanded = false
+                                    appState.scope.launch(Dispatchers.IO) {
+                                        MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
+                                        GlobalEvents.triggerRefresh()
+                                    }
+                                },
+                                leadingIcon = { Icon(Icons.Default.Sync, null) }
+                            )
                         }
                     }
                 }

@@ -1555,6 +1555,9 @@ private fun NavContextMenu(
     onNavigate: (() -> Unit)? = null,
     onAddStorageClick: (() -> Unit)? = null
 ) {
+    var currentScreen by remember { mutableStateOf("MAIN") }
+    LaunchedEffect(expanded) { if (!expanded) currentScreen = "MAIN" }
+
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
@@ -1569,310 +1572,328 @@ private fun NavContextMenu(
         Column(
             modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
         ) {
-            if (isLibrarySection && section !is NavSection.Home) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_remove)) },
-                    onClick = {
-                        onDismissRequest()
-                        when (section) {
-                            is NavSection.Recent -> appState.appConfigs.toggleRecentVisibility()
-                            is NavSection.Gallery -> appState.appConfigs.toggleGalleryVisibility()
-                            is NavSection.Music -> appState.appConfigs.toggleMusicVisibility()
-                            is NavSection.Downloads -> appState.appConfigs.toggleDownloadsVisibility()
-                            is NavSection.Documents -> appState.appConfigs.toggleDocumentsVisibility()
-                            is NavSection.Archives -> appState.appConfigs.toggleArchivesVisibility()
-                            is NavSection.Apks -> appState.appConfigs.toggleApksVisibility()
-                            is NavSection.Games -> appState.appConfigs.toggleGamesVisibility()
-                            is NavSection.RecycleBin -> appState.appConfigs.toggleTrashVisibility()
-                            else -> {}
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.VisibilityOff, null) }
-                )
-                HorizontalDivider()
-            }
-
-            if (section == NavSection.Games) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_add_storage)) },
-                    onClick = {
-                        onDismissRequest()
-                        if (onAddStorageClick != null) {
-                            appState.isAddingGameShortcut = true
-                            onAddStorageClick()
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Add, null) }
-                )
-                HorizontalDivider()
-            }
-
-            if (section is NavSection.Gallery) {
-                val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
-                val context = LocalContext.current
-
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_gallery_show_all))
-                            if (!isFilterEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        if (isFilterEnabled) {
-                            SettingsManager.setGalleryFilterEnabled(context, false)
-                            appState.refresh()
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Collections, null) }
-                )
-
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_gallery_folders))
-                            if (isFilterEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        if (!isFilterEnabled) {
-                            SettingsManager.setGalleryFilterEnabled(context, true)
-                            appState.refresh()
-                        }
-                        appState.isConfiguringGalleryFolders = true
-                    },
-                    leadingIcon = { Icon(Icons.Default.Folder, null) }
-                )
-
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_gallery_albums))
-                            if (appState.appConfigs.isGalleryAlbumsEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        appState.appConfigs.toggleGalleryAlbums()
-                    },
-                    leadingIcon = {
-                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
-                        if (iconTheme == IconTheme.MATERIAL) {
-                            Icon(Icons.Default.Folder, null)
-                        } else {
-                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
-                        }
+            when (currentScreen) {
+                "MAIN" -> {
+                    if (isLibrarySection && section !is NavSection.Home) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_remove)) },
+                            onClick = {
+                                onDismissRequest()
+                                when (section) {
+                                    is NavSection.Recent -> appState.appConfigs.toggleRecentVisibility()
+                                    is NavSection.Gallery -> appState.appConfigs.toggleGalleryVisibility()
+                                    is NavSection.Music -> appState.appConfigs.toggleMusicVisibility()
+                                    is NavSection.Downloads -> appState.appConfigs.toggleDownloadsVisibility()
+                                    is NavSection.Documents -> appState.appConfigs.toggleDocumentsVisibility()
+                                    is NavSection.Archives -> appState.appConfigs.toggleArchivesVisibility()
+                                    is NavSection.Apks -> appState.appConfigs.toggleApksVisibility()
+                                    is NavSection.Games -> appState.appConfigs.toggleGamesVisibility()
+                                    is NavSection.RecycleBin -> appState.appConfigs.toggleTrashVisibility()
+                                    else -> {}
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.VisibilityOff, null) }
+                        )
+                        HorizontalDivider()
                     }
-                )
-                HorizontalDivider()
-            }
 
-            if (section is NavSection.Music) {
-                val isFilterEnabled by SettingsManager.isMusicFilterEnabled
-                val context = LocalContext.current
+                    if (section == NavSection.Games) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.nav_add_storage)) },
+                            onClick = {
+                                onDismissRequest()
+                                if (onAddStorageClick != null) {
+                                    appState.isAddingGameShortcut = true
+                                    onAddStorageClick()
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.Add, null) }
+                        )
+                        HorizontalDivider()
+                    }
 
+                    if (section is NavSection.Gallery) {
+                        val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
+                        val context = LocalContext.current
 
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_gallery_show_all))
+                                    if (!isFilterEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                if (isFilterEnabled) {
+                                    SettingsManager.setGalleryFilterEnabled(context, false)
+                                    appState.refresh()
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.Collections, null) }
+                        )
 
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_music_folders))
-                            if (isFilterEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        if (!isFilterEnabled) {
-                            SettingsManager.setMusicFilterEnabled(context, true)
-                            appState.refresh()
-                        }
-                        appState.isConfiguringMusicFolders = true
-                    },
-                    leadingIcon = { Icon(Icons.Default.Folder, null) }
-                )
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_gallery_folders))
+                                    if (isFilterEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                if (!isFilterEnabled) {
+                                    SettingsManager.setGalleryFilterEnabled(context, true)
+                                    appState.refresh()
+                                }
+                                appState.isConfiguringGalleryFolders = true
+                            },
+                            leadingIcon = { Icon(Icons.Default.Folder, null) }
+                        )
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_create_playlist)) },
-                    onClick = {
-                        onDismissRequest()
-                        appState.createNewPlaylist()
-                    },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
-                )
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_sync_list)) },
-                    onClick = {
-                        onDismissRequest()
-                        appState.scope.launch(Dispatchers.IO) {
-                            MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
-                            GlobalEvents.triggerRefresh()
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Sync, null) }
-                )
-                HorizontalDivider()
-            }
-
-            if (onNavigate != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_open)) },
-                    onClick = {
-                        onDismissRequest()
-                        onNavigate()
-                    },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } // Using back arrow as a placeholder for "Open"
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_open_new_window)) },
-                    onClick = {
-                        onDismissRequest()
-                        when {
-                            section is NavSection.RecycleBin -> {
-                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                                appState.openInNewWindow(listOf(trashDir.toUniversal()))
-                            }
-                            path != null -> appState.openInNewWindow(listOf(File(path).toUniversal()))
-                            uri != null -> {
-                                DocumentFile.fromTreeUri(appState.context, uri)?.let {
-                                    appState.openInNewWindow(listOf(it.toUniversal()))
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_gallery_albums))
+                                    if (appState.appConfigs.isGalleryAlbumsEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                appState.appConfigs.toggleGalleryAlbums()
+                            },
+                            leadingIcon = {
+                                val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
+                                if (iconTheme == IconTheme.MATERIAL) {
+                                    Icon(Icons.Default.Folder, null)
+                                } else {
+                                    val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                    Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
                                 }
                             }
-                            else -> appState.openInNewWindow(emptyList())
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Tab, null) }
-                )
-            }
-
-            if (onEdit != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.nav_network_edit)) },
-                    onClick = {
-                        onDismissRequest()
-                        onEdit()
-                    },
-                    leadingIcon = { Icon(Icons.Default.Edit, null) }
-                )
-            }
-
-            if (onRename != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_rename)) },
-                    onClick = {
-                        onDismissRequest()
-                        onRename()
-                    },
-                    leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) }
-                )
-            }
-
-            if (onRemove != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_remove)) },
-                    onClick = {
-                        onDismissRequest()
-                        onRemove()
-                    },
-                    leadingIcon = { Icon(Icons.Default.Delete, null) }
-                )
-            }
-
-            if (section is NavSection.RecycleBin) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
-                    onClick = {
-                        onDismissRequest()
-                        appState.emptyRecycleBin()
-                    },
-                    leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
-                )
-            }
-
-            if (section is NavSection.Games) {
-                val isFtpEnabled by SettingsManager.isFtpServerEnabled
-                val ftpMode by SettingsManager.ftpMode
-                val context = LocalContext.current
-                
-                val isGamesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAMES
-
-                DropdownMenuItem(
-                    text = { Text(if (isGamesFtpActive) stringResource(R.string.nav_stop_ftp_game_manager) else stringResource(R.string.nav_start_ftp_game_manager)) },
-                    onClick = {
-                        onDismissRequest()
-                        if (isGamesFtpActive) {
-                            SettingsManager.setFtpServerEnabled(context, false)
-                        } else {
-                            SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAMES)
-                        }
-                    },
-                    leadingIcon = { Icon(if (isGamesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
-                )
-            }
-
-            if (section is NavSection.Documents) {
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.menu_documents_show_folders))
-                            if (appState.appConfigs.isDocumentsFolderEnabled) {
-                                Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        appState.appConfigs.toggleDocumentsFolder()
-                        onNavigate?.invoke()
-                    },
-                    leadingIcon = {
-                        val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
-                        if (iconTheme == IconTheme.MATERIAL) {
-                            Icon(Icons.Default.Folder, null)
-                        } else {
-                            val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
-                            Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
-                        }
+                        )
+                        HorizontalDivider()
                     }
-                )
-            }
-            if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.Music && section !is NavSection.NetworkStorage) {
-                HorizontalDivider()
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_properties)) },
-                    onClick = {
-                        onDismissRequest()
-                        when (section) {
-                            is NavSection.RecycleBin -> {
-                                val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
-                                appState.showProperties(listOf(trashDir.toUniversal()))
+
+                    if (section is NavSection.Music) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_music)) },
+                            leadingIcon = { Icon(Icons.Default.MusicNote, null) },
+                            trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                            onClick = { currentScreen = "MUSIC_MANAGER" }
+                        )
+                        HorizontalDivider()
+                    }
+
+                    if (onNavigate != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_open)) },
+                            onClick = {
+                                onDismissRequest()
+                                onNavigate()
+                            },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } // Using back arrow as a placeholder for "Open"
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_open_new_window)) },
+                            onClick = {
+                                onDismissRequest()
+                                when {
+                                    section is NavSection.RecycleBin -> {
+                                        val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                        appState.openInNewWindow(listOf(trashDir.toUniversal()))
+                                    }
+                                    path != null -> appState.openInNewWindow(listOf(File(path).toUniversal()))
+                                    uri != null -> {
+                                        DocumentFile.fromTreeUri(appState.context, uri)?.let {
+                                            appState.openInNewWindow(listOf(it.toUniversal()))
+                                        }
+                                    }
+                                    else -> appState.openInNewWindow(emptyList())
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.Tab, null) }
+                        )
+                    }
+
+                    if (onEdit != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.nav_network_edit)) },
+                            onClick = {
+                                onDismissRequest()
+                                onEdit()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Edit, null) }
+                        )
+                    }
+
+                    if (onRename != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_rename)) },
+                            onClick = {
+                                onDismissRequest()
+                                onRename()
+                            },
+                            leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) }
+                        )
+                    }
+
+                    if (onRemove != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_remove)) },
+                            onClick = {
+                                onDismissRequest()
+                                onRemove()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Delete, null) }
+                        )
+                    }
+
+                    if (section is NavSection.RecycleBin) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
+                            onClick = {
+                                onDismissRequest()
+                                appState.emptyRecycleBin()
+                            },
+                            leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
+                        )
+                    }
+
+                    if (section is NavSection.Games) {
+                        val isFtpEnabled by SettingsManager.isFtpServerEnabled
+                        val ftpMode by SettingsManager.ftpMode
+                        val context = LocalContext.current
+                        
+                        val isGamesFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.GAMES
+
+                        DropdownMenuItem(
+                            text = { Text(if (isGamesFtpActive) stringResource(R.string.nav_stop_ftp_game_manager) else stringResource(R.string.nav_start_ftp_game_manager)) },
+                            onClick = {
+                                onDismissRequest()
+                                if (isGamesFtpActive) {
+                                    SettingsManager.setFtpServerEnabled(context, false)
+                                } else {
+                                    SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.GAMES)
+                                }
+                            },
+                            leadingIcon = { Icon(if (isGamesFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+                        )
+                    }
+
+                    if (section is NavSection.Documents) {
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_documents_show_folders))
+                                    if (appState.appConfigs.isDocumentsFolderEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                appState.appConfigs.toggleDocumentsFolder()
+                                onNavigate?.invoke()
+                            },
+                            leadingIcon = {
+                                val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS)
+                                if (iconTheme == IconTheme.MATERIAL) {
+                                    Icon(Icons.Default.Folder, null)
+                                } else {
+                                    val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                    Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.FILES_FOLDERS), null)
+                                }
                             }
-                            else -> if (path != null) {
-                                appState.showProperties(listOf(File(path).toUniversal()))
-                            } else if (uri != null) {
-                                val doc = DocumentFile.fromTreeUri(appState.context, uri)
-                                if (doc != null) appState.showProperties(listOf(doc.toUniversal()))
+                        )
+                    }
+                    if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.Music && section !is NavSection.NetworkStorage) {
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_properties)) },
+                            onClick = {
+                                onDismissRequest()
+                                when (section) {
+                                    is NavSection.RecycleBin -> {
+                                        val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
+                                        appState.showProperties(listOf(trashDir.toUniversal()))
+                                    }
+                                    else -> if (path != null) {
+                                        appState.showProperties(listOf(File(path).toUniversal()))
+                                    } else if (uri != null) {
+                                        val doc = DocumentFile.fromTreeUri(appState.context, uri)
+                                        if (doc != null) appState.showProperties(listOf(doc.toUniversal()))
+                                    }
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.Info, null) }
+                        )
+                    }
+                }
+
+                "MUSIC_MANAGER" -> {
+                    val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+                    val context = LocalContext.current
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                        onClick = { currentScreen = "MAIN" }
+                    )
+                    HorizontalDivider()
+
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.menu_music_folders))
+                                if (isFilterEnabled) {
+                                    Spacer(Modifier.weight(1f))
+                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                }
                             }
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Info, null) }
-                )
+                        },
+                        onClick = {
+                            onDismissRequest()
+                            if (!isFilterEnabled) {
+                                SettingsManager.setMusicFilterEnabled(context, true)
+                                appState.refresh()
+                            }
+                            appState.isConfiguringMusicFolders = true
+                        },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_create_playlist)) },
+                        onClick = {
+                            onDismissRequest()
+                            appState.createNewPlaylist()
+                        },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_sync_list)) },
+                        onClick = {
+                            onDismissRequest()
+                            appState.scope.launch(Dispatchers.IO) {
+                                MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
+                                GlobalEvents.triggerRefresh()
+                            }
+                        },
+                        leadingIcon = { Icon(Icons.Default.Sync, null) }
+                    )
+                }
             }
         }
     }

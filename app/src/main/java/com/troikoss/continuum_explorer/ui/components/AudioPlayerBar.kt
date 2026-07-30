@@ -39,11 +39,11 @@ import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
 import com.troikoss.continuum_explorer.R
-import com.troikoss.continuum_explorer.utils.FileExplorerState
-import com.troikoss.continuum_explorer.utils.IconHelper
-import com.troikoss.continuum_explorer.utils.addToPlaylist
+import com.troikoss.continuum_explorer.utils.*
 import androidx.compose.ui.res.stringResource
 import androidx.media3.common.util.UnstableApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -214,6 +214,63 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.weight(1f)
                                     )
+
+                                    var showMusicManagerMenu by remember { mutableStateOf(false) }
+                                    Box {
+                                        IconButton(onClick = { showMusicManagerMenu = true }) {
+                                            Icon(Icons.Default.MusicNote, contentDescription = null)
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = showMusicManagerMenu,
+                                            onDismissRequest = { showMusicManagerMenu = false },
+                                            shape = RoundedCornerShape(16.dp),
+                                        ) {
+                                            val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        Text(stringResource(R.string.menu_music_folders))
+                                                        if (isFilterEnabled) {
+                                                            Spacer(Modifier.weight(1f))
+                                                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                                        }
+                                                    }
+                                                },
+                                                onClick = {
+                                                    showMusicManagerMenu = false
+                                                    if (!isFilterEnabled) {
+                                                        SettingsManager.setMusicFilterEnabled(context, true)
+                                                        appState.refresh()
+                                                    }
+                                                    appState.isConfiguringMusicFolders = true
+                                                },
+                                                leadingIcon = { Icon(Icons.Default.Folder, null) }
+                                            )
+
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(R.string.menu_create_playlist)) },
+                                                onClick = {
+                                                    showMusicManagerMenu = false
+                                                    appState.createNewPlaylist()
+                                                },
+                                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
+                                            )
+
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(R.string.menu_sync_list)) },
+                                                onClick = {
+                                                    showMusicManagerMenu = false
+                                                    appState.scope.launch(Dispatchers.IO) {
+                                                        MusicMetadataManager.sync(appState.context, SettingsManager.musicFolders.value)
+                                                        GlobalEvents.triggerRefresh()
+                                                    }
+                                                },
+                                                leadingIcon = { Icon(Icons.Default.Sync, null) }
+                                            )
+                                        }
+                                    }
+
                                     if (!showShuffleRepeatInMain) {
                                         IconButton(onClick = { AudioManager.toggleShuffle() }) {
                                             Icon(
