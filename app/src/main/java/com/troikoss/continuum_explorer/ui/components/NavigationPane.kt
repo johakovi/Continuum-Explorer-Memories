@@ -76,6 +76,7 @@ import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
+import com.troikoss.continuum_explorer.utils.createNewPlaylist
 import com.troikoss.continuum_explorer.utils.emptyRecycleBin
 import com.troikoss.continuum_explorer.utils.fadingEdge
 import com.troikoss.continuum_explorer.utils.fileDropTarget
@@ -1709,7 +1710,7 @@ private fun NavContextMenu(
                     text = { Text(stringResource(R.string.menu_create_playlist)) },
                     onClick = {
                         onDismissRequest()
-                        // Playlist creation logic could go here
+                        appState.createNewPlaylist()
                     },
                     leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
                 )

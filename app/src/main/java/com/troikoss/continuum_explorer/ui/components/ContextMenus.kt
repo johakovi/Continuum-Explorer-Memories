@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ContentCut
@@ -620,22 +621,35 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.folder)) },
-                    leadingIcon = { Icon(Icons.Default.Folder, null) },
-                    onClick = {
-                        appState.createNewFolder()
-                        onDismiss()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_text_document)) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.InsertDriveFile, null) },
-                    onClick = {
-                        appState.createNewFile()
-                        onDismiss()
-                    }
-                )
+                if (appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_create_playlist)) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) },
+                        onClick = {
+                            appState.createNewPlaylist()
+                            onDismiss()
+                        }
+                    )
+                }
+
+                if (appState.currentPath != null) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.folder)) },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) },
+                        onClick = {
+                            appState.createNewFolder()
+                            onDismiss()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_text_document)) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.InsertDriveFile, null) },
+                        onClick = {
+                            appState.createNewFile()
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
             "SORT" -> {
