@@ -132,9 +132,32 @@ suspend fun pasteFromClipboard(
     val isMove = usePendingCut && PendingCut.isActive
     val destSafDoc = if (currentSafUri != null) DocumentFile.fromTreeUri(context, currentSafUri) else null
 
+    // Optimization: Determine if all items can be moved/copied instantly on the same provider
+    val finalDestProvider = when {
+        currentPath != null -> LocalProvider
+        currentSafUri != null -> SafProvider
+        destProvider != null -> destProvider
+        else -> null
+    }
+    val finalDestParentId = when {
+        currentPath != null -> currentPath.absolutePath
+        currentSafUri != null -> currentSafUri.toString()
+        destProvider != null -> destParentId
+        else -> null
+    }
+
+    val allSameProvider = usePendingCut && finalDestProvider != null && PendingCut.files.all { sourceFile ->
+        (sourceFile.provider === finalDestProvider ||
+                (sourceFile.provider.kind == finalDestProvider.kind &&
+                        sourceFile.provider.connectionId == finalDestProvider.connectionId))
+    }
+
     var totalBytesToCopy = 0L
     withContext(Dispatchers.IO) {
-        if (usePendingCut) {
+        if (isMove && allSameProvider) {
+            // Skip expensive size calculation for same-provider moves as they are near-instant renames
+            totalBytesToCopy = 0L
+        } else if (usePendingCut) {
             totalBytesToCopy = PendingCut.files.sumOf { calculateSizeRecursively(context, it) }
         } else {
             for (i in 0 until totalCount) {
@@ -163,7 +186,7 @@ suspend fun pasteFromClipboard(
     }
 
     var globalBytesCopied = 0L
-    val buffer = ByteArray(32 * 1024)
+    val buffer = ByteArray(64 * 1024) // Increased buffer to 64KB
     var lastUpdateTime = System.currentTimeMillis()
     val speedWindow = ArrayDeque<Pair<Long, Long>>()
     speedWindow.add(lastUpdateTime to 0L)
@@ -229,20 +252,6 @@ suspend fun pasteFromClipboard(
             }
 
             try {
-                // Determine destination provider and parent ID for comparison
-                val finalDestProvider = when {
-                    currentPath != null -> LocalProvider
-                    currentSafUri != null -> SafProvider
-                    destProvider != null -> destProvider
-                    else -> null
-                }
-                val finalDestParentId = when {
-                    currentPath != null -> currentPath.absolutePath
-                    currentSafUri != null -> currentSafUri.toString()
-                    destProvider != null -> destParentId
-                    else -> null
-                }
-
                 // Optimization 1: Use direct Move/Copy if it's the SAME connection/provider instance
                 val isSameProvider = finalDestProvider != null &&
                     (sourceFile.provider === finalDestProvider ||
@@ -252,10 +261,10 @@ suspend fun pasteFromClipboard(
                 if (isSameProvider && finalDestParentId != null) {
                     val result = if (isMove) {
                         finalDestProvider.move(sourceFile.providerId, finalDestParentId, sourceFile.name)
-                    } else if (!sourceFile.isDirectory) {
-                        // Only auto-copy files if the provider supports it; otherwise fall through to copyRecursively
+                    } else {
+                        // Try direct copy for both files and directories if supported
                         finalDestProvider.copy(sourceFile.providerId, finalDestParentId, sourceFile.name)
-                    } else null
+                    }
 
                     if (result != null) {
                         pastedFileNames.add(sourceFile.name)

@@ -784,7 +784,10 @@ fun Modifier.fileDropTarget(
                                     }
                                     context.startActivity(intent)
                                     val choice = FileOperationsManager.requestMoveCopyChoice()
-                                    if (choice == MoveCopyResult.CANCEL) return@launch
+                                    if (choice == MoveCopyResult.CANCEL) {
+                                        FileOperationsManager.finish()
+                                        return@launch
+                                    }
                                     isMove = (choice == MoveCopyResult.MOVE)
                                     PendingCut.isActive = isMove
                                 }
@@ -800,40 +803,44 @@ fun Modifier.fileDropTarget(
                             context.startActivity(intent)
                         }
 
-                        val pastedNames = pasteFromClipboard(
-                            context = context,
-                            currentPath = actualPath,
-                            currentSafUri = actualSafUri,
-                            destProvider = actualNetworkProvider,
-                            destParentId = actualNetworkId,
-                            preloadedClipData = clipData
-                        )
-                        appState.refresh()?.join()
+                        try {
+                            val pastedNames = pasteFromClipboard(
+                                context = context,
+                                currentPath = actualPath,
+                                currentSafUri = actualSafUri,
+                                destProvider = actualNetworkProvider,
+                                destParentId = actualNetworkId,
+                                preloadedClipData = clipData
+                            )
+                            appState.refresh()?.join()
 
-                        if (isMove || pastedNames.isNotEmpty()) {
-                            GlobalEvents.triggerRefresh()
-                        }
-
-                        if (isMove) {
-                            appState.selectionManager.clear()
-                            PendingCut.files = emptyList()
-                            PendingCut.isActive = false
-                        } else if (isTouchDrag) {
-                            // Copy via touch — clear selection too
-                            appState.selectionManager.clear()
-                        }
-
-                        // Optionally select the newly dropped files if we are currently viewing the destination
-                        val isCurrentDest = actualPath == appState.currentPath &&
-                                actualSafUri == appState.currentSafUri &&
-                                actualNetworkProvider == appState.currentNetworkProvider &&
-                                actualNetworkId == appState.currentNetworkId
-                        if (pastedNames.isNotEmpty() && isCurrentDest) {
-                            val pastedFiles = appState.files.filter { pastedNames.contains(it.name) }
-                            if (pastedFiles.isNotEmpty()) {
-                                appState.selectionManager.clear()
-                                pastedFiles.forEach { appState.selectionManager.select(it) }
+                            if (isMove || pastedNames.isNotEmpty()) {
+                                GlobalEvents.triggerRefresh()
                             }
+
+                            if (isMove) {
+                                appState.selectionManager.clear()
+                                PendingCut.files = emptyList()
+                                PendingCut.isActive = false
+                            } else if (isTouchDrag) {
+                                // Copy via touch — clear selection too
+                                appState.selectionManager.clear()
+                            }
+
+                            // Optionally select the newly dropped files if we are currently viewing the destination
+                            val isCurrentDest = actualPath == appState.currentPath &&
+                                    actualSafUri == appState.currentSafUri &&
+                                    actualNetworkProvider == appState.currentNetworkProvider &&
+                                    actualNetworkId == appState.currentNetworkId
+                            if (pastedNames.isNotEmpty() && isCurrentDest) {
+                                val pastedFiles = appState.files.filter { pastedNames.contains(it.name) }
+                                if (pastedFiles.isNotEmpty()) {
+                                    appState.selectionManager.clear()
+                                    pastedFiles.forEach { appState.selectionManager.select(it) }
+                                }
+                            }
+                        } finally {
+                            FileOperationsManager.finish()
                         }
                     }
                     return true
