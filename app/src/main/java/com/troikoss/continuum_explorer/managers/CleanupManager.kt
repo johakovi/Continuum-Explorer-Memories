@@ -29,8 +29,11 @@ object CleanupManager {
                     thumbDir.deleteRecursively()
                 }
             }
+
+            // 3. Clear Gallery Metadata Cache
+            GalleryCacheManager.clearCache(context)
             
-            // 3. Clear .temp directory in external storage
+            // 4. Clear .temp directory in external storage
             val tempDir = RestrictedCache.getTempDir()
             if (tempDir.exists()) {
                 tempDir.deleteRecursively()

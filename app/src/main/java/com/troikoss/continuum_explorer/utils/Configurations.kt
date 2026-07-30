@@ -122,7 +122,7 @@ class FolderConfigurations(private val context: Context) {
         prefs.edit().putString(key, mode.name).apply()
     }
 
-    fun resolveViewMode(key: String?) {
+    fun resolveViewMode(key: String?, libraryItem: LibraryItem) {
         val prefs = context.getSharedPreferences("folder_view_modes", Context.MODE_PRIVATE)
         if (key != null) {
             val saved = prefs.getString(key, null)
@@ -134,9 +134,9 @@ class FolderConfigurations(private val context: Context) {
             }
         }
         val fallback = when {
-            key == "virtual://gallery" || key?.startsWith("virtual://gallery_album:") == true -> ViewMode.GALLERY
+            libraryItem == LibraryItem.Gallery -> ViewMode.GALLERY
             key == "virtual://music" -> ViewMode.GRID
-            key?.startsWith("virtual://music/") == true || key?.startsWith("virtual://music_album:") == true || key?.startsWith("virtual://playlist:") == true -> {
+            libraryItem == LibraryItem.Music -> {
                 if (key == "virtual://music/albums") ViewMode.GALLERY else ViewMode.MUSIC
             }
             else -> SettingsManager.defaultViewMode.value

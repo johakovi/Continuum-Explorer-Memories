@@ -520,8 +520,30 @@ object IconHelper {
                 name.endsWith(".apk") -> ApkThumbnail(file, fallbackPainter, modifier, iconSize, finalTint)
                 name.endsWith(".txt") -> TextFilePreview(file, fallbackPainter, modifier, iconSize, finalTint, isDetailView)
                 else -> {
+                    val context = LocalContext.current
+                    val thumbFile = remember(file) { DiskCache.getCacheFile(context, file) }
+                    var hasDiskThumb by remember(file) { mutableStateOf(thumbFile.exists()) }
+
+                    val request = remember(file, hasDiskThumb) {
+                        val data: Any = if (hasDiskThumb) thumbFile else (if (isAudio || file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath ?: file))
+                        ImageRequest.Builder(context)
+                            .data(data)
+                            .crossfade(true)
+                            .apply {
+                                if (file.provider.capabilities.isRemote && !hasDiskThumb) {
+                                    listener(
+                                        onSuccess = { _, result ->
+                                            val bitmap = drawableToBitmap(result.drawable)
+                                            saveBitmapToCache(bitmap, thumbFile)
+                                        }
+                                    )
+                                }
+                            }
+                            .build()
+                    }
+
                     SubcomposeAsyncImage(
-                        model = if (isAudio || file.provider.capabilities.isRemote) file else (file.documentFileRef?.uri ?: file.fileRef?.absolutePath),
+                        model = request,
                         contentDescription = null,
                         modifier = modifier,
                         contentScale = contentScale,

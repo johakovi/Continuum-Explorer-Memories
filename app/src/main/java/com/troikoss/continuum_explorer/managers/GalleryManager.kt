@@ -13,14 +13,30 @@ import com.troikoss.continuum_explorer.providers.SafProvider
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.providers.ShizukuProvider
 import com.troikoss.continuum_explorer.utils.AppConfigurations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 object GalleryManager {
     // Returns only the media files directly in dirPath (no subdirectories).
-    suspend fun getAlbumContents(context: Context, dirPath: String, provider: StorageProvider? = null): List<UniversalFile> {
+    suspend fun getAlbumContents(context: Context, dirPath: String, provider: StorageProvider? = null, forceRefresh: Boolean = false, useCacheOnly: Boolean = false): List<UniversalFile> {
         if (provider != null && provider !is LocalProvider) {
+            if (useCacheOnly) {
+                if (!forceRefresh) {
+                    val cached = GalleryCacheManager.loadCache(context, "album:$dirPath")
+                    if (cached != null) return cached
+                }
+                return emptyList()
+            }
+
             return try {
-                provider.listChildren(dirPath).filter { !it.isDirectory && isImageOrVideoFile(it.name) }
+                val files = provider.listChildren(dirPath).filter { !it.isDirectory && isImageOrVideoFile(it.name) }
+                if (files.isNotEmpty()) {
+                    GalleryCacheManager.saveCache(context, "album:$dirPath", files)
+                }
+                files
             } catch (e: Exception) {
                 emptyList()
             }
@@ -95,35 +111,64 @@ object GalleryManager {
         return LocalProvider
     }
 
-    suspend fun getGalleryFiles(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
-        val files = mutableListOf<UniversalFile>()
+    suspend fun getGalleryFiles(context: Context, allowedFolders: Set<String> = emptySet(), forceRefresh: Boolean = false, useCacheOnly: Boolean = false): List<UniversalFile> = withContext(Dispatchers.IO) {
+        val allFiles = java.util.Collections.synchronizedList(mutableListOf<UniversalFile>())
         val appConfigs = AppConfigurations(context)
 
-        // 1. Scan remote/allowed folders
-        allowedFolders.forEach { folderKey ->
-            when {
-                folderKey.startsWith("network:") -> {
-                    val parts = folderKey.split(":", limit = 4)
-                    if (parts.size == 4) {
-                        val kindName = parts[1]
-                        val connId = parts[2]
-                        val path = parts[3]
-                        val conn = appConfigs.networkConnections.find { it.id == connId }
-                        if (conn != null) {
-                            val provider = StorageProviders.network(conn)
-                            scanRemoteGalleryFolder(provider, path, kindName, connId, files)
+        if (useCacheOnly) {
+            allowedFolders.forEach { folderKey ->
+                if (!forceRefresh) {
+                    val cached = GalleryCacheManager.loadCache(context, "files:$folderKey")
+                    if (cached != null) allFiles.addAll(cached)
+                }
+            }
+            return@withContext allFiles.toList()
+        }
+
+        coroutineScope {
+            // 1. Scan local files via MediaStore (Parallel)
+            launch {
+                val localFiles = getLocalGalleryFiles(context, allowedFolders)
+                allFiles.addAll(localFiles)
+            }
+
+            // 2. Scan remote/allowed folders (Parallel)
+            allowedFolders.forEach { folderKey ->
+                if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
+                    launch {
+                        val folderFiles = mutableListOf<UniversalFile>()
+                        when {
+                            folderKey.startsWith("network:") -> {
+                                val parts = folderKey.split(":", limit = 4)
+                                if (parts.size == 4) {
+                                    val kindName = parts[1]
+                                    val connId = parts[2]
+                                    val path = parts[3]
+                                    val conn = appConfigs.networkConnections.find { it.id == connId }
+                                    if (conn != null) {
+                                        val provider = StorageProviders.network(conn)
+                                        scanRemoteGalleryFolder(provider, path, kindName, connId, folderFiles)
+                                    }
+                                }
+                            }
+                            folderKey.startsWith("content://") -> {
+                                scanRemoteGalleryFolder(SafProvider, folderKey, ProviderKind.SAF.name, null, folderFiles)
+                            }
+                        }
+                        if (folderFiles.isNotEmpty()) {
+                            GalleryCacheManager.saveCache(context, "files:$folderKey", folderFiles)
+                            allFiles.addAll(folderFiles)
                         }
                     }
-                }
-                folderKey.startsWith("content://") -> {
-                    scanRemoteGalleryFolder(SafProvider, folderKey, ProviderKind.SAF.name, null, files)
-                }
-                else -> {
-                    // Local folders are handled by MediaStore below with allowedFolders filter
                 }
             }
         }
 
+        allFiles.toList()
+    }
+
+    private fun getLocalGalleryFiles(context: Context, allowedFolders: Set<String>): List<UniversalFile> {
+        val files = mutableListOf<UniversalFile>()
         // 2. Scan local files via MediaStore
         val projection = arrayOf(
             MediaStore.Files.FileColumns.DATA,
@@ -203,39 +248,70 @@ object GalleryManager {
         }
     }
 
-    suspend fun getGalleryAlbums(context: Context, allowedFolders: Set<String> = emptySet()): List<UniversalFile> {
-        val albums = mutableListOf<UniversalFile>()
+    suspend fun getGalleryAlbums(context: Context, allowedFolders: Set<String> = emptySet(), forceRefresh: Boolean = false, useCacheOnly: Boolean = false): List<UniversalFile> = withContext(Dispatchers.IO) {
+        val allAlbums = java.util.Collections.synchronizedList(mutableListOf<UniversalFile>())
         val appConfigs = AppConfigurations(context)
 
-        // 1. Scan remote folders
-        allowedFolders.forEach { folderKey ->
-            if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
-                val provider: StorageProvider?
-                val path: String
-                val kind: String
-                val connId: String?
-
-                if (folderKey.startsWith("network:")) {
-                    val parts = folderKey.split(":", limit = 4)
-                    kind = parts[1]
-                    connId = parts[2]
-                    path = parts[3]
-                    val conn = appConfigs.networkConnections.find { it.id == connId }
-                    provider = conn?.let { StorageProviders.network(it) }
-                } else {
-                    provider = SafProvider
-                    path = folderKey
-                    kind = ProviderKind.SAF.name
-                    connId = null
+        if (useCacheOnly) {
+            allowedFolders.forEach { folderKey ->
+                if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
+                    if (!forceRefresh) {
+                        val cached = GalleryCacheManager.loadCache(context, "albums:$folderKey")
+                        if (cached != null) allAlbums.addAll(cached)
+                    }
                 }
+            }
+            return@withContext allAlbums.toList()
+        }
 
-                if (provider != null) {
-                    scanForRemoteAlbums(provider, path, kind, connId, albums)
+        coroutineScope {
+            // 1. Scan local folders (Parallel)
+            launch {
+                val local = getLocalGalleryAlbums(context, allowedFolders)
+                allAlbums.addAll(local)
+            }
+
+            // 2. Scan remote folders (Parallel)
+            allowedFolders.forEach { folderKey ->
+                if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
+                    launch {
+                        val folderAlbums = mutableListOf<UniversalFile>()
+                        val provider: StorageProvider?
+                        val path: String
+                        val kind: String
+                        val connId: String?
+
+                        if (folderKey.startsWith("network:")) {
+                            val parts = folderKey.split(":", limit = 4)
+                            kind = parts[1]
+                            connId = parts[2]
+                            path = parts[3]
+                            val conn = appConfigs.networkConnections.find { it.id == connId }
+                            provider = conn?.let { StorageProviders.network(it) }
+                        } else {
+                            provider = SafProvider
+                            path = folderKey
+                            kind = ProviderKind.SAF.name
+                            connId = null
+                        }
+
+                        if (provider != null) {
+                            scanForRemoteAlbums(provider, path, kind, connId, folderAlbums)
+                            if (folderAlbums.isNotEmpty()) {
+                                GalleryCacheManager.saveCache(context, "albums:$folderKey", folderAlbums)
+                                allAlbums.addAll(folderAlbums)
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // 2. Scan local folders
+        allAlbums.sortedBy { it.name.lowercase() }
+    }
+
+    private fun getLocalGalleryAlbums(context: Context, allowedFolders: Set<String>): List<UniversalFile> {
+        val albums = mutableListOf<UniversalFile>()
         val localAlbums = linkedMapOf<String, File>()
         fun scanForLocalAlbums(folder: File) {
             if (!folder.exists() || !folder.isDirectory || folder.name.startsWith(".")) return
@@ -275,14 +351,13 @@ object GalleryManager {
             }
         } catch (_: Exception) {}
 
-        localAlbums.values.sortedBy { it.name.lowercase() }.forEach { dir ->
+        localAlbums.values.forEach { dir ->
             albums.add(UniversalFile(
                 name = dir.name, isDirectory = true, lastModified = dir.lastModified(),
                 length = 0, provider = LocalProvider, providerId = dir.absolutePath,
                 parentId = "virtual://gallery"
             ))
         }
-
         return albums
     }
 

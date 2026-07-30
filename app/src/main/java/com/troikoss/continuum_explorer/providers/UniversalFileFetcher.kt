@@ -9,6 +9,7 @@ import coil.fetch.SourceResult
 import coil.request.Options
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.utils.DiskCache
 import okio.buffer
 import okio.source
 import okio.Path.Companion.toPath
@@ -18,6 +19,7 @@ class UniversalFileFetcher(
     private val options: Options,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
+        // 1. Check for Audio/Album covers first (they are already local)
         val isAudio = file.mimeType?.startsWith("audio/") == true || 
                 listOf(".mp3", ".wav", ".ogg", ".m4a", ".flac").any { file.name.lowercase().endsWith(it) }
 
@@ -47,6 +49,17 @@ class UniversalFileFetcher(
             }
         }
 
+        // 2. Check persistent DiskCache (for remote files and complex types like PDF/APK)
+        val thumbFile = DiskCache.getCacheFile(options.context, file)
+        if (thumbFile.exists()) {
+            return SourceResult(
+                source = ImageSource(file = thumbFile.absolutePath.toPath(), fileSystem = okio.FileSystem.SYSTEM),
+                mimeType = "image/png",
+                dataSource = DataSource.DISK
+            )
+        }
+
+        // 3. Fallback to downloading from provider
         val source = ImageSource(
             source = file.provider.openInput(file.providerId).source().buffer(),
             context = options.context,

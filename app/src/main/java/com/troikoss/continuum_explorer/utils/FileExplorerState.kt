@@ -140,7 +140,7 @@ class FileExplorerState(
         scope.launch(Dispatchers.IO) {
             val key = getCurrentStorageKey()
             withContext(Dispatchers.Main) {
-                folderConfigs.resolveViewMode(key)
+                folderConfigs.resolveViewMode(key, libraryItem)
                 folderConfigs.resolveSortParams(key)
                 folderConfigs.resolveGridSize(key)
                 folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
@@ -496,7 +496,7 @@ class FileExplorerState(
                 isLoading = true
                 files = emptyList() // Clear previous results immediately
                 val key = getCurrentStorageKey()
-                folderConfigs.resolveViewMode(key)
+                folderConfigs.resolveViewMode(key, libraryItem)
                 folderConfigs.resolveSortParams(key)
                 folderConfigs.resolveGridSize(key)
                 loadedPathKey = key ?: context.getString(R.string.msg_search_results)
@@ -627,6 +627,27 @@ class FileExplorerState(
     private suspend fun loadFiles(forceRefresh: Boolean = false) {
         isLoading = true
         accessError = null
+
+        if (libraryItem == LibraryItem.Gallery && !forceRefresh) {
+            val cachedList = withContext(Dispatchers.IO) {
+                when {
+                    currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = false, useCacheOnly = true)
+                    appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true)
+                    else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true)
+                }
+            }
+            if (cachedList.isNotEmpty()) {
+                val key = getCurrentStorageKey()
+                val sortParams = folderConfigs.sortParams
+                val sorted = sortFiles(cachedList, sortParams)
+                withContext(Dispatchers.Main) {
+                    files = sorted
+                    selectionManager.allFiles = files
+                    // We don't set isLoading = false here as we want to continue loading fresh data
+                }
+            }
+        }
+
         if (currentArchiveFile == null && currentArchiveUri == null) {
             archiveCache = null
         }
@@ -654,9 +675,9 @@ class FileExplorerState(
                     LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
                     LibraryItem.Home -> emptyList()
                     LibraryItem.Gallery -> when {
-                        currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath)
-                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
-                        else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
+                        currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh)
+                        appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh)
+                        else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh)
                     }
                     LibraryItem.Music -> {
                         val pathStr = currentPath?.path ?: ""
@@ -750,7 +771,7 @@ class FileExplorerState(
             }
 
             withContext(Dispatchers.Main) {
-                folderConfigs.resolveViewMode(key)
+                folderConfigs.resolveViewMode(key, libraryItem)
                 folderConfigs.resolveGridSize(key)
                 folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
                 folderConfigs.resolveColumnWidths(key)
