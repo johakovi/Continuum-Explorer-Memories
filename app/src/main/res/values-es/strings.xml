@@ -335,8 +335,14 @@
     <string name="menu_musicplayer">Reproductor de música</string>
     <string name="menu_gallery_albums">Álbumes</string>
     <string name="menu_gallery_folders">Carpetas de la galería</string>
+    <string name="menu_gallery_add_current">Añadir carpeta actual</string>
+    <string name="menu_gallery_custom_path">Ruta personalizada</string>
     <string name="menu_music_albums">Álbumes</string>
     <string name="menu_music_folders">Carpetas de música</string>
+    <string name="menu_music_add_current">Añadir carpeta actual</string>
+    <string name="menu_music_custom_path">Ruta personalizada</string>
+    <string name="dialog_add_custom_path">Añadir ruta personalizada</string>
+    <string name="custom_path_hint">Introduce la dirección del directorio (ej. /sdcard/Music)</string>
     <string name="menu_create_playlist">Crear lista de reproducción</string>
     <string name="default_playlist_name">Nueva lista de reproducción</string>
     <string name="menu_add_to_playlist">Añadir a lista de reproducción</string>

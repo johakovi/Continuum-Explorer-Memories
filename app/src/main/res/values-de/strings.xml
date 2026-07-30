@@ -334,8 +334,14 @@
     <string name="menu_musicplayer">Musik-Player</string>
     <string name="menu_gallery_albums">Alben</string>
     <string name="menu_gallery_folders">Galerie-Ordner</string>
+    <string name="menu_gallery_add_current">Aktuellen Ordner hinzufügen</string>
+    <string name="menu_gallery_custom_path">Eigener Pfad</string>
     <string name="menu_music_albums">Alben</string>
     <string name="menu_music_folders">Musik-Ordner</string>
+    <string name="menu_music_add_current">Aktuellen Ordner hinzufügen</string>
+    <string name="menu_music_custom_path">Eigener Pfad</string>
+    <string name="dialog_add_custom_path">Eigenen Pfad hinzufügen</string>
+    <string name="custom_path_hint">Verzeichnisadresse eingeben (z. B. /sdcard/Music)</string>
     <string name="menu_create_playlist">Playlist erstellen</string>
     <string name="default_playlist_name">Neue Playlist</string>
     <string name="menu_add_to_playlist">Zur Playlist hinzufügen</string>

@@ -321,8 +321,14 @@
     <string name="menu_musicplayer">Müzik çalar</string>
     <string name="menu_gallery_albums">Albümler</string>
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
+    <string name="menu_gallery_add_current">Geçerli Klasörü Ekle</string>
+    <string name="menu_gallery_custom_path">Özel Yol</string>
     <string name="menu_music_albums">Albümler</string>
     <string name="menu_music_folders">Müzik Klasörleri</string>
+    <string name="menu_music_add_current">Geçerli Klasörü Ekle</string>
+    <string name="menu_music_custom_path">Özel Yol</string>
+    <string name="dialog_add_custom_path">Özel Yol Ekle</string>
+    <string name="custom_path_hint">Dizin adresini girin (örn. /sdcard/Music)</string>
     <string name="menu_create_playlist">Oynatma Listesi Oluştur</string>
     <string name="default_playlist_name">Yeni Oynatma Listesi</string>
     <string name="menu_add_to_playlist">Oynatma Listesine Ekle</string>

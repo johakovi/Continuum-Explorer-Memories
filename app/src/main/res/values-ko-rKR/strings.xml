@@ -334,8 +334,14 @@
     <string name="menu_musicplayer">음악 플레이어</string>
     <string name="menu_gallery_albums">앨범</string>
     <string name="menu_gallery_folders">갤러리 폴더</string>
+    <string name="menu_gallery_add_current">현재 폴더 추가</string>
+    <string name="menu_gallery_custom_path">사용자 정의 경로</string>
     <string name="menu_music_albums">앨범</string>
     <string name="menu_music_folders">음악 폴더</string>
+    <string name="menu_music_add_current">현재 폴더 추가</string>
+    <string name="menu_music_custom_path">사용자 정의 경로</string>
+    <string name="dialog_add_custom_path">사용자 정의 경로 추가</string>
+    <string name="custom_path_hint">디렉토리 주소를 입력하세요 (예: /sdcard/Music)</string>
     <string name="menu_create_playlist">재생 목록 만들기</string>
     <string name="default_playlist_name">새 재생 목록</string>
     <string name="menu_add_to_playlist">재생 목록에 추가</string>

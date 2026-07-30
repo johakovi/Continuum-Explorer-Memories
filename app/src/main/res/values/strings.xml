@@ -332,9 +332,15 @@
     <string name="nav_game_saves">Game Manager</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_gallery_folders">Gallery Folders</string>
+    <string name="menu_gallery_add_current">Add Current Folder</string>
+    <string name="menu_gallery_custom_path">Custom Path</string>
     <string name="menu_musicplayer">Music player</string>
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Music Folders</string>
+    <string name="menu_music_add_current">Add Current Folder</string>
+    <string name="menu_music_custom_path">Custom Path</string>
+    <string name="dialog_add_custom_path">Add Custom Path</string>
+    <string name="custom_path_hint">Enter directory address (e.g. /sdcard/Music)</string>
     <string name="menu_create_playlist">Create Playlist</string>
     <string name="default_playlist_name">New Playlist</string>
     <string name="menu_add_to_playlist">Add to Playlist</string>

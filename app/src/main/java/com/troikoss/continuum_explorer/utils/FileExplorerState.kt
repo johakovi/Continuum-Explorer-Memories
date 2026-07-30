@@ -856,7 +856,9 @@ class FileExplorerState(
 
     fun getCurrentStorageKey(): String? {
         if (isSearchMode) return context.getString(R.string.msg_search_results)
-        if (currentNetworkProvider != null && currentNetworkId != null) return currentNetworkId
+        if (currentNetworkProvider != null && currentNetworkId != null) {
+            return "network:${currentNetworkProvider!!.kind.name}:${currentNetworkProvider!!.connectionId}:${currentNetworkId}"
+        }
         return if (currentArchiveFile != null || currentArchiveUri != null) {
             val base = currentArchiveFile?.absolutePath ?: currentArchiveUri.toString()
             "archive:$base:${currentArchivePath.removeSuffix("/")}"

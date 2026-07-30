@@ -2,12 +2,20 @@ package com.troikoss.continuum_explorer.managers
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
+import android.media.MediaDataSource
 import androidx.compose.runtime.*
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.model.ProviderKind
+import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.providers.SafProvider
+import com.troikoss.continuum_explorer.providers.StorageProviders
+import com.troikoss.continuum_explorer.providers.ShizukuProvider
+import com.troikoss.continuum_explorer.utils.AppConfigurations
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.InputStream
 
 data class MusicSongMetadata(
     val title: String,
@@ -16,7 +24,9 @@ data class MusicSongMetadata(
     val filePath: String,
     val duration: Long,
     val trackNumber: Int?,
-    val lastSync: Long
+    val lastSync: Long,
+    val providerKind: String? = null,
+    val connectionId: String? = null
 )
 
 data class MusicAlbumMetadata(
@@ -25,8 +35,51 @@ data class MusicAlbumMetadata(
     val folderPath: String,
     val trackCount: Int,
     val lastSync: Long,
-    val coverPath: String? = null
+    val coverPath: String? = null,
+    val providerKind: String? = null,
+    val connectionId: String? = null
 )
+
+private class UniversalMediaDataSource(
+    private val provider: StorageProvider,
+    private val providerId: String,
+    private val size: Long
+) : MediaDataSource() {
+    private var stream: InputStream? = null
+    private var currentPosition: Long = -1
+
+    override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int {
+        if (position >= this.size) return -1
+        val toRead = if (position + size > this.size) (this.size - position).toInt() else size
+        if (toRead <= 0) return 0
+
+        try {
+            if (stream == null || currentPosition != position) {
+                stream?.close()
+                stream = provider.openInput(providerId, position)
+                currentPosition = position
+            }
+            
+            var totalRead = 0
+            while (totalRead < toRead) {
+                val read = stream!!.read(buffer, offset + totalRead, toRead - totalRead)
+                if (read == -1) break
+                totalRead += read
+                currentPosition += read
+            }
+            return if (totalRead == 0) -1 else totalRead
+        } catch (e: Exception) {
+            return -1
+        }
+    }
+
+    override fun getSize(): Long = size
+
+    override fun close() {
+        stream?.close()
+        stream = null
+    }
+}
 
 object MusicMetadataManager {
     private const val METADATA_FOLDER = "music_metadata"
@@ -80,20 +133,35 @@ object MusicMetadataManager {
         saveFavourites(context)
     }
 
+    private fun getProvider(context: Context, kind: String?, connectionId: String?): StorageProvider {
+        if (kind == null || kind == ProviderKind.LOCAL.name) return LocalProvider
+        if (kind == ProviderKind.SAF.name) return SafProvider
+        if (kind == ProviderKind.SHIZUKU.name) return ShizukuProvider
+        
+        if (connectionId != null) {
+            val appConfigs = AppConfigurations(context)
+            val conn = appConfigs.networkConnections.find { it.id == connectionId }
+            if (conn != null) {
+                return StorageProviders.network(conn)
+            }
+        }
+        return LocalProvider
+    }
+
     fun getFavourites(context: Context): List<UniversalFile> {
         if (songs.isEmpty()) {
             loadMetadata(context)
         }
         return songs.filter { favouriteState.containsKey(it.filePath) }.map { song ->
-            val file = File(song.filePath)
+            val provider = getProvider(context, song.providerKind, song.connectionId)
             UniversalFile(
                 name = song.title,
                 isDirectory = false,
                 lastModified = song.lastSync,
-                length = file.length(),
-                provider = LocalProvider,
+                length = 0L,
+                provider = provider,
                 providerId = song.filePath,
-                parentId = file.parentFile?.absolutePath,
+                parentId = provider.parentId(song.filePath),
                 mimeType = "audio/*"
             )
         }
@@ -114,11 +182,13 @@ object MusicMetadataManager {
                     loadedAlbums.add(
                         MusicAlbumMetadata(
                             albumName = obj.getString("albumName"),
-                            artistName = if (obj.isNull("artistName")) null else obj.getString("artistName"),
+                            artistName = obj.optString("artistName", null),
                             folderPath = obj.getString("folderPath"),
                             trackCount = obj.getInt("trackCount"),
                             lastSync = obj.getLong("lastSync"),
-                            coverPath = if (obj.isNull("coverPath")) null else obj.getString("coverPath")
+                            coverPath = obj.optString("coverPath", null),
+                            providerKind = obj.optString("providerKind", null),
+                            connectionId = obj.optString("connectionId", null)
                         )
                     )
                 }
@@ -141,12 +211,14 @@ object MusicMetadataManager {
                     loadedSongs.add(
                         MusicSongMetadata(
                             title = obj.getString("title"),
-                            artist = if (obj.isNull("artist")) null else obj.getString("artist"),
-                            album = if (obj.isNull("album")) null else obj.getString("album"),
+                            artist = obj.optString("artist", null),
+                            album = obj.optString("album", null),
                             filePath = obj.getString("filePath"),
                             duration = obj.getLong("duration"),
                             trackNumber = if (obj.isNull("trackNumber")) null else obj.getInt("trackNumber"),
-                            lastSync = obj.getLong("lastSync")
+                            lastSync = obj.getLong("lastSync"),
+                            providerKind = obj.optString("providerKind", null),
+                            connectionId = obj.optString("connectionId", null)
                         )
                     )
                 }
@@ -175,6 +247,8 @@ object MusicMetadataManager {
                     put("trackCount", album.trackCount)
                     put("lastSync", album.lastSync)
                     put("coverPath", album.coverPath ?: JSONObject.NULL)
+                    put("providerKind", album.providerKind ?: JSONObject.NULL)
+                    put("connectionId", album.connectionId ?: JSONObject.NULL)
                 }
                 albumArray.put(obj)
             }
@@ -190,6 +264,8 @@ object MusicMetadataManager {
                     put("duration", song.duration)
                     put("trackNumber", song.trackNumber ?: JSONObject.NULL)
                     put("lastSync", song.lastSync)
+                    put("providerKind", song.providerKind ?: JSONObject.NULL)
+                    put("connectionId", song.connectionId ?: JSONObject.NULL)
                 }
                 songArray.put(obj)
             }
@@ -217,12 +293,13 @@ object MusicMetadataManager {
             loadMetadata(context)
         }
         return albums.map { album ->
+            val provider = getProvider(context, album.providerKind, album.connectionId)
             UniversalFile(
                 name = album.albumName,
                 isDirectory = true,
                 lastModified = album.lastSync,
                 length = album.trackCount.toLong(),
-                provider = LocalProvider,
+                provider = provider,
                 providerId = "virtual://music/albums/${album.albumName}",
                 parentId = "virtual://music/albums",
                 mimeType = "album"
@@ -235,30 +312,51 @@ object MusicMetadataManager {
             loadMetadata(context)
         }
         return songs.map { song ->
-            val file = File(song.filePath)
+            val provider = getProvider(context, song.providerKind, song.connectionId)
             UniversalFile(
                 name = song.title,
                 isDirectory = false,
                 lastModified = song.lastSync,
-                length = file.length(),
-                provider = LocalProvider,
+                length = 0L,
+                provider = provider,
                 providerId = song.filePath,
-                parentId = file.parentFile?.absolutePath,
+                parentId = provider.parentId(song.filePath),
                 mimeType = "audio/*"
             )
         }
     }
 
-    fun sync(context: Context, musicFolders: Set<String>) {
+    suspend fun sync(context: Context, musicFolders: Set<String>) {
         val newAlbums = mutableListOf<MusicAlbumMetadata>()
         val newSongs = mutableListOf<MusicSongMetadata>()
         val retriever = MediaMetadataRetriever()
         val coversFolder = getCoversFolder(context)
+        val appConfigs = AppConfigurations(context)
 
-        musicFolders.forEach { folderPath ->
-            val rootFolder = File(folderPath)
-            if (rootFolder.exists() && rootFolder.isDirectory) {
-                scanFolder(rootFolder, newAlbums, newSongs, retriever, coversFolder)
+        musicFolders.forEach { folderKey ->
+            when {
+                folderKey.startsWith("network:") -> {
+                    val parts = folderKey.split(":", limit = 4)
+                    if (parts.size == 4) {
+                        val kindName = parts[1]
+                        val connId = parts[2]
+                        val path = parts[3]
+                        val conn = appConfigs.networkConnections.find { it.id == connId }
+                        if (conn != null) {
+                            val provider = StorageProviders.network(conn)
+                            scanRemoteFolder(context, provider, path, kindName, connId, newAlbums, newSongs, retriever, coversFolder)
+                        }
+                    }
+                }
+                folderKey.startsWith("content://") -> {
+                    scanRemoteFolder(context, SafProvider, folderKey, ProviderKind.SAF.name, null, newAlbums, newSongs, retriever, coversFolder)
+                }
+                else -> {
+                    val rootFolder = File(folderKey)
+                    if (rootFolder.exists() && rootFolder.isDirectory) {
+                        scanLocalFolder(rootFolder, newAlbums, newSongs, retriever, coversFolder)
+                    }
+                }
             }
         }
 
@@ -272,7 +370,7 @@ object MusicMetadataManager {
         }
     }
 
-    private fun scanFolder(
+    private fun scanLocalFolder(
         folder: File,
         albumList: MutableList<MusicAlbumMetadata>,
         songList: MutableList<MusicSongMetadata>,
@@ -280,7 +378,7 @@ object MusicMetadataManager {
         coversFolder: File
     ) {
         val files = folder.listFiles() ?: return
-        val audioFiles = files.filter { it.isFile && isAudioFile(it) }
+        val audioFiles = files.filter { it.isFile && isAudioFile(it.name) }
 
         if (audioFiles.isNotEmpty()) {
             val albumsInFolder = mutableMapOf<String, MutableList<File>>()
@@ -288,76 +386,155 @@ object MusicMetadataManager {
             audioFiles.forEach { file ->
                 try {
                     retriever.setDataSource(file.absolutePath)
-                    val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.nameWithoutExtension
+                    extractMetadataAndAddSong(file.name, file.absolutePath, ProviderKind.LOCAL.name, null, songList, retriever, albumsInFolder, folder.name)
+                } catch (e: Exception) {
+                    addFallbackSong(file.name, file.absolutePath, ProviderKind.LOCAL.name, null, songList, albumsInFolder, folder.name)
+                }
+            }
+
+            processAlbumsInFolder(albumsInFolder, ProviderKind.LOCAL.name, null, albumList, retriever, coversFolder)
+        }
+
+        files.filter { it.isDirectory }.forEach {
+            scanLocalFolder(it, albumList, songList, retriever, coversFolder)
+        }
+    }
+
+    private suspend fun scanRemoteFolder(
+        context: Context,
+        provider: StorageProvider,
+        parentId: String,
+        kindName: String,
+        connectionId: String?,
+        albumList: MutableList<MusicAlbumMetadata>,
+        songList: MutableList<MusicSongMetadata>,
+        retriever: MediaMetadataRetriever,
+        coversFolder: File
+    ) {
+        val children = try { provider.listChildren(parentId) } catch (e: Exception) { emptyList() }
+        val audioFiles = children.filter { !it.isDirectory && isAudioFile(it.name) }
+
+        if (audioFiles.isNotEmpty()) {
+            val albumsInFolder = mutableMapOf<String, MutableList<String>>()
+
+            audioFiles.forEach { file ->
+                try {
+                    retriever.setDataSource(UniversalMediaDataSource(provider, file.providerId, file.length))
+                    
+                    val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.name.substringBeforeLast('.')
                     val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-                    val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: folder.name
+                    val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: provider.displayName(parentId)
                     val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
                     val trackNumber = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)?.toIntOrNull()
 
                     songList.add(MusicSongMetadata(
-                        title = title,
-                        artist = artist,
-                        album = album,
-                        filePath = file.absolutePath,
-                        duration = duration,
-                        trackNumber = trackNumber,
-                        lastSync = System.currentTimeMillis()
+                        title = title, artist = artist, album = album, filePath = file.providerId,
+                        duration = duration, trackNumber = trackNumber, lastSync = System.currentTimeMillis(),
+                        providerKind = kindName, connectionId = connectionId
                     ))
-
-                    albumsInFolder.getOrPut(album) { mutableListOf() }.add(file)
+                    albumsInFolder.getOrPut(album) { mutableListOf() }.add(file.providerId)
                 } catch (e: Exception) {
-                    val albumTag = folder.name
-                    albumsInFolder.getOrPut(albumTag) { mutableListOf() }.add(file)
+                    val albumTag = provider.displayName(parentId)
                     songList.add(MusicSongMetadata(
-                        title = file.name,
-                        artist = null,
-                        album = albumTag,
-                        filePath = file.absolutePath,
-                        duration = 0,
-                        trackNumber = null,
-                        lastSync = System.currentTimeMillis()
+                        title = file.name, artist = null, album = albumTag, filePath = file.providerId,
+                        duration = 0, trackNumber = null, lastSync = System.currentTimeMillis(),
+                        providerKind = kindName, connectionId = connectionId
                     ))
+                    albumsInFolder.getOrPut(albumTag) { mutableListOf() }.add(file.providerId)
                 }
             }
 
-            albumsInFolder.forEach { (albumName, filesInAlbum) ->
-                val firstFile = filesInAlbum.first()
+            albumsInFolder.forEach { (albumName, idsInAlbum) ->
                 var artist: String? = null
                 var coverPath: String? = null
-
                 try {
-                    retriever.setDataSource(firstFile.absolutePath)
-                    artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-                    val embeddedPicture = retriever.embeddedPicture
-                    if (embeddedPicture != null) {
-                        val coverFile = File(coversFolder, "${albumName.hashCode()}.jpg")
-                        if (!coverFile.exists()) {
-                            coverFile.writeBytes(embeddedPicture)
+                    val firstId = idsInAlbum.first()
+                    val firstFile = audioFiles.find { it.providerId == firstId }
+                    if (firstFile != null) {
+                        retriever.setDataSource(UniversalMediaDataSource(provider, firstId, firstFile.length))
+                        artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                        val embeddedPicture = retriever.embeddedPicture
+                        if (embeddedPicture != null) {
+                            val coverFile = File(coversFolder, "${albumName.hashCode()}.jpg")
+                            if (!coverFile.exists()) coverFile.writeBytes(embeddedPicture)
+                            coverPath = coverFile.absolutePath
                         }
-                        coverPath = coverFile.absolutePath
                     }
-                } catch (e: Exception) { }
+                } catch (e: Exception) {}
 
-                albumList.add(
-                    MusicAlbumMetadata(
-                        albumName = albumName,
-                        artistName = artist,
-                        folderPath = folder.absolutePath,
-                        trackCount = filesInAlbum.size,
-                        lastSync = System.currentTimeMillis(),
-                        coverPath = coverPath
-                    )
-                )
+                albumList.add(MusicAlbumMetadata(
+                    albumName = albumName, artistName = artist, folderPath = parentId,
+                    trackCount = idsInAlbum.size, lastSync = System.currentTimeMillis(),
+                    coverPath = coverPath, providerKind = kindName, connectionId = connectionId
+                ))
             }
         }
 
-        files.filter { it.isDirectory }.forEach {
-            scanFolder(it, albumList, songList, retriever, coversFolder)
+        children.filter { it.isDirectory }.forEach {
+            scanRemoteFolder(context, provider, it.providerId, kindName, connectionId, albumList, songList, retriever, coversFolder)
         }
     }
 
-    private fun isAudioFile(file: File): Boolean {
-        val ext = file.extension.lowercase()
+    private fun extractMetadataAndAddSong(
+        fileName: String, filePath: String, kind: String, connId: String?,
+        songList: MutableList<MusicSongMetadata>, retriever: MediaMetadataRetriever,
+        albumsInFolder: MutableMap<String, MutableList<File>>, defaultAlbum: String
+    ) {
+        val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: fileName.substringBeforeLast('.')
+        val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+        val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: defaultAlbum
+        val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
+        val trackNumber = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)?.toIntOrNull()
+
+        songList.add(MusicSongMetadata(
+            title = title, artist = artist, album = album, filePath = filePath,
+            duration = duration, trackNumber = trackNumber, lastSync = System.currentTimeMillis(),
+            providerKind = kind, connectionId = connId
+        ))
+        albumsInFolder.getOrPut(album) { mutableListOf() }.add(File(filePath))
+    }
+
+    private fun addFallbackSong(
+        fileName: String, filePath: String, kind: String, connId: String?,
+        songList: MutableList<MusicSongMetadata>, albumsInFolder: MutableMap<String, MutableList<File>>, defaultAlbum: String
+    ) {
+        songList.add(MusicSongMetadata(
+            title = fileName, artist = null, album = defaultAlbum, filePath = filePath,
+            duration = 0, trackNumber = null, lastSync = System.currentTimeMillis(),
+            providerKind = kind, connectionId = connId
+        ))
+        albumsInFolder.getOrPut(defaultAlbum) { mutableListOf() }.add(File(filePath))
+    }
+
+    private fun processAlbumsInFolder(
+        albumsInFolder: Map<String, List<File>>, kind: String, connId: String?,
+        albumList: MutableList<MusicAlbumMetadata>, retriever: MediaMetadataRetriever, coversFolder: File
+    ) {
+        albumsInFolder.forEach { (albumName, filesInAlbum) ->
+            val firstFile = filesInAlbum.first()
+            var artist: String? = null
+            var coverPath: String? = null
+            try {
+                retriever.setDataSource(firstFile.absolutePath)
+                artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                val embeddedPicture = retriever.embeddedPicture
+                if (embeddedPicture != null) {
+                    val coverFile = File(coversFolder, "${albumName.hashCode()}.jpg")
+                    if (!coverFile.exists()) coverFile.writeBytes(embeddedPicture)
+                    coverPath = coverFile.absolutePath
+                }
+            } catch (e: Exception) { }
+
+            albumList.add(MusicAlbumMetadata(
+                albumName = albumName, artistName = artist, folderPath = firstFile.parent ?: "",
+                trackCount = filesInAlbum.size, lastSync = System.currentTimeMillis(),
+                coverPath = coverPath, providerKind = kind, connectionId = connId
+            ))
+        }
+    }
+
+    private fun isAudioFile(fileName: String): Boolean {
+        val ext = fileName.substringAfterLast('.', "").lowercase()
         return ext in listOf("mp3", "m4a", "ogg", "wav", "flac", "aac")
     }
 
@@ -374,37 +551,9 @@ object MusicMetadataManager {
     }
 
     fun getCoverPathForSong(context: Context, file: UniversalFile): String? {
-        val filePath = file.providerId
-        val song = songs.find { it.filePath == filePath }
+        val song = songs.find { it.filePath == file.providerId }
         if (song != null) {
             return song.album?.let { getCoverPath(it, context) }
-        }
-
-        // Fallback for files not in synced metadata: try to extract album name and check covers folder
-        if (file.provider.kind == com.troikoss.continuum_explorer.model.ProviderKind.LOCAL || 
-            file.provider.kind == com.troikoss.continuum_explorer.model.ProviderKind.SHIZUKU) {
-            val actualPath = file.providerId
-            try {
-                val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(actualPath)
-                val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-                if (album != null) {
-                    val coversFolder = getCoversFolder(context)
-                    val coverFile = File(coversFolder, "${album.hashCode()}.jpg")
-                    if (coverFile.exists()) {
-                        retriever.release()
-                        return coverFile.absolutePath
-                    }
-
-                    val embeddedPicture = retriever.embeddedPicture
-                    if (embeddedPicture != null) {
-                        coverFile.writeBytes(embeddedPicture)
-                        retriever.release()
-                        return coverFile.absolutePath
-                    }
-                }
-                retriever.release()
-            } catch (e: Exception) { }
         }
         return null
     }
@@ -414,16 +563,11 @@ object MusicMetadataManager {
             loadMetadata(context)
         }
         return songs.filter { it.album?.equals(albumName, ignoreCase = true) == true }.map { song ->
-            val file = File(song.filePath)
+            val provider = getProvider(context, song.providerKind, song.connectionId)
             UniversalFile(
-                name = song.title,
-                isDirectory = false,
-                lastModified = song.lastSync,
-                length = file.length(),
-                provider = LocalProvider,
-                providerId = song.filePath,
-                parentId = file.parentFile?.absolutePath,
-                mimeType = "audio/*"
+                name = song.title, isDirectory = false, lastModified = song.lastSync,
+                length = 0L, provider = provider, providerId = song.filePath,
+                parentId = provider.parentId(song.filePath), mimeType = "audio/*"
             )
         }
     }

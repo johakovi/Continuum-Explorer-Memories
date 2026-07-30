@@ -334,8 +334,14 @@
     <string name="menu_musicplayer">Музичний плеєр</string>
     <string name="menu_gallery_albums">Альбоми</string>
     <string name="menu_gallery_folders">Папки галереї</string>
+    <string name="menu_gallery_add_current">Додати поточну папку</string>
+    <string name="menu_gallery_custom_path">Власний шлях</string>
     <string name="menu_music_albums">Альбоми</string>
     <string name="menu_music_folders">Музичні папки</string>
+    <string name="menu_music_add_current">Додати поточну папку</string>
+    <string name="menu_music_custom_path">Власний шлях</string>
+    <string name="dialog_add_custom_path">Додати власний шлях</string>
+    <string name="custom_path_hint">Введіть адресу каталогу (наприклад, /sdcard/Music)</string>
     <string name="menu_create_playlist">Створити плейліст</string>
     <string name="default_playlist_name">Новий плейліст</string>
     <string name="menu_add_to_playlist">Додати до плейліста</string>

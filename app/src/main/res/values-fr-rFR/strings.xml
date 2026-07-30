@@ -335,8 +335,14 @@
     <string name="menu_musicplayer">Lecteur de musique</string>
     <string name="menu_gallery_albums">Albums</string>
     <string name="menu_gallery_folders">Dossiers de la galerie</string>
+    <string name="menu_gallery_add_current">Ajouter le dossier actuel</string>
+    <string name="menu_gallery_custom_path">Chemin personnalisé</string>
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Dossiers de musique</string>
+    <string name="menu_music_add_current">Ajouter le dossier actuel</string>
+    <string name="menu_music_custom_path">Chemin personnalisé</string>
+    <string name="dialog_add_custom_path">Ajouter un chemin personnalisé</string>
+    <string name="custom_path_hint">Entrez l\'adresse du répertoire (ex: /sdcard/Music)</string>
     <string name="menu_create_playlist">Créer une liste de lecture</string>
     <string name="default_playlist_name">Nouvelle liste de lecture</string>
     <string name="menu_add_to_playlist">Ajouter à la liste de lecture</string>

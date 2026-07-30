@@ -334,8 +334,14 @@
     <string name="menu_musicplayer">Musiikkisoitin</string>
     <string name="menu_gallery_albums">Albumit</string>
     <string name="menu_gallery_folders">Gallerian kansiot</string>
+    <string name="menu_gallery_add_current">Lisää nykyinen kansio</string>
+    <string name="menu_gallery_custom_path">Oma polku</string>
     <string name="menu_music_albums">Albumit</string>
     <string name="menu_music_folders">Musiikkikansiot</string>
+    <string name="menu_music_add_current">Lisää nykyinen kansio</string>
+    <string name="menu_music_custom_path">Oma polku</string>
+    <string name="dialog_add_custom_path">Lisää oma polku</string>
+    <string name="custom_path_hint">Kirjoita kansion osoite (esim. /sdcard/Music)</string>
     <string name="menu_create_playlist">Luo soittolista</string>
     <string name="default_playlist_name">Uusi soittolista</string>
     <string name="menu_add_to_playlist">Lisää soittolistaan</string>

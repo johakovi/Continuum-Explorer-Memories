@@ -1054,6 +1054,44 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
     val context = LocalContext.current
     val folders by SettingsManager.galleryFolders
     val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
+    var showCustomPathDialog by remember { mutableStateOf(false) }
+
+    if (showCustomPathDialog) {
+        var customPath by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showCustomPathDialog = false },
+            title = { Text(stringResource(R.string.dialog_add_custom_path)) },
+            text = {
+                OutlinedTextField(
+                    value = customPath,
+                    onValueChange = { customPath = it },
+                    placeholder = { Text(stringResource(R.string.custom_path_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (customPath.isNotBlank()) {
+                            val newSet = folders.toMutableSet()
+                            newSet.add(customPath.trim())
+                            SettingsManager.setGalleryFolders(context, newSet)
+                            appState.refresh()
+                        }
+                        showCustomPathDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomPathDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 
     Dialog(
         onDismissRequest = { appState.isConfiguringGalleryFolders = false },
@@ -1140,17 +1178,50 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                             }
                         }
                         
-                            Button(
-                                onClick = {
-                                    onAddFolder()
-                                },
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        val currentPath = appState.getCurrentStorageKey()
+                        val canAddCurrent = currentPath != null && !currentPath.startsWith("virtual://")
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = { onAddFolder() },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("SAF")
+                                }
+
+                                if (canAddCurrent) {
+                                    Button(
+                                        onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.add(currentPath!!)
+                                            SettingsManager.setGalleryFolders(context, newSet)
+                                            appState.refresh()
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                                    ) {
+                                        Icon(Icons.Default.AddLocation, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(stringResource(R.string.menu_gallery_add_current))
+                                    }
+                                }
+                            }
+
+                            OutlinedButton(
+                                onClick = { showCustomPathDialog = true },
+                                modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = null)
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.gallery_add_folder))
+                                Text(stringResource(R.string.menu_gallery_custom_path))
                             }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -1174,6 +1245,44 @@ fun MusicFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
     val context = LocalContext.current
     val folders by SettingsManager.musicFolders
     val isFilterEnabled by SettingsManager.isMusicFilterEnabled
+    var showCustomPathDialog by remember { mutableStateOf(false) }
+
+    if (showCustomPathDialog) {
+        var customPath by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showCustomPathDialog = false },
+            title = { Text(stringResource(R.string.dialog_add_custom_path)) },
+            text = {
+                OutlinedTextField(
+                    value = customPath,
+                    onValueChange = { customPath = it },
+                    placeholder = { Text(stringResource(R.string.custom_path_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (customPath.isNotBlank()) {
+                            val newSet = folders.toMutableSet()
+                            newSet.add(customPath.trim())
+                            SettingsManager.setMusicFolders(context, newSet)
+                            appState.refresh()
+                        }
+                        showCustomPathDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomPathDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 
     Dialog(
         onDismissRequest = { appState.isConfiguringMusicFolders = false },
@@ -1260,17 +1369,50 @@ fun MusicFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                             }
                         }
                         
-                            Button(
-                                onClick = {
-                                    onAddFolder()
-                                },
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        val currentPath = appState.getCurrentStorageKey()
+                        val canAddCurrent = currentPath != null && !currentPath.startsWith("virtual://")
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = { onAddFolder() },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("SAF")
+                                }
+
+                                if (canAddCurrent) {
+                                    Button(
+                                        onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.add(currentPath!!)
+                                            SettingsManager.setMusicFolders(context, newSet)
+                                            appState.refresh()
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                                    ) {
+                                        Icon(Icons.Default.AddLocation, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(stringResource(R.string.menu_music_add_current))
+                                    }
+                                }
+                            }
+
+                            OutlinedButton(
+                                onClick = { showCustomPathDialog = true },
+                                modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = null)
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Add Music Folder")
+                                Text(stringResource(R.string.menu_music_custom_path))
                             }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

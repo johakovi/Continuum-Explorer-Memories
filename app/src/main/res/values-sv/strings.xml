@@ -332,8 +332,14 @@
     <string name="menu_musicplayer">Musikspelare</string>
     <string name="menu_gallery_albums">Album</string>
     <string name="menu_gallery_folders">Gallerimappar</string>
+    <string name="menu_gallery_add_current">Lägg till aktuell mapp</string>
+    <string name="menu_gallery_custom_path">Egen sökväg</string>
     <string name="menu_music_albums">Album</string>
     <string name="menu_music_folders">Musikmappar</string>
+    <string name="menu_music_add_current">Lägg till aktuell mapp</string>
+    <string name="menu_music_custom_path">Egen sökväg</string>
+    <string name="dialog_add_custom_path">Lägg till egen sökväg</string>
+    <string name="custom_path_hint">Ange mappens adress (t.ex. /sdcard/Music)</string>
     <string name="menu_create_playlist">Skapa spellista</string>
     <string name="default_playlist_name">Ny spellista</string>
     <string name="menu_add_to_playlist">Lägg till i spellista</string>

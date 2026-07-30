@@ -332,8 +332,14 @@
     <string name="menu_musicplayer">音乐播放器</string>
     <string name="menu_gallery_albums">相册</string>
     <string name="menu_gallery_folders">画廊文件夹</string>
+    <string name="menu_gallery_add_current">添加当前文件夹</string>
+    <string name="menu_gallery_custom_path">自定义路径</string>
     <string name="menu_music_albums">专辑</string>
     <string name="menu_music_folders">音乐文件夹</string>
+    <string name="menu_music_add_current">添加当前文件夹</string>
+    <string name="menu_music_custom_path">自定义路径</string>
+    <string name="dialog_add_custom_path">添加自定义路径</string>
+    <string name="custom_path_hint">输入目录地址 (例如 /sdcard/Music)</string>
     <string name="menu_create_playlist">创建播放列表</string>
     <string name="default_playlist_name">新播放列表</string>
     <string name="menu_add_to_playlist">添加到播放列表</string>
