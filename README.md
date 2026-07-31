@@ -24,6 +24,8 @@ _Note: This project is forked from troikoss / Continuum Explorer_
  <img width="368" alt="Screen_Recording_20260711_094754_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/3d779cc2-0390-478a-b6c3-432ca447ada0" /> 
  <img width="368" alt="Screenshot_20260731_182254_Continuum Explorer" src="https://github.com/user-attachments/assets/736193b3-ab52-4540-8368-32a29f9e21b2" />  
  <img width="368" alt="Screenshot_20260731_182314_Continuum Explorer" src="https://github.com/user-attachments/assets/d2e9f1d9-8f1d-40c0-b434-2c8829cd03a0" />
+ <img width="368" alt="Screenshot_20260731_185357_Continuum Explorer" src="https://github.com/user-attachments/assets/0b810682-bb31-447d-9455-346b6ca3735a" />
+
  <img width="368" alt="Screenshot_20260731_185033_Continuum Explorer" src="https://github.com/user-attachments/assets/fc7db263-558b-47ed-9c01-214a35f8e059" />
 
 
