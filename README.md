@@ -1,14 +1,15 @@
 
 # Continuum Explorer (Memories)
 <img width="72" height="72" alt="ic_launcher" src="https://github.com/user-attachments/assets/4da8432b-f41d-443b-af68-88bec19c9cd7" />
- 
+
+ ### [**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
 
 Multifunctional filemanager, for working with your files or just to play your media!
 Works with tablets, desktops and phones. UI Adapts to your device screen.
 
 _Note: This project is forked from troikoss / Continuum Explorer_
 
-[**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
+
 
 [<img width="200" alt="badge_github" src="https://github.com/user-attachments/assets/787645c4-7de6-40f7-b76a-0c2a751811b6" />](https://github.com/johakovi/Continuum-Explorer-Memories/releases) 
 [<img width="200" alt="badge_obtainium" src="https://github.com/user-attachments/assets/bf1da4c3-50e3-42ea-b0a3-66d74128138b" />](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/johakovi/Continuum-Explorer-Memories)
