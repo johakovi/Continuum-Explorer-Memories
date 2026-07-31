@@ -126,6 +126,9 @@ class FileExplorerState(
     // Callback to open a new tab
     var onOpenInNewTab: ((UniversalFile) -> Unit)? = null
 
+    // Callback to request focus for the explorer UI
+    var requestFocus: (() -> Unit)? = null
+
     var isSearchMode by mutableStateOf(false)
     var isSearchUIActive by mutableStateOf(false)
     var isAddressBarActive by mutableStateOf(false)

@@ -2,6 +2,8 @@ package com.troikoss.continuum_explorer.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
@@ -162,8 +164,15 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     // --- Side Effects ---
 
     // Focus management
+    LaunchedEffect(focusRequester) {
+        appState.requestFocus = {
+            try { focusRequester.requestFocus() } catch (_: Exception) {}
+        }
+    }
+
     LaunchedEffect(appState, appState.loadedPathKey, appState.isSearchUIActive, appState.isAddressBarActive) {
         if (!appState.isSearchUIActive && !appState.isAddressBarActive) {
+            delay(100) // Give Compose time to settle focusable modifiers
             try { focusRequester.requestFocus() } catch (_: Exception) {}
         }
     }
@@ -546,6 +555,12 @@ private fun FileLayout(
             Box(modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .onGloballyPositioned { headerHeightPx = it.size.height.toFloat() }
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        focusRequester.requestFocus()
+                    }
+                }
             ) {
                 DetailsHeader(appState = appState, scrollState = hScrollState)
             }
@@ -553,6 +568,12 @@ private fun FileLayout(
             Box(modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .onGloballyPositioned { headerHeightPx = it.size.height.toFloat() }
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        focusRequester.requestFocus()
+                    }
+                }
             ) {
                 MusicHeader(appState = appState, scrollState = hScrollState)
             }
@@ -666,7 +687,13 @@ private fun FileGrid(
         },
         modifier = (if (viewMode == ViewMode.DETAILS) Modifier.fillMaxSize().padding(horizontal = 16.dp)
         else Modifier.fillMaxSize().padding(horizontal = 32.dp))
-            .fadingEdge(gridState, showBottom = isInWindowMode),
+            .fadingEdge(gridState, showBottom = isInWindowMode)
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    focusRequester.requestFocus()
+                }
+            },
         contentPadding = if (viewMode == ViewMode.DETAILS) PaddingValues(bottom = fadeHeight)
         else PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp + fadeHeight)
     ) {

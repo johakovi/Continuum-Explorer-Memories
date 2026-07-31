@@ -20,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -51,6 +52,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
     val configs = appState.appConfigs
     val extendedColors = LocalExtendedColors.current
     val gridState = rememberLazyGridState()
+    val focusRequester = remember { FocusRequester() }
 
     // Track dragging state for reordering
     var draggedItemId by remember { mutableStateOf<String?>(null) }
@@ -63,6 +65,12 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
 
     val itemSize = appState.folderConfigs.gridItemSize.dp
 
+    LaunchedEffect(focusRequester) {
+        appState.requestFocus = {
+            try { focusRequester.requestFocus() } catch (_: Exception) {}
+        }
+    }
+
     // Map the dynamic libraryOrder to HomeItemData, excluding "home" itself
     val items = configs.libraryOrder.filter { it != "home" }.mapNotNull { id ->
         getHomeItemData(id, configs, appState, extendedColors)
@@ -74,7 +82,7 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
             .navigationBarsPadding()
             .containerGestures(
                 selectionManager = appState.selectionManager,
-                focusRequester = remember { androidx.compose.ui.focus.FocusRequester() },
+                focusRequester = focusRequester,
                 viewMode = com.troikoss.continuum_explorer.model.ViewMode.GRID,
                 columns = 1,
                 onZoom = { factor ->
@@ -98,7 +106,13 @@ fun HomeView(appState: FileExplorerState, onAddStorage: (() -> Unit)? = null) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
-                .fadingEdge(gridState, showBottom = false),
+                .fadingEdge(gridState, showBottom = false)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        focusRequester.requestFocus()
+                    }
+                },
             contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)

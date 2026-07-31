@@ -59,7 +59,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -188,6 +187,18 @@ fun Modifier.containerGestures(
             down = FocusRequester.Cancel
         }
         .focusable()
+        // Ensure the container (and thus hotkeys) always gains focus when clicked/touched,
+        // even if children or the grid consume the event.
+        .pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                    if (event.type == PointerEventType.Press) {
+                        focusRequester.requestFocus()
+                    }
+                }
+            }
+        }
         .pointerInput(onZoom) {
             awaitPointerEventScope {
                 while (true) {
@@ -455,7 +466,6 @@ fun Modifier.itemGestures(
     focusRequester: FocusRequester,
     appState: FileExplorerState
 ): Modifier = composed {
-    val focusManager = LocalFocusManager.current
     var lastClickTime by remember { mutableLongStateOf(0L) }
     var isPrimaryClick by remember { mutableStateOf(false) }
 
@@ -473,7 +483,7 @@ fun Modifier.itemGestures(
                     // Consume immediately so containerGestures knows a finger landed on an item
                     // and doesn't clear selection via its own touch-press handler.
                     event.changes.forEach { it.consume() }
-                    focusManager.clearFocus()
+                    focusRequester.requestFocus()
                     val pointerId = event.changes[0].id
                     val longPress = awaitLongPressOrCancellation(pointerId)
                     if (longPress != null) {
