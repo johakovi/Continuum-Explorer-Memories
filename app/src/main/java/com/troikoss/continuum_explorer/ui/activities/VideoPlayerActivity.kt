@@ -123,6 +123,7 @@ import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.AppConfigurations
 import com.troikoss.continuum_explorer.providers.ProviderDataSource
 import com.troikoss.continuum_explorer.utils.getSiblingFiles
+import com.troikoss.continuum_explorer.managers.CleanupManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.CancellationException
@@ -490,7 +491,16 @@ fun VideoPlayerScreen(
     }
 
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
-    DisposableEffect(Unit) { onDispose { exoPlayer.release() } }
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+            // Clear network cache when player is closed to remove temporary files/fragments
+            val appContext = context.applicationContext
+            kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
+                CleanupManager.clearNetworkCache(appContext)
+            }
+        }
+    }
 
     // ── UI ──────────────────────────────────────────────────────────────────
     Scaffold { innerPadding ->
@@ -930,7 +940,7 @@ fun VideoPlayerScreen(
                                             trailingIcon = {
                                                 Row {
                                                     val sel = subtitleTracks.firstOrNull { it.isSelected }
-                                                    Text(sel?.label ?: "Off", color = Color.Gray)
+                                                    Text(sel?.label ?: stringResource(R.string.off), color = Color.Gray)
                                                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
                                                 }
                                             },

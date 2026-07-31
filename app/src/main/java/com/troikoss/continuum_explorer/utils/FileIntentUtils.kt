@@ -484,7 +484,7 @@ fun openInTermux(context: Context, path: String, isScript: Boolean = false) {
             context.startService(intent)
         }
     } catch (e: Exception) {
-        Toast.makeText(context, "Failed to open Termux: ${e.message}. Ensure 'Allow external apps' is enabled in Termux settings.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.msg_termux_failed, e.message), Toast.LENGTH_LONG).show()
     }
 }
 

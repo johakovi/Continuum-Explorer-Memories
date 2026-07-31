@@ -62,6 +62,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -120,6 +121,7 @@ import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
 import com.troikoss.continuum_explorer.utils.deleteFiles
 import com.troikoss.continuum_explorer.utils.getSiblingFiles
+import com.troikoss.continuum_explorer.managers.CleanupManager
 import com.troikoss.continuum_explorer.utils.renameFile
 import com.troikoss.continuum_explorer.utils.toUniversal
 import kotlinx.coroutines.Dispatchers
@@ -159,6 +161,16 @@ fun ImageViewerScreen(
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
     val isFilmstripDragged by listState.interactionSource.collectIsDraggedAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            // Clear network cache when image viewer is closed
+            val appContext = context.applicationContext
+            kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
+                CleanupManager.clearNetworkCache(appContext)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -610,7 +622,7 @@ fun ImageViewerScreen(
                                 try {
                                     val contentUri = getSecureContentUri(context, data)
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newUri(context.contentResolver, "Copied Image", contentUri)
+                                    val clip = ClipData.newUri(context.contentResolver, resources.getString(R.string.menu_copy_image), contentUri)
                                     clipboard.setPrimaryClip(clip)
                                     Toast.makeText(context, resources.getString(R.string.menu_copy_image), Toast.LENGTH_SHORT).show()
                                 } catch (e: Exception) {
@@ -845,7 +857,7 @@ fun ImageViewerScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = { rotation = (rotation + 90f) % 360f }) {
-                                    Icon(Icons.AutoMirrored.Filled.RotateRight, contentDescription = "Rotate", tint = Color.White)
+                                    Icon(Icons.AutoMirrored.Filled.RotateRight, contentDescription = stringResource(R.string.menu_rotate), tint = Color.White)
                                 }
                                 IconButton(onClick = {
                                     currentUri?.let { data ->

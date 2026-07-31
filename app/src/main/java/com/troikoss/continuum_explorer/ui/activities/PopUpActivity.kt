@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.format.Formatter
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.unit.dp
@@ -107,6 +108,11 @@ class PopUpActivity : ComponentActivity() {
                 
                 LaunchedEffect(Unit) {
                     isVisible = true
+                }
+
+                BackHandler {
+                    FileOperationsManager.cancel()
+                    finish()
                 }
 
                 Box(

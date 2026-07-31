@@ -227,6 +227,15 @@ open class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        resetInactivityTimer()
+        // Aggressive cleanup of remote files when returning to the app
+        lifecycleScope.launch(Dispatchers.IO) {
+            CleanupManager.clearNetworkCache(applicationContext)
+        }
+    }
+
     override fun onUserInteraction() {
         super.onUserInteraction()
         resetInactivityTimer()
@@ -239,8 +248,8 @@ open class MainActivity : AppCompatActivity() {
         
         com.troikoss.continuum_explorer.managers.AudioManager.release()
 
-        // Final cleanup on exit
-        lifecycleScope.launch(Dispatchers.IO) {
+        // Final cleanup on exit - use a separate scope so it's not cancelled by lifecycle
+        kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
             CleanupManager.clearCache(applicationContext)
         }
     }

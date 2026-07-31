@@ -3,10 +3,14 @@ package com.troikoss.continuum_explorer.utils
 import android.content.Context
 import android.os.Environment
 import com.troikoss.continuum_explorer.managers.ShizukuManager
+import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.ShizukuProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.yield
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -70,11 +74,17 @@ object RestrictedCache {
                 val buf = ByteArray(64 * 1024)
                 var copied = 0L
                 while (true) {
+                    ensureActive()
+                    if (FileOperationsManager.isCancelled.value) {
+                        throw Exception(context.getString(R.string.msg_operation_cancelled))
+                    }
+
                     val n = input.read(buf)
                     if (n <= 0) break
                     output.write(buf, 0, n)
                     copied += n
                     onProgress(copied, file.length)
+                    yield()
                 }
             }
         }

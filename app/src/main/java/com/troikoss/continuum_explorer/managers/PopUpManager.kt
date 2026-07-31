@@ -264,7 +264,7 @@ object FileOperationsManager {
         }
 
         return if (totalQueuedOperations.intValue > 1) {
-            "(${completedOperationsInQueue.intValue + 1}/${totalQueuedOperations.intValue}) $baseTitle"
+            context.getString(R.string.op_queue_title, completedOperationsInQueue.intValue + 1, totalQueuedOperations.intValue, baseTitle)
         } else {
             baseTitle
         }

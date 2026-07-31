@@ -1086,6 +1086,7 @@ object IconHelper {
     // --- Rendering Logic ---
     private suspend fun renderPdfThumbnail(context: Context, file: UniversalFile, thumbFile: File) {
         try {
+            var cachedFileToDelete: File? = null
             val pfd = when {
                 file.documentFileRef != null ->
                     context.contentResolver.openFileDescriptor(file.documentFileRef!!.uri, "r")
@@ -1093,6 +1094,7 @@ object IconHelper {
                     ParcelFileDescriptor.open(file.fileRef, ParcelFileDescriptor.MODE_READ_ONLY)
                 else -> {
                     val cached = RemoteCache.cache(context, file)
+                    cachedFileToDelete = cached
                     ParcelFileDescriptor.open(cached, ParcelFileDescriptor.MODE_READ_ONLY)
                 }
             }
@@ -1104,19 +1106,26 @@ object IconHelper {
                             page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                             saveBitmapToCache(bmp, thumbFile)
                         } finally {
-                            bmp.recycle() // was missing
+                            bmp.recycle()
                         }
                     }
-                } // renderer.close() now handled by .use
+                }
             }
+            // Delete the full cached file after thumbnail is generated
+            cachedFileToDelete?.delete()
         } catch (e: Exception) { e.printStackTrace() }
     }
 
     private suspend fun renderApkThumbnail(context: Context, file: UniversalFile, thumbFile: File) {
+        var cachedFileToDelete: File? = null
         try {
             val apkPath = when {
                 file.fileRef != null -> file.fileRef!!.absolutePath
-                file.provider.capabilities.isRemote -> RemoteCache.cache(context, file).absolutePath
+                file.provider.capabilities.isRemote -> {
+                    val cached = RemoteCache.cache(context, file)
+                    cachedFileToDelete = cached
+                    cached.absolutePath
+                }
                 else -> return
             }
             val pm = context.packageManager
@@ -1126,7 +1135,11 @@ object IconHelper {
                 appInfo.publicSourceDir = apkPath
                 saveBitmapToCache(drawableToBitmap(appInfo.loadIcon(pm)), thumbFile)
             }
-        } catch (e: Exception) { e.printStackTrace() }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cachedFileToDelete?.delete()
+        }
     }
 
     private fun saveBitmapToCache(bitmap: Bitmap, file: File) {

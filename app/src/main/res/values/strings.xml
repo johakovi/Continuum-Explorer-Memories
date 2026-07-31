@@ -160,6 +160,7 @@
     <string name="op_extracting">Extracting archive…</string>
     <string name="op_compressing">Compressing items…</string>
     <string name="op_processing">Processing items…</string>
+    <string name="op_queue_title">(%1$d/%2$d) %3$s</string>
     <string name="op_finished">Finished</string>
     <string name="op_time_remaining">Time remaining:</string>
     <string name="op_items_remaining">Items remaining:</string>
@@ -308,6 +309,7 @@
     <string name="menu_clear_selection">Clear Selection</string>
     <string name="menu_select_inverse">Select Inverse</string>
     <string name="menu_remove">Remove</string>
+    <string name="menu_rotate">Rotate</string>
     <string name="menu_zoom_in">Zoom in</string>
     <string name="menu_zoom_out">Zoom out</string>
     <string name="menu_reset_zoom">Reset zoom</string>
@@ -465,6 +467,7 @@
     <string name="msg_already_at_saf_root">Already at picked folder root</string>
     <string name="msg_empty_clipboard">Clipboard is empty</string>
     <string name="msg_compression_failed">Compression failed: %1$s</string>
+    <string name="msg_termux_failed">Failed to open Termux: %1$s. Ensure \'Allow external apps\' is enabled in Termux settings.</string>
     <string name="msg_unknown_compression_error">Unknown compression error</string>
     <string name="menu_set_wallpaper_failed">Failed to set wallpaper</string>
 

@@ -121,7 +121,9 @@ class WebDavProvider(
         }
     }
 
-    private inner class WatchdogInputStream(private val wrapped: InputStream) : InputStream() {
+    private inner class WatchdogInputStream(private val resp: okhttp3.Response) : InputStream() {
+        private val wrapped: InputStream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
+
         override fun read(): Int = readWithWatchdog { wrapped.read() }
         override fun read(b: ByteArray): Int = readWithWatchdog { wrapped.read(b) }
         override fun read(b: ByteArray, off: Int, len: Int): Int = readWithWatchdog { wrapped.read(b, off, len) }
@@ -140,7 +142,13 @@ class WebDavProvider(
             }
         }
 
-        override fun close() { wrapped.close() }
+        override fun close() {
+            try {
+                wrapped.close()
+            } finally {
+                resp.close()
+            }
+        }
         override fun available(): Int = wrapped.available()
         override fun skip(n: Long): Long = wrapped.skip(n)
         override fun mark(readlimit: Int) = wrapped.mark(readlimit)
@@ -252,8 +260,7 @@ class WebDavProvider(
             resp.close()
             throw NetworkProviderException("GET failed: ${resp.code}")
         }
-        val stream = resp.body?.byteStream() ?: throw NetworkProviderException("Empty response body")
-        WatchdogInputStream(stream)
+        WatchdogInputStream(resp)
     }
 
     override fun openReadFd(id: String): ParcelFileDescriptor? = null

@@ -13,37 +13,41 @@ object CleanupManager {
 
     /**
      * Clears targeted temporary data.
-     * @param includeThumbnails if true, also wipes the thumbnails cache.
+     * @param includeThumbnails if true, also wipes the thumbnails and gallery metadata.
      */
     suspend fun clearCache(context: Context, includeThumbnails: Boolean = false) = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "Starting cache cleanup (includeThumbnails=$includeThumbnails)...")
             
-            // 1. Clear Remote Cache (network files)
+            // 1. Clear Remote Cache (temporary large files from network)
             RemoteCache.evictAll(context)
             
-            // 2. Clear Thumbnails if requested
+            // 2. Clear .temp directory in external storage (temporary copies of restricted files)
+            val tempDir = RestrictedCache.getTempDir()
+            if (tempDir.exists()) {
+                tempDir.deleteRecursively()
+                tempDir.mkdirs() 
+            }
+
+            // 3. Clear Thumbnails and Gallery Metadata ONLY if explicitly requested
             if (includeThumbnails) {
                 val thumbDir = File(context.cacheDir, "thumbnails")
                 if (thumbDir.exists()) {
                     thumbDir.deleteRecursively()
                 }
-            }
-
-            // 3. Clear Gallery Metadata Cache
-            GalleryCacheManager.clearCache(context)
-            
-            // 4. Clear .temp directory in external storage
-            val tempDir = RestrictedCache.getTempDir()
-            if (tempDir.exists()) {
-                tempDir.deleteRecursively()
-                tempDir.mkdirs() // Recreate empty .temp
+                GalleryCacheManager.clearCache(context)
             }
             
-            // 4. Clear generic cache items
+            // 4. Clear generic cache items, but ALWAYS keep gallery and thumbnail directories
+            // unless includeThumbnails is true.
             context.cacheDir.listFiles()?.forEach { file ->
-                // Don't delete directories we might want to keep
-                if (file.name != "network" && file.name != "thumbnails") {
+                if (file.name == "network") {
+                    // Handled by RemoteCache.evictAll
+                } else if (file.name == "thumbnails" || file.name == "gallery_metadata") {
+                    if (includeThumbnails) {
+                        file.deleteRecursively()
+                    }
+                } else {
                     file.deleteRecursively()
                 }
             }
@@ -55,12 +59,20 @@ object CleanupManager {
     }
 
     /**
-     * Specifically clears only thumbnails.
+     * Specifically clears only network cache.
+     */
+    suspend fun clearNetworkCache(context: Context) = withContext(Dispatchers.IO) {
+        RemoteCache.evictAll(context)
+    }
+
+    /**
+     * Specifically clears only thumbnails and gallery metadata.
      */
     suspend fun clearThumbnails(context: Context) = withContext(Dispatchers.IO) {
         val thumbDir = File(context.cacheDir, "thumbnails")
         if (thumbDir.exists()) {
             thumbDir.deleteRecursively()
         }
+        GalleryCacheManager.clearCache(context)
     }
 }
