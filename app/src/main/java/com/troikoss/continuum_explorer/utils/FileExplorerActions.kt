@@ -141,7 +141,14 @@ fun FileExplorerState.paste() {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clipData = clipboard.primaryClip
     val isMove = PendingCut.isActive
-    val targetPath = currentPath
+    
+    val targetPath = when {
+        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        }
+        else -> currentPath
+    }
+    
     val targetSafUri = currentSafUri
     val targetProvider = currentNetworkProvider
     val targetNetworkId = currentNetworkId
@@ -380,9 +387,16 @@ fun FileExplorerState.createNewFolder() {
 }
 
 fun FileExplorerState.createNewFile() {
+    val targetPath = when {
+        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        }
+        else -> currentPath
+    }
+
     FileOperationsManager.openCreateFile(context) { name ->
         FileOperationsManager.enqueue(OperationType.NONE, context.getString(R.string.dialog_new_file)) {
-            val success = createFile(context, currentPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
+            val success = createFile(context, targetPath, currentSafUri, currentNetworkProvider, currentNetworkId, name)
             withContext(Dispatchers.Main) {
                 if (success) {
                     refresh()?.join()

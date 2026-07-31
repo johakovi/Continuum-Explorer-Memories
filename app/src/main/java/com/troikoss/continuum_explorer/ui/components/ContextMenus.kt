@@ -331,7 +331,7 @@ fun ItemContextMenu(
                     trailingIcon = { CtrlShortcut("C") }
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null))) {
+                if (hasClipboardItems && (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_paste)) },
                         onClick = {
@@ -615,7 +615,7 @@ fun BackgroundContextMenu(
                     }
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null))) {
+                if (hasClipboardItems && (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_paste)) },
                         leadingIcon = { Icon(Icons.Default.ContentPaste, null) },
@@ -636,7 +636,7 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                if (appState.currentPath != null) {
+                if (appState.currentPath != null || appState.libraryItem == LibraryItem.Gallery) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.folder)) },
                         leadingIcon = { Icon(Icons.Default.Folder, null) },
