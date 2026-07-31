@@ -92,7 +92,6 @@ fun TopBar(
 ) {
 
     val context = LocalContext.current
-    val msgThumbnailsCleared = stringResource(R.string.msg_thumbnails_cleared)
     val msgNotDirArchive = stringResource(R.string.msg_not_dir_archive)
     val msgFileNotFound = stringResource(R.string.msg_file_not_found)
     val msgInvalidPath = stringResource(R.string.msg_invalid_path)
@@ -847,18 +846,6 @@ fun TopBar(
                                     context.startActivity(intent)
                                 },
                                 leadingIcon = { Icon(Icons.Default.Settings, stringResource(R.string.settings)) }
-                            )
-
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_clear_thumbnails)) },
-                                onClick = {
-                                    optionsMenuExpanded = false
-                                    coroutineScope.launch {
-                                        CleanupManager.clearThumbnails(context.applicationContext)
-                                        Toast.makeText(context, msgThumbnailsCleared, Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                                leadingIcon = { Icon(Icons.Default.DeleteSweep, null) }
                             )
 
                             DropdownMenuItem(

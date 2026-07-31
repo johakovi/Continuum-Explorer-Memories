@@ -1,6 +1,8 @@
 package com.troikoss.continuum_explorer.ui.activities
 
 import android.content.Intent
+import com.troikoss.continuum_explorer.managers.CleanupManager
+import kotlinx.coroutines.launch
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -23,9 +25,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -71,6 +76,7 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val deleteBehavior = SettingsManager.deleteBehavior.value
     val touchDragBehavior = SettingsManager.touchDragBehavior.value
     val isDefaultArchiveViewerEnabled = SettingsManager.isDefaultArchiveViewerEnabled.value
@@ -621,10 +627,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(16.dp)
             )
 
+            val msgThumbnailsCleared = stringResource(R.string.msg_thumbnails_cleared)
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.menu_clear_thumbnails)) },
+                leadingContent = { Icon(Icons.Default.DeleteSweep, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    coroutineScope.launch {
+                        CleanupManager.clearThumbnails(context.applicationContext)
+                        Toast.makeText(context, msgThumbnailsCleared, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+
 
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_app_inactivity_timeout)) },
+                leadingContent = { Icon(Icons.Default.HourglassEmpty, contentDescription = null) },
                 supportingContent = { 
                     val text = if (appInactivityTimeout > 0) 
                         stringResource(R.string.settings_timeout_minutes, appInactivityTimeout)
@@ -636,6 +655,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_language)) },
+                leadingContent = { Icon(Icons.Default.Language, contentDescription = null) },
                 supportingContent = {
                     val text = when (language) {
                         "tr" -> stringResource(R.string.settings_language_turkish)
