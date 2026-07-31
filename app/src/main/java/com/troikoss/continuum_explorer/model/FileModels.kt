@@ -157,3 +157,16 @@ data class NetworkConnection(
 )
 
 data class GameShortcut(val uri: Uri, val name: String? = null)
+
+enum class SubtitleStyle {
+    SHADOW,
+    BAR
+}
+
+enum class SubtitleFontSize(val scale: Float) {
+    EXTRA_BIG(1.5f),
+    BIG(1.25f),
+    MEDIUM(1.0f),
+    SMALL(0.75f),
+    EXTRA_SMALL(0.5f)
+}

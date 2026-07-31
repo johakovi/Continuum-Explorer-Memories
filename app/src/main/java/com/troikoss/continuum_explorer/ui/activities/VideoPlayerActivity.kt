@@ -113,10 +113,16 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.SubtitleView
 import androidx.media3.ui.PlayerView
+import android.graphics.Color as AndroidColor
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.ProviderKind
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.model.SubtitleStyle
+import com.troikoss.continuum_explorer.model.SubtitleFontSize
+import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
@@ -151,6 +157,19 @@ enum class ResizeMode(val labelRes: Int, val value: Int) {
     ZOOM(R.string.media_zoom, AspectRatioFrameLayout.RESIZE_MODE_ZOOM),
     FIXED_WIDTH(R.string.media_fixed_w, AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH),
     FIXED_HEIGHT(R.string.media_fixed_h, AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT),
+}
+
+private fun SubtitleStyle.getLabelRes(): Int = when (this) {
+    SubtitleStyle.SHADOW -> R.string.subtitle_style_shadow
+    SubtitleStyle.BAR -> R.string.subtitle_style_bar
+}
+
+private fun SubtitleFontSize.getLabelRes(): Int = when (this) {
+    SubtitleFontSize.EXTRA_BIG -> R.string.subtitle_size_extra_big
+    SubtitleFontSize.BIG -> R.string.subtitle_size_big
+    SubtitleFontSize.MEDIUM -> R.string.subtitle_size_medium
+    SubtitleFontSize.SMALL -> R.string.subtitle_size_small
+    SubtitleFontSize.EXTRA_SMALL -> R.string.subtitle_size_extra_small
 }
 
 
@@ -215,6 +234,8 @@ fun VideoPlayerScreen(
     // ── Options menu ────────────────────────────────────────────────────────
     var optionsMenuExpanded by remember { mutableStateOf(false) }
     var optionsScreen       by remember { mutableStateOf("MAIN") }
+    var subtitleStyle       by remember { mutableStateOf(SettingsManager.subtitleStyle.value) }
+    var subtitleFontSize    by remember { mutableStateOf(SettingsManager.subtitleFontSize.value) }
 
     // ── Volume ──────────────────────────────────────────────────────────────
     var volume by remember { mutableFloatStateOf(1f) }
@@ -315,6 +336,32 @@ fun VideoPlayerScreen(
     // ── Apply resize mode ───────────────────────────────────────────────────
     LaunchedEffect(resizeMode) {
         playerViewRef?.resizeMode = resizeMode.value
+    }
+
+    // ── Apply subtitle style ────────────────────────────────────────────────
+    LaunchedEffect(playerViewRef, subtitleStyle, subtitleFontSize) {
+        playerViewRef?.let { pv ->
+            val style = when (subtitleStyle) {
+                SubtitleStyle.SHADOW -> CaptionStyleCompat(
+                    AndroidColor.WHITE,
+                    AndroidColor.TRANSPARENT,
+                    AndroidColor.TRANSPARENT,
+                    CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW,
+                    AndroidColor.BLACK,
+                    null
+                )
+                SubtitleStyle.BAR -> CaptionStyleCompat(
+                    AndroidColor.WHITE,
+                    AndroidColor.BLACK,
+                    AndroidColor.TRANSPARENT,
+                    CaptionStyleCompat.EDGE_TYPE_NONE,
+                    AndroidColor.BLACK,
+                    null
+                )
+            }
+            pv.subtitleView?.setStyle(style)
+            pv.subtitleView?.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * subtitleFontSize.scale)
+        }
     }
 
     // ── Load sibling videos ─────────────────────────────────────────────────
@@ -1059,6 +1106,32 @@ fun VideoPlayerScreen(
                                         )
                                         HorizontalDivider()
 
+                                        // Subtitle Style entry
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.menu_subtitle_appearance)) },
+                                            trailingIcon = {
+                                                Row {
+                                                    Text(stringResource(subtitleStyle.getLabelRes()), color = Color.Gray)
+                                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
+                                                }
+                                            },
+                                            onClick = { optionsScreen = "SUBTITLE_STYLE" }
+                                        )
+                                        HorizontalDivider()
+
+                                        // Subtitle Size entry
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.menu_subtitle_font_size)) },
+                                            trailingIcon = {
+                                                Row {
+                                                    Text(stringResource(subtitleFontSize.getLabelRes()), color = Color.Gray)
+                                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
+                                                }
+                                            },
+                                            onClick = { optionsScreen = "SUBTITLE_SIZE" }
+                                        )
+                                        HorizontalDivider()
+
                                         // "Off" option — disable all text tracks
                                         val subtitlesOff = subtitleTracks.none { it.isSelected }
                                         DropdownMenuItem(
@@ -1099,6 +1172,54 @@ fun VideoPlayerScreen(
                                                                 .setOverrideForType(override)
                                                                 .build()
                                                     }
+                                                    optionsMenuExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    // ── SUBTITLE STYLE screen ─────────────
+                                    "SUBTITLE_STYLE" -> {
+                                        DropdownMenuItem(
+                                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) },
+                                            text = { Text(stringResource(R.string.back)) },
+                                            onClick = { optionsScreen = "SUBTITLES" }
+                                        )
+                                        HorizontalDivider()
+
+                                        SubtitleStyle.entries.forEach { style ->
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(style.getLabelRes())) },
+                                                trailingIcon = {
+                                                    if (subtitleStyle == style) Icon(Icons.Default.Check, null)
+                                                },
+                                                onClick = {
+                                                    subtitleStyle = style
+                                                    SettingsManager.setSubtitleStyle(context, style)
+                                                    optionsMenuExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    // ── SUBTITLE SIZE screen ─────────────
+                                    "SUBTITLE_SIZE" -> {
+                                        DropdownMenuItem(
+                                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) },
+                                            text = { Text(stringResource(R.string.back)) },
+                                            onClick = { optionsScreen = "SUBTITLES" }
+                                        )
+                                        HorizontalDivider()
+
+                                        SubtitleFontSize.entries.forEach { size ->
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(size.getLabelRes())) },
+                                                trailingIcon = {
+                                                    if (subtitleFontSize == size) Icon(Icons.Default.Check, null)
+                                                },
+                                                onClick = {
+                                                    subtitleFontSize = size
+                                                    SettingsManager.setSubtitleFontSize(context, size)
                                                     optionsMenuExpanded = false
                                                 }
                                             )

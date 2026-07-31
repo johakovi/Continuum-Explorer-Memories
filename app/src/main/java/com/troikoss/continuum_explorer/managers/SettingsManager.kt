@@ -7,6 +7,8 @@ import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
+import com.troikoss.continuum_explorer.model.SubtitleStyle
+import com.troikoss.continuum_explorer.model.SubtitleFontSize
 import com.troikoss.continuum_explorer.utils.GlobalEvents
 
 enum class DetailsMode {
@@ -100,6 +102,8 @@ object SettingsManager {
     private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
     private const val KEY_MUSIC_FOLDERS = "music_folders"
     private const val KEY_MUSIC_FILTER_ENABLED = "music_filter_enabled"
+    private const val KEY_SUBTITLE_STYLE = "subtitle_style"
+    private const val KEY_SUBTITLE_FONT_SIZE = "subtitle_font_size"
     private const val PREFS_FOLDER_COLORS = "folder_colors"
     private const val KEY_DEFAULT_FOLDER_COLOR = "default_folder_color"
 
@@ -218,6 +222,12 @@ object SettingsManager {
 
     private val _isMusicFilterEnabled = mutableStateOf(false)
     val isMusicFilterEnabled: State<Boolean> = _isMusicFilterEnabled
+
+    private val _subtitleStyle = mutableStateOf(SubtitleStyle.BAR)
+    val subtitleStyle: State<SubtitleStyle> = _subtitleStyle
+
+    private val _subtitleFontSize = mutableStateOf(SubtitleFontSize.MEDIUM)
+    val subtitleFontSize: State<SubtitleFontSize> = _subtitleFontSize
 
     private val _folderColors = mutableStateMapOf<String, Long>()
     val folderColors: Map<String, Long> = _folderColors
@@ -395,6 +405,20 @@ object SettingsManager {
 
         _musicFolders.value = prefs.getStringSet(KEY_MUSIC_FOLDERS, emptySet()) ?: emptySet()
         _isMusicFilterEnabled.value = prefs.getBoolean(KEY_MUSIC_FILTER_ENABLED, false)
+
+        val savedSubtitleStyle = prefs.getString(KEY_SUBTITLE_STYLE, SubtitleStyle.BAR.name)
+        _subtitleStyle.value = try {
+            SubtitleStyle.valueOf(savedSubtitleStyle ?: SubtitleStyle.BAR.name)
+        } catch (_: Exception) {
+            SubtitleStyle.BAR
+        }
+
+        val savedSubtitleFontSize = prefs.getString(KEY_SUBTITLE_FONT_SIZE, SubtitleFontSize.MEDIUM.name)
+        _subtitleFontSize.value = try {
+            SubtitleFontSize.valueOf(savedSubtitleFontSize ?: SubtitleFontSize.MEDIUM.name)
+        } catch (_: Exception) {
+            SubtitleFontSize.MEDIUM
+        }
 
         val colorPrefs = context.getSharedPreferences(PREFS_FOLDER_COLORS, Context.MODE_PRIVATE)
         _folderColors.clear()
@@ -758,6 +782,20 @@ object SettingsManager {
         _isMusicFilterEnabled.value = enabled
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_MUSIC_FILTER_ENABLED, enabled).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setSubtitleStyle(context: Context, style: SubtitleStyle) {
+        _subtitleStyle.value = style
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(KEY_SUBTITLE_STYLE, style.name).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setSubtitleFontSize(context: Context, size: SubtitleFontSize) {
+        _subtitleFontSize.value = size
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(KEY_SUBTITLE_FONT_SIZE, size.name).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 
