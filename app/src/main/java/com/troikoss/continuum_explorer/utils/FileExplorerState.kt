@@ -630,16 +630,18 @@ class FileExplorerState(
 
         val key = getCurrentStorageKey()
         withContext(Dispatchers.Main) {
-            folderConfigs.resolveViewMode(key, libraryItem)
             folderConfigs.resolveSortParams(key)
-            folderConfigs.resolveGridSize(key)
-            folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
-            folderConfigs.resolveColumnWidths(key)
         }
 
         val onIncrementalUpdate: (List<UniversalFile>) -> Unit = { partial ->
             scope.launch(Dispatchers.Main) {
                 if (libraryItem == LibraryItem.Gallery) {
+                    // Resolve UI layout configs together with file assignment
+                    folderConfigs.resolveViewMode(key, libraryItem)
+                    folderConfigs.resolveGridSize(key)
+                    folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
+                    folderConfigs.resolveColumnWidths(key)
+
                     val sorted = sortFiles(partial, folderConfigs.sortParams)
                     files = sorted
                     selectionManager.allFiles = files
@@ -658,6 +660,12 @@ class FileExplorerState(
             if (cachedList.isNotEmpty()) {
                 val sorted = sortFiles(cachedList, folderConfigs.sortParams)
                 withContext(Dispatchers.Main) {
+                    // Resolve UI layout configs together with file assignment
+                    folderConfigs.resolveViewMode(key, libraryItem)
+                    folderConfigs.resolveGridSize(key)
+                    folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
+                    folderConfigs.resolveColumnWidths(key)
+
                     files = sorted
                     selectionManager.allFiles = files
                 }
@@ -784,6 +792,12 @@ class FileExplorerState(
             }
 
             withContext(Dispatchers.Main) {
+                // Resolve UI layout configs together with file assignment
+                folderConfigs.resolveViewMode(key, libraryItem)
+                folderConfigs.resolveGridSize(key)
+                folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
+                folderConfigs.resolveColumnWidths(key)
+
                 recycleBinMetadata = newMeta
                 files = sortedList
 

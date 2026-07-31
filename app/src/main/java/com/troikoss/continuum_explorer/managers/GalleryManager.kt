@@ -20,21 +20,18 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 object GalleryManager {
-    // Returns only the media files directly in dirPath (no subdirectories).
-    suspend fun getAlbumContents(context: Context, dirPath: String, provider: StorageProvider? = null, forceRefresh: Boolean = false, useCacheOnly: Boolean = false, onUpdate: ((List<UniversalFile>) -> Unit)? = null): List<UniversalFile> {
+    suspend fun getAlbumContents(context: Context, dirPath: String, provider: StorageProvider? = null, forceRefresh: Boolean = false, useCacheOnly: Boolean = false, onUpdate: ((List<UniversalFile>) -> Unit)? = null): List<UniversalFile> = withContext(Dispatchers.IO) {
         if (provider != null && provider !is LocalProvider) {
-            if (useCacheOnly) {
-                if (!forceRefresh) {
-                    val cached = GalleryCacheManager.loadCache(context, "album:$dirPath")
-                    if (cached != null) {
-                        onUpdate?.invoke(cached)
-                        return cached
-                    }
-                }
-                return emptyList()
+            val cached = if (!forceRefresh) GalleryCacheManager.loadCache(context, "album:$dirPath") else null
+            if (cached != null) {
+                onUpdate?.invoke(cached)
             }
 
-            return try {
+            if (useCacheOnly) {
+                return@withContext cached ?: emptyList()
+            }
+
+            return@withContext try {
                 val files = provider.listChildren(dirPath).filter { !it.isDirectory && isImageOrVideoFile(it.name) }
                 if (files.isNotEmpty()) {
                     GalleryCacheManager.saveCache(context, "album:$dirPath", files)
@@ -42,13 +39,13 @@ object GalleryManager {
                 onUpdate?.invoke(files)
                 files
             } catch (e: Exception) {
-                emptyList()
+                cached ?: emptyList()
             }
         }
 
         val items = getLocalAlbumContents(context, dirPath)
         onUpdate?.invoke(items)
-        return items
+        items
     }
 
     private fun getLocalAlbumContents(context: Context, dirPath: String): List<UniversalFile> {
@@ -120,31 +117,38 @@ object GalleryManager {
     }
 
     suspend fun getGalleryFiles(context: Context, allowedFolders: Set<String> = emptySet(), forceRefresh: Boolean = false, useCacheOnly: Boolean = false, onUpdate: ((List<UniversalFile>) -> Unit)? = null): List<UniversalFile> = withContext(Dispatchers.IO) {
-        val allFiles = java.util.Collections.synchronizedList(mutableListOf<UniversalFile>())
         val appConfigs = AppConfigurations(context)
+        val dataMap = java.util.Collections.synchronizedMap(mutableMapOf<String, List<UniversalFile>>())
 
-        if (useCacheOnly) {
-            allFiles.addAll(getLocalGalleryFiles(context, allowedFolders))
-            allowedFolders.forEach { folderKey ->
-                if (!forceRefresh) {
-                    val cached = GalleryCacheManager.loadCache(context, "files:$folderKey")
-                    if (cached != null) allFiles.addAll(cached)
-                }
-            }
-            val result = allFiles.toList()
-            onUpdate?.invoke(result)
-            return@withContext result
+        fun emit() {
+            onUpdate?.invoke(dataMap.values.flatten())
         }
 
         coroutineScope {
-            // 1. Scan local files via MediaStore (Parallel)
-            launch {
-                val localFiles = getLocalGalleryFiles(context, allowedFolders)
-                allFiles.addAll(localFiles)
-                onUpdate?.invoke(allFiles.toList())
+            // 1. Initial Load: Cache (Immediate)
+            if (!forceRefresh) {
+                allowedFolders.forEach { folderKey ->
+                    if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
+                        launch {
+                            val cached = GalleryCacheManager.loadCache(context, "files:$folderKey")
+                            if (cached != null) {
+                                dataMap["cache:$folderKey"] = cached
+                                emit()
+                            }
+                        }
+                    }
+                }
             }
 
-            // 2. Scan remote/allowed folders (Parallel)
+            // 2. Initial Load: Local (MediaStore is fast, but let it be parallel)
+            launch {
+                dataMap["local"] = getLocalGalleryFiles(context, allowedFolders)
+                emit()
+            }
+
+            if (useCacheOnly) return@coroutineScope
+
+            // 3. Scan remote/allowed folders (Parallel) to refresh
             allowedFolders.forEach { folderKey ->
                 if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
                     launch {
@@ -169,15 +173,16 @@ object GalleryManager {
                         }
                         if (folderFiles.isNotEmpty()) {
                             GalleryCacheManager.saveCache(context, "files:$folderKey", folderFiles)
-                            allFiles.addAll(folderFiles)
-                            onUpdate?.invoke(allFiles.toList())
+                            dataMap.remove("cache:$folderKey")
+                            dataMap["fresh:$folderKey"] = folderFiles
+                            emit()
                         }
                     }
                 }
             }
         }
 
-        allFiles.toList()
+        dataMap.values.flatten()
     }
 
     private fun getLocalGalleryFiles(context: Context, allowedFolders: Set<String>): List<UniversalFile> {
@@ -262,33 +267,38 @@ object GalleryManager {
     }
 
     suspend fun getGalleryAlbums(context: Context, allowedFolders: Set<String> = emptySet(), forceRefresh: Boolean = false, useCacheOnly: Boolean = false, onUpdate: ((List<UniversalFile>) -> Unit)? = null): List<UniversalFile> = withContext(Dispatchers.IO) {
-        val allAlbums = java.util.Collections.synchronizedList(mutableListOf<UniversalFile>())
         val appConfigs = AppConfigurations(context)
+        val dataMap = java.util.Collections.synchronizedMap(mutableMapOf<String, List<UniversalFile>>())
 
-        if (useCacheOnly) {
-            allAlbums.addAll(getLocalGalleryAlbums(context, allowedFolders))
-            allowedFolders.forEach { folderKey ->
-                if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
-                    if (!forceRefresh) {
-                        val cached = GalleryCacheManager.loadCache(context, "albums:$folderKey")
-                        if (cached != null) allAlbums.addAll(cached)
-                    }
-                }
-            }
-            val result = allAlbums.toList()
-            onUpdate?.invoke(result)
-            return@withContext result
+        fun emit() {
+            onUpdate?.invoke(dataMap.values.flatten().sortedBy { it.name.lowercase() })
         }
 
         coroutineScope {
-            // 1. Scan local folders (Parallel)
-            launch {
-                val local = getLocalGalleryAlbums(context, allowedFolders)
-                allAlbums.addAll(local)
-                onUpdate?.invoke(allAlbums.toList())
+            // 1. Initial Load: Cache (Immediate)
+            if (!forceRefresh) {
+                allowedFolders.forEach { folderKey ->
+                    if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
+                        launch {
+                            val cached = GalleryCacheManager.loadCache(context, "albums:$folderKey")
+                            if (cached != null) {
+                                dataMap["cache:$folderKey"] = cached
+                                emit()
+                            }
+                        }
+                    }
+                }
             }
 
-            // 2. Scan remote folders (Parallel)
+            // 2. Initial Load: Local
+            launch {
+                dataMap["local"] = getLocalGalleryAlbums(context, allowedFolders)
+                emit()
+            }
+
+            if (useCacheOnly) return@coroutineScope
+
+            // 3. Scan remote folders (Parallel) to refresh
             allowedFolders.forEach { folderKey ->
                 if (folderKey.startsWith("network:") || folderKey.startsWith("content://")) {
                     launch {
@@ -316,8 +326,9 @@ object GalleryManager {
                             scanForRemoteAlbums(provider, path, kind, connId, folderAlbums)
                             if (folderAlbums.isNotEmpty()) {
                                 GalleryCacheManager.saveCache(context, "albums:$folderKey", folderAlbums)
-                                allAlbums.addAll(folderAlbums)
-                                onUpdate?.invoke(allAlbums.toList())
+                                dataMap.remove("cache:$folderKey")
+                                dataMap["fresh:$folderKey"] = folderAlbums
+                                emit()
                             }
                         }
                     }
@@ -325,7 +336,7 @@ object GalleryManager {
             }
         }
 
-        allAlbums.sortedBy { it.name.lowercase() }
+        dataMap.values.flatten().sortedBy { it.name.lowercase() }
     }
 
     private fun getLocalGalleryAlbums(context: Context, allowedFolders: Set<String>): List<UniversalFile> {
