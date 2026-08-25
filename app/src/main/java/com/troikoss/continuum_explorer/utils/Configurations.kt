@@ -281,6 +281,7 @@ class AppConfigurations(private val context: Context) {
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
+    var isVideosVisible by mutableStateOf(false)
     var isMusicVisible by mutableStateOf(false)
     var isDownloadsVisible by mutableStateOf(false)
     var isDocumentsVisible by mutableStateOf(true)
@@ -578,6 +579,7 @@ class AppConfigurations(private val context: Context) {
         }
         isRecentVisible = prefs.getBoolean("is_recent_visible", true)
         isGalleryVisible = prefs.getBoolean("is_gallery_visible", true)
+        isVideosVisible = prefs.getBoolean("is_videos_visible", false)
         isMusicVisible = prefs.getBoolean("is_music_visible", false)
         isDownloadsVisible = prefs.getBoolean("is_downloads_visible", false)
         isDocumentsVisible = prefs.getBoolean("is_documents_visible", true)
@@ -601,6 +603,7 @@ class AppConfigurations(private val context: Context) {
             putString("order", libraryOrder.joinToString("|"))
             putBoolean("is_recent_visible", isRecentVisible)
             putBoolean("is_gallery_visible", isGalleryVisible)
+            putBoolean("is_videos_visible", isVideosVisible)
             putBoolean("is_music_visible", isMusicVisible)
             putBoolean("is_downloads_visible", isDownloadsVisible)
             putBoolean("is_documents_visible", isDocumentsVisible)
@@ -623,6 +626,12 @@ class AppConfigurations(private val context: Context) {
 
     fun toggleGalleryVisibility() {
         isGalleryVisible = !isGalleryVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleVideosVisibility() {
+        isVideosVisible = !isVideosVisible
         saveLibrarySettings()
         GlobalEvents.triggerConfigUpdate()
     }

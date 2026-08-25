@@ -94,7 +94,9 @@
     <string name="shortcuts_ctrl_cvx_desc">Kopiera / Klipp ut / Klistra in</string>
     <string name="shortcuts_delete">Delete</string>
     <string name="shortcuts_delete_desc">Ta bort (Shift + Delete för permanent)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">Byt namn</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">Uppdatera</string>
     <string name="shortcuts_app_actions">App-åtgärder</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -298,6 +300,15 @@
     <string name="menu_new_playlist">Ny spellista</string>
     <string name="menu_content">Innehåll</string>
     <string name="menu_subtitles">Undertexter</string>
+    <string name="menu_subtitle_appearance">Utseende</string>
+    <string name="subtitle_style_shadow">Skugga</string>
+    <string name="subtitle_style_bar">Stapel</string>
+    <string name="menu_subtitle_font_size">Teckenstorlek</string>
+    <string name="subtitle_size_extra_big">Extra stor (+50%)</string>
+    <string name="subtitle_size_big">Stor (+25%)</string>
+    <string name="subtitle_size_medium">Mellan</string>
+    <string name="subtitle_size_small">Liten (-25%)</string>
+    <string name="subtitle_size_extra_small">Extra liten (-50%)</string>
     <string name="menu_audio_track">Ljudspår</string>
     <string name="menu_speed">Hastighet</string>
     <string name="menu_aspect_ratio">Bildförhållande</string>
@@ -313,6 +324,7 @@
     <string name="menu_copy_image">Kopiera bild</string>
     <string name="menu_set_wallpaper">Använd som bakgrund</string>
     <string name="menu_fullscreen">Helskärm</string>
+    <string name="menu_rotate">Rotera</string>
     <string name="menu_undo">Ångra</string>
     <string name="menu_redo">Gör om</string>
     <string name="menu_folder_color">Mappfärg</string>
@@ -323,6 +335,7 @@
     <string name="nav_home">Hem</string>
     <string name="nav_recent">Senaste</string>
     <string name="nav_gallery">Galleri</string>
+    <string name="nav_video">Videor</string>
     <string name="nav_music">Musik</string>
     <string name="nav_downloads">Hämtningar</string>
     <string name="nav_documents">Dokument</string>
@@ -334,6 +347,9 @@
     <string name="menu_gallery_folders">Gallerimappar</string>
     <string name="menu_gallery_add_current">Lägg till aktuell mapp</string>
     <string name="menu_gallery_custom_path">Egen sökväg</string>
+    <string name="menu_video_folders">Videomappar</string>
+    <string name="menu_video_add_current">Lägg till aktuell mapp</string>
+    <string name="menu_video_custom_path">Egen sökväg</string>
     <string name="menu_music_albums">Album</string>
     <string name="menu_music_folders">Musikmappar</string>
     <string name="menu_music_add_current">Lägg till aktuell mapp</string>
@@ -350,6 +366,11 @@
     <string name="gallery_managed_folders">Hanterade mappar:</string>
     <string name="gallery_add_folder">Lägg till mapp</string>
     <string name="menu_gallery_show_all">Visa alla media</string>
+    <string name="video_filter_off_msg">Filtrering är för närvarande AV. Visar all media.</string>
+    <string name="video_no_folders_msg">Inga mappar tillagda. Standardmediaplatser kommer att användas om filtrering är aktiverad.</string>
+    <string name="video_managed_folders">Hanterade mappar:</string>
+    <string name="video_add_folder">Lägg till mapp</string>
+    <string name="menu_video_show_all">Visa alla media</string>
     <string name="menu_documents_folder">Mapp</string>
     <string name="menu_documents_show_folders">Visa mappar</string>
     <string name="menu_favourite">Favorit</string>
@@ -464,6 +485,7 @@
     <string name="msg_already_at_saf_root">Redan i den valda mappens rot</string>
     <string name="msg_empty_clipboard">Urklipp är tomt</string>
     <string name="msg_compression_failed">Komprimering misslyckades: %1$s</string>
+    <string name="msg_termux_failed">Det gick inte att öppna Termux: %1$s. Se till att \'Tillåt externa appar\' är aktiverat i Termux-inställningarna.</string>
     <string name="msg_unknown_compression_error">Okänt komprimeringsfel</string>
     <string name="menu_set_wallpaper_failed">Misslyckades med att ställa in bakgrund</string>
     <string name="media_share_image_failed">Kunde inte dela bild</string>
@@ -550,6 +572,7 @@
     <string name="msg_restricted_access_shizuku">Denna mapp är begränsad av Android. Aktivera och auktorisera Shizuku för att få åtkomst.</string>
     <string name="msg_cant_access_directory">Kan inte komma åt denna mapp</string>
     <string name="msg_nothing_here">Det finns inget här än</string>
+    <string name="msg_video_nothing_here">Inga medier eller mappar tillagda i videohanteraren</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Batteri</string>

@@ -301,6 +301,15 @@
     <string name="menu_new_playlist">Nouvelle liste de lecture</string>
     <string name="menu_content">Contenu</string>
     <string name="menu_subtitles">Sous-titres</string>
+    <string name="menu_subtitle_appearance">Apparence</string>
+    <string name="subtitle_style_shadow">Ombre</string>
+    <string name="subtitle_style_bar">Barre</string>
+    <string name="menu_subtitle_font_size">Taille de la police</string>
+    <string name="subtitle_size_extra_big">Très grand (+50%)</string>
+    <string name="subtitle_size_big">Grand (+25%)</string>
+    <string name="subtitle_size_medium">Moyen</string>
+    <string name="subtitle_size_small">Petit (-25%)</string>
+    <string name="subtitle_size_extra_small">Très petit (-50%)</string>
     <string name="menu_audio_track">Piste audio</string>
     <string name="menu_speed">Vitesse</string>
     <string name="menu_aspect_ratio">Rapport d\'aspect</string>
@@ -316,6 +325,7 @@
     <string name="menu_copy_image">Copier l\'image</string>
     <string name="menu_set_wallpaper">Définir comme fond d\'écran</string>
     <string name="menu_fullscreen">Plein écran</string>
+    <string name="menu_rotate">Faire pivoter</string>
     <string name="menu_undo">Annuler</string>
     <string name="menu_redo">Rétablir</string>
     <string name="menu_folder_color">Couleur du dossier</string>
@@ -326,6 +336,7 @@
     <string name="nav_home">Accueil</string>
     <string name="nav_recent">Récents</string>
     <string name="nav_gallery">Galerie</string>
+    <string name="nav_video">Vidéos</string>
     <string name="nav_music">Musique</string>
     <string name="nav_downloads">Téléchargements</string>
     <string name="nav_documents">Documents</string>
@@ -337,6 +348,9 @@
     <string name="menu_gallery_folders">Dossiers de la galerie</string>
     <string name="menu_gallery_add_current">Ajouter le dossier actuel</string>
     <string name="menu_gallery_custom_path">Chemin personnalisé</string>
+    <string name="menu_video_folders">Dossiers vidéo</string>
+    <string name="menu_video_add_current">Ajouter le dossier actuel</string>
+    <string name="menu_video_custom_path">Chemin personnalisé</string>
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Dossiers de musique</string>
     <string name="menu_music_add_current">Ajouter le dossier actuel</string>
@@ -353,6 +367,11 @@
     <string name="gallery_managed_folders">Dossiers gérés :</string>
     <string name="gallery_add_folder">Ajouter un dossier</string>
     <string name="menu_gallery_show_all">Afficher tous les médias</string>
+    <string name="video_filter_off_msg">Le filtrage est actuellement DÉSACTIVÉ. Affichage de tous les médias.</string>
+    <string name="video_no_folders_msg">Aucun dossier ajouté. Les emplacements multimédias standards seront utilisés si le filtrage est activé.</string>
+    <string name="video_managed_folders">Dossiers gérés :</string>
+    <string name="video_add_folder">Ajouter un dossier</string>
+    <string name="menu_video_show_all">Afficher tous les médias</string>
     <string name="menu_documents_folder">Dossier</string>
     <string name="menu_documents_show_folders">Afficher les dossiers</string>
     <string name="menu_favourite">Favori</string>
@@ -467,6 +486,7 @@
     <string name="msg_already_at_saf_root">Déjà à la racine du dossier sélectionné</string>
     <string name="msg_empty_clipboard">Le presse-papiers est vide</string>
     <string name="msg_compression_failed">Échec de la compression : %1$s</string>
+    <string name="msg_termux_failed">Échec de l\'ouverture de Termux : %1$s. Assurez-vous que \'Autoriser les applications externes\' est activé dans les paramètres de Termux.</string>
     <string name="msg_unknown_compression_error">Erreur de compression inconnue</string>
     <string name="menu_set_wallpaper_failed">Échec de la définition du fond d\'écran</string>
     <string name="media_share_image_failed">Échec du partage de l\'image</string>
@@ -551,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">Ce répertoire est restreint par Android. Veuillez activer et autoriser Shizuku pour y accéder.</string>
     <string name="msg_cant_access_directory">Impossible d\'accéder à ce répertoire</string>
     <string name="msg_nothing_here">Il n\'y a encore rien ici</string>
+    <string name="msg_video_nothing_here">Aucun média ou dossier ajouté au gestionnaire de vidéos</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Système et batterie</string>

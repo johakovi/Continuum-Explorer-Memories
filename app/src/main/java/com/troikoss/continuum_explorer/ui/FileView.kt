@@ -215,8 +215,8 @@ private fun FileGalleryView(
             )
 
             // Skip folder preview overlay in gallery mode if it's already a gallery album (which uses 2x2 grid)
-            val isGalleryAlbum = file.parentId == "virtual://gallery"
-            if (!isGalleryAlbum) {
+            val isLibraryAlbum = file.parentId == "virtual://gallery"
+            if (!isLibraryAlbum) {
                 FolderPreview(
                     folder = file,
                     thumbSize = contentSize / 1.5f,
@@ -291,8 +291,8 @@ private fun FileGridView(
             )
 
             // Skip folder preview overlay if it's already a gallery album (which uses 2x2 grid)
-            val isGalleryAlbum = file.parentId == "virtual://gallery"
-            if (!isGalleryAlbum) {
+            val isLibraryAlbum = file.parentId == "virtual://gallery"
+            if (!isLibraryAlbum) {
                 FolderPreview(
                     folder = file,
                     thumbSize = contentSize / 2,

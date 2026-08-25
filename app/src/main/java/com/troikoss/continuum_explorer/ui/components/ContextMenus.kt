@@ -131,8 +131,9 @@ fun ItemContextMenu(
         }
     }
     val selectionManager = appState.selectionManager
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
+    val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
     val selectedItems = selectionManager.selectedItems.toList()
     val onlyOneSelected = selectedItems.size == 1
@@ -286,7 +287,7 @@ fun ItemContextMenu(
                     HorizontalDivider()
                 }
 
-                if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                if (!isInVirtualStorage || (isInGalleryOrVideos && appState.currentPath != null)) {
                     if (hasArchive) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_extract)) },
@@ -331,7 +332,7 @@ fun ItemContextMenu(
                     trailingIcon = { CtrlShortcut("C") }
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery)) {
+                if (hasClipboardItems && (!isInVirtualStorage || isInGalleryOrVideos)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_paste)) },
                         onClick = {
@@ -503,8 +504,9 @@ fun BackgroundContextMenu(
     }
 
     var currentScreen by remember { mutableStateOf("MAIN") }
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
+    val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 
     LaunchedEffect(expanded) {
@@ -536,7 +538,7 @@ fun BackgroundContextMenu(
                     HorizontalDivider()
                 }
 
-                if (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery) {
+                if (!isInVirtualStorage || isInGalleryOrVideos) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_new)) },
                         leadingIcon = { Icon(Icons.Default.Add, null) },
@@ -615,7 +617,7 @@ fun BackgroundContextMenu(
                     }
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || appState.libraryItem == LibraryItem.Gallery)) {
+                if (hasClipboardItems && (!isInVirtualStorage || isInGalleryOrVideos)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_paste)) },
                         leadingIcon = { Icon(Icons.Default.ContentPaste, null) },
@@ -636,7 +638,7 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                if (appState.currentPath != null || appState.libraryItem == LibraryItem.Gallery) {
+                if (appState.currentPath != null || isInGalleryOrVideos) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.folder)) },
                         leadingIcon = { Icon(Icons.Default.Folder, null) },

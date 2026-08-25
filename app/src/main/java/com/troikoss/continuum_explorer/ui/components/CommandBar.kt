@@ -101,9 +101,10 @@ fun CommandBar(
     val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     var hasClipboardItems by remember { mutableStateOf(clipboard.hasPrimaryClip()) }
 
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.Music)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.Music)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
+    val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInMusic = appState.libraryItem == LibraryItem.Music
 
     DisposableEffect(clipboard) {
@@ -147,7 +148,7 @@ fun CommandBar(
         ) {
             // Normal Folder UI
             if (!isSelectionMode) {
-                if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                if (!isInVirtualStorage || (isInGalleryOrVideos && appState.currentPath != null)) {
                     CommandDropDown(
                         text = stringResource(R.string.menu_new),
                         icon = Icons.Default.Add
@@ -190,7 +191,7 @@ fun CommandBar(
                     onClick = { selectionManager.selectAll() },
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null))) {
+                if (hasClipboardItems && (!isInVirtualStorage || (isInGalleryOrVideos && appState.currentPath != null))) {
                     CommandButton(
                         text = stringResource(R.string.menu_paste),
                         icon = Icons.Default.ContentPaste,
@@ -281,7 +282,7 @@ fun CommandBar(
                     VerticalDivider()
                 }
 
-                if (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null)) {
+                if (!isInVirtualStorage || (isInGalleryOrVideos && appState.currentPath != null)) {
                     if (hasArchive) {
                         CommandButton(
                             text = stringResource(R.string.menu_extract).removeSuffix("..."),
@@ -339,7 +340,7 @@ fun CommandBar(
                     onClick = { isTouch -> appState.copySelection(); if (isTouch) selectionManager.clear() },
                 )
 
-                if (hasClipboardItems && (!isInVirtualStorage || (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null))) {
+                if (hasClipboardItems && (!isInVirtualStorage || (isInGalleryOrVideos && appState.currentPath != null))) {
                     CommandButton(
                         text = stringResource(R.string.menu_paste),
                         icon = Icons.Default.ContentPaste,

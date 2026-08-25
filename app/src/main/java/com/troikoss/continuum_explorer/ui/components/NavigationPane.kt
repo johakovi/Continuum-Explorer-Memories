@@ -316,6 +316,7 @@ fun NavigationPane(
         isRecycleBinEnabled,
         appState.appConfigs.isRecentVisible,
         appState.appConfigs.isGalleryVisible,
+        appState.appConfigs.isVideosVisible,
         appState.appConfigs.isMusicVisible,
         appState.appConfigs.isDownloadsVisible,
         appState.appConfigs.isDocumentsVisible,
@@ -330,6 +331,7 @@ fun NavigationPane(
                 "trash" -> isRecycleBinEnabled && appState.appConfigs.isTrashVisible
                 "recent" -> appState.appConfigs.isRecentVisible
                 "gallery" -> appState.appConfigs.isGalleryVisible
+                "videos" -> appState.appConfigs.isVideosVisible
                 "music" -> appState.appConfigs.isMusicVisible
                 "downloads" -> appState.appConfigs.isDownloadsVisible
                 "documents" -> appState.appConfigs.isDocumentsVisible
@@ -637,6 +639,17 @@ fun NavigationPane(
                                     appState = appState,
                                     textAlphaProvider = textAlphaProvider,
                                     section = NavSection.Gallery,
+                                    isMinimized = isMinimized,
+                                    onAddStorageClick = onAddStorageClick
+                                )
+                                "videos" -> NavItem(
+                                    label = stringResource(R.string.nav_video),
+                                    icon = Icons.Default.Movie,
+                                    customIcon = R.drawable.ic_nav_video,
+                                    onClick = { onItemSelected(NavSection.Videos) },
+                                    appState = appState,
+                                    textAlphaProvider = textAlphaProvider,
+                                    section = NavSection.Videos,
                                     isMinimized = isMinimized,
                                     onAddStorageClick = onAddStorageClick
                                 )
@@ -987,6 +1000,10 @@ fun NavigationPane(
     if (appState.isConfiguringGalleryFolders) {
         GalleryFoldersDialog(appState, onAddStorageClick)
     }
+
+    if (appState.isConfiguringVideoFolders) {
+        VideoFoldersDialog(appState, onAddStorageClick)
+    }
     if (appState.isConfiguringMusicFolders) {
         MusicFoldersDialog(appState, onAddStorageClick)
     }
@@ -1232,6 +1249,197 @@ fun GalleryFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { appState.isConfiguringGalleryFolders = false }) {
+                            Text(stringResource(R.string.done))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VideoFoldersDialog(appState: FileExplorerState, onAddFolder: () -> Unit) {
+    val context = LocalContext.current
+    val folders by SettingsManager.videoFolders
+    val isFilterEnabled by SettingsManager.isVideoFilterEnabled
+    var showCustomPathDialog by remember { mutableStateOf(false) }
+
+    if (showCustomPathDialog) {
+        var customPath by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showCustomPathDialog = false },
+            title = { Text(stringResource(R.string.dialog_add_custom_path)) },
+            text = {
+                OutlinedTextField(
+                    value = customPath,
+                    onValueChange = { customPath = it },
+                    placeholder = { Text(stringResource(R.string.custom_path_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (customPath.isNotBlank()) {
+                            val newSet = folders.toMutableSet()
+                            newSet.add(customPath.trim())
+                            SettingsManager.setVideoFolders(context, newSet)
+                            appState.refresh()
+                        }
+                        showCustomPathDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomPathDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    Dialog(
+        onDismissRequest = { appState.isConfiguringVideoFolders = false },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        var isVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { isVisible = true }
+
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = scaleIn(initialScale = 0.9f) + fadeIn(),
+            exit = scaleOut(targetScale = 0.9f) + fadeOut(),
+            label = "VideoFoldersDialogAnimation"
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(24.dp)
+                    .shadow(16.dp, RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        stringResource(R.string.menu_video_folders),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Spacer(Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
+                        if (!isFilterEnabled) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                            ) {
+                                Text(
+                                    stringResource(R.string.video_filter_off_msg),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(8.dp),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        if (folders.isEmpty()) {
+                            Text(
+                                stringResource(R.string.video_no_folders_msg),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                        } else {
+                            Text(
+                                stringResource(R.string.video_managed_folders),
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                                itemsIndexed(folders.toList()) { _, path ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Default.Folder, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = path,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        IconButton(onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.remove(path)
+                                            SettingsManager.setVideoFolders(context, newSet)
+                                            appState.refresh()
+                                        }) {
+                                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(20.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        val currentPath = appState.getCurrentStorageKey()
+                        val canAddCurrent = currentPath != null && !currentPath.startsWith("virtual://")
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = { onAddFolder() },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("SAF")
+                                }
+
+                                if (canAddCurrent) {
+                                    Button(
+                                        onClick = {
+                                            val newSet = folders.toMutableSet()
+                                            newSet.add(currentPath!!)
+                                            SettingsManager.setVideoFolders(context, newSet)
+                                            appState.refresh()
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                                    ) {
+                                        Icon(Icons.Default.AddLocation, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(stringResource(R.string.menu_video_add_current))
+                                    }
+                                }
+                            }
+
+                            OutlinedButton(
+                                onClick = { showCustomPathDialog = true },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.menu_video_custom_path))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { appState.isConfiguringVideoFolders = false }) {
                             Text(stringResource(R.string.done))
                         }
                     }
@@ -1564,10 +1772,10 @@ private fun NavContextMenu(
         shape = RoundedCornerShape(16.dp),
         containerColor = LocalExtendedColors.current.menuBackground
     ) {
-        val isLibrarySection = section is NavSection.Recent || section is NavSection.Gallery ||
-                section is NavSection.Music || section is NavSection.Downloads ||
-                section is NavSection.Documents || section is NavSection.Games ||
-                section is NavSection.RecycleBin
+        val isLibrarySection = section == NavSection.Recent || section == NavSection.Gallery ||
+                section == NavSection.Videos || section == NavSection.Music || 
+                section == NavSection.Downloads || section == NavSection.Documents || 
+                section == NavSection.Games || section == NavSection.RecycleBin
 
         Column(
             modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
@@ -1580,15 +1788,16 @@ private fun NavContextMenu(
                             onClick = {
                                 onDismissRequest()
                                 when (section) {
-                                    is NavSection.Recent -> appState.appConfigs.toggleRecentVisibility()
-                                    is NavSection.Gallery -> appState.appConfigs.toggleGalleryVisibility()
-                                    is NavSection.Music -> appState.appConfigs.toggleMusicVisibility()
-                                    is NavSection.Downloads -> appState.appConfigs.toggleDownloadsVisibility()
-                                    is NavSection.Documents -> appState.appConfigs.toggleDocumentsVisibility()
-                                    is NavSection.Archives -> appState.appConfigs.toggleArchivesVisibility()
-                                    is NavSection.Apks -> appState.appConfigs.toggleApksVisibility()
-                                    is NavSection.Games -> appState.appConfigs.toggleGamesVisibility()
-                                    is NavSection.RecycleBin -> appState.appConfigs.toggleTrashVisibility()
+                                    NavSection.Recent -> appState.appConfigs.toggleRecentVisibility()
+                                    NavSection.Gallery -> appState.appConfigs.toggleGalleryVisibility()
+                                    NavSection.Videos -> appState.appConfigs.toggleVideosVisibility()
+                                    NavSection.Music -> appState.appConfigs.toggleMusicVisibility()
+                                    NavSection.Downloads -> appState.appConfigs.toggleDownloadsVisibility()
+                                    NavSection.Documents -> appState.appConfigs.toggleDocumentsVisibility()
+                                    NavSection.Archives -> appState.appConfigs.toggleArchivesVisibility()
+                                    NavSection.Apks -> appState.appConfigs.toggleApksVisibility()
+                                    NavSection.Games -> appState.appConfigs.toggleGamesVisibility()
+                                    NavSection.RecycleBin -> appState.appConfigs.toggleTrashVisibility()
                                     else -> {}
                                 }
                             },
@@ -1612,7 +1821,7 @@ private fun NavContextMenu(
                         HorizontalDivider()
                     }
 
-                    if (section is NavSection.Gallery) {
+                    if (section == NavSection.Gallery) {
                         val isFilterEnabled by SettingsManager.isGalleryFilterEnabled
                         val context = LocalContext.current
 
@@ -1684,7 +1893,54 @@ private fun NavContextMenu(
                         HorizontalDivider()
                     }
 
-                    if (section is NavSection.Music) {
+                    if (section == NavSection.Videos) {
+                        val isFilterEnabled by SettingsManager.isVideoFilterEnabled
+                        val context = LocalContext.current
+
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_video_show_all))
+                                    if (!isFilterEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                if (isFilterEnabled) {
+                                    SettingsManager.setVideoFilterEnabled(context, false)
+                                    appState.refresh()
+                                }
+                            },
+                            leadingIcon = { Icon(Icons.Default.VideoLibrary, null) }
+                        )
+
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.menu_video_folders))
+                                    if (isFilterEnabled) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            },
+                            onClick = {
+                                onDismissRequest()
+                                if (!isFilterEnabled) {
+                                    SettingsManager.setVideoFilterEnabled(context, true)
+                                    appState.refresh()
+                                }
+                                appState.isConfiguringVideoFolders = true
+                            },
+                            leadingIcon = { Icon(Icons.Default.Folder, null) }
+                        )
+                        HorizontalDivider()
+                    }
+
+                    if (section == NavSection.Music) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_music)) },
                             leadingIcon = { Icon(Icons.Default.MusicNote, null) },
@@ -1708,7 +1964,7 @@ private fun NavContextMenu(
                             onClick = {
                                 onDismissRequest()
                                 when {
-                                    section is NavSection.RecycleBin -> {
+                                    section == NavSection.RecycleBin -> {
                                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                                         appState.openInNewWindow(listOf(trashDir.toUniversal()))
                                     }
@@ -1758,7 +2014,7 @@ private fun NavContextMenu(
                         )
                     }
 
-                    if (section is NavSection.RecycleBin) {
+                    if (section == NavSection.RecycleBin) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_empty_recycle_bin)) },
                             onClick = {
@@ -1790,7 +2046,7 @@ private fun NavContextMenu(
                         )
                     }
 
-                    if (section is NavSection.Documents) {
+                    if (section == NavSection.Documents) {
                         DropdownMenuItem(
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1817,14 +2073,14 @@ private fun NavContextMenu(
                             }
                         )
                     }
-                    if (section !is NavSection.Recent && section !is NavSection.Gallery && section !is NavSection.Music && section !is NavSection.NetworkStorage) {
+                    if (section != NavSection.Recent && section != NavSection.Gallery && section != NavSection.Videos && section != NavSection.Music && section !is NavSection.NetworkStorage) {
                         HorizontalDivider()
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_properties)) },
                             onClick = {
                                 onDismissRequest()
                                 when (section) {
-                                    is NavSection.RecycleBin -> {
+                                    NavSection.RecycleBin -> {
                                         val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
                                         appState.showProperties(listOf(trashDir.toUniversal()))
                                     }
@@ -1931,6 +2187,7 @@ private fun NavItem(
         val tint = when (section) {
             is NavSection.Home -> extendedColors.homeIcon
             is NavSection.Gallery -> extendedColors.galleryIcon
+            is NavSection.Videos -> extendedColors.videoIcon
             is NavSection.Music -> extendedColors.musicIcon
             is NavSection.Recent -> extendedColors.recentIcon
             is NavSection.Downloads -> extendedColors.downloadsIcon
@@ -1951,6 +2208,7 @@ private fun NavItem(
                     R.drawable.ic_zip -> R.drawable.ic_zip_duo
                     R.drawable.ic_android_logo -> R.drawable.ic_android_logo // Add duo if available
                     R.drawable.ic_nav_game -> R.drawable.ic_nav_game_duo
+                    R.drawable.ic_nav_video -> R.drawable.ic_nav_video_duo
                     R.drawable.ic_nav_trash -> R.drawable.ic_nav_trash_duo
                     R.drawable.ic_storage -> R.drawable.ic_storage_duo
                     else -> customIcon

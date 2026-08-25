@@ -91,10 +91,12 @@
     <string name="shortcuts_shift_enter">Shift + Enter</string>
     <string name="shortcuts_shift_enter_desc">在新窗口中打开</string>
     <string name="shortcuts_ctrl_cvx">Ctrl + C / X / V</string>
-    <string name="shortcuts_ctrl_cvx_desc">复制 / 剪切 / 粘贴</string>
+    <string name="shortcuts_ctrl_cvx_desc">复制 / 剪切 /粘贴</string>
     <string name="shortcuts_delete">Delete</string>
     <string name="shortcuts_delete_desc">删除 (Shift + Delete 永久删除)</string>
+    <string name="shortcuts_f2" translatable="false">F2</string>
     <string name="shortcuts_f2_desc">重命名</string>
+    <string name="shortcuts_f5" translatable="false">F5</string>
     <string name="shortcuts_f5_desc">刷新</string>
     <string name="shortcuts_app_actions">应用操作</string>
     <string name="shortcuts_ctrl_n">Ctrl + N</string>
@@ -298,6 +300,15 @@
     <string name="menu_new_playlist">新建播放列表</string>
     <string name="menu_content">内容</string>
     <string name="menu_subtitles">字幕</string>
+    <string name="menu_subtitle_appearance">外观</string>
+    <string name="subtitle_style_shadow">阴影</string>
+    <string name="subtitle_style_bar">条形</string>
+    <string name="menu_subtitle_font_size">字体大小</string>
+    <string name="subtitle_size_extra_big">特大 (+50%)</string>
+    <string name="subtitle_size_big">大 (+25%)</string>
+    <string name="subtitle_size_medium">中</string>
+    <string name="subtitle_size_small">小 (-25%)</string>
+    <string name="subtitle_size_extra_small">特小 (-50%)</string>
     <string name="menu_audio_track">音轨</string>
     <string name="menu_speed">速度</string>
     <string name="menu_aspect_ratio">比例</string>
@@ -313,6 +324,7 @@
     <string name="menu_copy_image">复制图片</string>
     <string name="menu_set_wallpaper">设为壁纸</string>
     <string name="menu_fullscreen">全屏</string>
+    <string name="menu_rotate">旋转</string>
     <string name="menu_undo">撤销</string>
     <string name="menu_redo">重做</string>
     <string name="menu_folder_color">文件夹颜色</string>
@@ -323,6 +335,7 @@
     <string name="nav_home">首页</string>
     <string name="nav_recent">最近</string>
     <string name="nav_gallery">画廊</string>
+    <string name="nav_video">视频</string>
     <string name="nav_music">音乐</string>
     <string name="nav_downloads">下载</string>
     <string name="nav_documents">文档</string>
@@ -334,6 +347,9 @@
     <string name="menu_gallery_folders">画廊文件夹</string>
     <string name="menu_gallery_add_current">添加当前文件夹</string>
     <string name="menu_gallery_custom_path">自定义路径</string>
+    <string name="menu_video_folders">视频文件夹</string>
+    <string name="menu_video_add_current">添加当前文件夹</string>
+    <string name="menu_video_custom_path">自定义路径</string>
     <string name="menu_music_albums">专辑</string>
     <string name="menu_music_folders">音乐文件夹</string>
     <string name="menu_music_add_current">添加当前文件夹</string>
@@ -350,6 +366,11 @@
     <string name="gallery_managed_folders">已管理的文件夹:</string>
     <string name="gallery_add_folder">添加文件夹</string>
     <string name="menu_gallery_show_all">显示所有媒体</string>
+    <string name="video_filter_off_msg">过滤功能已关闭。显示所有媒体。</string>
+    <string name="video_no_folders_msg">未添加文件夹。启用过滤后将使用标准媒体位置。</string>
+    <string name="video_managed_folders">已管理的文件夹:</string>
+    <string name="video_add_folder">添加文件夹</string>
+    <string name="menu_video_show_all">显示所有媒体</string>
     <string name="menu_documents_folder">文件夹</string>
     <string name="menu_documents_show_folders">显示文件夹</string>
     <string name="menu_favourite">收藏</string>
@@ -464,6 +485,7 @@
     <string name="msg_already_at_saf_root">已在所选文件夹根目录</string>
     <string name="msg_empty_clipboard">剪贴板为空</string>
     <string name="msg_compression_failed">压缩失败: %1$s</string>
+    <string name="msg_termux_failed">无法打开 Termux: %1$s。请确保在 Termux 设置中启用了“允许外部应用”。</string>
     <string name="msg_unknown_compression_error">未知压缩错误</string>
     <string name="menu_set_wallpaper_failed">设置壁纸失败</string>
 
@@ -549,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">此目录受 Android 限制。请启用并授权 Shizuku 以访问它。</string>
     <string name="msg_cant_access_directory">无法访问此目录</string>
     <string name="msg_nothing_here">这里还没有任何东西</string>
+    <string name="msg_video_nothing_here">视频管理器中未添加任何媒体或文件夹</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">系统与电池</string>

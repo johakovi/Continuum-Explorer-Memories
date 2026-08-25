@@ -173,6 +173,7 @@ open class MainActivity : AppCompatActivity() {
         val initialLibraryItemFromIntent = when {
             intent.getBooleanExtra("isRecent", false) -> LibraryItem.Recent
             intent.getBooleanExtra("isGallery", false) -> LibraryItem.Gallery
+            intent.getBooleanExtra("isVideos", false) -> LibraryItem.Videos
             intent.getBooleanExtra("isDocuments", false) -> LibraryItem.Documents
             intent.getBooleanExtra("isArchives", false) -> LibraryItem.Archives
             intent.getBooleanExtra("isApks", false) -> LibraryItem.Apks

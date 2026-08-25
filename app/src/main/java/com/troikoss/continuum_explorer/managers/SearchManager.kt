@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
+import com.troikoss.continuum_explorer.managers.VideoManager
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
@@ -62,6 +63,14 @@ object SearchManager {
         } else if (libraryItem == LibraryItem.Gallery) {
             val allGallery = GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet())
             for (media in allGallery) {
+                if (!isActive) break
+                if (matches(media, parsedQuery)) {
+                    results.add(media)
+                }
+            }
+        } else if (libraryItem == LibraryItem.Videos) {
+            val allVideos = VideoManager.getVideoFiles(context, if (SettingsManager.isVideoFilterEnabled.value) SettingsManager.videoFolders.value else emptySet())
+            for (media in allVideos) {
                 if (!isActive) break
                 if (matches(media, parsedQuery)) {
                     results.add(media)

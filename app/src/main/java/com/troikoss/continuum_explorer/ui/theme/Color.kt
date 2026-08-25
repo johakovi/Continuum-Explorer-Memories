@@ -48,7 +48,7 @@ val ThemeDocx = Color(0xFF1E88E5)
 val ThemeTxt = Color(0xFF78909C)
 val ThemeTerminal = Color(0xFF424242)
 val ThemeImage = Color(0xFFE15D82)
-val ThemeVideo = Color(0xFFFF9800)
+val ThemeVideo = Color(0xFF9CE5D6)
 
 val ThemeFileDuo = Color(0xFFB0BEC5)
 val ThemeZipDuo = Color(0xFFE99C47)
@@ -67,6 +67,6 @@ val ThemeAndroidDuo = Color(0xFF4CAF50)
 val ThemeGameSavesDuo = Color(0xFF7C4DFF)
 val ThemeAudioDuo = Color(0xFF2B31CE)
 val ThemeImageDuo = Color(0xFFE15D82)
-val ThemeVideoDuo = Color(0xFFFF9800)
+val ThemeVideoDuo = Color(0xFF9CE5D6)
 
 

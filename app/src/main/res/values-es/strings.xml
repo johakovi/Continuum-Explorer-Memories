@@ -301,6 +301,15 @@
     <string name="menu_new_playlist">Nueva lista de reproducción</string>
     <string name="menu_content">Contenido</string>
     <string name="menu_subtitles">Subtítulos</string>
+    <string name="menu_subtitle_appearance">Apariencia</string>
+    <string name="subtitle_style_shadow">Sombra</string>
+    <string name="subtitle_style_bar">Barra</string>
+    <string name="menu_subtitle_font_size">Tamaño de fuente</string>
+    <string name="subtitle_size_extra_big">Muy grande (+50%)</string>
+    <string name="subtitle_size_big">Grande (+25%)</string>
+    <string name="subtitle_size_medium">Medio</string>
+    <string name="subtitle_size_small">Pequeño (-25%)</string>
+    <string name="subtitle_size_extra_small">Muy pequeño (-50%)</string>
     <string name="menu_audio_track">Pista de audio</string>
     <string name="menu_speed">Velocidad</string>
     <string name="menu_aspect_ratio">Relación de aspecto</string>
@@ -316,6 +325,7 @@
     <string name="menu_copy_image">Copiar imagen</string>
     <string name="menu_set_wallpaper">Establecer como fondo</string>
     <string name="menu_fullscreen">Pantalla completa</string>
+    <string name="menu_rotate">Girar</string>
     <string name="menu_undo">Deshacer</string>
     <string name="menu_redo">Rehacer</string>
     <string name="menu_folder_color">Color de la carpeta</string>
@@ -326,6 +336,7 @@
     <string name="nav_home">Inicio</string>
     <string name="nav_recent">Reciente</string>
     <string name="nav_gallery">Galería</string>
+    <string name="nav_video">Vídeos</string>
     <string name="nav_music">Música</string>
     <string name="nav_downloads">Descargas</string>
     <string name="nav_documents">Documentos</string>
@@ -337,6 +348,9 @@
     <string name="menu_gallery_folders">Carpetas de la galería</string>
     <string name="menu_gallery_add_current">Añadir carpeta actual</string>
     <string name="menu_gallery_custom_path">Ruta personalizada</string>
+    <string name="menu_video_folders">Carpetas de vídeos</string>
+    <string name="menu_video_add_current">Añadir carpeta actual</string>
+    <string name="menu_video_custom_path">Ruta personalizada</string>
     <string name="menu_music_albums">Álbumes</string>
     <string name="menu_music_folders">Carpetas de música</string>
     <string name="menu_music_add_current">Añadir carpeta actual</string>
@@ -353,6 +367,11 @@
     <string name="gallery_managed_folders">Carpetas gestionadas:</string>
     <string name="gallery_add_folder">Añadir carpeta</string>
     <string name="menu_gallery_show_all">Mostrar todos los medios</string>
+    <string name="video_filter_off_msg">El filtrado está DESACTIVADO. Mostrando todos los archivos multimedia.</string>
+    <string name="video_no_folders_msg">No se han añadido carpetas. Se usarán las ubicaciones multimedia estándar si el filtrado está activado.</string>
+    <string name="video_managed_folders">Carpetas gestionadas:</string>
+    <string name="video_add_folder">Añadir carpeta</string>
+    <string name="menu_video_show_all">Mostrar todos los medios</string>
     <string name="menu_documents_folder">Carpeta</string>
     <string name="menu_documents_show_folders">Mostrar carpetas</string>
     <string name="menu_favourite">Favorito</string>
@@ -467,6 +486,7 @@
     <string name="msg_already_at_saf_root">Ya se encuentra en la raíz de la carpeta seleccionada</string>
     <string name="msg_empty_clipboard">El portapapeles está vacío</string>
     <string name="msg_compression_failed">Error de compresión: %1$s</string>
+    <string name="msg_termux_failed">Error al abrir Termux: %1$s. Asegúrese de que \'Permitir aplicaciones externas\' esté habilitado en la configuración de Termux.</string>
     <string name="msg_unknown_compression_error">Error de compresión desconocido</string>
     <string name="menu_set_wallpaper_failed">Error al establecer fondo</string>
     <string name="media_share_image_failed">Error al compartir imagen</string>
@@ -547,6 +567,7 @@
     <string name="msg_restricted_access_shizuku">Este directorio está restringido por Android. Por favor, active y autorice Shizuku para acceder a él.</string>
     <string name="msg_cant_access_directory">No se puede acceder a este directorio</string>
     <string name="msg_nothing_here">No hay nada aquí todavía</string>
+    <string name="msg_video_nothing_here">No se han añadido archivos multimedia o carpetas al gestor de vídeos</string>
 
     <string name="msg_remote_permanent_warning">Los archivos de red se eliminarán permanentemente (no se pueden mover a la papelera).</string>
     <string name="msg_archive_remote_unsupported">El archivado aún no es compatible con ubicaciones de red.</string>

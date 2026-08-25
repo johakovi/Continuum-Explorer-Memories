@@ -300,6 +300,15 @@
     <string name="menu_new_playlist">Neue Wiedergabeliste</string>
     <string name="menu_content">Inhalt</string>
     <string name="menu_subtitles">Untertitel</string>
+    <string name="menu_subtitle_appearance">Aussehen</string>
+    <string name="subtitle_style_shadow">Schatten</string>
+    <string name="subtitle_style_bar">Balken</string>
+    <string name="menu_subtitle_font_size">Schriftgröße</string>
+    <string name="subtitle_size_extra_big">Sehr groß (+50%)</string>
+    <string name="subtitle_size_big">Groß (+25%)</string>
+    <string name="subtitle_size_medium">Mittel</string>
+    <string name="subtitle_size_small">Klein (-25%)</string>
+    <string name="subtitle_size_extra_small">Sehr klein (-50%)</string>
     <string name="menu_audio_track">Tonspur</string>
     <string name="menu_speed">Geschwindigkeit</string>
     <string name="menu_aspect_ratio">Seitenverhältnis</string>
@@ -315,6 +324,7 @@
     <string name="menu_copy_image">Bild kopieren</string>
     <string name="menu_set_wallpaper">Als Hintergrundbild festlegen</string>
     <string name="menu_fullscreen">Vollbild</string>
+    <string name="menu_rotate">Drehen</string>
     <string name="menu_undo">Rückgängig</string>
     <string name="menu_redo">Wiederholen</string>
     <string name="menu_folder_color">Ordnerfarbe</string>
@@ -325,6 +335,7 @@
     <string name="nav_home">Startseite</string>
     <string name="nav_recent">Zuletzt verwendet</string>
     <string name="nav_gallery">Galerie</string>
+    <string name="nav_video">Videos</string>
     <string name="nav_music">Musik</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Dokumente</string>
@@ -336,6 +347,9 @@
     <string name="menu_gallery_folders">Galerie-Ordner</string>
     <string name="menu_gallery_add_current">Aktuellen Ordner hinzufügen</string>
     <string name="menu_gallery_custom_path">Eigener Pfad</string>
+    <string name="menu_video_folders">Video-Ordner</string>
+    <string name="menu_video_add_current">Aktuellen Ordner hinzufügen</string>
+    <string name="menu_video_custom_path">Eigener Pfad</string>
     <string name="menu_music_albums">Alben</string>
     <string name="menu_music_folders">Musik-Ordner</string>
     <string name="menu_music_add_current">Aktuellen Ordner hinzufügen</string>
@@ -352,6 +366,11 @@
     <string name="gallery_managed_folders">Verwaltete Ordner:</string>
     <string name="gallery_add_folder">Ordner hinzufügen</string>
     <string name="menu_gallery_show_all">Alle Medien anzeigen</string>
+    <string name="video_filter_off_msg">Filterung ist momentan AUS. Alle Medien werden angezeigt.</string>
+    <string name="video_no_folders_msg">Keine Ordner hinzugefügt. Standard-Medienorte werden verwendet, wenn die Filterung aktiviert ist.</string>
+    <string name="video_managed_folders">Verwaltete Ordner:</string>
+    <string name="video_add_folder">Ordner hinzufügen</string>
+    <string name="menu_video_show_all">Alle Medien anzeigen</string>
     <string name="menu_documents_folder">Ordner</string>
     <string name="menu_documents_show_folders">Ordner anzeigen</string>
     <string name="menu_favourite">Favorit</string>
@@ -466,6 +485,7 @@
     <string name="msg_already_at_saf_root">Bereits im gewählten Ordner-Stammverzeichnis</string>
     <string name="msg_empty_clipboard">Zwischenablage ist leer</string>
     <string name="msg_compression_failed">Komprimierung fehlgeschlagen: %1$s</string>
+    <string name="msg_termux_failed">Termux konnte nicht geöffnet werden: %1$s. Stellen Sie sicher, dass \'Externe Apps zulassen\' in den Termux-Einstellungen aktiviert ist.</string>
     <string name="msg_unknown_compression_error">Unbekannter Komprimierungsfehler</string>
     <string name="menu_set_wallpaper_failed">Hintergrundbild konnte nicht festgelegt werden</string>
 
@@ -551,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">Dieses Verzeichnis ist von Android eingeschränkt. Bitte aktiviere und autorisiere Shizuku, um darauf zuzugreifen.</string>
     <string name="msg_cant_access_directory">Zugriff auf dieses Verzeichnis nicht möglich</string>
     <string name="msg_nothing_here">Hier gibt es noch nichts</string>
+    <string name="msg_video_nothing_here">Keine Medien oder Ordner zum Video-Manager hinzugefügt</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Akku</string>

@@ -288,6 +288,15 @@
     <string name="menu_new_playlist">Yeni Oynatma Listesi</string>
     <string name="menu_content">İçindekiler</string>
     <string name="menu_subtitles">Altyazı</string>
+    <string name="menu_subtitle_appearance">Görünüm</string>
+    <string name="subtitle_style_shadow">Gölge</string>
+    <string name="subtitle_style_bar">Çubuk</string>
+    <string name="menu_subtitle_font_size">Yazı Tipi Boyutu</string>
+    <string name="subtitle_size_extra_big">Çok Büyük (+%50)</string>
+    <string name="subtitle_size_big">Büyük (+%25)</string>
+    <string name="subtitle_size_medium">Orta</string>
+    <string name="subtitle_size_small">Küçük (-%25)</string>
+    <string name="subtitle_size_extra_small">Çok Küçük (-%50)</string>
     <string name="menu_audio_track">Ses Parçası</string>
     <string name="menu_speed">Hız</string>
     <string name="menu_aspect_ratio">En Boy Oranı</string>
@@ -303,6 +312,7 @@
     <string name="menu_copy_image">Görseli kopyala</string>
     <string name="menu_set_wallpaper">Arkaplan Olarak Ayarla</string>
     <string name="menu_fullscreen">Tam Ekran</string>
+    <string name="menu_rotate">Döndür</string>
     <string name="menu_undo">Geri Al</string>
     <string name="menu_redo">Yinele</string>
     <string name="menu_folder_color">Klasör rengi</string>
@@ -312,6 +322,7 @@
     <string name="nav_home">Ana Sayfa</string>
     <string name="nav_recent">Son Kullanılanlar</string>
     <string name="nav_gallery">Galeri</string>
+    <string name="nav_video">Videolar</string>
     <string name="nav_music">Müzik</string>
     <string name="nav_downloads">İndirilenler</string>
     <string name="nav_documents">Belgeler</string>
@@ -323,6 +334,9 @@
     <string name="menu_gallery_folders">Galeri Klasörleri</string>
     <string name="menu_gallery_add_current">Geçerli Klasörü Ekle</string>
     <string name="menu_gallery_custom_path">Özel Yol</string>
+    <string name="menu_video_folders">Video Klasörleri</string>
+    <string name="menu_video_add_current">Geçerli Klasörü Ekle</string>
+    <string name="menu_video_custom_path">Özel Yol</string>
     <string name="menu_music_albums">Albümler</string>
     <string name="menu_music_folders">Müzik Klasörleri</string>
     <string name="menu_music_add_current">Geçerli Klasörü Ekle</string>
@@ -339,6 +353,11 @@
     <string name="gallery_managed_folders">Yönetilen Klasörler:</string>
     <string name="gallery_add_folder">Klasör Ekle</string>
     <string name="menu_gallery_show_all">Tüm Medyayı Göster</string>
+    <string name="video_filter_off_msg">Filtreleme şu anda KAPALI. Tüm medya gösteriliyor.</string>
+    <string name="video_no_folders_msg">Hiçbir klasör eklenmedi. Filtreleme etkinleştirilirse standart medya konumları kullanılacaktır.</string>
+    <string name="video_managed_folders">Yönetilen Klasörler:</string>
+    <string name="video_add_folder">Klasör Ekle</string>
+    <string name="menu_video_show_all">Tüm Medyayı Göster</string>
     <string name="menu_documents_folder">Klasör</string>
     <string name="menu_documents_show_folders">Klasörleri Göster</string>
     <string name="menu_favourite">Favori</string>
@@ -452,6 +471,7 @@
     <string name="msg_already_at_saf_root">Zaten seçilen klasörün kök dizinindesiniz</string>
     <string name="msg_empty_clipboard">Pano boş</string>
     <string name="msg_compression_failed">Sıkıştırma başarısız oldu: %1$s</string>
+    <string name="msg_termux_failed">Termux açılamadı: %1$s. Termux ayarlarında \'Harici uygulamalara izin ver\' seçeneğinin etkinleştirildiğinden emin olun.</string>
     <string name="msg_unknown_compression_error">Bilinmeyen sıkıştırma hatası</string>
     <string name="menu_set_wallpaper_failed">Arka plan ayarlanamadı</string>
     <string name="media_share_image_failed">Görsel paylaşılamadı</string>
@@ -532,6 +552,7 @@
     <string name="msg_restricted_access_shizuku">Bu dizin Android tarafından kısıtlanmıştır. Lütfen erişmek için Shizuku\'yu etkinleştirin ve yetkilendirin.</string>
     <string name="msg_cant_access_directory">Bu dizine erişilemiyor</string>
     <string name="msg_nothing_here">Henüz burada bir şey yok</string>
+    <string name="msg_video_nothing_here">Video yöneticisine medya veya klasör eklenmedi</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistem ve Pil</string>

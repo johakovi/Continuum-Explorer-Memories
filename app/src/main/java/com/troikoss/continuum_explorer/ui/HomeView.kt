@@ -263,6 +263,7 @@ private fun getHomeItemData(id: String, configs: AppConfigurations, appState: Fi
     return when (id) {
         "recent" -> HomeItemData("recent", stringResource(R.string.nav_recent), Icons.Default.History, R.drawable.ic_nav_recent, R.drawable.ic_nav_recent_duo, configs.isRecentVisible, { configs.toggleRecentVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Recent) }, extendedColors.recentIcon)
         "gallery" -> HomeItemData("gallery", stringResource(R.string.nav_gallery), Icons.Default.Image, R.drawable.ic_nav_gallery, R.drawable.ic_nav_gallery_duo, configs.isGalleryVisible, { configs.toggleGalleryVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) }, extendedColors.galleryIcon)
+        "videos" -> HomeItemData("videos", stringResource(R.string.nav_video), Icons.Default.Movie, R.drawable.ic_nav_video, R.drawable.ic_nav_video_duo, configs.isVideosVisible, { configs.toggleVideosVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Videos) }, extendedColors.videoIcon)
         "music" -> HomeItemData("music", stringResource(R.string.nav_music), Icons.Default.MusicNote, R.drawable.ic_nav_music, R.drawable.ic_nav_music_duo, configs.isMusicVisible, { configs.toggleMusicVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Music) }, extendedColors.musicIcon)
         "downloads" -> HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads) }, extendedColors.downloadsIcon)
         "documents" -> HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, {
@@ -452,6 +453,79 @@ fun HomeShortcutItem(
                         leadingIcon = { Icon(Icons.Default.Folder, null) }
                     )
 
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.menu_gallery_albums))
+                                if (appState.appConfigs.isGalleryAlbumsEnabled) {
+                                    Spacer(Modifier.weight(1f))
+                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
+                        onClick = {
+                            onDismissMenu()
+                            appState.appConfigs.toggleGalleryAlbums()
+                        },
+                        leadingIcon = {
+                            val iconTheme = SettingsManager.getEffectiveIconTheme(IconCategory.HOME)
+                            if (iconTheme == IconTheme.MATERIAL) {
+                                Icon(Icons.Default.PhotoAlbum, null)
+                            } else {
+                                val resId = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_folder_duo else R.drawable.ic_folder
+                                Icon(IconHelper.rememberThemePainter(resId, category = com.troikoss.continuum_explorer.managers.IconCategory.HOME), null)
+                            }
+                        }
+                    )
+
+                    HorizontalDivider()
+                }
+
+                if (item.id == "videos") {
+                    val isFilterEnabled by SettingsManager.isVideoFilterEnabled
+                    val context = LocalContext.current
+
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.menu_video_show_all))
+                                if (!isFilterEnabled) {
+                                    Spacer(Modifier.weight(1f))
+                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
+                        onClick = {
+                            onDismissMenu()
+                            if (isFilterEnabled) {
+                                SettingsManager.setVideoFilterEnabled(context, false)
+                                appState.refresh()
+                            }
+                        },
+                        leadingIcon = { Icon(Icons.Default.VideoLibrary, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.menu_video_folders))
+                                if (isFilterEnabled) {
+                                    Spacer(Modifier.weight(1f))
+                                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                }
+                            }
+                        },
+                        onClick = {
+                            onDismissMenu()
+                            if (!isFilterEnabled) {
+                                SettingsManager.setVideoFilterEnabled(context, true)
+                                appState.refresh()
+                            }
+                            appState.isConfiguringVideoFolders = true
+                        },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) }
+                    )
+
                     HorizontalDivider()
                 }
 
@@ -542,6 +616,7 @@ fun HomeShortcutItem(
                         val virtualFile = when (item.id) {
                             "recent" -> UniversalFile(appState.context.getString(R.string.nav_recent), true, 0, 0, LocalProvider, "virtual://recent")
                             "gallery" -> UniversalFile(appState.context.getString(R.string.nav_gallery), true, 0, 0, LocalProvider, "virtual://gallery")
+                            "videos" -> UniversalFile(appState.context.getString(R.string.nav_video), true, 0, 0, LocalProvider, "virtual://videos")
                             "music" -> UniversalFile(appState.context.getString(R.string.nav_music), true, 0, 0, LocalProvider, "virtual://music")
                             "downloads" -> UniversalFile(appState.context.getString(R.string.nav_downloads), true, 0, 0, LocalProvider, "virtual://downloads")
                             "documents" -> UniversalFile(appState.context.getString(R.string.nav_documents), true, 0, 0, LocalProvider, "virtual://documents")
@@ -590,6 +665,7 @@ fun HomeShortcutItem(
                         val virtualFile = when (item.id) {
                             "recent" -> UniversalFile(appState.context.getString(R.string.nav_recent), true, 0, 0, LocalProvider, "virtual://recent")
                             "gallery" -> UniversalFile(appState.context.getString(R.string.nav_gallery), true, 0, 0, LocalProvider, "virtual://gallery")
+                            "videos" -> UniversalFile(appState.context.getString(R.string.nav_video), true, 0, 0, LocalProvider, "virtual://videos")
                             "music" -> UniversalFile(appState.context.getString(R.string.nav_music), true, 0, 0, LocalProvider, "virtual://music")
                             "downloads" -> UniversalFile(appState.context.getString(R.string.nav_downloads), true, 0, 0, LocalProvider, "virtual://downloads")
                             "documents" -> UniversalFile(appState.context.getString(R.string.nav_documents), true, 0, 0, LocalProvider, "virtual://documents")

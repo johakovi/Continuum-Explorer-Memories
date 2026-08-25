@@ -26,6 +26,7 @@ import com.troikoss.continuum_explorer.managers.RecentFilesManager
 import com.troikoss.continuum_explorer.managers.SearchManager
 import com.troikoss.continuum_explorer.managers.SelectionManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
+import com.troikoss.continuum_explorer.managers.VideoManager
 import com.troikoss.continuum_explorer.model.*
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.providers.LocalProvider
@@ -106,6 +107,7 @@ class FileExplorerState(
     // Flag for adding game shortcuts
     var isAddingGameShortcut by mutableStateOf(false)
     var isConfiguringGalleryFolders by mutableStateOf(false)
+    var isConfiguringVideoFolders by mutableStateOf(false)
     var isConfiguringMusicFolders by mutableStateOf(false)
 
     // Centralized selection manager
@@ -259,6 +261,9 @@ class FileExplorerState(
             } else if (libraryItem == LibraryItem.Gallery) {
                 if (currentPath != null) currentPath!!.name
                 else context.getString(R.string.nav_gallery)
+            } else if (libraryItem == LibraryItem.Videos) {
+                if (currentPath != null) currentPath!!.name
+                else context.getString(R.string.nav_video)
             } else if (currentArchiveFile != null) {
                 currentArchiveFile?.name ?: context.getString(R.string.archive)
             } else if (currentArchiveUri != null) {
@@ -445,6 +450,15 @@ class FileExplorerState(
                 providerId = "virtual://apks"
             )
 
+            libraryItem == LibraryItem.Videos -> UniversalFile(
+                name = context.getString(R.string.nav_video),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = currentPath?.absolutePath ?: "virtual://videos"
+            )
+
             else -> null
         }
 
@@ -454,7 +468,7 @@ class FileExplorerState(
         } else if (currentArchiveFile != null || currentArchiveUri != null) {
             true
         } else if (libraryItem != LibraryItem.None) {
-            (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Music) && currentPath != null
+            (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos || libraryItem == LibraryItem.Music) && currentPath != null
         } else if (currentPath != null) {
             currentPath?.absolutePath != storageRoot.absolutePath
         } else if (currentSafUri != null) {
@@ -567,6 +581,15 @@ class FileExplorerState(
                 }
                 isConfiguringGalleryFolders = false
                 refresh()
+            } else if (isConfiguringVideoFolders) {
+                val path = SafUtils.getRawPathFromUri(context, uri)
+                if (path != null) {
+                    val currentFolders = SettingsManager.videoFolders.value.toMutableSet()
+                    currentFolders.add(path)
+                    SettingsManager.setVideoFolders(context, currentFolders)
+                }
+                isConfiguringVideoFolders = false
+                refresh()
             } else if (isConfiguringMusicFolders) {
                 val path = SafUtils.getRawPathFromUri(context, uri)
                 if (path != null) {
@@ -588,6 +611,7 @@ class FileExplorerState(
         } else {
             isAddingGameShortcut = false
             isConfiguringGalleryFolders = false
+            isConfiguringVideoFolders = false
             isConfiguringMusicFolders = false
         }
     }
@@ -638,7 +662,7 @@ class FileExplorerState(
 
         val onIncrementalUpdate: (List<UniversalFile>) -> Unit = { partial ->
             scope.launch(Dispatchers.Main) {
-                if (libraryItem == LibraryItem.Gallery) {
+                if (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) {
                     // Resolve UI layout configs together with file assignment
                     folderConfigs.resolveViewMode(key, libraryItem)
                     folderConfigs.resolveGridSize(key)
@@ -658,6 +682,29 @@ class FileExplorerState(
                     currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
                     appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
                     else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
+                }
+            }
+            if (cachedList.isNotEmpty()) {
+                val sorted = sortFiles(cachedList, folderConfigs.sortParams)
+                withContext(Dispatchers.Main) {
+                    // Resolve UI layout configs together with file assignment
+                    folderConfigs.resolveViewMode(key, libraryItem)
+                    folderConfigs.resolveGridSize(key)
+                    folderConfigs.resolveColumnVisibility(key, libraryItem == LibraryItem.RecycleBin)
+                    folderConfigs.resolveColumnWidths(key)
+
+                    files = sorted
+                    selectionManager.allFiles = files
+                }
+            }
+        }
+
+        if (libraryItem == LibraryItem.Videos && !forceRefresh) {
+            val cachedList = withContext(Dispatchers.IO) {
+                when {
+                    currentPath != null -> VideoManager.getVideoAlbumContents(context, currentPath!!.absolutePath, forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
+                    SettingsManager.isVideoFilterEnabled.value -> VideoManager.getVideoAlbums(context, SettingsManager.videoFolders.value, forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
+                    else -> VideoManager.getVideoFiles(context, emptySet(), forceRefresh = false, useCacheOnly = true, onUpdate = onIncrementalUpdate)
                 }
             }
             if (cachedList.isNotEmpty()) {
@@ -702,6 +749,11 @@ class FileExplorerState(
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
                         appConfigs.isGalleryAlbumsEnabled -> GalleryManager.getGalleryAlbums(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
                         else -> GalleryManager.getGalleryFiles(context, if (SettingsManager.isGalleryFilterEnabled.value) SettingsManager.galleryFolders.value else emptySet(), forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
+                    }
+                    LibraryItem.Videos -> when {
+                        currentPath != null -> VideoManager.getVideoAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
+                        SettingsManager.isVideoFilterEnabled.value -> VideoManager.getVideoAlbums(context, SettingsManager.videoFolders.value, forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
+                        else -> VideoManager.getVideoFiles(context, emptySet(), forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
                     }
                     LibraryItem.Music -> {
                         val pathStr = currentPath?.path ?: ""
@@ -790,7 +842,7 @@ class FileExplorerState(
 
                 val filteredList = if (showHidden) universalList else universalList.filter { !it.name.startsWith(".") }
 
-                val skipSort = libraryItem == LibraryItem.Recent || (libraryItem == LibraryItem.Gallery && !appConfigs.isGalleryAlbumsEnabled) || (libraryItem == LibraryItem.Music && !appConfigs.isMusicAlbumsEnabled)
+                val skipSort = libraryItem == LibraryItem.Recent || (libraryItem == LibraryItem.Gallery && !appConfigs.isGalleryAlbumsEnabled) || (libraryItem == LibraryItem.Videos && !SettingsManager.isVideoFilterEnabled.value) || (libraryItem == LibraryItem.Music && !appConfigs.isMusicAlbumsEnabled)
                 Pair(if (skipSort) filteredList else sortFiles(filteredList, sortParams, meta), meta)
             }
 
@@ -828,6 +880,7 @@ class FileExplorerState(
                     LibraryItem.Recent -> "recent"
                     LibraryItem.Home -> "home"
                     LibraryItem.Gallery -> "gallery"
+                    LibraryItem.Videos -> "videos"
                     LibraryItem.Music -> "music"
                     LibraryItem.Downloads -> "downloads"
                     LibraryItem.Documents -> "documents"
@@ -912,6 +965,9 @@ class FileExplorerState(
         } else if (libraryItem == LibraryItem.Gallery) {
             if (currentPath != null) "virtual://gallery_album:${currentPath!!.absolutePath}"
             else "virtual://gallery"
+        } else if (libraryItem == LibraryItem.Videos) {
+            if (currentPath != null) "virtual://videos_album:${currentPath!!.absolutePath}"
+            else "virtual://videos"
         } else if (libraryItem == LibraryItem.Music) {
             val pathStr = currentPath?.path ?: ""
             val normalized = pathStr.replace("//", "/").removeSuffix("/")

@@ -300,6 +300,15 @@
     <string name="menu_new_playlist">Новий плейліст</string>
     <string name="menu_content">Контент</string>
     <string name="menu_subtitles">Субтитри</string>
+    <string name="menu_subtitle_appearance">Зовнішній вигляд</string>
+    <string name="subtitle_style_shadow">Тінь</string>
+    <string name="subtitle_style_bar">Смуга</string>
+    <string name="menu_subtitle_font_size">Розмір шрифту</string>
+    <string name="subtitle_size_extra_big">Дуже великий (+50%)</string>
+    <string name="subtitle_size_big">Великий (+25%)</string>
+    <string name="subtitle_size_medium">Середній</string>
+    <string name="subtitle_size_small">Маленький (-25%)</string>
+    <string name="subtitle_size_extra_small">Дуже маленький (-50%)</string>
     <string name="menu_audio_track">Аудіодоріжка</string>
     <string name="menu_speed">Швидкість</string>
     <string name="menu_aspect_ratio">Співвідношення сторін</string>
@@ -315,6 +324,7 @@
     <string name="menu_copy_image">Копіювати зображення</string>
     <string name="menu_set_wallpaper">Встановити як шпалери</string>
     <string name="menu_fullscreen">Повноекранний режим</string>
+    <string name="menu_rotate">Повернути</string>
     <string name="menu_undo">Скасувати</string>
     <string name="menu_redo">Повернути</string>
     <string name="menu_folder_color">Колір папки</string>
@@ -325,6 +335,7 @@
     <string name="nav_home">Головна</string>
     <string name="nav_recent">Нещодавні</string>
     <string name="nav_gallery">Галерея</string>
+    <string name="nav_video">Відео</string>
     <string name="nav_music">Музика</string>
     <string name="nav_downloads">Завантаження</string>
     <string name="nav_documents">Документи</string>
@@ -336,6 +347,9 @@
     <string name="menu_gallery_folders">Папки галереї</string>
     <string name="menu_gallery_add_current">Додати поточну папку</string>
     <string name="menu_gallery_custom_path">Власний шлях</string>
+    <string name="menu_video_folders">Папки відео</string>
+    <string name="menu_video_add_current">Додати поточну папку</string>
+    <string name="menu_video_custom_path">Власний шлях</string>
     <string name="menu_music_albums">Альбоми</string>
     <string name="menu_music_folders">Музичні папки</string>
     <string name="menu_music_add_current">Додати поточну папку</string>
@@ -352,6 +366,11 @@
     <string name="gallery_managed_folders">Керовані папки:</string>
     <string name="gallery_add_folder">Додати папку</string>
     <string name="menu_gallery_show_all">Показати всі медіафайли</string>
+    <string name="video_filter_off_msg">Фільтрування наразі ВИМКНЕНО. Відображаються всі медіафайли.</string>
+    <string name="video_no_folders_msg">Жодної папки не додано. Будуть використані стандартні розташування, якщо фільтрування увімкнено.</string>
+    <string name="video_managed_folders">Керовані папки:</string>
+    <string name="video_add_folder">Додати папку</string>
+    <string name="menu_video_show_all">Показати всі медіафайли</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="menu_documents_show_folders">Показати папки</string>
     <string name="menu_favourite">Обране</string>
@@ -466,6 +485,7 @@
     <string name="msg_already_at_saf_root">Ви вже в корені вибраної папки</string>
     <string name="msg_empty_clipboard">Буфер обміну порожній</string>
     <string name="msg_compression_failed">Помилка стиснення: %1$s</string>
+    <string name="msg_termux_failed">Не вдалося відкрити Termux: %1$s. Переконайтеся, що в налаштуваннях Termux увімкнено опцію \'Дозволити зовнішні додатки\'.</string>
     <string name="msg_unknown_compression_error">Невідома помилка стиснення</string>
     <string name="menu_set_wallpaper_failed">Не вдалося встановити шпалери</string>
 
@@ -551,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">Цей каталог обмежений Android. Будь ласка, увімкніть та авторизуйте Shizuku для доступу до нього.</string>
     <string name="msg_cant_access_directory">Немає доступу до цієї директорії</string>
     <string name="msg_nothing_here">Тут поки що нічого немає</string>
+    <string name="msg_video_nothing_here">У відеоменеджер не додано медіафайлів або папок</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Система та батарея</string>

@@ -300,6 +300,15 @@
     <string name="menu_new_playlist">새 재생 목록</string>
     <string name="menu_content">콘텐츠</string>
     <string name="menu_subtitles">자막</string>
+    <string name="menu_subtitle_appearance">모양</string>
+    <string name="subtitle_style_shadow">그림자</string>
+    <string name="subtitle_style_bar">바</string>
+    <string name="menu_subtitle_font_size">글꼴 크기</string>
+    <string name="subtitle_size_extra_big">매우 크게 (+50%)</string>
+    <string name="subtitle_size_big">크게 (+25%)</string>
+    <string name="subtitle_size_medium">중간</string>
+    <string name="subtitle_size_small">작게 (-25%)</string>
+    <string name="subtitle_size_extra_small">매우 작게 (-50%)</string>
     <string name="menu_audio_track">오디오 트랙</string>
     <string name="menu_speed">속도</string>
     <string name="menu_aspect_ratio">화면 비율</string>
@@ -315,6 +324,7 @@
     <string name="menu_copy_image">이미지 복사</string>
     <string name="menu_set_wallpaper">배경화면으로 설정</string>
     <string name="menu_fullscreen">전체 화면</string>
+    <string name="menu_rotate">회전</string>
     <string name="menu_undo">실행 취소</string>
     <string name="menu_redo">다시 실행</string>
     <string name="menu_folder_color">폴더 색상</string>
@@ -325,6 +335,7 @@
     <string name="nav_home">홈</string>
     <string name="nav_recent">최근 항목</string>
     <string name="nav_gallery">갤러리</string>
+    <string name="nav_video">비디오</string>
     <string name="nav_music">음악</string>
     <string name="nav_downloads">다운로드</string>
     <string name="nav_documents">문서</string>
@@ -336,6 +347,9 @@
     <string name="menu_gallery_folders">갤러리 폴더</string>
     <string name="menu_gallery_add_current">현재 폴더 추가</string>
     <string name="menu_gallery_custom_path">사용자 정의 경로</string>
+    <string name="menu_video_folders">비디오 폴더</string>
+    <string name="menu_video_add_current">현재 폴더 추가</string>
+    <string name="menu_video_custom_path">사용자 정의 경로</string>
     <string name="menu_music_albums">앨범</string>
     <string name="menu_music_folders">음악 폴더</string>
     <string name="menu_music_add_current">현재 폴더 추가</string>
@@ -352,6 +366,11 @@
     <string name="gallery_managed_folders">관리되는 폴더:</string>
     <string name="gallery_add_folder">폴더 추가</string>
     <string name="menu_gallery_show_all">모든 미디어 보기</string>
+    <string name="video_filter_off_msg">필터링이 현재 꺼져 있습니다. 모든 미디어를 표시합니다.</string>
+    <string name="video_no_folders_msg">추가된 폴더가 없습니다. 필터링이 활성화된 경우 표준 미디어 위치가 사용됩니다.</string>
+    <string name="video_managed_folders">관리되는 폴더:</string>
+    <string name="video_add_folder">폴더 추가</string>
+    <string name="menu_video_show_all">모든 미디어 보기</string>
     <string name="menu_documents_folder">폴더</string>
     <string name="menu_documents_show_folders">폴더 표시</string>
     <string name="menu_favourite">즐겨찾기</string>
@@ -466,6 +485,7 @@
     <string name="msg_already_at_saf_root">이미 선택한 폴더 루트에 있습니다</string>
     <string name="msg_empty_clipboard">클립보드가 비어 있습니다</string>
     <string name="msg_compression_failed">압축 실패: %1$s</string>
+    <string name="msg_termux_failed">Termux를 여는 데 실패했습니다: %1$s. Termux 설정에서 \'외부 앱 허용\'이 활성화되어 있는지 확인하세요.</string>
     <string name="msg_unknown_compression_error">알 수 없는 압축 오류</string>
     <string name="menu_set_wallpaper_failed">배경화면 설정 실패</string>
 
@@ -551,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">이 디렉토리는 Android에 의해 제한되었습니다. 접근하려면 Shizuku를 활성화하고 권한을 부여하세요.</string>
     <string name="msg_cant_access_directory">이 디렉토리에 액세스할 수 없습니다</string>
     <string name="msg_nothing_here">아직 아무것도 없습니다</string>
+    <string name="msg_video_nothing_here">비디오 관리자에 미디어 또는 폴더가 추가되지 않았습니다</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">시스템 및 배터리</string>

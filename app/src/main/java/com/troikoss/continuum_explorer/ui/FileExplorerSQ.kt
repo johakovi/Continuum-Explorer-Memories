@@ -90,6 +90,7 @@ fun FileExplorerSQ(
                     )
                     item.absolutePath == "virtual://recent" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Recent)
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
+                    item.absolutePath == "virtual://videos" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Videos)
                     item.absolutePath == "virtual://music" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Music)
                     item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
@@ -688,6 +689,7 @@ private fun navigateToSection(
         }
         is NavSection.Recent -> appState.navigateTo(null, null, libraryItem = LibraryItem.Recent)
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
+        is NavSection.Videos -> appState.navigateTo(null, null, libraryItem = LibraryItem.Videos)
         is NavSection.Music -> appState.navigateTo(null, null, libraryItem = LibraryItem.Music)
         is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
         is NavSection.Archives -> appState.navigateTo(null, null, libraryItem = LibraryItem.Archives)

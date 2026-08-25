@@ -175,6 +175,9 @@ fun FileExplorerState.getLocationName(location: NavLocation): String {
     } else if (location.libraryItem == LibraryItem.Gallery) {
         if (location.path != null) location.path.name
         else context.getString(R.string.nav_gallery)
+    } else if (location.libraryItem == LibraryItem.Videos) {
+        if (location.path != null) location.path.name
+        else context.getString(R.string.nav_video)
     } else if (location.libraryItem == LibraryItem.Documents) {
         context.getString(R.string.nav_documents)
     } else if (location.libraryItem == LibraryItem.Games) {
@@ -277,11 +280,11 @@ fun FileExplorerState.goUp() {
         return
     }
 
-    if (libraryItem == LibraryItem.Gallery && currentPath != null) {
+    if ((libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) && currentPath != null) {
         val leavingPath = currentPath
         val parentDir = currentPath?.parentFile
         val targetPath = if (parentDir == null || parentDir.absolutePath == storageRoot.absolutePath || !parentDir.exists()) null else parentDir
-        navigateTo(newPath = targetPath, newUri = null, libraryItem = LibraryItem.Gallery)
+        navigateTo(newPath = targetPath, newUri = null, libraryItem = libraryItem)
         if (targetPath != null) focusItemInList(leavingPath, null)
         return
     }

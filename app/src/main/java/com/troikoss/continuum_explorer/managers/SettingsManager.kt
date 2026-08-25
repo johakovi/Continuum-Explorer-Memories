@@ -100,6 +100,8 @@ object SettingsManager {
     private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
     private const val KEY_GALLERY_FOLDERS = "gallery_folders"
     private const val KEY_GALLERY_FILTER_ENABLED = "gallery_filter_enabled"
+    private const val KEY_VIDEO_FOLDERS = "video_folders"
+    private const val KEY_VIDEO_FILTER_ENABLED = "video_filter_enabled"
     private const val KEY_MUSIC_FOLDERS = "music_folders"
     private const val KEY_MUSIC_FILTER_ENABLED = "music_filter_enabled"
     private const val KEY_SUBTITLE_STYLE = "subtitle_style"
@@ -216,6 +218,12 @@ object SettingsManager {
 
     private val _isGalleryFilterEnabled = mutableStateOf(false)
     val isGalleryFilterEnabled: State<Boolean> = _isGalleryFilterEnabled
+
+    private val _videoFolders = mutableStateOf(setOf<String>())
+    val videoFolders: State<Set<String>> = _videoFolders
+
+    private val _isVideoFilterEnabled = mutableStateOf(false)
+    val isVideoFilterEnabled: State<Boolean> = _isVideoFilterEnabled
 
     private val _musicFolders = mutableStateOf(setOf<String>())
     val musicFolders: State<Set<String>> = _musicFolders
@@ -402,6 +410,9 @@ object SettingsManager {
 
         _galleryFolders.value = prefs.getStringSet(KEY_GALLERY_FOLDERS, emptySet()) ?: emptySet()
         _isGalleryFilterEnabled.value = prefs.getBoolean(KEY_GALLERY_FILTER_ENABLED, false)
+
+        _videoFolders.value = prefs.getStringSet(KEY_VIDEO_FOLDERS, emptySet()) ?: emptySet()
+        _isVideoFilterEnabled.value = prefs.getBoolean(KEY_VIDEO_FILTER_ENABLED, false)
 
         _musicFolders.value = prefs.getStringSet(KEY_MUSIC_FOLDERS, emptySet()) ?: emptySet()
         _isMusicFilterEnabled.value = prefs.getBoolean(KEY_MUSIC_FILTER_ENABLED, false)
@@ -768,6 +779,23 @@ object SettingsManager {
         _isGalleryFilterEnabled.value = enabled
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_GALLERY_FILTER_ENABLED, enabled).apply()
+        GlobalEvents.triggerRefresh()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setVideoFolders(context: Context, folders: Set<String>) {
+        _videoFolders.value = folders
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putStringSet(KEY_VIDEO_FOLDERS, folders).apply()
+        GlobalEvents.triggerRefresh()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setVideoFilterEnabled(context: Context, enabled: Boolean) {
+        _isVideoFilterEnabled.value = enabled
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_VIDEO_FILTER_ENABLED, enabled).apply()
+        GlobalEvents.triggerRefresh()
         GlobalEvents.triggerConfigUpdate()
     }
 

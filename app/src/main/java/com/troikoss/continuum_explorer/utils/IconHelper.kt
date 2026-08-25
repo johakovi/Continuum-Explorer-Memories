@@ -319,6 +319,7 @@ object IconHelper {
             } else if (file.isDirectory) {
                 when {
                     file.providerId == "virtual://gallery" || file.providerId.startsWith("virtual://gallery_album:") -> extendedColors.galleryIcon
+                    file.providerId == "virtual://videos" || file.providerId.startsWith("virtual://videos_album:") -> extendedColors.videoIcon
                     file.providerId == "virtual://music" || file.providerId.startsWith("virtual://music/") || file.providerId.startsWith("virtual://music_album:") || file.mimeType == "album" ||
                             file.providerId.lowercase().let { it.endsWith(".m3u") || it.endsWith(".m3u8") || it.endsWith(".wpl") } -> MaterialTheme.colorScheme.primary
                     file.providerId == "virtual://recent" -> extendedColors.recentIcon
@@ -368,9 +369,9 @@ object IconHelper {
 
         if (file.isDirectory) {
             val isAlbum = file.mimeType == "album" || file.providerId.startsWith("virtual://music_album:")
-            val isGalleryAlbum = file.parentId == "virtual://gallery"
+            val isLibraryAlbum = file.parentId == "virtual://gallery"
 
-            if (isGalleryAlbum && effectiveIconTheme != IconTheme.MATERIAL) {
+            if (isLibraryAlbum && effectiveIconTheme != IconTheme.MATERIAL) {
                 Grid2x2FolderIcon(file, modifier, iconSize)
                 return
             }
@@ -900,9 +901,9 @@ object IconHelper {
     ) {
         if (!folder.isDirectory) return
 
-        // Skip previews for folders in the root of internal storage, gallery albums (which use 2x2 grids), or those with custom overlays
+        // Skip previews for folders in the root of internal storage, library albums (which use 2x2 grids), or those with custom overlays
         val internalRoot = android.os.Environment.getExternalStorageDirectory().absolutePath
-        if (folder.parentId == internalRoot || folder.parentId == "virtual://gallery" || getOverlayIconRes(folder) != null) return
+        if (folder.parentId == internalRoot || folder.parentId == "virtual://gallery" || folder.parentId == "virtual://videos" || getOverlayIconRes(folder) != null) return
 
         val cacheKey = "${folder.provider.kind}:${folder.absolutePath}"
         var previewFile by remember(folder) {

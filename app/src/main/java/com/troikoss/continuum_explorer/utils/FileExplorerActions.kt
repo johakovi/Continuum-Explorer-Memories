@@ -40,6 +40,7 @@ fun FileExplorerState.open(item: UniversalFile) {
             if (itemFileRef != null) {
                 when {
                     libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
+                    libraryItem == LibraryItem.Videos -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Videos)
                     item.providerId.startsWith("virtual://music") || item.mimeType == "album" || item.mimeType == "audio/x-mpegurl" || item.mimeType == "application/vnd.ms-wpl" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
                     else -> {
                         safStack.clear()
@@ -48,7 +49,7 @@ fun FileExplorerState.open(item: UniversalFile) {
                 }
             } else if (itemDocRef != null) {
                 val oldUri = currentSafUri
-                navigateTo(null, itemDocRef.uri)
+                navigateTo(null, itemDocRef.uri, libraryItem = if (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) libraryItem else LibraryItem.None)
                 oldUri?.let { safStack.add(it) }
             }
         }
@@ -100,6 +101,7 @@ fun FileExplorerState.openInNewWindow(items: List<UniversalFile>) {
             when {
                 libraryItem == LibraryItem.Recent -> putExtra("isRecent", true)
                 libraryItem == LibraryItem.Gallery -> putExtra("isGallery", true)
+            libraryItem == LibraryItem.Videos -> putExtra("isVideos", true)
                 libraryItem == LibraryItem.RecycleBin -> putExtra("isRecycleBin", true)
                 currentPath != null -> putExtra("path", currentPath?.absolutePath)
                 currentSafUri != null -> putExtra("uri", currentSafUri.toString())
@@ -143,7 +145,7 @@ fun FileExplorerState.paste() {
     val isMove = PendingCut.isActive
     
     val targetPath = when {
-        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+        (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) && currentPath == null -> {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         }
         else -> currentPath
@@ -348,7 +350,7 @@ fun FileExplorerState.confirmRename(target: UniversalFile, newName: String) {
 
 fun FileExplorerState.createNewFolder() {
     val targetPath = when {
-        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+        (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) && currentPath == null -> {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         }
         else -> currentPath
@@ -360,7 +362,7 @@ fun FileExplorerState.createNewFolder() {
             withContext(Dispatchers.Main) {
                 if (success) {
                     // If we created a folder at the Gallery root, ensure it's indexed/visible
-                    if (libraryItem == LibraryItem.Gallery && currentPath == null && targetPath != null) {
+                    if ((libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) && currentPath == null && targetPath != null) {
                         val newFolderPath = File(targetPath, name).absolutePath
                         val currentFolders = SettingsManager.galleryFolders.value
                         val isAlreadyIndexed = currentFolders.any { newFolderPath.startsWith(it) }
@@ -388,7 +390,7 @@ fun FileExplorerState.createNewFolder() {
 
 fun FileExplorerState.createNewFile() {
     val targetPath = when {
-        libraryItem == LibraryItem.Gallery && currentPath == null -> {
+        (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) && currentPath == null -> {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         }
         else -> currentPath

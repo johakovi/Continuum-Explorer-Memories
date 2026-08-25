@@ -302,6 +302,15 @@
     <string name="menu_new_playlist">Nova Lista de Reprodução</string>
     <string name="menu_content">Conteúdo</string>
     <string name="menu_subtitles">Legendas</string>
+    <string name="menu_subtitle_appearance">Aparência</string>
+    <string name="subtitle_style_shadow">Sombra</string>
+    <string name="subtitle_style_bar">Barra</string>
+    <string name="menu_subtitle_font_size">Tamanho da fonte</string>
+    <string name="subtitle_size_extra_big">Muito grande (+50%)</string>
+    <string name="subtitle_size_big">Grande (+25%)</string>
+    <string name="subtitle_size_medium">Médio</string>
+    <string name="subtitle_size_small">Pequeno (-25%)</string>
+    <string name="subtitle_size_extra_small">Muito pequeno (-50%)</string>
     <string name="menu_audio_track">Faixa de Áudio</string>
     <string name="menu_speed">Velocidade</string>
     <string name="menu_aspect_ratio">Proporção</string>
@@ -318,6 +327,7 @@
     <string name="menu_set_wallpaper">Definir como Papel de Parede</string>
     <string name="menu_set_wallpaper_failed">Falha ao definir papel de parede</string>
     <string name="menu_fullscreen">Tela Cheia</string>
+    <string name="menu_rotate">Rodar</string>
     <string name="menu_undo">Desfazer</string>
     <string name="menu_redo">Refazer</string>
     <string name="menu_folder_color">Cor da pasta</string>
@@ -329,6 +339,7 @@
     <string name="nav_home">Início</string>
     <string name="nav_recent">Recentes</string>
     <string name="nav_gallery">Galeria</string>
+    <string name="nav_video">Vídeos</string>
     <string name="nav_music">Música</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documentos</string>
@@ -340,6 +351,9 @@
     <string name="menu_gallery_folders">Pastas da Galeria</string>
     <string name="menu_gallery_add_current">Adicionar pasta atual</string>
     <string name="menu_gallery_custom_path">Caminho personalizado</string>
+    <string name="menu_video_folders">Pastas de vídeos</string>
+    <string name="menu_video_add_current">Adicionar pasta atual</string>
+    <string name="menu_video_custom_path">Caminho personalizado</string>
     <string name="menu_music_albums">Álbuns</string>
     <string name="menu_music_folders">Pastas de Música</string>
     <string name="menu_music_add_current">Adicionar pasta atual</string>
@@ -356,6 +370,11 @@
     <string name="gallery_managed_folders">Pastas geridas:</string>
     <string name="gallery_add_folder">Adicionar pasta</string>
     <string name="menu_gallery_show_all">Mostrar Todas as Mídias</string>
+    <string name="video_filter_off_msg">A filtragem está DESATIVADA. Mostrando todos os ficheiros multimédia.</string>
+    <string name="video_no_folders_msg">Nenhuma pasta adicionada. Os locais de multimédia padrão serão usados se a filtragem estiver ativada.</string>
+    <string name="video_managed_folders">Pastas geridas:</string>
+    <string name="video_add_folder">Adicionar pasta</string>
+    <string name="menu_video_show_all">Mostrar Todas as Mídias</string>
     <string name="menu_documents_folder">Pasta</string>
     <string name="menu_documents_show_folders">Mostrar pastas</string>
     <string name="menu_favourite">Favorito</string>
@@ -470,6 +489,7 @@
     <string name="msg_already_at_saf_root">Já está na raiz da pasta escolhida</string>
     <string name="msg_empty_clipboard">A área de transferência está vazia</string>
     <string name="msg_compression_failed">Falha na compactação: %1$s</string>
+    <string name="msg_termux_failed">Falha ao abrir o Termux: %1$s. Certifique-se de que \'Permitir aplicações externas\' está ativado nas definições do Termux.</string>
     <string name="msg_unknown_compression_error">Erro de compactação desconhecido</string>
 
     <!-- Dialog Titles -->
@@ -547,6 +567,7 @@
     <string name="msg_restricted_access_shizuku">Este diretório é restrito pelo Android. Por favor, ative e autorize o Shizuku para acessá-lo.</string>
     <string name="msg_cant_access_directory">Não é possível aceder a este diretório</string>
     <string name="msg_nothing_here">Ainda não há nada aqui</string>
+    <string name="msg_video_nothing_here">Nenhum ficheiro multimédia ou pasta adicionada ao gestor de vídeos</string>
 
     <string name="msg_remote_permanent_warning">Os arquivos de rede serão excluídos permanentemente (não podem ser movidos para a lixeira).</string>
     <string name="msg_archive_remote_unsupported">O arquivamento ainda não é suportado para locais de rede.</string>

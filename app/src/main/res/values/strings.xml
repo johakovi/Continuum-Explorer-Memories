@@ -160,7 +160,7 @@
     <string name="op_extracting">Extracting archive…</string>
     <string name="op_compressing">Compressing items…</string>
     <string name="op_processing">Processing items…</string>
-    <string name="op_queue_title">(%1$d/%2$d) %3$s</string>
+    <string name="op_queue_title" translatable="false">(%1$d/%2$d) %3$s</string>
     <string name="op_finished">Finished</string>
     <string name="op_time_remaining">Time remaining:</string>
     <string name="op_items_remaining">Items remaining:</string>
@@ -335,6 +335,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_recent">Recent</string>
     <string name="nav_gallery">Gallery</string>
+    <string name="nav_video">Videos</string>
     <string name="nav_music">Music</string>
     <string name="nav_downloads">Downloads</string>
     <string name="nav_documents">Documents</string>
@@ -345,6 +346,9 @@
     <string name="menu_gallery_folders">Gallery Folders</string>
     <string name="menu_gallery_add_current">Add Current Folder</string>
     <string name="menu_gallery_custom_path">Custom Path</string>
+    <string name="menu_video_folders">Video Folders</string>
+    <string name="menu_video_add_current">Add Current Folder</string>
+    <string name="menu_video_custom_path">Custom Path</string>
     <string name="menu_musicplayer">Music player</string>
     <string name="menu_music_albums">Albums</string>
     <string name="menu_music_folders">Music Folders</string>
@@ -362,6 +366,11 @@
     <string name="gallery_managed_folders">Managed Folders:</string>
     <string name="gallery_add_folder">Add Folder</string>
     <string name="menu_gallery_show_all">Show All Media</string>
+    <string name="video_filter_off_msg">Filtering is currently OFF. Showing all media.</string>
+    <string name="video_no_folders_msg">No folders added. Standard media locations will be used if filtering is enabled.</string>
+    <string name="video_managed_folders">Managed Folders:</string>
+    <string name="video_add_folder">Add Folder</string>
+    <string name="menu_video_show_all">Show All Media</string>
     <string name="menu_documents_folder">Folder</string>
     <string name="menu_documents_show_folders">Show Folders</string>
     <string name="menu_favourite">Favourite</string>
@@ -562,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">This directory is restricted by Android. Please enable and authorize Shizuku to access it.</string>
     <string name="msg_cant_access_directory">Can\'t access to this directory</string>
     <string name="msg_nothing_here">There isn\'t anything yet</string>
+    <string name="msg_video_nothing_here">No media or folders added to video manager</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Battery</string>

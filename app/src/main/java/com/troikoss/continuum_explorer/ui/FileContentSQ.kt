@@ -387,14 +387,19 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         val accessErr = appState.accessError
         val isMusicSubfolder = appState.libraryItem == LibraryItem.Music && appState.currentPath != null
         val isGames = appState.libraryItem == LibraryItem.Games
-        val isEmptyState = !appState.isLoading && (isMusicSubfolder || isGames) && appState.files.isEmpty()
+        val isVideos = appState.libraryItem == LibraryItem.Videos
+        val isEmptyState = !appState.isLoading && (isMusicSubfolder || isGames || isVideos) && appState.files.isEmpty()
 
         if (accessErr != null) {
             AccessErrorView(message = accessErr)
         } else if (appState.libraryItem == LibraryItem.Home) {
             HomeView(appState = appState, onAddStorage = onAddStorage)
         } else if (isEmptyState) {
-            EmptyStateView()
+            val emptyMessage = when (appState.libraryItem) {
+                LibraryItem.Videos -> stringResource(R.string.msg_video_nothing_here)
+                else -> stringResource(R.string.msg_nothing_here)
+            }
+            EmptyStateView(emptyMessage)
         } else {
             FileLayout(
                 appState = appState,
@@ -428,7 +433,7 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
 }
 
 @Composable
-private fun EmptyStateView() {
+private fun EmptyStateView(message: String = stringResource(R.string.msg_nothing_here)) {
     val emoticons = remember { listOf("(ᵕ • ᴗ •)", "( •᷄ᴗ•́)", "(⇀‸↼‶)", "(ᵕ ó ᴗ ò)") }
     val emoticon = remember { emoticons.random() }
 
@@ -442,7 +447,7 @@ private fun EmptyStateView() {
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
-                text = "${stringResource(R.string.msg_nothing_here)} $emoticon",
+                text = "$message $emoticon",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center

@@ -121,7 +121,7 @@ fun TopBar(
         }
     }
 
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
 
@@ -424,23 +424,67 @@ fun TopBar(
                                 .horizontalScroll(breadcrumbScrollState),
                             verticalAlignment = CenterVertically
                         ) {
-                            if (appState.libraryItem == LibraryItem.Gallery && appState.currentPath != null) {
-                                // Gallery album breadcrumb: "Gallery > AlbumName"
+                            if ((appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos) && appState.currentPath != null) {
+                                // Library root button (Gallery or Videos)
+                                val rootLabel = if (appState.libraryItem == LibraryItem.Gallery) stringResource(R.string.nav_gallery) else stringResource(R.string.nav_video)
+                                val rootItem = if (appState.libraryItem == LibraryItem.Gallery) LibraryItem.Gallery else LibraryItem.Videos
+
                                 TextButton(
-                                    onClick = { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) },
+                                    onClick = { appState.navigateTo(null, null, libraryItem = rootItem) },
                                     contentPadding = PaddingValues(horizontal = 12.dp)
                                 ) {
                                     Text(
-                                        text = stringResource(R.string.nav_gallery),
+                                        text = rootLabel,
                                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
                                         color = MaterialTheme.colorScheme.onSurface)
                                 }
                                 Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
-                                Text(
-                                    text = appState.currentPath!!.name,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.primary)
+
+                                if (appState.libraryItem == LibraryItem.Gallery) {
+                                    // Gallery remains one-level (Albums)
+                                    Text(
+                                        text = appState.currentPath!!.name,
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.primary)
+                                } else {
+                                    // Videos supports full hierarchical breadcrumbs
+                                    visibleSegments.forEachIndexed { index, folderName ->
+                                        val displayName = if (folderName == "0") stringResource(R.string.nav_internal_storage) else folderName
+                                        val isLast = index == visibleSegments.size - 1
+
+                                        val realIndex = if (zeroIndex != -1) zeroIndex + index else index
+                                        val targetPathSegments = allSegments.take(realIndex + 1)
+                                        val targetPathString = "/" + targetPathSegments.joinToString("/")
+                                        val targetFile = File(targetPathString)
+
+                                        val leavingFile = if (realIndex + 1 < allSegments.size) {
+                                            val leavingPathSegments = allSegments.take(realIndex + 2)
+                                            File("/" + leavingPathSegments.joinToString("/"))
+                                        } else null
+
+                                        TextButton(
+                                            onClick = {
+                                                appState.navigateTo(targetFile, null, libraryItem = LibraryItem.Videos)
+                                                appState.focusItemInList(leavingFile, null)
+                                            },
+                                            contentPadding = PaddingValues(horizontal = 12.dp),
+                                            modifier = if (targetFile.isDirectory) Modifier.fileDropTarget(appState, destPath = targetFile) else Modifier
+                                        ) {
+                                            Text(
+                                                text = displayName,
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    fontSize = 13.sp,
+                                                    fontWeight = if (isLast) FontWeight.Bold else FontWeight.Normal
+                                                ),
+                                                color = if (isLast) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                        if (!isLast) {
+                                            Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
+                                        }
+                                    }
+                                }
                             } else if (appState.libraryItem == LibraryItem.RecycleBin) {
                                 Text(
                                     text = stringResource(R.string.nav_recycle_bin),
@@ -636,9 +680,9 @@ fun TopBar(
                                         Icon(painterResource(id = R.drawable.ic_breadcrumb_arrow), null, modifier = Modifier.size(16.dp))
                                     }
                                 }
-                            } else if (appState.libraryItem == LibraryItem.Gallery) {
+                            } else if (appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos) {
                                 Text(
-                                    text = stringResource(R.string.nav_gallery),
+                                    text = if (appState.libraryItem == LibraryItem.Gallery) stringResource(R.string.nav_gallery) else stringResource(R.string.nav_video),
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.primary

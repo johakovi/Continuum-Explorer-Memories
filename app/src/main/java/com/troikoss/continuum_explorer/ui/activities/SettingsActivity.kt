@@ -488,6 +488,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         LibraryItem.Home -> stringResource(R.string.nav_home)
                         LibraryItem.Recent -> stringResource(R.string.nav_recent)
                         LibraryItem.Gallery -> stringResource(R.string.nav_gallery)
+                        LibraryItem.Videos -> stringResource(R.string.nav_video)
                         LibraryItem.Music -> stringResource(R.string.nav_music)
                         LibraryItem.Downloads -> stringResource(R.string.nav_downloads)
                         LibraryItem.Documents -> stringResource(R.string.nav_documents)

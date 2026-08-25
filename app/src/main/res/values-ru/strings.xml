@@ -300,6 +300,15 @@
     <string name="menu_new_playlist">Новый плейлист</string>
     <string name="menu_content">Контент</string>
     <string name="menu_subtitles">Субтитры</string>
+    <string name="menu_subtitle_appearance">Внешний вид</string>
+    <string name="subtitle_style_shadow">Тень</string>
+    <string name="subtitle_style_bar">Полоса</string>
+    <string name="menu_subtitle_font_size">Размер шрифта</string>
+    <string name="subtitle_size_extra_big">Очень большой (+50%)</string>
+    <string name="subtitle_size_big">Большой (+25%)</string>
+    <string name="subtitle_size_medium">Средний</string>
+    <string name="subtitle_size_small">Маленький (-25%)</string>
+    <string name="subtitle_size_extra_small">Очень маленький (-50%)</string>
     <string name="menu_audio_track">Аудиодорожка</string>
     <string name="menu_speed">Скорость</string>
     <string name="menu_aspect_ratio">Соотношение сторон</string>
@@ -315,6 +324,7 @@
     <string name="menu_copy_image">Копировать изображение</string>
     <string name="menu_set_wallpaper">Установить как обои</string>
     <string name="menu_fullscreen">Полноэкранный режим</string>
+    <string name="menu_rotate">Повернуть</string>
     <string name="menu_undo">Отменить</string>
     <string name="menu_redo">Вернуть</string>
     <string name="menu_folder_color">Цвет папки</string>
@@ -325,6 +335,7 @@
     <string name="nav_home">Главная</string>
     <string name="nav_recent">Недавние</string>
     <string name="nav_gallery">Галерея</string>
+    <string name="nav_video">Видео</string>
     <string name="nav_music">Музыка</string>
     <string name="nav_downloads">Загрузки</string>
     <string name="nav_documents">Документы</string>
@@ -336,6 +347,9 @@
     <string name="menu_gallery_folders">Папки галереи</string>
     <string name="menu_gallery_add_current">Добавить текущую папку</string>
     <string name="menu_gallery_custom_path">Пользовательский путь</string>
+    <string name="menu_video_folders">Папки видео</string>
+    <string name="menu_video_add_current">Добавить текущую папку</string>
+    <string name="menu_video_custom_path">Пользовательский путь</string>
     <string name="menu_music_albums">Альбомы</string>
     <string name="menu_music_folders">Музыкальные папки</string>
     <string name="menu_music_add_current">Добавить текущую папку</string>
@@ -352,6 +366,11 @@
     <string name="gallery_managed_folders">Управляемые папки:</string>
     <string name="gallery_add_folder">Добавить папку</string>
     <string name="menu_gallery_show_all">Показать все медиа</string>
+    <string name="video_filter_off_msg">Фильтрация выключена. Отображаются все медиафайлы.</string>
+    <string name="video_no_folders_msg">Папки не добавлены. Будут использованы стандартные расположения, если фильтрация включена.</string>
+    <string name="video_managed_folders">Управляемые папки:</string>
+    <string name="video_add_folder">Добавить папку</string>
+    <string name="menu_video_show_all">Показать все медиа</string>
     <string name="menu_documents_folder">Папка</string>
     <string name="menu_documents_show_folders">Показать папки</string>
     <string name="menu_favourite">Избранное</string>
@@ -466,6 +485,7 @@
     <string name="msg_already_at_saf_root">Вы уже в корне выбранной папки</string>
     <string name="msg_empty_clipboard">Буфер обмена пуст</string>
     <string name="msg_compression_failed">Ошибка сжатия: %1$s</string>
+    <string name="msg_termux_failed">Не удалось открыть Termux: %1$s. Убедитесь, что в настройках Termux включена опция \'Разрешить внешние приложения\'.</string>
     <string name="msg_unknown_compression_error">Неизвестная ошибка сжатия</string>
     <string name="menu_set_wallpaper_failed">Не удалось установить обои</string>
 
@@ -551,6 +571,7 @@
     <string name="msg_restricted_access_shizuku">Этот каталог ограничен Android. Пожалуйста, включите и авторизуйте Shizuku для доступа к нему.</string>
     <string name="msg_cant_access_directory">Нет доступа к этой директории</string>
     <string name="msg_nothing_here">Здесь пока ничего нет</string>
+    <string name="msg_video_nothing_here">В видеоменеджер не добавлены медиафайлы или папки</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Система и батарея</string>
