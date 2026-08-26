@@ -56,6 +56,9 @@ object GamesManager {
         GameSaveInfo("NS (Suyu)", "Android/data/org.suyu.suyu_emu/files"),
         GameSaveInfo("The Wreck", "Android/data/com.ThePixelHunt.TheWreck"),
         GameSaveInfo("Mindustry", "Android/data/io.anuke.mindustry/files/saves"),
+        GameSaveInfo("BloonsTD (EGS)", "Android/data/com.ninjakiwi.bloonstd6epic/files"),
+        GameSaveInfo("Polytrack", "Android/data/com.kodub.polytrack"),
+        GameSaveInfo("Construction Simulator (EGS)", "Android/data/com.astragon.cs3EGS/files/Profiles"),
     )
 
     fun hasAnyGame(context: Context): Boolean {
