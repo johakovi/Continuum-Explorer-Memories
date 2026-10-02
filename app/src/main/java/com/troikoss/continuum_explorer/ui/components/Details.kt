@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
@@ -160,7 +160,8 @@ fun DetailsPane(
                             fontSize = 14.sp
                         )
                     }
-                    if (!file.isDirectory) {
+                    val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
+                    if (!file.isDirectory && !isMusic) {
                         Text(
                             text = stringResource(R.string.details_size, appState.formatSize(file.length)),
                             fontSize = 14.sp
@@ -293,7 +294,8 @@ fun DetailsBar(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                if (!file.isDirectory) {
+                val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
+                if (!file.isDirectory && !isMusic) {
                     Text(
                         text = stringResource(R.string.details_size, appState.formatSize(file.length)),
                         fontSize = 14.sp,

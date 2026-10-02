@@ -400,7 +400,8 @@ private fun FileContentView(
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
-                        if (!file.isDirectory) {
+                        val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
+                        if (!file.isDirectory && !isMusic) {
                             Text(
                                 text = formattedSize,
                                 style = MaterialTheme.typography.bodySmall,
@@ -505,8 +506,9 @@ private fun FileMusicView(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(Modifier.width(8.dp))
-                        if (!file.isDirectory) {
+                        val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
+                        if (!file.isDirectory && !isMusic) {
+                            Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "•",
                                 style = MaterialTheme.typography.bodySmall,
@@ -626,9 +628,10 @@ private fun FileDetailsView(
                     val width = appState.folderConfigs.columnWidths[column.type] ?: column.minWidth
                     val uuidKey = file.fileRef?.parentFile?.name
                     val meta = uuidKey?.let { appState.recycleBinMetadata[it] }
+                    val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
                     val text = when (column.type) {
                         FileColumnType.DATE -> remember(file) { appState.formatDate(file.lastModified) }
-                        FileColumnType.SIZE -> if (file.isDirectory) remember(file) { file.fileRef?.listFiles()?.size?.let { n -> if (n == 1) resources.getString(R.string.details_item_count_singular) else resources.getString(R.string.details_item_count_plural, n) } ?: "--" } else remember(file) { appState.formatSize(file.length) }
+                        FileColumnType.SIZE -> if (isMusic && !file.isDirectory) "--" else if (file.isDirectory) remember(file) { file.fileRef?.listFiles()?.size?.let { n -> if (n == 1) resources.getString(R.string.details_item_count_singular) else resources.getString(R.string.details_item_count_plural, n) } ?: "--" } else remember(file) { appState.formatSize(file.length) }
                         FileColumnType.TYPE -> getFileType(file, context)
                         FileColumnType.DATE_DELETED -> meta?.deletedAt?.let { appState.formatDate(it) } ?: "--"
                         FileColumnType.DELETED_FROM -> meta?.deletedFrom ?: "--"
