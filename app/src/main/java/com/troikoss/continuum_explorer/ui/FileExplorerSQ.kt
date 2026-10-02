@@ -28,7 +28,6 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
@@ -643,7 +642,7 @@ private fun ExplorerBody(
                     onResizeStarted = { isResizingNav = true },
                     onResize = { delta ->
                         appState.appConfigs.detailsPaneWidth =
-                            (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 300.dp)
+                            (appState.appConfigs.detailsPaneWidth - delta).coerceIn(200.dp, 600.dp)
                     },
                     onResizeFinished = {
                         isResizingNav = false
