@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.troikoss.continuum_explorer_memories"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 37
         versionCode = 40
         versionName = "Memories M8.1"
