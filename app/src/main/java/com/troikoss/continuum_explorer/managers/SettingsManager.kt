@@ -288,11 +288,11 @@ object SettingsManager {
             TouchDragBehavior.ASK
         }
 
-        val savedTheme = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
+        val savedTheme = prefs.getString(KEY_THEME_MODE, ThemeMode.ENHANCED_SYSTEM.name)
         _themeMode.value = try {
-            ThemeMode.valueOf(savedTheme ?: ThemeMode.SYSTEM.name)
+            ThemeMode.valueOf(savedTheme ?: ThemeMode.ENHANCED_SYSTEM.name)
         } catch (_: Exception) {
-            ThemeMode.SYSTEM
+            ThemeMode.ENHANCED_SYSTEM
         }
 
         val savedThemeBar = prefs.getString(KEY_THEME_BAR, ThemeShape.ROUNDED.name)
