@@ -220,6 +220,7 @@
     <string name="settings_details_hidden">Hidden</string>
     <string name="settings_details_pane">Side Pane</string>
     <string name="settings_details_bar">Bottom Bar</string>
+    <string name="settings_command_bar">Command Bar</string>
     <string name="settings_show_command_bar">Show Command Bar</string>
     <string name="settings_show_command_bar_desc">Toolbar with file operation buttons below the address bar.</string>
     <string name="settings_show_hidden_files">Show hidden files/folders</string>
@@ -241,6 +242,7 @@
     <string name="settings_choose_del_behavior">Choose Deletion Behavior</string>
     <string name="settings_choose_theme">Choose Theme</string>
     <string name="settings_choose_details_mode">Choose Details Mode</string>
+    <string name="settings_details_mode">Details Mode</string>
     <string name="settings_starting_page">Starting Page</string>
     <string name="settings_choose_starting_page">Choose Starting Page</string>
     <string name="settings_language">Language</string>
@@ -292,6 +294,7 @@
     <string name="menu_by_location">By Location</string>
     <string name="menu_details">Details</string>
     <string name="menu_grid">Grid</string>
+    <string name="menu_tools">Tools</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_music">Music</string>
     <string name="menu_sync_list">Sync List</string>

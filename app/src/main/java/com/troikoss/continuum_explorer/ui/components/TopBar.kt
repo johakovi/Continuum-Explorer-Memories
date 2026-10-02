@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -877,6 +878,12 @@ fun TopBar(
                                 trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                                 onClick = { currentOptionsScreen = "SORT" }
                             )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_tools)) },
+                                leadingIcon = { Icon(Icons.Filled.AppSettingsAlt, null) },
+                                trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                                onClick = { currentOptionsScreen = "TOOLS" }
+                            )
 
                             HorizontalDivider()
 
@@ -1032,6 +1039,35 @@ fun TopBar(
                                     }
                                 )
                             }
+                        }
+                        "TOOLS" -> {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = { currentOptionsScreen = "MAIN" }
+                            )
+                            HorizontalDivider()
+
+                            TODO("Add more tools")
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_command_bar)) },
+                                leadingIcon = { Icon(Icons.Default.TextFormat, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.NAME) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_details_mode)) },
+                                leadingIcon = { Icon(Icons.Default.DateRange, null) },
+                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.DATE) },
+                                onClick = {
+                                    appState.folderConfigs.toggleSort(FileColumnType.DATE, appState.getCurrentStorageKey()) { appState.refresh() }
+                                    optionsMenuExpanded = false
+                                }
+                            )
+
                         }
 
                         "MUSIC_MANAGER" -> {
