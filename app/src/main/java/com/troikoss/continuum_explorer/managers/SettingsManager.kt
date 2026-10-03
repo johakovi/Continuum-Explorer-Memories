@@ -61,6 +61,7 @@ enum class IconStyle {
     CUSTOM
 }
 
+@Suppress("unused")
 object SettingsManager {
     private const val PREFS_NAME = "explorer_settings"
     private const val KEY_DELETE_BEHAVIOR = "delete_behavior"
@@ -81,6 +82,7 @@ object SettingsManager {
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
+    private const val KEY_PREFERRED_DETAILS_MODE = "preferred_details_mode"
     private const val KEY_TAB_BAR_BACKGROUND_URI = "tab_bar_background_uri"
     private const val KEY_STARTING_PAGE = "starting_page"
 
@@ -139,7 +141,6 @@ object SettingsManager {
     val themeTop: State<ThemeTopMode> = _themeTop
 
     private val _iconTheme = mutableStateOf(IconTheme.COLOURFUL)
-    val iconTheme: State<IconTheme> = _iconTheme
 
     private val _iconStyle = mutableStateOf(IconStyle.COLOURFUL)
     val iconStyle: State<IconStyle> = _iconStyle
@@ -167,6 +168,9 @@ object SettingsManager {
 
     private val _detailsMode = mutableStateOf(DetailsMode.OFF)
     val detailsMode: State<DetailsMode> = _detailsMode
+
+    private val _preferredDetailsMode = mutableStateOf(DetailsMode.PANE)
+    val preferredDetailsMode: State<DetailsMode> = _preferredDetailsMode
 
     private val _startingPage = mutableStateOf(LibraryItem.Home)
     val startingPage: State<LibraryItem> = _startingPage
@@ -378,6 +382,19 @@ object SettingsManager {
             DetailsMode.OFF
         }
 
+        val savedPreferred = prefs.getString(KEY_PREFERRED_DETAILS_MODE, null)
+        _preferredDetailsMode.value = try {
+            if (savedPreferred != null) {
+                DetailsMode.valueOf(savedPreferred)
+            } else if (_detailsMode.value != DetailsMode.OFF) {
+                _detailsMode.value
+            } else {
+                DetailsMode.PANE
+            }
+        } catch (_: Exception) {
+            DetailsMode.PANE
+        }
+
         val savedStartingPage = prefs.getString(KEY_STARTING_PAGE, LibraryItem.Home.name)
         _startingPage.value = try {
             LibraryItem.valueOf(savedStartingPage ?: LibraryItem.Home.name)
@@ -450,7 +467,7 @@ object SettingsManager {
         val savedViewMode = prefs.getString(KEY_DEFAULT_VIEW_MODE, ViewMode.DETAILS.name)
         _defaultViewMode.value = try {
             ViewMode.valueOf(savedViewMode ?: ViewMode.DETAILS.name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ViewMode.DETAILS
         }
     }
@@ -476,8 +493,21 @@ object SettingsManager {
     fun setDetailsMode(context: Context, mode: DetailsMode) {
         _detailsMode.value = mode
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_DETAILS_MODE, mode.name).apply()
+        val editor = prefs.edit().putString(KEY_DETAILS_MODE, mode.name)
+        if (mode != DetailsMode.OFF) {
+            _preferredDetailsMode.value = mode
+            editor.putString(KEY_PREFERRED_DETAILS_MODE, mode.name)
+        }
+        editor.apply()
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun toggleDetailsMode(context: Context) {
+        if (_detailsMode.value == DetailsMode.OFF) {
+            setDetailsMode(context, _preferredDetailsMode.value)
+        } else {
+            setDetailsMode(context, DetailsMode.OFF)
+        }
     }
 
     fun setStartingPage(context: Context, item: LibraryItem) {
@@ -615,20 +645,18 @@ object SettingsManager {
     }
 
     fun getEffectiveIconTheme(category: IconCategory): IconTheme {
-        val style = _iconStyle.value
-        if (style == IconStyle.CUSTOM) {
-            return when (category) {
-                IconCategory.SIDEBAR -> _sidebarIconTheme.value
-                IconCategory.MUSIC -> _musicIconTheme.value
-                IconCategory.FILES_FOLDERS -> _folderIconTheme.value
-                IconCategory.HOME -> _homeIconTheme.value
+        return when (_iconStyle.value) {
+            IconStyle.CUSTOM -> {
+                when (category) {
+                    IconCategory.SIDEBAR -> _sidebarIconTheme.value
+                    IconCategory.MUSIC -> _musicIconTheme.value
+                    IconCategory.FILES_FOLDERS -> _folderIconTheme.value
+                    IconCategory.HOME -> _homeIconTheme.value
+                }
             }
-        }
-        return when (style) {
             IconStyle.MATERIAL -> IconTheme.MATERIAL
             IconStyle.COLOURFUL -> IconTheme.COLOURFUL
             IconStyle.COLOURFULDUO -> IconTheme.COLOURFULDUO
-            else -> IconTheme.COLOURFUL
         }
     }
 

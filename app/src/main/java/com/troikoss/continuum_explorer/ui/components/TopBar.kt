@@ -59,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import com.troikoss.continuum_explorer.managers.CleanupManager
+import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
@@ -1048,26 +1049,65 @@ fun TopBar(
                             )
                             HorizontalDivider()
 
-                            TODO("Add more tools")
+                            val isCommandBarVisible = SettingsManager.isCommandBarVisible.value
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.settings_command_bar)) },
                                 leadingIcon = { Icon(Icons.Default.TextFormat, null) },
-                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.NAME) },
+                                trailingIcon = {
+                                    Checkbox(
+                                        checked = isCommandBarVisible,
+                                        onCheckedChange = null
+                                    )
+                                },
                                 onClick = {
-                                    appState.folderConfigs.toggleSort(FileColumnType.NAME, appState.getCurrentStorageKey()) { appState.refresh() }
-                                    optionsMenuExpanded = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.settings_details_mode)) },
-                                leadingIcon = { Icon(Icons.Default.DateRange, null) },
-                                trailingIcon = { appState.folderConfigs.SortArrow(FileColumnType.DATE) },
-                                onClick = {
-                                    appState.folderConfigs.toggleSort(FileColumnType.DATE, appState.getCurrentStorageKey()) { appState.refresh() }
-                                    optionsMenuExpanded = false
+                                    SettingsManager.setCommandBarVisible(context, !isCommandBarVisible)
                                 }
                             )
 
+                            val isDetailsModeOn = SettingsManager.detailsMode.value != DetailsMode.OFF
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_details_mode)) },
+                                leadingIcon = { Icon(Icons.Default.Info, null) },
+                                trailingIcon = {
+                                    Checkbox(
+                                        checked = isDetailsModeOn,
+                                        onCheckedChange = null
+                                    )
+                                },
+                                onClick = {
+                                    SettingsManager.toggleDetailsMode(context)
+                                }
+                            )
+
+                            val showHidden = SettingsManager.showHiddenFiles.value
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_show_hidden_files)) },
+                                leadingIcon = { Icon(if (showHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) },
+                                trailingIcon = {
+                                    Checkbox(
+                                        checked = showHidden,
+                                        onCheckedChange = null
+                                    )
+                                },
+                                onClick = {
+                                    SettingsManager.setShowHiddenFiles(context, !showHidden)
+                                }
+                            )
+
+                            val iconSelection = SettingsManager.iconTouchSelection.value
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_icon_selection)) },
+                                leadingIcon = { Icon(Icons.Default.TouchApp, null) },
+                                trailingIcon = {
+                                    Checkbox(
+                                        checked = iconSelection,
+                                        onCheckedChange = null
+                                    )
+                                },
+                                onClick = {
+                                    SettingsManager.setIconTouchSelection(context, !iconSelection)
+                                }
+                            )
                         }
 
                         "MUSIC_MANAGER" -> {
