@@ -1,7 +1,10 @@
 package com.troikoss.continuum_explorer.ui.components
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.BackHandler
+import kotlinx.coroutines.delay
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -53,6 +56,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -155,7 +165,8 @@ class CustomPdfViewerFragment : PdfViewerFragment() {
 @Composable
 fun PdfViewerScreen(
     uri: Uri,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onRegisterSingleTapListener: (((x: Float, y: Float) -> Unit) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val extendedColors = LocalExtendedColors.current
@@ -166,6 +177,84 @@ fun PdfViewerScreen(
 
     var canScrollUp by remember { mutableStateOf(false) }
     var canScrollDown by remember { mutableStateOf(true) }
+    var areSystemBarsVisible by remember { mutableStateOf(true) }
+    var topControlsBounds by remember { mutableStateOf<Rect?>(null) }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    val hideSystemBars = {
+        val activity = context as? Activity
+        val window = activity?.window
+        if (window != null) {
+            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController.hide(WindowInsetsCompat.Type.systemBars())
+            areSystemBarsVisible = false
+        }
+    }
+
+    val showSystemBars = {
+        val activity = context as? Activity
+        val window = activity?.window
+        if (window != null) {
+            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController.show(WindowInsetsCompat.Type.systemBars())
+            areSystemBarsVisible = true
+        }
+    }
+
+    val toggleSystemBars = {
+        if (areSystemBarsVisible) {
+            hideSystemBars()
+        } else {
+            showSystemBars()
+        }
+    }
+
+    LaunchedEffect(isSearchActive) {
+        if (isSearchActive) {
+            hideSystemBars()
+            while (isSearchActive) {
+                delay(250)
+                try {
+                    val frag = pdfViewerFragment
+                    if (frag != null && frag.isAdded && !frag.isTextSearchActive) {
+                        isSearchActive = false
+                    }
+                } catch (_: Exception) {
+                    // Ignore if fragment view not ready yet
+                }
+            }
+        } else {
+            showSystemBars()
+        }
+    }
+
+    BackHandler(enabled = isSearchActive) {
+        try {
+            pdfViewerFragment?.isTextSearchActive = false
+        } catch (_: Exception) {}
+        isSearchActive = false
+        showSystemBars()
+    }
+
+    LaunchedEffect(onRegisterSingleTapListener) {
+        onRegisterSingleTapListener?.invoke { x, y ->
+            if (isSearchActive) {
+                hideSystemBars()
+                return@invoke
+            }
+
+            val bounds = topControlsBounds
+            if (areSystemBarsVisible && bounds != null && bounds.contains(Offset(x, y))) {
+                // Tap inside top controls FABs/bar while visible, ignore system bar toggle
+            } else {
+                toggleSystemBars()
+            }
+        }
+    }
 
     val configuration = LocalConfiguration.current
     val isPhoneOrTablet = configuration.smallestScreenWidthDp < 840
@@ -174,7 +263,8 @@ fun PdfViewerScreen(
 
     val topControlsPadding = if (isPhoneOrTablet) {
         statusBarHeight + 1.dp
-    } else { 36.dp
+    } else {
+        36.dp
     }
 
     Box(
@@ -294,7 +384,7 @@ fun PdfViewerScreen(
 
         // Top Fading Transparency Scrim with 300ms fade animation
         AnimatedVisibility(
-            visible = canScrollUp,
+            visible = areSystemBarsVisible && canScrollUp,
             enter = fadeIn(animationSpec = tween(300)),
             exit = fadeOut(animationSpec = tween(300)),
             modifier = Modifier.align(Alignment.TopCenter)
@@ -313,7 +403,7 @@ fun PdfViewerScreen(
 
         // Bottom Fading Transparency Scrim with 300ms fade animation
         AnimatedVisibility(
-            visible = isPhoneOrTablet && canScrollDown,
+            visible = areSystemBarsVisible && isPhoneOrTablet && canScrollDown,
             enter = fadeIn(animationSpec = tween(300)),
             exit = fadeOut(animationSpec = tween(300)),
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -335,15 +425,31 @@ fun PdfViewerScreen(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(top = topControlsPadding, start = 16.dp, end = 16.dp)
+                .onGloballyPositioned { coordinates ->
+                    topControlsBounds = coordinates.boundsInWindow()
+                }
         ) {
             PdfViewerTopControls(
                 documentName = documentName,
                 containerColor = extendedColors.menuBackground,
                 contentColor = extendedColors.textColor,
+                areSystemBarsVisible = areSystemBarsVisible,
                 onBackClick = onBackClick,
                 onSearchClick = {
-                    pdfViewerFragment?.let { fragment ->
-                        fragment.isTextSearchActive = !fragment.isTextSearchActive
+                    val frag = pdfViewerFragment
+                    if (frag != null && frag.isAdded) {
+                        try {
+                            val newState = !frag.isTextSearchActive
+                            frag.isTextSearchActive = newState
+                            isSearchActive = newState
+                            if (newState) {
+                                hideSystemBars()
+                            } else {
+                                showSystemBars()
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 },
                 onPrintClick = {
@@ -371,12 +477,25 @@ fun PdfViewerTopControls(
     documentName: String,
     containerColor: Color,
     contentColor: Color,
+    areSystemBarsVisible: Boolean = true,
     onBackClick: () -> Unit = {},
     onSearchClick: () -> Unit = {},
     onPrintClick: () -> Unit = {},
     onShareClick: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(true) }
+    var wasExpandedBeforeHide by remember { mutableStateOf(true) }
+
+    LaunchedEffect(areSystemBarsVisible) {
+        if (!areSystemBarsVisible) {
+            wasExpandedBeforeHide = isExpanded
+            isExpanded = false
+        } else {
+            if (wasExpandedBeforeHide) {
+                isExpanded = true
+            }
+        }
+    }
 
     Row(
         verticalAlignment = Alignment.Top,
@@ -389,7 +508,10 @@ fun PdfViewerTopControls(
         ) {
             // Master App Logo FAB
             FloatingActionButton(
-                onClick = { isExpanded = !isExpanded },
+                onClick = {
+                    isExpanded = !isExpanded
+                    wasExpandedBeforeHide = isExpanded
+                },
                 containerColor = containerColor,
                 contentColor = contentColor,
                 shape = CircleShape,

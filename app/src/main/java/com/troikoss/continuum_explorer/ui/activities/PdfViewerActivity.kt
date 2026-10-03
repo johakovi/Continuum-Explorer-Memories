@@ -3,12 +3,16 @@ package com.troikoss.continuum_explorer.ui.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
 import com.troikoss.continuum_explorer.ui.components.PdfViewerScreen
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
@@ -16,6 +20,16 @@ import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 class PdfViewerActivity : FragmentActivity() {
 
     private var currentUri by mutableStateOf<Uri?>(null)
+    private var onSingleTapListener: ((Float, Float) -> Unit)? = null
+
+    private val gestureDetector by lazy {
+        GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                onSingleTapListener?.invoke(e.x, e.y)
+                return false
+            }
+        })
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -35,11 +49,23 @@ class PdfViewerActivity : FragmentActivity() {
                 if (pdfUri != null) {
                     PdfViewerScreen(
                         uri = pdfUri,
-                        onBackClick = { finish() }
+                        onBackClick = { finish() },
+                        onRegisterSingleTapListener = { listener ->
+                            onSingleTapListener = listener
+                        }
                     )
                 }
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        try {
+            gestureDetector.onTouchEvent(ev)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -47,5 +73,11 @@ class PdfViewerActivity : FragmentActivity() {
         setIntent(intent)
         val uri = intent.data ?: return
         currentUri = uri
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.show(WindowInsetsCompat.Type.systemBars())
     }
 }
