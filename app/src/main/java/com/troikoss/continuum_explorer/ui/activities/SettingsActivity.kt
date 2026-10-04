@@ -164,6 +164,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showAboutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.settings)) },

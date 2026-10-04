@@ -324,7 +324,7 @@ fun FileExplorerTheme(
     val isVeryDark = currentPack == null && (themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark))
     val isVeryLight = currentPack == null && (themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark))
 
-    val dynamicScheme = if (dynamicColor && currentPack == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    val dynamicScheme = if (dynamicColor && !isVeryDark && !isVeryLight && currentPack == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     } else null
@@ -343,7 +343,18 @@ fun FileExplorerTheme(
             tertiary = dynamicScheme.tertiary,
             primaryContainer = dynamicScheme.primaryContainer,
             secondaryContainer = dynamicScheme.secondaryContainer,
-            tertiaryContainer = dynamicScheme.tertiaryContainer
+            tertiaryContainer = dynamicScheme.tertiaryContainer,
+            surface = dynamicScheme.surface,
+            onSurface = dynamicScheme.onSurface,
+            surfaceVariant = dynamicScheme.surfaceVariant,
+            onSurfaceVariant = dynamicScheme.onSurfaceVariant,
+            surfaceContainer = dynamicScheme.surfaceContainer,
+            surfaceContainerLow = dynamicScheme.surfaceContainerLow,
+            surfaceContainerHigh = dynamicScheme.surfaceContainerHigh,
+            surfaceContainerHighest = dynamicScheme.surfaceContainerHighest,
+            surfaceContainerLowest = dynamicScheme.surfaceContainerLowest,
+            background = dynamicScheme.background,
+            onBackground = dynamicScheme.onBackground
         )
     }
 
@@ -356,7 +367,6 @@ fun FileExplorerTheme(
         isVeryDark -> {
             val sidebarIconColor = if (sidebarTheme == IconTheme.MATERIAL) colorScheme.primary else VeryDarkIcons
             val folderIconColor = if (folderTheme == IconTheme.MATERIAL) colorScheme.primary else VeryDarkIcons
-            val musicIconColor = if (musicTheme == IconTheme.MATERIAL) colorScheme.primary else VeryDarkIcons
             ExtendedColors(
                 sidebarBackground = VeryDarkSidebar,
                 topBarBackground = VeryDarkTopBar,
@@ -426,7 +436,6 @@ fun FileExplorerTheme(
         isVeryLight -> {
             val sidebarIconColor = if (sidebarTheme == IconTheme.MATERIAL) colorScheme.primary else VeryLightIcons
             val folderIconColor = if (folderTheme == IconTheme.MATERIAL) colorScheme.primary else VeryLightIcons
-            val musicIconColor = if (musicTheme == IconTheme.MATERIAL) colorScheme.primary else VeryLightIcons
             ExtendedColors(
                 sidebarBackground = VeryLightSidebar,
                 topBarBackground = VeryLightTopBar,
@@ -494,19 +503,16 @@ fun FileExplorerTheme(
             )
         }
         else -> {
-            val primary = colorScheme.primary
-            val onSurface = colorScheme.onSurface
-            val surfaceLow = colorScheme.surfaceContainerLow
             ExtendedColors(
-                sidebarBackground = colorScheme.surfaceContainerHigh,
-                topBarBackground = surfaceLow,
-                navButtonBackground = surfaceLow,
-                searchBoxBackground = colorScheme.surfaceContainerHigh,
-                tabBarBackground = colorScheme.surfaceContainerHighest,
+                sidebarBackground = colorScheme.surfaceContainer,
+                topBarBackground = colorScheme.surfaceContainerLow,
+                navButtonBackground = colorScheme.surfaceContainerLow,
+                searchBoxBackground = colorScheme.surfaceContainer,
+                tabBarBackground = colorScheme.surface,
                 selectionBackground = colorScheme.primaryContainer,
-                sidebarIcons = primary,
-                homeIcon = if (sidebarTheme == IconTheme.COLOURFUL) ThemeHome else if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeHomeDuo else primary,
-                folderIcon = if (folderTheme == IconTheme.COLOURFUL || folderTheme == IconTheme.COLOURFULDUO) defaultFolderColor else primary,
+                sidebarIcons = colorScheme.onSurface,
+                homeIcon = if (sidebarTheme == IconTheme.COLOURFUL) ThemeHome else if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeHomeDuo else colorScheme.primary,
+                folderIcon = if (folderTheme == IconTheme.COLOURFUL || folderTheme == IconTheme.COLOURFULDUO) defaultFolderColor else colorScheme.primary,
                 galleryIcon = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
                 recentIcon = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else ThemeRecent,
                 filesIcon = if (folderTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else ThemeFile,
@@ -528,35 +534,35 @@ fun FileExplorerTheme(
                 musicIcon = if (musicTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else ThemeAudio,
                 dcimIcon = if (folderTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
                 picturesIcon = if (folderTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
-                folderIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) defaultFolderColor else primary,
-                homeIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeHomeDuo else primary,
-                filesIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else primary,
-                galleryIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else primary,
-                recentIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else primary,
-                documentsIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else primary,
-                gameIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else primary,
-                gameShortcutIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
-                recycleBinIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else primary,
-                downloadsIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else primary,
-                androidIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else primary,
-                zipIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else primary,
-                pdfIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else primary,
-                xlsIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else primary,
-                docxIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else primary,
-                txtIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else primary,
-                terminalIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else primary,
+                folderIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) defaultFolderColor else colorScheme.primary,
+                homeIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeHomeDuo else colorScheme.primary,
+                filesIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeFileDuo else colorScheme.primary,
+                galleryIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else colorScheme.primary,
+                recentIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeRecentDuo else colorScheme.primary,
+                documentsIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeFilesDuo else colorScheme.primary,
+                gameIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeGameSavesDuo else colorScheme.primary,
+                gameShortcutIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else colorScheme.primary,
+                recycleBinIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeRecycleBinDuo else colorScheme.primary,
+                downloadsIconDuo = if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeDownloadsDuo else colorScheme.primary,
+                androidIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeAndroidDuo else colorScheme.primary,
+                zipIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeZipDuo else colorScheme.primary,
+                pdfIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemePdfDuo else colorScheme.primary,
+                xlsIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeXlsDuo else colorScheme.primary,
+                docxIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeDocxDuo else colorScheme.primary,
+                txtIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeTxtDuo else colorScheme.primary,
+                terminalIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeTerminalDuo else colorScheme.primary,
                 imageIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeImageDuo else ThemeImage,
                 videoIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeVideoDuo else ThemeVideo,
                 audioIconDuo = if (musicTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else ThemeAudio,
                 musicIconDuo = if (musicTheme == IconTheme.COLOURFULDUO) ThemeAudioDuo else ThemeAudio,
                 dcimIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
                 picturesIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
-                tabActiveBackground = surfaceLow,
-                textColor = onSurface,
-                menuBackground = colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
-                fileViewBackground = colorScheme.surfaceContainerLowest,
-                background = surfaceLow,
-                commandPanelBackground = surfaceLow,
+                tabActiveBackground = colorScheme.surfaceContainerLow,
+                textColor = colorScheme.onSurface,
+                menuBackground = colorScheme.surfaceContainerLowest.copy(alpha = 0.98f),
+                fileViewBackground = colorScheme.surfaceContainer,
+                background = colorScheme.surfaceContainerLow,
+                commandPanelBackground = colorScheme.surfaceContainerLow,
                 statusBarColor = Color.Transparent,
                 navigationBarColor = Color.Transparent,
                 outline = colorScheme.outline,

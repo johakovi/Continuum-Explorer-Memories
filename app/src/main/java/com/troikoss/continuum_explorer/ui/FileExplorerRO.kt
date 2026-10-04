@@ -629,7 +629,7 @@ private fun ExplorerBody(
             Box(modifier = Modifier
                 .weight(1f)
                 .padding(top = 2.dp)
-                .then(if (contentIsRounded) Modifier.padding(8.dp) else Modifier)
+                .then(if (contentIsRounded) Modifier.padding(2.dp) else Modifier)
             ) {
                 FileContent(appState = appState, isInWindowMode = isInWindowMode, onAddStorage = onAddStorage)
             }
