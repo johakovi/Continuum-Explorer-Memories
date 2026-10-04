@@ -7,7 +7,7 @@
 Multifunctional filemanager, for working with your files or just to play your media!
 Works with tablets, desktops and phones. UI Adapts to your device screen.
 
-_Note: This project is originally forked from troikoss / Continuum Explorer, but now it is standalone._
+_Note: This project is originally forked from [troikoss / Continuum Explorer](https://github.com/troikoss/Continuum-Explorer), but now it works as standalone._
 
 
 
