@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 
 val DarkPrimarySelection = Color(0xFF212121)
 val DarkPrimary = Color(0xFF2196F3)
-val DarkSecondary = Color(0xFF4A8585)
-val DarkTertiary = Color(0xFF84D9D2)
+val DarkSecondary = Color(0xFF0067FF)
+val DarkTertiary = Color(0xFF82BDFF)
 
 val LightPrimarySelection = Color(0xFFE0E0E0)
 val LightPrimary = Color(0xFF2196F3)
