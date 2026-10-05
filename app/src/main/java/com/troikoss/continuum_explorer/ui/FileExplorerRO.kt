@@ -19,6 +19,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -239,11 +241,16 @@ fun FileExplorerRO(
             drawerContent = {
                 val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
                 ModalDrawerSheet(
-                    modifier = if (appearance == UIAppearance.PHONE) {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp).statusBarsPadding().navigationBarsPadding()
+                    modifier = (if (appearance == UIAppearance.PHONE) {
+                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
                     } else {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).statusBarsPadding().navigationBarsPadding()
-                    },
+                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                    }).then(
+                        Modifier.shadow(
+                            elevation = 8.dp,
+                            shape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape
+                        )
+                    ).statusBarsPadding().navigationBarsPadding(),
                     drawerContainerColor = LocalExtendedColors.current.sidebarBackground.copy(alpha = 0.98f),
                     drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else androidx.compose.ui.graphics.RectangleShape,
                     windowInsets = WindowInsets(0, 0, 0, 0)
@@ -567,9 +574,15 @@ private fun ExplorerBody(
                         .zIndex(2f)
                 ) {
                     PermanentDrawerSheet(
-                        modifier = Modifier.width(navPaneWidth).fillMaxHeight(),
+                        modifier = Modifier
+                            .width(navPaneWidth)
+                            .fillMaxHeight()
+                            .shadow(
+                                elevation = 8.dp,
+                                shape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape
+                            ),
                         windowInsets = WindowInsets(0, 0, 0, 0),
-                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else androidx.compose.ui.graphics.RectangleShape,
+                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape,
                         drawerContainerColor = sidebarBg.copy(alpha = 0.98f)
                     ) {
                         NavigationPane(

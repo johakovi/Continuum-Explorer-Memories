@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -57,7 +55,6 @@ import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -303,7 +300,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
             .fillMaxSize()
             .then(
                 if (contentIsRounded && appState.getScreenSize() != ScreenSize.SMALL)
-                    Modifier.shadow(elevation = 8.dp, shape = fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
+                    Modifier.clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
                 else
                     Modifier.background(FileExplorerTheme.extendedColors.background)
             )
