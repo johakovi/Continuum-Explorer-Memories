@@ -392,7 +392,7 @@ fun PdfViewerScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(statusBarHeight + 16.dp)
+                    .height(statusBarHeight + 0.dp)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(extendedColors.fileViewBackground, Color.Transparent)
@@ -411,7 +411,7 @@ fun PdfViewerScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(navBarHeight + 16.dp)
+                    .height(navBarHeight + 8.dp)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color.Transparent, extendedColors.fileViewBackground)
