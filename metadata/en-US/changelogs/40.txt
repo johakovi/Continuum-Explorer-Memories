@@ -1,0 +1,19 @@
+Memories 8.1 update with QOF improvement
+
+Important note:
+After updating libraries for this app, the minimum requirement for the system rises to Android 9.
+
+New additions:
+- New games added to support (BloonsTD6 (EGS), Construction Simulator (EGS) and Polytrack)
+- Video manager added to homepage
+- PDF Viewer reworked fully
+- Tools menu inside three dot button
+
+Updates:
+- Details window max size increased
+- Blur added to elements (https://github.com/chrisbanes/haze)
+  
+Fixes:
+- Music details fixed
+- Colour palette optimised and fixed
+
