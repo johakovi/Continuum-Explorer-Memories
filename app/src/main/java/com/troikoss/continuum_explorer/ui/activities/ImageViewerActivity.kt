@@ -55,6 +55,8 @@ import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import com.troikoss.continuum_explorer.ui.components.LocalHazeState
+import com.troikoss.continuum_explorer.ui.components.hazeBlur
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -546,6 +548,7 @@ fun ImageViewerScreen(
                     }
                 }
 
+                val hazeState = LocalHazeState.current
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
@@ -553,8 +556,13 @@ fun ImageViewerScreen(
                         x = with(LocalDensity.current) { menuOffset.x.toDp() },
                         y = with(LocalDensity.current) { menuOffset.y.toDp() }
                     ),
+                    modifier = Modifier.hazeBlur(
+                        hazeState,
+                        LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                        RoundedCornerShape(16.dp)
+                    ),
                     shape = RoundedCornerShape(16.dp),
-                    containerColor = LocalExtendedColors.current.menuBackground
+                    containerColor = Color.Transparent
                 ) {
                     // --- GROUP 1: Open With ---
                     DropdownMenuItem(

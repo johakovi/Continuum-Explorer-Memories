@@ -41,6 +41,8 @@ import com.troikoss.continuum_explorer.managers.*
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.ui.components.LocalHazeState
+import com.troikoss.continuum_explorer.ui.components.hazeBlur
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -365,11 +367,17 @@ fun HomeShortcutItem(
             }
         }
 
+        val hazeState = LocalHazeState.current
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = onDismissMenu,
             offset = menuOffset,
-            containerColor = LocalExtendedColors.current.menuBackground
+            modifier = Modifier.hazeBlur(
+                hazeState,
+                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                RoundedCornerShape(16.dp)
+            ),
+            containerColor = Color.Transparent
         ) {
             Column(
                 modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))

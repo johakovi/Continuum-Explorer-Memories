@@ -387,16 +387,13 @@ private fun TabItem(
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isColorful = SettingsManager.isColorfulBarsEnabled.value
     val themeTop = SettingsManager.themeTop.value
 
     val backgroundColor = when {
-        selected && isColorful -> MaterialTheme.colorScheme.primaryContainer
         selected -> LocalExtendedColors.current.tabActiveBackground
         else -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else Color.Transparent
     }
     val textColor = when {
-        selected && isColorful -> MaterialTheme.colorScheme.onPrimaryContainer
         selected -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }

@@ -42,6 +42,8 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import com.troikoss.continuum_explorer.ui.components.LocalHazeState
+import com.troikoss.continuum_explorer.ui.components.hazeBlur
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -937,11 +939,17 @@ fun VideoPlayerScreen(
                                     tint = Color.White, modifier = Modifier.size(36.dp))
                             }
 
+                            val hazeState = LocalHazeState.current
                             DropdownMenu(
                                 expanded        = optionsMenuExpanded,
                                 onDismissRequest = { optionsMenuExpanded = false },
+                                modifier = Modifier.hazeBlur(
+                                    hazeState,
+                                    LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                                    RoundedCornerShape(16.dp)
+                                ),
                                 shape = RoundedCornerShape(16.dp),
-                                containerColor = LocalExtendedColors.current.menuBackground
+                                containerColor = Color.Transparent
                             ) {
                                 when (optionsScreen) {
 

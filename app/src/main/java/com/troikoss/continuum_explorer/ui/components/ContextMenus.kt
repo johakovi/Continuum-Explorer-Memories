@@ -74,6 +74,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -139,13 +140,14 @@ fun ItemContextMenu(
     val onlyOneSelected = selectedItems.size == 1
     val hasDirectories = selectedItems.any { it.isDirectory }
     val hasArchive = selectedItems.any { ZipUtils.isArchive(it) }
-
+    val hazeState = LocalHazeState.current
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
+        modifier = Modifier.hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground
+        containerColor = Color.Transparent
     ) {
         when (currentScreen) {
             "MAIN" -> {
@@ -307,7 +309,7 @@ fun ItemContextMenu(
                         },
                         leadingIcon = { Icon(Icons.Default.Archive, null) }
                     )
-                HorizontalDivider()
+                    HorizontalDivider()
                 }
 
                 if (!isInRecycleBin) {
@@ -515,11 +517,14 @@ fun BackgroundContextMenu(
         }
     }
 
+    val hazeState = LocalHazeState.current
+
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
+        modifier = Modifier.hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground
+        containerColor = Color.Transparent
     ) {
         when (currentScreen) {
             "MAIN" -> {
@@ -786,10 +791,10 @@ fun BackgroundContextMenu(
 
                 val storageKey = appState.getCurrentStorageKey() ?: ""
                 val isMusicRoot = storageKey == "virtual://music"
-                val isMusicSub = storageKey.startsWith("virtual://music/") || 
-                                 storageKey.startsWith("virtual://music_album:") || 
-                                 storageKey.startsWith("virtual://playlist:")
-                
+                val isMusicSub = storageKey.startsWith("virtual://music/") ||
+                        storageKey.startsWith("virtual://music_album:") ||
+                        storageKey.startsWith("virtual://playlist:")
+
                 if (isMusicRoot) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_grid)) },

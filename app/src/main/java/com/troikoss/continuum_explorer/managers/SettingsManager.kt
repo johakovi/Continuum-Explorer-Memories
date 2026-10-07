@@ -187,8 +187,6 @@ object SettingsManager {
     private val _defaultViewMode = mutableStateOf(ViewMode.DETAILS)
     val defaultViewMode: State<ViewMode> = _defaultViewMode
 
-    private val _isColorfulBarsEnabled = mutableStateOf(false)
-    val isColorfulBarsEnabled: State<Boolean> = _isColorfulBarsEnabled
 
     private val _termuxSupport = mutableStateOf(true)
     val termuxSupport: State<Boolean> = _termuxSupport
@@ -405,7 +403,6 @@ object SettingsManager {
         _isCommandBarVisible.value = prefs.getBoolean(KEY_COMMAND_BAR_VISIBLE, true)
         _showHiddenFiles.value = prefs.getBoolean(KEY_SHOW_HIDDEN_FILES, false)
         _iconTouchSelection.value = prefs.getBoolean(KEY_ICON_TOUCH_SELECTION, true)
-        _isColorfulBarsEnabled.value = prefs.getBoolean(KEY_COLORFUL_BARS, false)
 
         _isDefaultArchiveViewerEnabled.value = prefs.getBoolean(KEY_DEFAULT_ARCHIVE_VIEWER, true)
         _termuxSupport.value = prefs.getBoolean(KEY_TERMUX_SUPPORT, true)
@@ -549,12 +546,6 @@ object SettingsManager {
         GlobalEvents.triggerConfigUpdate()
     }
 
-    fun setColorfulBarsEnabled(context: Context, enabled: Boolean) {
-        _isColorfulBarsEnabled.value = enabled
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_COLORFUL_BARS, enabled).apply()
-        GlobalEvents.triggerConfigUpdate()
-    }
 
     fun setTermuxSupportEnabled(context: Context, enabled: Boolean) {
         _termuxSupport.value = enabled

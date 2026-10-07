@@ -1665,11 +1665,17 @@ private fun NavBackgroundContextMenu(
     val isFtpEnabled by SettingsManager.isFtpServerEnabled
     val ftpMode by SettingsManager.ftpMode
 
+    val hazeState = LocalHazeState.current
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
+        modifier = Modifier.hazeBlur(
+            hazeState,
+            LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+            RoundedCornerShape(16.dp)
+        ),
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground
+        containerColor = Color.Transparent
     ) {
         Column(
             modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
@@ -1766,11 +1772,17 @@ private fun NavContextMenu(
     var currentScreen by remember { mutableStateOf("MAIN") }
     LaunchedEffect(expanded) { if (!expanded) currentScreen = "MAIN" }
 
+    val hazeState = LocalHazeState.current
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
+        modifier = Modifier.hazeBlur(
+            hazeState,
+            LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+            RoundedCornerShape(16.dp)
+        ),
         shape = RoundedCornerShape(16.dp),
-        containerColor = LocalExtendedColors.current.menuBackground
+        containerColor = Color.Transparent
     ) {
         val isLibrarySection = section == NavSection.Recent || section == NavSection.Gallery ||
                 section == NavSection.Videos || section == NavSection.Music || 

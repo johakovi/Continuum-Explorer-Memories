@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -48,6 +49,9 @@ import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
+import com.troikoss.continuum_explorer.ui.components.LocalHazeState
+import com.troikoss.continuum_explorer.ui.components.hazeBackground
+import dev.chrisbanes.haze.HazeState
 import com.troikoss.continuum_explorer.ui.components.*
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.CoroutineScope
@@ -216,9 +220,11 @@ fun FileExplorerRO(
 
     val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
     val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
+    val hazeState = remember { HazeState() }
 
-    Box(
-        modifier = Modifier
+    CompositionLocalProvider(LocalHazeState provides hazeState) {
+        Box(
+            modifier = Modifier
             .fillMaxSize()
             .background(extendedColors.background)
             .pointerInput(Unit) {
@@ -326,11 +332,13 @@ fun FileExplorerRO(
             ) { innerPadding ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     ExplorerBody(
-                        modifier = Modifier.padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                        modifier = Modifier
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                            )
+                            .hazeBackground(hazeState),
                         appState = appState,
                         isInWindowMode = isInWindowMode,
                         onAddStorage = { safLauncher.launch(null) },
@@ -369,8 +377,6 @@ fun FileExplorerRO(
         if (showBottomBar) {
             val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
                 extendedColors.navigationBarColor
-            else if (SettingsManager.isColorfulBarsEnabled.value)
-                MaterialTheme.colorScheme.primaryContainer
             else
                 extendedColors.topBarBackground
 
@@ -443,6 +449,7 @@ fun FileExplorerRO(
             contentColor = LocalExtendedColors.current.textColor
         )
     }
+}
 }
 
 @Composable

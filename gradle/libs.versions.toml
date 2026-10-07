@@ -35,6 +35,7 @@ material = "1.14.0"
 fragment = "1.9.1"
 wavyslider = "2.2.0"
 coreKtxVersion = "1.19.1"
+haze = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -85,7 +86,7 @@ google-material = { group = "com.google.android.material", name = "material", ve
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
 wavy-slider = { group = "ir.mahozad.multiplatform", name = "wavy-slider", version.ref = "wavyslider" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtxVersion" }
-
+haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "haze" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

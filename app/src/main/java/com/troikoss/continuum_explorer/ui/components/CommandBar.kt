@@ -53,7 +53,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -66,6 +65,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
@@ -123,7 +123,7 @@ fun CommandBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
-        color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.commandPanelBackground
+        color = LocalExtendedColors.current.commandPanelBackground
     ) {
         Row(
             modifier = Modifier
@@ -523,11 +523,17 @@ fun CommandDropDown(
             onClick = { expanded = true },
             trailingIcon = Icons.Default.KeyboardArrowDown
         )
+        val hazeState = LocalHazeState.current
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier.hazeBlur(
+                hazeState,
+                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                RoundedCornerShape(16.dp)
+            ),
             shape = RoundedCornerShape(16.dp),
-            containerColor = LocalExtendedColors.current.menuBackground
+            containerColor = Color.Transparent
         ) {
             menuItems { expanded = false }
         }

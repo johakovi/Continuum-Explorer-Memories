@@ -17,6 +17,8 @@ import com.troikoss.continuum_explorer.providers.UniversalFileFetcher
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.ui.FileExplorer
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
+import com.troikoss.continuum_explorer.ui.components.CrashDialog
+import com.troikoss.continuum_explorer.ui.components.CrashLogger
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import kotlinx.coroutines.Dispatchers
@@ -138,7 +140,8 @@ open class MainActivity : AppCompatActivity() {
             ShizukuManager.requestPermission(1002)
         }
 
-        // Initialize settings and storage providers
+        // Initialize settings, crash logger and storage providers
+        CrashLogger.init(applicationContext)
         SettingsManager.init(applicationContext)
         com.troikoss.continuum_explorer.managers.ThemePackManager.init(applicationContext)
         com.troikoss.continuum_explorer.managers.MusicMetadataManager.init(applicationContext)
@@ -220,6 +223,7 @@ open class MainActivity : AppCompatActivity() {
                     initialLibraryItem = initialLibraryItem,
                     initialNetworkConnectionId = initialNetworkConnectionId
                 )
+                CrashDialog()
             }
         }
     }

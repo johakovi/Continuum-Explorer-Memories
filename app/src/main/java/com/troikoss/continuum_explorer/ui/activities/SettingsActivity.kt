@@ -91,7 +91,6 @@ fun SettingsScreen(onBack: () -> Unit) {
     val showHiddenFiles = SettingsManager.showHiddenFiles.value
     val iconTouchSelection = SettingsManager.iconTouchSelection.value
     val defaultViewMode = SettingsManager.defaultViewMode.value
-    val isColorfulBarsEnabled = SettingsManager.isColorfulBarsEnabled.value
     val termuxSupport = SettingsManager.termuxSupport.value
     val iconStyle = SettingsManager.iconStyle.value
     val musicIconTheme = SettingsManager.musicIconTheme.value
@@ -224,19 +223,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                 },
                 modifier = Modifier.clickable { showThemeContentDialog = true }
             )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_colorful_bars)) },
-                supportingContent = { Text(stringResource(R.string.settings_colorful_bars_desc)) },
-                trailingContent = {
-                    Switch(
-                        checked = isColorfulBarsEnabled,
-                        onCheckedChange = { SettingsManager.setColorfulBarsEnabled(context, it) }
-                    )
-                }
-            )
-
-
 
 
             ListItem(

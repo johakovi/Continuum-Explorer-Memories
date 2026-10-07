@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -109,12 +110,18 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
             }
         }
 
+        val hazeState = LocalHazeState.current
         DropdownMenu(
             expanded = showColumnMenu,
             onDismissRequest = { showColumnMenu = false },
             offset = columnMenuOffset,
+            modifier = Modifier.hazeBlur(
+                hazeState,
+                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                RoundedCornerShape(16.dp)
+            ),
             shape = RoundedCornerShape(16.dp),
-            containerColor = LocalExtendedColors.current.menuBackground
+            containerColor = Color.Transparent
         ) {
             appState.folderConfigs.extraColumns.forEach { column ->
                 val isVisible = column.type !in appState.folderConfigs.hiddenColumns

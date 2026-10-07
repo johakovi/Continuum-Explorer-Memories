@@ -114,8 +114,7 @@ fun TopBar(
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
-    val isColorful = SettingsManager.isColorfulBarsEnabled.value
-    val navButtonBg = if (isColorful) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.navButtonBackground
+    val navButtonBg = LocalExtendedColors.current.navButtonBackground
 
     LaunchedEffect(optionsMenuExpanded) {
         if (!optionsMenuExpanded) {
@@ -213,7 +212,7 @@ fun TopBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
-        color = if (SettingsManager.isColorfulBarsEnabled.value) MaterialTheme.colorScheme.primaryContainer else LocalExtendedColors.current.topBarBackground
+        color = LocalExtendedColors.current.topBarBackground
     ) {
         Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
             if (!hideNavButtons) {
@@ -313,14 +312,20 @@ fun TopBar(
                                     Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.dialog_search_options))
                                 }
 
+                                val hazeState = LocalHazeState.current
                                 DropdownMenu(
                                     expanded = searchOptionsMenuExpanded,
                                     onDismissRequest = {
                                         searchOptionsMenuExpanded = false
                                         searchKindMenuExpanded = false
                                     },
+                                    modifier = Modifier.hazeBlur(
+                                        hazeState,
+                                        LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                                        RoundedCornerShape(16.dp)
+                                    ),
                                     shape = RoundedCornerShape(16.dp),
-                                    containerColor = LocalExtendedColors.current.menuBackground
+                                    containerColor = Color.Transparent
                                 ) {
                                     if (searchKindMenuExpanded) {
                                         DropdownMenuItem(
@@ -823,16 +828,23 @@ fun TopBar(
                 SearchButton(appState = appState, searchQuery = searchQuery, searchSubfolders = searchSubfolders)
             }
 
+
             Box {
                 IconButton(onClick = { optionsMenuExpanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.options))
                 }
 
+                val hazeState = LocalHazeState.current
                 DropdownMenu(
                     expanded = optionsMenuExpanded,
                     onDismissRequest = { optionsMenuExpanded = false },
+                    modifier = Modifier.hazeBlur(
+                        hazeState,
+                        LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                        RoundedCornerShape(16.dp)
+                    ),
                     shape = RoundedCornerShape(16.dp),
-                    containerColor = LocalExtendedColors.current.menuBackground
+                    containerColor = Color.Transparent
                 ) {
                     when (currentOptionsScreen) {
                         "MAIN" -> {
@@ -1249,11 +1261,17 @@ fun NavigationControls(
                         )
                     }
 
+                    val hazeState = LocalHazeState.current
                     DropdownMenu(
                         expanded = historyMenuExpanded,
                         onDismissRequest = { historyMenuExpanded = false },
+                        modifier = Modifier.hazeBlur(
+                            hazeState,
+                            LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                            RoundedCornerShape(16.dp)
+                        ),
                         shape = RoundedCornerShape(16.dp),
-                        containerColor = LocalExtendedColors.current.menuBackground
+                        containerColor = Color.Transparent
                     ) {
                         // Forward History (Latest at top)
                         appState.forwardStack.take(5)

@@ -46,8 +46,10 @@ import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.providers.StorageProviders
+import androidx.compose.runtime.CompositionLocalProvider
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.ui.components.*
+import dev.chrisbanes.haze.HazeState
 import com.troikoss.continuum_explorer.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -216,9 +218,11 @@ fun FileExplorerSQ(
 
     val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
     val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
+    val hazeState = remember { HazeState() }
 
-    Box(
-        modifier = Modifier
+    CompositionLocalProvider(LocalHazeState provides hazeState) {
+        Box(
+            modifier = Modifier
             .fillMaxSize()
             .background(extendedColors.background)
             .pointerInput(Unit) {
@@ -321,11 +325,13 @@ fun FileExplorerSQ(
             ) { innerPadding ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     ExplorerBody(
-                        modifier = Modifier.padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                        modifier = Modifier
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                            )
+                            .hazeBackground(hazeState),
                         appState = appState,
                         isInWindowMode = isInWindowMode,
                         onAddStorage = { safLauncher.launch(null) },
@@ -364,8 +370,6 @@ fun FileExplorerSQ(
         if (showBottomBar) {
             val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
                 extendedColors.navigationBarColor
-            else if (SettingsManager.isColorfulBarsEnabled.value)
-                MaterialTheme.colorScheme.primaryContainer
             else
                 extendedColors.topBarBackground
 
@@ -438,6 +442,7 @@ fun FileExplorerSQ(
             contentColor = LocalExtendedColors.current.textColor
         )
     }
+}
 }
 
 @Composable

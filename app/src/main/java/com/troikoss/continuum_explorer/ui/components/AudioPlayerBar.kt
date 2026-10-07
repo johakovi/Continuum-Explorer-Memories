@@ -38,6 +38,7 @@ import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
+import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.utils.*
 import androidx.compose.ui.res.stringResource
@@ -221,10 +222,17 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             Icon(Icons.Default.MusicNote, contentDescription = null)
                                         }
 
+                                        val hazeState = LocalHazeState.current
                                         DropdownMenu(
                                             expanded = showMusicManagerMenu,
                                             onDismissRequest = { showMusicManagerMenu = false },
+                                            modifier = Modifier.hazeBlur(
+                                                hazeState,
+                                                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                                                RoundedCornerShape(16.dp)
+                                            ),
                                             shape = RoundedCornerShape(16.dp),
+                                            containerColor = Color.Transparent
                                         ) {
                                             val isFilterEnabled by SettingsManager.isMusicFilterEnabled
                                             DropdownMenuItem(
