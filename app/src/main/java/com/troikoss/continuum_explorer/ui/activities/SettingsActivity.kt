@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.troikoss.continuum_explorer.R
@@ -1486,7 +1487,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 val appIcon = remember {
                     context.packageManager.getApplicationIcon(context.packageName)
                 }
-
+                val bulletStyle = MaterialTheme.typography.bodyMedium.copy(
+                    textIndent = TextIndent(firstLine = 0.sp, restLine = 14.sp)
+                )
                 val version = try {
                     context.packageManager.getPackageInfo(context.packageName, 0).versionName
                 } catch (_: Exception) {
@@ -1529,68 +1532,31 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 Spacer(modifier = Modifier.height(20.dp))
 
 
-                                Text(
-                                    text = "Icons used:",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- Phosphor by Phosphor Icons ",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- Material Design Icons by Google",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- Lets Icons by Leonid Tsvetkov",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- IconPark Outline by ByteDance",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- Bootstrap Icons by The Bootstrap Authors",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = "- Solar by 480 Design",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
+                                Column {
+                                    Text(
+                                        text = "Icons used:",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        lineHeight = 16.sp
+                                    )
+                                    listOf(
+                                        "Phosphor by Phosphor Icons",
+                                        "Material Design Icons by Google",
+                                        "Lets Icons by Leonid Tsvetkov",
+                                        "IconPark Outline by ByteDance",
+                                        "Bootstrap Icons by The Bootstrap Authors",
+                                        "Solar by 480 Design"
+                                    ).forEach { item ->
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Text(
+                                            text = "- $item",
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            style = bulletStyle,
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
 
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Text(
-                                    text = "Font:",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
-                                Text(
-                                    text = "- Inter Designed by Rasmus Andersson ",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    lineHeight = 16.sp
-                                )
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Text(
                                     text = "Links:",
@@ -1628,6 +1594,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     modifier = Modifier
                                         .clickable {
                                             uriHandler.openUri("https://github.com/mahozad/wavy-slider")
+                                        }
+                                        .padding(top = 4.dp)
+                                )
+                                Text(
+                                    text = "haze by chrisbanes",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline), // Adds the underline
+                                    lineHeight = 16.sp,
+                                    modifier = Modifier
+                                        .clickable {
+                                            uriHandler.openUri("https://github.com/chrisbanes/haze")
                                         }
                                         .padding(top = 4.dp)
                                 )
