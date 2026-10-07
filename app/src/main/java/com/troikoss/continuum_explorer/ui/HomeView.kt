@@ -377,6 +377,7 @@ fun HomeShortcutItem(
                 LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
                 RoundedCornerShape(16.dp)
             ),
+            shape = RoundedCornerShape(16.dp),
             containerColor = Color.Transparent
         ) {
             Column(
