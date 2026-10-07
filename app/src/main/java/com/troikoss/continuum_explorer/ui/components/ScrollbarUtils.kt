@@ -210,3 +210,92 @@ fun HorizontalScrollbar(
         }
     }
 }
+
+@Composable
+fun VerticalScrollbar(
+    scrollState: ScrollState,
+    isNearEdge: Boolean,
+    isRecentlyScrolled: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val isScrollable by remember { derivedStateOf { scrollState.maxValue > 0 } }
+
+    var isDragging by remember { mutableStateOf(false) }
+    val isScrolling = scrollState.isScrollInProgress || isDragging
+
+    val alpha by animateFloatAsState(
+        targetValue = if ((isNearEdge || isScrolling || isRecentlyScrolled) && isScrollable) 1f else 0f,
+        animationSpec = if ((isNearEdge || isScrolling || isRecentlyScrolled) && isScrollable) tween(150) else tween(durationMillis = 300, delayMillis = 500),
+        label = "v_scrollbar_alpha"
+    )
+
+    val thumbColor = MaterialTheme.colorScheme.onSurface
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .width(16.dp)
+            .pointerInput(scrollState) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    down.consume()
+                    isDragging = true
+                    var prevY = down.position.y
+                    try {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            if (!change.pressed) break
+                            val dragDeltaY = change.position.y - prevY
+                            if (dragDeltaY != 0f) {
+                                change.consume()
+                                val maxValue = scrollState.maxValue
+                                if (maxValue > 0 && size.height > 0) {
+                                    val contentHeight = size.height + maxValue.toFloat()
+                                    val scrollRatio = contentHeight / size.height
+                                    coroutineScope.launch { scrollState.scrollBy(dragDeltaY * scrollRatio) }
+                                }
+                            }
+                            prevY = change.position.y
+                        }
+                    } finally {
+                        isDragging = false
+                    }
+                }
+            }
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(6.dp)
+                .padding(vertical = 4.dp)
+                .align(Alignment.CenterEnd)
+        ) {
+            if (alpha == 0f) return@Canvas
+            val maxValue = scrollState.maxValue
+            if (maxValue <= 0) return@Canvas
+
+            val contentHeight = size.height + maxValue
+            val thumbFraction = (size.height / contentHeight).coerceIn(0.08f, 1f)
+            val thumbHeight = size.height * thumbFraction
+            val scrollFraction = (scrollState.value.toFloat() / maxValue).coerceIn(0f, 1f)
+            val thumbTop = (size.height - thumbHeight) * scrollFraction
+
+            // Track
+            drawRoundRect(
+                color = thumbColor.copy(alpha = alpha * 0.15f),
+                topLeft = Offset(0f, 0f),
+                size = size,
+                cornerRadius = CornerRadius(size.width / 2f)
+            )
+            // Thumb
+            drawRoundRect(
+                color = thumbColor.copy(alpha = alpha * 0.55f),
+                topLeft = Offset(0f, thumbTop),
+                size = Size(size.width, thumbHeight),
+                cornerRadius = CornerRadius(size.width / 2f)
+            )
+        }
+    }
+}
