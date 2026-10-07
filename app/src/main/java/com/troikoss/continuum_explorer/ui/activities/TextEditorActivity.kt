@@ -337,8 +337,8 @@ class TextEditorActivity : ComponentActivity() {
                                         if (lineNumber == currentLine) {
                                             val boxTop = top + 2f + 2f
                                             val boxBottom = bottom - 2f + 2f
-                                            val boxLeft = 4f
-                                            val boxRight = size.width - with(density) { 12.dp.toPx() }
+                                            val boxLeft = -10f
+                                            val boxRight = size.width - with(density) { 12.dp.toPx() } + 15f
                                             val rect = RectF(boxLeft, boxTop, boxRight, boxBottom)
                                             canvas.drawRoundRect(rect, 6f, 6f, activePaint)
                                         }
