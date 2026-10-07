@@ -78,8 +78,8 @@ Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-
 List of other FOSS [apps](https://github.com/offa/android-foss)
 
 ## More languages?
-If you want contribute to adding more languages to my fork or original troikoss app,
-then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml) or this [link (troikoss)](https://github.com/troikoss/Continuum-Explorer/blob/master/app/src/main/res/values/strings.xml) and send file to us! c:
+If you want contribute to adding more languages,
+then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml).
 
  ## More features?
 Let me know if there is something you want to this app!
