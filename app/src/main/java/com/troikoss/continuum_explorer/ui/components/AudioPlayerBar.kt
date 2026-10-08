@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ir.mahozad.multiplatform.wavyslider.material.WavySlider
 import ir.mahozad.multiplatform.wavyslider.WaveDirection
+import com.troikoss.continuum_explorer.model.UIAppearance
 import com.troikoss.continuum_explorer.managers.AudioManager
 import com.troikoss.continuum_explorer.managers.MusicMetadataManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
@@ -49,6 +50,8 @@ import kotlinx.coroutines.launch
 @OptIn(UnstableApi::class)
 @Composable
 fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
+    val appearance = appState.getUIAppearance()
+    val isPhone = appearance == UIAppearance.PHONE
     val currentTrack = AudioManager.currentTrack
     val currentTitle = AudioManager.currentTitle
     val currentArtist = AudioManager.currentArtist
@@ -168,7 +171,11 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                     if (animatedHeight > 120.dp) {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
-                            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 60.dp, bottomEnd = 60.dp),
+                            shape = if (isPhone) {
+                                RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp)
+                            } else {
+                                RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 60.dp, bottomEnd = 60.dp)
+                            },
                             color = MaterialTheme.colorScheme.surfaceContainerHigh,
                             tonalElevation = 4.dp,
                             shadowElevation = 2.dp
@@ -391,9 +398,17 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                             .height(120.dp),
                         shape = if (showDrawer) {
-                            RoundedCornerShape(bottomStart = 60.dp, bottomEnd = 60.dp)
+                            if (isPhone) {
+                                RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                            } else {
+                                RoundedCornerShape(bottomStart = 60.dp, bottomEnd = 60.dp)
+                            }
                         } else {
-                            RoundedCornerShape(60.dp)
+                            if (isPhone) {
+                                RoundedCornerShape(24.dp)
+                            } else {
+                                RoundedCornerShape(60.dp)
+                            }
                         },
                         color = MaterialTheme.colorScheme.surfaceContainerHigh,
                         tonalElevation = if (showDrawer) 4.dp else 8.dp,
