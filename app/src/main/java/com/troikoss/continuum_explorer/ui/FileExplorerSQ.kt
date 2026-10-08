@@ -251,7 +251,7 @@ fun FileExplorerSQ(
                     } else {
                         Modifier.padding(vertical = 8.dp, horizontal = 8.dp).statusBarsPadding().navigationBarsPadding()
                     },
-                    drawerShape = if (sidebarIsRounded) RoundedCornerShape(12.dp) else RectangleShape,
+                    drawerShape = RoundedCornerShape(8.dp) ,
                     drawerContainerColor = sidebarBg.copy(alpha = 0.98f),
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
