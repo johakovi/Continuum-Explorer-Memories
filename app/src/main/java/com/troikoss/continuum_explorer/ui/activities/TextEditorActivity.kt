@@ -19,6 +19,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -177,7 +178,10 @@ class TextEditorActivity : ComponentActivity() {
                                 Icon(Icons.Default.Save, contentDescription = "Save")
                             }
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 )
             }
         ) { padding ->
@@ -225,36 +229,11 @@ class TextEditorActivity : ComponentActivity() {
                     }
                 }
 
-                val density = LocalDensity.current
-                val edgeThresholdPx = with(density) { 48.dp.toPx() }
-                var contentBoxSize by remember { mutableStateOf(IntSize.Zero) }
-                var contentLocalMousePos by remember { mutableStateOf<Offset?>(null) }
-                val showVertical by remember { derivedStateOf {
-                    val pos = contentLocalMousePos ?: return@derivedStateOf false
-                    pos.x > contentBoxSize.width - edgeThresholdPx
-                } }
-                val showHorizontal by remember { derivedStateOf {
-                    val pos = contentLocalMousePos ?: return@derivedStateOf false
-                    pos.y > contentBoxSize.height - edgeThresholdPx
-                } }
-
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .onSizeChanged { contentBoxSize = it }
-                        .pointerInput(Unit) {
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                                    when (event.type) {
-                                        PointerEventType.Move, PointerEventType.Enter ->
-                                            contentLocalMousePos = event.changes.firstOrNull()?.position
-                                        PointerEventType.Exit -> contentLocalMousePos = null
-                                        else -> {}
-                                    }
-                                }
-                            }
-                        }
+                        .padding(12.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -320,7 +299,7 @@ class TextEditorActivity : ComponentActivity() {
                             pos.y > contentBoxSize.height - edgeThresholdPx
                         } }
 
-                        Box(
+                        Surface(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .onSizeChanged { contentBoxSize = it }
@@ -336,131 +315,136 @@ class TextEditorActivity : ComponentActivity() {
                                             }
                                         }
                                     }
-                                }
+                                },
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+    tonalElevation = 2.dp
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(verticalScrollState)
-                                    .padding(1.dp)
-                                    .padding(end = 1.dp)
-                            ) {
-                                // Line numbers gutter.
-                                Box(
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Row(
                                     modifier = Modifier
-                                        .width(48.dp)
-                                        .then(
-                                            textLayoutResult?.let { layout ->
-                                                Modifier.height(with(density) { layout.size.height.toDp() })
-                                            } ?: Modifier.height(0.dp)
-                                        )
+                                        .fillMaxSize()
+                                        .verticalScroll(verticalScrollState)
+                                        .padding(1.dp)
+                                        .padding(end = 1.dp)
                                 ) {
-                                    Canvas(modifier = Modifier.fillMaxSize()) {
-                                        val layout = textLayoutResult ?: return@Canvas
-                                        val canvas = drawContext.canvas.nativeCanvas
-
-                                        val paint = Paint().apply {
-                                            isAntiAlias = true
-                                            textSize = with(density) { 15.sp.toPx() }
-                                            textAlign = Paint.Align.RIGHT
-                                            color = android.graphics.Color.GRAY
-                                        }
-
-                                        val linePaint = Paint().apply {
-                                            isAntiAlias = true
-                                            color = android.graphics.Color.parseColor("#44888888")
-                                            strokeWidth = with(density) { 1.dp.toPx() }
-                                        }
-
-                                        val activePaint = Paint().apply {
-                                            isAntiAlias = true
-                                            color = android.graphics.Color.argb(
-                                                64, // ~25% opacity
-                                                (primaryColor.red * 255).toInt(),
-                                                (primaryColor.green * 255).toInt(),
-                                                (primaryColor.blue * 255).toInt()
+                                    // Line numbers gutter.
+                                    Box(
+                                        modifier = Modifier
+                                            .width(48.dp)
+                                            .then(
+                                                textLayoutResult?.let { layout ->
+                                                    Modifier.height(with(density) { layout.size.height.toDp() })
+                                                } ?: Modifier.height(0.dp)
                                             )
-                                            style = Paint.Style.FILL
-                                        }
+                                    ) {
+                                        Canvas(modifier = Modifier.fillMaxSize()) {
+                                            val layout = textLayoutResult ?: return@Canvas
+                                            val canvas = drawContext.canvas.nativeCanvas
 
-                                        val rightEdgePx = size.width - with(density) { 12.dp.toPx() }
-
-                                        // Draw continuous vertical dividing line between numbers and text rows
-                                        canvas.drawLine(size.width - 2f, 0f, size.width - 2f, size.height, linePaint)
-
-                                        for (line in 0 until layout.lineCount) {
-                                            val lineStart = layout.getLineStart(line)
-                                            val isNewLogicalLine = line == 0 ||
-                                                    text.getOrNull(lineStart - 1) == '\n'
-                                            if (!isNewLogicalLine) continue
-
-                                            val lineNumber =
-                                                text.take(lineStart).count { it == '\n' } + 1
-
-                                            val top = layout.getLineTop(line)
-                                            val bottom = layout.getLineBottom(line)
-                                            val baseline = (top + bottom) / 2f -
-                                                    (paint.descent() + paint.ascent()) / 2f + 2f // Shifted down 2px for exact row alignment
-
-                                            // Highlight selected active line number with translucent primary box
-                                            if (lineNumber == currentLine) {
-                                                val boxTop = top + 2f + 2f
-                                                val boxBottom = bottom - 2f + 2f
-                                                val boxLeft = -10f
-                                                val boxRight = size.width - with(density) { 12.dp.toPx() } + 15f
-                                                val rect = RectF(boxLeft, boxTop, boxRight, boxBottom)
-                                                canvas.drawRoundRect(rect, 6f, 6f, activePaint)
+                                            val paint = Paint().apply {
+                                                isAntiAlias = true
+                                                textSize = with(density) { 15.sp.toPx() }
+                                                textAlign = Paint.Align.RIGHT
+                                                color = android.graphics.Color.GRAY
                                             }
 
-                                            canvas.drawText(
-                                                lineNumber.toString(),
-                                                rightEdgePx,
-                                                baseline,
-                                                paint
-                                            )
+                                            val linePaint = Paint().apply {
+                                                isAntiAlias = true
+                                                color = android.graphics.Color.parseColor("#44888888")
+                                                strokeWidth = with(density) { 1.dp.toPx() }
+                                            }
+
+                                            val activePaint = Paint().apply {
+                                                isAntiAlias = true
+                                                color = android.graphics.Color.argb(
+                                                    64, // ~25% opacity
+                                                    (primaryColor.red * 255).toInt(),
+                                                    (primaryColor.green * 255).toInt(),
+                                                    (primaryColor.blue * 255).toInt()
+                                                )
+                                                style = Paint.Style.FILL
+                                            }
+
+                                            val rightEdgePx = size.width - with(density) { 12.dp.toPx() }
+
+                                            // Draw continuous vertical dividing line between numbers and text rows
+                                            canvas.drawLine(size.width - 2f, 0f, size.width - 2f, size.height, linePaint)
+
+                                            for (line in 0 until layout.lineCount) {
+                                                val lineStart = layout.getLineStart(line)
+                                                val isNewLogicalLine = line == 0 ||
+                                                        text.getOrNull(lineStart - 1) == '\n'
+                                                if (!isNewLogicalLine) continue
+
+                                                val lineNumber =
+                                                    text.take(lineStart).count { it == '\n' } + 1
+
+                                                val top = layout.getLineTop(line)
+                                                val bottom = layout.getLineBottom(line)
+                                                val baseline = (top + bottom) / 2f -
+                                                        (paint.descent() + paint.ascent()) / 2f + 2f // Shifted down 2px for exact row alignment
+
+                                                // Highlight selected active line number with translucent primary box
+                                                if (lineNumber == currentLine) {
+                                                    val boxTop = top + 2f + 2f
+                                                    val boxBottom = bottom - 2f + 2f
+                                                    val boxLeft = -10f
+                                                    val boxRight = size.width - with(density) { 12.dp.toPx() } + 15f
+                                                    val rect = RectF(boxLeft, boxTop, boxRight, boxBottom)
+                                                    canvas.drawRoundRect(rect, 6f, 6f, activePaint)
+                                                }
+
+                                                canvas.drawText(
+                                                    lineNumber.toString(),
+                                                    rightEdgePx,
+                                                    baseline,
+                                                    paint
+                                                )
+                                            }
                                         }
+                                    }
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    // Horizontally scrollable text editor area.
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .horizontalScroll(horizontalScrollState)
+                                    ) {
+                                        BasicTextField(
+                                            value = textState,
+                                            onValueChange = { textState = it },
+                                            modifier = Modifier
+                                                .width(IntrinsicSize.Max)
+                                                .height(IntrinsicSize.Min),
+                                            textStyle = editorStyle,
+                                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                            visualTransformation = searchTransformation,
+                                            onTextLayout = { textLayoutResult = it }
+                                        )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                // Horizontally scrollable text editor area.
-                                Box(
+                                VerticalScrollbar(
+                                    scrollState = verticalScrollState,
+                                    isNearEdge = showVertical,
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .horizontalScroll(horizontalScrollState)
-                                ) {
-                                    BasicTextField(
-                                        value = textState,
-                                        onValueChange = { textState = it },
-                                        modifier = Modifier
-                                            .width(IntrinsicSize.Max)
-                                            .height(IntrinsicSize.Min),
-                                        textStyle = editorStyle,
-                                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                        visualTransformation = searchTransformation,
-                                        onTextLayout = { textLayoutResult = it }
-                                    )
-                                }
+                                        .align(Alignment.CenterEnd)
+                                        .fillMaxHeight()
+                                        .padding(top = 16.dp, bottom = 16.dp, end = 4.dp)
+                                )
+
+                                HorizontalScrollbar(
+                                    scrollState = horizontalScrollState,
+                                    isNearEdge = showHorizontal,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .padding(start = 62.dp, end = 16.dp, bottom = 4.dp)
+                                )
                             }
-
-                            VerticalScrollbar(
-                                scrollState = verticalScrollState,
-                                isNearEdge = showVertical,
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .fillMaxHeight()
-                                    .padding(top = 16.dp, bottom = 16.dp, end = 4.dp)
-                            )
-
-                            HorizontalScrollbar(
-                                scrollState = horizontalScrollState,
-                                isNearEdge = showHorizontal,
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .padding(start = 62.dp, end = 16.dp, bottom = 4.dp)
-                            )
                         }
                     }
                 }
