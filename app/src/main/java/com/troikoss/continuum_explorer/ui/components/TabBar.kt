@@ -160,7 +160,7 @@ fun TabBar(
         modifier = modifier
             .fillMaxWidth()
             .height(totalBarHeight)
-            .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground),
+            .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground.copy(alpha = 0.5f)),
         contentAlignment = Alignment.BottomStart
     ) {
         backgroundUri?.let { uri ->
@@ -169,6 +169,7 @@ fun TabBar(
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop
+
             )
         }
 
@@ -388,10 +389,12 @@ private fun TabItem(
     modifier: Modifier = Modifier
 ) {
     val themeTop = SettingsManager.themeTop.value
+    val hazeState = LocalHazeState.current
+    val nonActiveBgColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.3f)
 
     val backgroundColor = when {
         selected -> LocalExtendedColors.current.tabActiveBackground
-        else -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else Color.Transparent
+        else -> nonActiveBgColor
     }
     val textColor = when {
         selected -> if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
@@ -418,28 +421,38 @@ private fun TabItem(
                 }
             }
             .let {
-                if (selected && themeTop == ThemeTopMode.ATTACHED) {
-                    it.drawBehind {
-                        val r = 8.dp.toPx()
-                        val path = Path().apply {
-                            // Left inverted corner
-                            moveTo(-r, size.height)
-                            quadraticTo(0f, size.height, 0f, size.height - r)
-                            // Top part
-                            lineTo(0f, r)
-                            arcTo(Rect(0f, 0f, r * 2, r * 2), 180f, 90f, false)
-                            lineTo(size.width - r, 0f)
-                            arcTo(Rect(size.width - r * 2, 0f, size.width, r * 2), 270f, 90f, false)
-                            // Right inverted corner
-                            lineTo(size.width, size.height - r)
-                            quadraticTo(size.width, size.height, size.width + r, size.height)
-                            lineTo(size.width + r, size.height)
-                            close()
+                if (selected) {
+                    if (themeTop == ThemeTopMode.ATTACHED) {
+                        it.drawBehind {
+                            val r = 8.dp.toPx()
+                            val path = Path().apply {
+                                // Left inverted corner
+                                moveTo(-r, size.height)
+                                quadraticTo(0f, size.height, 0f, size.height - r)
+                                // Top part
+                                lineTo(0f, r)
+                                arcTo(Rect(0f, 0f, r * 2, r * 2), 180f, 90f, false)
+                                lineTo(size.width - r, 0f)
+                                arcTo(Rect(size.width - r * 2, 0f, size.width, r * 2), 270f, 90f, false)
+                                // Right inverted corner
+                                lineTo(size.width, size.height - r)
+                                quadraticTo(size.width, size.height, size.width + r, size.height)
+                                lineTo(size.width + r, size.height)
+                                close()
+                            }
+                            drawPath(path, backgroundColor)
                         }
-                        drawPath(path, backgroundColor)
+                    } else {
+                        it.clip(shape).background(backgroundColor)
                     }
                 } else {
-                    it.clip(shape).background(backgroundColor)
+                    it.clip(shape)
+                        .hazeBlur(
+                            hazeState,
+                            nonActiveBgColor,
+                            shape
+                        )
+                        .background(nonActiveBgColor)
                 }
             }
             .height(if (themeTop == ThemeTopMode.FLOAT) 36.dp else 32.dp)

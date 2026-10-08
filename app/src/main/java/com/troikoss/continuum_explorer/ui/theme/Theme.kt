@@ -508,7 +508,7 @@ fun FileExplorerTheme(
                 topBarBackground = colorScheme.surfaceContainerLow,
                 navButtonBackground = colorScheme.surfaceContainerLow,
                 searchBoxBackground = colorScheme.surfaceContainer,
-                tabBarBackground = colorScheme.surface,
+                tabBarBackground = colorScheme.surfaceContainerLow,
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = colorScheme.onSurface,
                 homeIcon = if (sidebarTheme == IconTheme.COLOURFUL) ThemeHome else if (sidebarTheme == IconTheme.COLOURFULDUO) ThemeHomeDuo else colorScheme.primary,

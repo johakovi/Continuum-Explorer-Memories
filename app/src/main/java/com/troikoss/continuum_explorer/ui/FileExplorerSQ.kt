@@ -225,6 +225,7 @@ fun FileExplorerSQ(
             modifier = Modifier
             .fillMaxSize()
             .background(extendedColors.background)
+            .hazeBackground(hazeState)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
@@ -504,7 +505,7 @@ private fun ExplorerTopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow else LocalExtendedColors.current.topBarBackground)
+            .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.75f) else LocalExtendedColors.current.topBarBackground.copy(alpha = 0.75f))
     ) {
         val topInsets = if (appearance == UIAppearance.PHONE) WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) else WindowInsets(0, 0, 0, 0)
         Column(modifier = Modifier.windowInsetsPadding(topInsets)) {

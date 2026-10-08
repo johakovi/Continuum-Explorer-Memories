@@ -56,12 +56,14 @@ import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import com.troikoss.continuum_explorer.ui.components.LocalHazeState
+import com.troikoss.continuum_explorer.ui.components.hazeBackground
 import com.troikoss.continuum_explorer.ui.components.hazeBlur
+import dev.chrisbanes.haze.HazeState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -163,6 +165,9 @@ fun ImageViewerScreen(
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
     val isFilmstripDragged by listState.interactionSource.collectIsDraggedAsState()
+    val hazeState = remember { HazeState() }
+
+    CompositionLocalProvider(LocalHazeState provides hazeState) {
 
     DisposableEffect(Unit) {
         onDispose {
@@ -528,23 +533,30 @@ fun ImageViewerScreen(
                             } else Modifier),
                         contentAlignment = Alignment.Center
                     ) {
-                        AsyncImage(
-                            model = item,
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            onSuccess = { 
-                                imageSizes[item] = it.painter.intrinsicSize
-                            },
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .graphicsLayer(
-                                    scaleX = if (isCurrent) scale else 1f,
-                                    scaleY = if (isCurrent) scale else 1f,
-                                    translationX = if (isCurrent) offset.x else 0f,
-                                    translationY = if (isCurrent) offset.y else 0f,
-                                    rotationZ = if (isCurrent) rotation else 0f
-                                )
-                        )
+                                .hazeBackground(hazeState),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AsyncImage(
+                                model = item,
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit,
+                                onSuccess = { 
+                                    imageSizes[item] = it.painter.intrinsicSize
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer(
+                                        scaleX = if (isCurrent) scale else 1f,
+                                        scaleY = if (isCurrent) scale else 1f,
+                                        translationX = if (isCurrent) offset.x else 0f,
+                                        translationY = if (isCurrent) offset.y else 0f,
+                                        rotationZ = if (isCurrent) rotation else 0f
+                                    )
+                            )
+                        }
                     }
                 }
 
@@ -850,12 +862,18 @@ fun ImageViewerScreen(
                         }
 
                         // Control panel
-                        Surface(
+                        val panelHazeState = LocalHazeState.current
+                        Box(
                             modifier = Modifier
                                 .padding(bottom = 24.dp, top = 8.dp)
-                                .height(56.dp),
-                            shape = CircleShape,
-                            color = Color(0xFF1E1E1E).copy(alpha = 0.85f),
+                                .height(56.dp)
+                                .hazeBlur(
+                                    panelHazeState,
+                                    Color(0xFF1E1E1E).copy(alpha = 0.65f),
+                                    CircleShape
+                                )
+                                .background(Color(0xFF1E1E1E).copy(alpha = 0.0f)),
+                            contentAlignment = Alignment.Center
                         ) {
                             Row(
                                 modifier = Modifier
@@ -930,6 +948,7 @@ fun ImageViewerScreen(
             }
         }
     }
+}
 }
 
 private fun withImageFile(data: Any?, action: (File) -> Unit) {

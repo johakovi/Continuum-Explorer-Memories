@@ -17,7 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,14 +99,13 @@ val LocalHazeState = compositionLocalOf { HazeState() }
  */
 fun Modifier.hazeBackground(hazeState: HazeState): Modifier =
     this.hazeSource(state = hazeState)
-
 /**
  * Crash-proof Modifier applied to floating overlays, context menus, top bar, or sidebars to render the blurred backdrop.
  */
 fun Modifier.hazeBlur(
     hazeState: HazeState,
     tintColor: Color = Color.Unspecified,
-    roundedCornerShape: RoundedCornerShape = RoundedCornerShape(16.dp)
+    shape: Shape = RoundedCornerShape(16.dp)
 ): Modifier {
     val effectiveColor = if (tintColor != Color.Unspecified) tintColor else Color(0xFF1C1C1C).copy(alpha = 0.65f)
     val style = HazeStyle(
@@ -113,7 +114,7 @@ fun Modifier.hazeBlur(
         backgroundColor = effectiveColor
     )
 
-    return this.hazeEffect(state = hazeState, style = style)
+    return this.clip(shape).hazeEffect(state = hazeState, style = style)
 }
 
 /**
