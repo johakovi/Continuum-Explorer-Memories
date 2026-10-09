@@ -324,19 +324,19 @@ fun FileExplorerTheme(
     val isVeryDark = currentPack == null && (themeMode == ThemeMode.VERY_DARK || (themeMode == ThemeMode.ENHANCED_SYSTEM && isSystemDark))
     val isVeryLight = currentPack == null && (themeMode == ThemeMode.VERY_LIGHT || (themeMode == ThemeMode.ENHANCED_SYSTEM && !isSystemDark))
 
-    val dynamicScheme = if (dynamicColor && !isVeryDark && !isVeryLight && currentPack == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    val dynamicScheme = if (dynamicColor && currentPack == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     } else null
 
     var colorScheme = when {
-        isVeryDark -> VeryDarkColorScheme
-        isVeryLight -> VeryLightColorScheme
+        isVeryDark -> VeryDarkColorScheme.copy(primary = dynamicScheme?.primary ?: VeryDarkColorScheme.primary)
+        isVeryLight -> VeryLightColorScheme.copy(primary = dynamicScheme?.primary ?: VeryLightColorScheme.primary)
         darkTheme -> darkColorScheme()
         else -> lightColorScheme()
     }
 
-    if (dynamicScheme != null) {
+    if (dynamicScheme != null && !isVeryDark && !isVeryLight) {
         colorScheme = colorScheme.copy(
             primary = dynamicScheme.primary,
             secondary = dynamicScheme.secondary,

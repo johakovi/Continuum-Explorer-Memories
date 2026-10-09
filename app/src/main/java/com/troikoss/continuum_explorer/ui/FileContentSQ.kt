@@ -85,6 +85,8 @@ import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
 import com.troikoss.continuum_explorer.ui.components.DetailsHeader
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -417,6 +419,37 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                     gridContainerHeightPx = height
                 },
                 isInWindowMode = isInWindowMode
+            )
+        }
+
+        // Fading element overlay inside SQUARE window
+        val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
+        val extraHeight = if (isGestureNav) 0.dp else 10.dp
+        val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
+
+        if (fadeHeight > 0.dp) {
+            val fadeColor = if (contentIsRounded)
+                FileExplorerTheme.extendedColors.fileViewBackground
+            else
+                FileExplorerTheme.extendedColors.background
+
+            val solidPart = if (isGestureNav) 0.dp else 1.dp
+            val stopPoint = ((fadeHeight - solidPart).coerceAtLeast(0.dp) / fadeHeight).coerceIn(0f, 1f)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(fadeHeight)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.3f to fadeColor.copy(alpha = 0.5f),
+                            stopPoint to fadeColor,
+                            1f to fadeColor
+                        )
+                    )
             )
         }
 

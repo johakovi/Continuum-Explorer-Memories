@@ -82,6 +82,8 @@ import com.troikoss.continuum_explorer.ui.components.DetailsHeader
 import com.troikoss.continuum_explorer.ui.components.MusicHeader
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -414,6 +416,37 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
             )
         }
 
+        // Fading element overlay inside ROUND window
+        val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
+        val extraHeight = if (isGestureNav) 0.dp else 8.dp
+        val fadeHeight = if (bottomInset > 0.dp) (bottomInset + extraHeight).coerceAtMost(36.dp) else 28.dp
+
+        if (fadeHeight > 0.dp) {
+            val fadeColor = if (contentIsRounded && appState.getScreenSize() != ScreenSize.SMALL)
+                FileExplorerTheme.extendedColors.fileViewBackground
+            else
+                FileExplorerTheme.extendedColors.background
+
+            val solidPart = if (isGestureNav) 0.dp else 1.dp
+            val stopPoint = ((fadeHeight - solidPart).coerceAtLeast(0.dp) / fadeHeight).coerceIn(0f, 1f)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(fadeHeight)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.3f to fadeColor.copy(alpha = 0.5f),
+                            stopPoint to fadeColor,
+                            1f to fadeColor
+                        )
+                    )
+            )
+        }
+
         // Floating context menu
         Box(modifier = Modifier.offset(menuOffset.x, menuOffset.y)) {
             BackgroundContextMenu(
@@ -678,8 +711,8 @@ private fun FileGrid(
     val viewMode = appState.activeViewMode
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val isGestureNav = bottomInset > 0.dp && bottomInset < 40.dp
-    val extraHeight = if (isGestureNav) 0.dp else 20.dp
-    val fadeHeight = if (bottomInset > 0.dp) bottomInset + extraHeight else 0.dp
+    val extraHeight = if (isGestureNav) 0.dp else 8.dp
+    val fadeHeight = if (bottomInset > 0.dp) (bottomInset + extraHeight).coerceAtMost(36.dp) else 28.dp
 
     LazyVerticalGrid(
         state = gridState,
