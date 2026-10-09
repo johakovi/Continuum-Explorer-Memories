@@ -73,6 +73,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import coil.Coil
 import coil.compose.AsyncImagePainter
@@ -1245,6 +1246,56 @@ object IconHelper {
 
     suspend fun getFileBitmap(context: Context, file: UniversalFile): Bitmap = withContext(Dispatchers.IO) {
         getThumbnailBitmap(context, file) ?: getIconForItem(file).toBitmap(sizePx = 96)
+    }
+
+    suspend fun getShortcutIconBitmap(context: Context, item: UniversalFile): Bitmap = withContext(Dispatchers.IO) {
+        val xxx = if (item.isDirectory) {
+            val lName = item.name.lowercase()
+            val lPath = (item.fileRef?.absolutePath ?: item.documentFileRef?.uri?.toString() ?: "").lowercase()
+            when {
+                lName.contains("doc") || lPath.endsWith("/documents") -> "documents"
+                lName.contains("download") || lPath.endsWith("/download") || lPath.endsWith("/downloads") -> "downloads"
+                lName.contains("music") || lPath.endsWith("/music") -> "music"
+                lName.contains("picture") || lName.contains("photo") || lName.contains("dcim") -> "gallery"
+                lName.contains("archive") || lPath.endsWith("/archives") -> "zip"
+                lName.contains("trash") || lPath.endsWith("/trash") || lPath.endsWith("/recycle_bin") -> "trash"
+                lName.contains("apk") || lPath.endsWith("/apks") -> "apk"
+                lName.contains("game") || lPath.endsWith("/games_manager") -> "game"
+                else -> "folder"
+            }
+        } else {
+            val name = item.name.lowercase()
+            val ext = name.substringAfterLast('.', "")
+            if (ext.isNotEmpty()) {
+                val resId = context.resources.getIdentifier("ic_sh_$ext", "drawable", context.packageName)
+                if (resId != 0) {
+                    val drawable = ContextCompat.getDrawable(context, resId)
+                    if (drawable != null) return@withContext drawableToBitmap(drawable)
+                }
+            }
+            when {
+                name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
+                        name.endsWith(".tar") || name.endsWith(".gz") -> "zip"
+                name.endsWith(".pdf") -> "pdf"
+                name.endsWith(".xls") || name.endsWith(".xlsx") || name.endsWith(".ods") || name.endsWith(".csv") -> "xls"
+                name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odt") -> "docx"
+                name.endsWith(".txt") -> "txt"
+                name.endsWith(".sh") -> "sh"
+                name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg") || name.endsWith(".flac") || name.endsWith(".m4a") -> "audio"
+                name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") || name.endsWith(".mov") || name.endsWith(".webm") -> "video"
+                name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".webp") -> "image"
+                name.endsWith(".apk") -> "apk"
+                else -> "file"
+            }
+        }
+
+        val resId = context.resources.getIdentifier("ic_sh_$xxx", "drawable", context.packageName)
+        if (resId != 0) {
+            val drawable = ContextCompat.getDrawable(context, resId)
+            if (drawable != null) return@withContext drawableToBitmap(drawable)
+        }
+
+        return@withContext getFileBitmap(context, item)
     }
 
     private suspend fun getThumbnailBitmap(context: Context, file: UniversalFile): Bitmap? = withContext(Dispatchers.IO) {

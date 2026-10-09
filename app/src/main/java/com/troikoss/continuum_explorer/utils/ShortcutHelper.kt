@@ -98,7 +98,7 @@ object ShortcutHelper {
             }
 
             val iconBitmap = withContext(Dispatchers.IO) {
-                IconHelper.getFileBitmap(context, item)
+                IconHelper.getShortcutIconBitmap(context, item)
             }
             val icon = IconCompat.createWithBitmap(iconBitmap)
 

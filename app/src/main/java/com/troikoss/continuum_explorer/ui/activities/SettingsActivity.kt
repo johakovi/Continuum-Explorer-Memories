@@ -1523,7 +1523,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "App is made under GPL-3.0 license" + "and based on troikoss/continuum_explorer",
+                                    text = "App is made under GPL-3.0 license " + "and based on troikoss/continuum_explorer",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodyMedium,
                                     lineHeight = 16.sp
