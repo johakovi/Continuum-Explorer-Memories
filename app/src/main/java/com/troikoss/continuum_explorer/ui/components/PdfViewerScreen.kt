@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -257,11 +258,26 @@ fun PdfViewerScreen(
     }
 
     val configuration = LocalConfiguration.current
+    val activity = context as? Activity
+    val isMultiWindow = try { activity?.isInMultiWindowMode == true } catch (_: Exception) { false }
+    val isDeX = configuration.toString().contains("dexMode", ignoreCase = true)
+    val captionPadding = WindowInsets.captionBar.asPaddingValues().calculateTopPadding()
+    val hasCaption = captionPadding > 0.dp
+    val isInWindowMode = isDeX || isMultiWindow || hasCaption
+
     val isPhoneOrTablet = configuration.smallestScreenWidthDp < 840
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val topControlsPadding = if (isPhoneOrTablet) {
+    val topWindowBarHeight = if (isInWindowMode) {
+        maxOf(captionPadding, 40.dp)
+    } else {
+        statusBarHeight
+    }
+
+    val topControlsPadding = if (isInWindowMode) {
+        topWindowBarHeight + 8.dp
+    } else if (isPhoneOrTablet) {
         statusBarHeight + 1.dp
     } else {
         36.dp
@@ -384,7 +400,7 @@ fun PdfViewerScreen(
 
         // Top Fading Transparency Scrim with 300ms fade animation
         AnimatedVisibility(
-            visible = areSystemBarsVisible && canScrollUp,
+            visible = isInWindowMode || (areSystemBarsVisible && canScrollUp),
             enter = fadeIn(animationSpec = tween(300)),
             exit = fadeOut(animationSpec = tween(300)),
             modifier = Modifier.align(Alignment.TopCenter)
@@ -392,7 +408,7 @@ fun PdfViewerScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(statusBarHeight + 0.dp)
+                    .height(if (isInWindowMode) topWindowBarHeight else statusBarHeight)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(extendedColors.fileViewBackground, Color.Transparent)
