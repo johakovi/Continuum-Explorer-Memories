@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">Сервер «%1$s» занадто довго не відповідає. Бажаєте продовжити очікування чи скасувати операцію?</string>
     <string name="dialog_wait">Зачекати</string>
     <string name="terminal_debug_title">Вивід налагодження терміналу</string>
+    <string name="msg_empty_folder">Порожня папка</string>
+    <string name="msg_search_not_found_folder">У цій папці нічого не знайдено</string>
+    <string name="msg_search_not_found_subfolders">У цій папці та підпапках нічого не знайдено</string>
+    <string name="settings_command_bar">Панель команд</string>
+    <string name="settings_details_mode">Режим деталей</string>
+    <string name="menu_tools">Інструменти</string>
 </resources>

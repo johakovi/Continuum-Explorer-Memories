@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">Servern \"%1$s\" tar lång tid på sig att svara. Vill du fortsätta vänta eller avbryta åtgärden?</string>
     <string name="dialog_wait">Vänta</string>
     <string name="terminal_debug_title">Debug-utskrift för terminal</string>
+    <string name="msg_empty_folder">Tom mapp</string>
+    <string name="msg_search_not_found_folder">Hittade inte det du sökte i den här mappen</string>
+    <string name="msg_search_not_found_subfolders">Hittade inte det du sökte i den här mappen och undermapparna</string>
+    <string name="settings_command_bar">Kommandofält</string>
+    <string name="settings_details_mode">Detaljläge</string>
+    <string name="menu_tools">Verktyg</string>
 </resources>

@@ -134,6 +134,14 @@ class FileExplorerState(
     var isSearchMode by mutableStateOf(false)
     var isSearchUIActive by mutableStateOf(false)
     var isAddressBarActive by mutableStateOf(false)
+    var lastSearchQuery by mutableStateOf("")
+    var lastSearchSubfolders by mutableStateOf(false)
+
+    fun clearSearch() {
+        isSearchMode = false
+        lastSearchQuery = ""
+        lastSearchSubfolders = false
+    }
 
     val activeViewMode: ViewMode
         @Composable
@@ -489,7 +497,7 @@ class FileExplorerState(
 
     fun refresh(): Job? {
         if (isSearchMode) {
-            isSearchMode = false
+            clearSearch()
         }
         return triggerLoad(forceRefresh = true)
     }
@@ -497,11 +505,14 @@ class FileExplorerState(
     fun performSearch(query: String, searchSubfolders: Boolean) {
         if (query.isBlank()) {
             if (isSearchMode) {
-                isSearchMode = false
+                clearSearch()
                 triggerLoad()
             }
             return
         }
+
+        lastSearchQuery = query
+        lastSearchSubfolders = searchSubfolders
 
         loadingJob?.cancel()
         loadingJob = scope.launch {

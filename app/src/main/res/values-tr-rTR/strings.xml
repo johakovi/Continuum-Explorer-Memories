@@ -578,4 +578,10 @@
     <string name="dialog_unresponsive_server_message">\"%1$s\" sunucusunun yanıt vermesi uzun sürüyor. Beklemeye devam mı etmek istersiniz yoksa işlemi iptal mi etmek istersiniz?</string>
     <string name="dialog_wait">Bekle</string>
     <string name="terminal_debug_title">Terminal Hata Ayıklama Çıktısı</string>
+    <string name="msg_empty_folder">Boş klasör</string>
+    <string name="msg_search_not_found_folder">Bu klasörde aradığınız bulunamadı</string>
+    <string name="msg_search_not_found_subfolders">Bu klasörde ve alt klasörlerde aradığınız bulunamadı</string>
+    <string name="settings_command_bar">Komut Çubuğu</string>
+    <string name="settings_details_mode">Ayrıntılar Modu</string>
+    <string name="menu_tools">Araçlar</string>
 </resources>

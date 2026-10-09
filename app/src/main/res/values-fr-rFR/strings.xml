@@ -597,4 +597,10 @@
     <string name="dialog_unresponsive_server_message">Le serveur \"%1$s\" met beaucoup de temps à répondre. Voulez-vous continuer à attendre ou annuler l\'opération ?</string>
     <string name="dialog_wait">Attendre</string>
     <string name="terminal_debug_title">Sortie de débogage du terminal</string>
+    <string name="msg_empty_folder">Dossier vide</string>
+    <string name="msg_search_not_found_folder">Aucun résultat trouvé dans ce dossier</string>
+    <string name="msg_search_not_found_subfolders">Aucun résultat trouvé dans ce dossier et ses sous-dossiers</string>
+    <string name="settings_command_bar">Barre de commandes</string>
+    <string name="settings_details_mode">Mode de détails</string>
+    <string name="menu_tools">Outils</string>
 </resources>

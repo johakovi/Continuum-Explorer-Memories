@@ -597,4 +597,10 @@
     <string name="dialog_unresponsive_server_message">Сервер «%1$s» слишком долго не отвечает. Хотите продолжить ожидание или отменить операцию?</string>
     <string name="dialog_wait">Подождать</string>
     <string name="terminal_debug_title">Вывод отладки терминала</string>
+    <string name="msg_empty_folder">Пустая папка</string>
+    <string name="msg_search_not_found_folder">В этой папке ничего не найдено</string>
+    <string name="msg_search_not_found_subfolders">В этой папке и подпапках ничего не найдено</string>
+    <string name="settings_command_bar">Панель команд</string>
+    <string name="settings_details_mode">Режим деталей</string>
+    <string name="menu_tools">Инструменты</string>
 </resources>

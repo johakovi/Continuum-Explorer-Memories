@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">Palvelimella \"%1$s\" kestää kauan vastata. Haluatko jatkaa odottamista vai peruuttaa toiminnon?</string>
     <string name="dialog_wait">Odota</string>
     <string name="terminal_debug_title">Terminaalin debug-tuloste</string>
+    <string name="msg_empty_folder">Tyhjä kansio</string>
+    <string name="msg_search_not_found_folder">Hakusi ei tuottanut tuloksia tässä kansiossa</string>
+    <string name="msg_search_not_found_subfolders">Hakusi ei tuottanut tuloksia tässä kansiossa eikä alikansioissa</string>
+    <string name="settings_command_bar">Komentopalkki</string>
+    <string name="settings_details_mode">Yksityiskohdat-tila</string>
+    <string name="menu_tools">Työkalut</string>
 </resources>

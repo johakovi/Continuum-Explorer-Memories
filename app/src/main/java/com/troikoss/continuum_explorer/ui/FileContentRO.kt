@@ -381,19 +381,21 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         }
 
         val accessErr = appState.accessError
-        val isMusicSubfolder = appState.libraryItem == LibraryItem.Music && appState.currentPath != null
-        val isGames = appState.libraryItem == LibraryItem.Games
-        val isVideos = appState.libraryItem == LibraryItem.Videos
-        val isEmptyState = !appState.isLoading && (isMusicSubfolder || isGames || isVideos) && appState.files.isEmpty()
+        val isEmptyState = !appState.isLoading && appState.files.isEmpty()
 
         if (accessErr != null) {
             AccessErrorView(message = accessErr)
         } else if (appState.libraryItem == LibraryItem.Home) {
             HomeView(appState = appState, onAddStorage = onAddStorage)
         } else if (isEmptyState) {
-            val emptyMessage = when (appState.libraryItem) {
-                LibraryItem.Videos -> stringResource(R.string.msg_video_nothing_here)
-                else -> stringResource(R.string.msg_nothing_here)
+            val emptyMessage = if (appState.isSearchMode || appState.lastSearchQuery.isNotBlank()) {
+                if (appState.lastSearchSubfolders) {
+                    stringResource(R.string.msg_search_not_found_subfolders)
+                } else {
+                    stringResource(R.string.msg_search_not_found_folder)
+                }
+            } else {
+                stringResource(R.string.msg_empty_folder)
             }
             EmptyStateView(emptyMessage)
         } else {
@@ -461,7 +463,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
 
 @Composable
 private fun EmptyStateView(message: String = stringResource(R.string.msg_nothing_here)) {
-    val emoticons = remember { listOf("(ᵕ • ᴗ •)", "( •᷄ᴗ•́)", "(⇀‸↼‶)", "(ᵕ ó ᴗ ò)") }
+    val emoticons = remember { listOf("(ᵕ • ᴗ •)", "(⇀‸↼‶)", "(ᵕ ó ᴗ ò)") }
     val emoticon = remember { emoticons.random() }
 
     Box(

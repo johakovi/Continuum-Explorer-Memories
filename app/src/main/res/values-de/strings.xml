@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">Der Server \"%1$s\" braucht lange für eine Antwort. Möchten Sie weiter warten oder den Vorgang abbrechen?</string>
     <string name="dialog_wait">Warten</string>
     <string name="terminal_debug_title">Terminal-Debug-Ausgabe</string>
+    <string name="msg_empty_folder">Leerer Ordner</string>
+    <string name="msg_search_not_found_folder">Nichts in diesem Ordner gefunden</string>
+    <string name="msg_search_not_found_subfolders">Nichts in diesem Ordner und Unterordnern gefunden</string>
+    <string name="settings_command_bar">Befehlsleiste</string>
+    <string name="settings_details_mode">Detailmodus</string>
+    <string name="menu_tools">Werkzeuge</string>
 </resources>

@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">服务器 \"%1$s\" 响应时间过长。您想继续等待还是取消操作？</string>
     <string name="dialog_wait">等待</string>
     <string name="terminal_debug_title">终端调试输出</string>
+    <string name="msg_empty_folder">空文件夹</string>
+    <string name="msg_search_not_found_folder">在此文件夹中未找到您搜索的内容</string>
+    <string name="msg_search_not_found_subfolders">在此文件夹及子文件夹中未找到您搜索的内容</string>
+    <string name="settings_command_bar">命令栏</string>
+    <string name="settings_details_mode">详细信息模式</string>
+    <string name="menu_tools">工具</string>
 </resources>

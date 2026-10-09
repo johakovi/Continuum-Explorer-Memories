@@ -598,4 +598,10 @@
     <string name="dialog_unresponsive_server_message">El servidor \"%1$s\" está tardando mucho en responder. ¿Desea seguir esperando o cancelar la operación?</string>
     <string name="dialog_wait">Esperar</string>
     <string name="terminal_debug_title">Salida de depuración del terminal</string>
+    <string name="msg_empty_folder">Carpeta vacía</string>
+    <string name="msg_search_not_found_folder">No se encontró lo que buscas en esta carpeta</string>
+    <string name="msg_search_not_found_subfolders">No se encontró lo que buscas en esta carpeta y subcarpetas</string>
+    <string name="settings_command_bar">Barra de comandos</string>
+    <string name="settings_details_mode">Modo de detalles</string>
+    <string name="menu_tools">Herramientas</string>
 </resources>

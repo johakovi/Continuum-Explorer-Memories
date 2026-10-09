@@ -44,7 +44,7 @@ fun FileExplorerState.navigateTo(
         currentNetworkId = networkId
         currentNetworkConnectionId = networkConnectionId
         networkError = null
-        isSearchMode = false
+        clearSearch()
         scrollToItemIndex = null
         selectionManager.reset()
         triggerLoad()
@@ -91,7 +91,7 @@ fun FileExplorerState.navigateTo(
     currentNetworkId = null
     currentNetworkConnectionId = null
     networkError = null
-    isSearchMode = false
+    clearSearch()
 
     scrollToItemIndex = null
     selectionManager.reset()

@@ -597,4 +597,10 @@
     <string name="dialog_unresponsive_server_message">\"%1$s\" 서버가 응답하는 데 시간이 오래 걸립니다. 계속 기다리시겠습니까, 아니면 작업을 취소하시겠습니까?</string>
     <string name="dialog_wait">기다리기</string>
     <string name="terminal_debug_title">터미널 디버그 출력</string>
+    <string name="msg_empty_folder">빈 폴더</string>
+    <string name="msg_search_not_found_folder">이 폴더에서 검색 결과를 찾지 못했습니다</string>
+    <string name="msg_search_not_found_subfolders">이 폴더 및 하위 폴더에서 검색 결과를 찾지 못했습니다</string>
+    <string name="settings_command_bar">명령 도구 모음</string>
+    <string name="settings_details_mode">상세 정보 모드</string>
+    <string name="menu_tools">도구</string>
 </resources>

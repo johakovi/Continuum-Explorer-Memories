@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Continuum Explorer</string>
 
     <!-- Shortcuts -->
@@ -575,6 +575,9 @@
     <string name="msg_cant_access_directory">Can\'t access to this directory</string>
     <string name="msg_nothing_here">There isn\'t anything yet</string>
     <string name="msg_video_nothing_here">No media or folders added to video manager</string>
+    <string name="msg_empty_folder">Empty folder</string>
+    <string name="msg_search_not_found_folder">Didn\'t found what you search in this folder</string>
+    <string name="msg_search_not_found_subfolders">Didn\'t found what you search in this folder and subfolders</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">System &amp; Battery</string>
