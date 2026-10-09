@@ -643,7 +643,7 @@ fun BackgroundContextMenu(
                 )
                 HorizontalDivider()
 
-                if (appState.currentPath != null || isInGalleryOrVideos) {
+                if (!isInVirtualStorage || isInGalleryOrVideos) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.folder)) },
                         leadingIcon = { Icon(Icons.Default.Folder, null) },
