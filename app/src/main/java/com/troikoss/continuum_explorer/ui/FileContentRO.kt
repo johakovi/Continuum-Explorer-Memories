@@ -55,6 +55,7 @@ import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -74,7 +75,6 @@ import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.ThemeShape
 import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
-import com.troikoss.continuum_explorer.model.ScreenSize
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
@@ -301,8 +301,8 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         modifier = Modifier
             .fillMaxSize()
             .then(
-                if (contentIsRounded && appState.getScreenSize() != ScreenSize.SMALL)
-                    Modifier.clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
+                if (contentIsRounded)
+                    Modifier.shadow(elevation = 8.dp, shape = fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
                 else
                     Modifier.background(FileExplorerTheme.extendedColors.background)
             )
@@ -425,7 +425,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         val fadeHeight = if (bottomInset > 0.dp) (bottomInset + extraHeight).coerceAtMost(36.dp) else 28.dp
 
         if (fadeHeight > 0.dp) {
-            val fadeColor = if (contentIsRounded && appState.getScreenSize() != ScreenSize.SMALL)
+            val fadeColor = if (contentIsRounded)
                 FileExplorerTheme.extendedColors.fileViewBackground
             else
                 FileExplorerTheme.extendedColors.background

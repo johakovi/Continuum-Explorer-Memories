@@ -2,6 +2,7 @@ package com.troikoss.continuum_explorer.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -29,6 +30,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -253,12 +255,7 @@ fun FileExplorerRO(
                         Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
                     } else {
                         Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
-                    }).then(
-                        Modifier.shadow(
-                            elevation = 8.dp,
-                            shape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape
-                        )
-                    ).statusBarsPadding().navigationBarsPadding(),
+                    }).statusBarsPadding().navigationBarsPadding(),
                     drawerContainerColor = LocalExtendedColors.current.sidebarBackground.copy(alpha = 0.98f),
                     drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else androidx.compose.ui.graphics.RectangleShape,
                     windowInsets = WindowInsets(0, 0, 0, 0)
@@ -494,32 +491,37 @@ private fun ExplorerTopBar(
 ) {
     val appearance = appState.getUIAppearance()
     val themeTop = SettingsManager.themeTop.value
+    val topInsets = if (appearance == UIAppearance.PHONE) WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) else WindowInsets(0, 0, 0, 0)
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (themeTop == ThemeTopMode.FLOAT) MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.75f) else LocalExtendedColors.current.topBarBackground.copy(alpha = 0.75f))
     ) {
-        val topInsets = if (appearance == UIAppearance.PHONE) WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) else WindowInsets(0, 0, 0, 0)
-        Column(modifier = Modifier.windowInsetsPadding(topInsets)) {
-            TabBar(
-                tabStates = tabs,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = onTabSelected,
-                onAddTab = onAddTab,
-                onCloseTab = onCloseTab,
-                onMoveTab = onMoveTab
-            )
+        TabBar(
+            tabStates = tabs,
+            selectedTabIndex = selectedTabIndex,
+            onTabSelected = onTabSelected,
+            onAddTab = onAddTab,
+            onCloseTab = onCloseTab,
+            onMoveTab = onMoveTab,
+            contentWindowInsets = topInsets
+        )
 
-            TopBar(
-                onMenuClick = onMenuClick,
-                appState = appState,
-                hideNavButtons = hideNavButtons,
-                hideSearchButton = hideSearchButton,
-                hideMenuButton = hideMenuButton
-            )
-            
+        TopBar(
+            onMenuClick = onMenuClick,
+            appState = appState,
+            hideNavButtons = hideNavButtons,
+            hideSearchButton = hideSearchButton,
+            hideMenuButton = hideMenuButton,
+            contentWindowInsets = topInsets
+        )
 
-            if (SettingsManager.isCommandBarVisible.value) {
+        if (SettingsManager.isCommandBarVisible.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(topInsets)
+            ) {
                 CommandBar(appState = appState)
             }
         }
@@ -556,14 +558,23 @@ private fun ExplorerBody(
 
     Column(modifier = modifier.fillMaxSize()) {
         val appearance = appState.getUIAppearance()
-        Row(modifier = Modifier.weight(1f).padding(horizontal = 2.dp)) {
+        val configuration = LocalConfiguration.current
+        val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val showBottomBar = appearance == UIAppearance.PHONE && isPortrait
+        Row(modifier = Modifier.weight(1f)) {
             // Navigation Pane (Side)
             if (screenSize != ScreenSize.SMALL) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .padding(start = 8.dp)
-                        .then(if (appearance == UIAppearance.PHONE) Modifier.padding(vertical = 8.dp).statusBarsPadding().navigationBarsPadding() else Modifier.padding(top = 2.dp).navigationBarsPadding())
+                        .then(
+                            if (appearance == UIAppearance.PHONE) {
+                                Modifier.padding(top = 8.dp, bottom = 8.dp).navigationBarsPadding()
+                            } else {
+                                Modifier.padding(top = 2.dp).navigationBarsPadding()
+                            }
+                        )
                         .zIndex(2f)
                 ) {
                     PermanentDrawerSheet(
@@ -634,12 +645,19 @@ private fun ExplorerBody(
             // Main Content Area
             Box(modifier = Modifier
                 .weight(1f)
-                .padding(top = 2.dp)
                 .then(
-                    if (contentIsRounded)
-                        Modifier.padding(vertical = 0.dp, horizontal = 2.dp).navigationBarsPadding()
-                    else
+                    if (contentIsRounded) {
                         Modifier
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 2.dp,
+                                bottom = if (showBottomBar) 68.dp else 2.dp
+                            )
+                            .navigationBarsPadding()
+                    } else {
+                        Modifier.padding(top = 2.dp)
+                    }
                 )
             ) {
                 FileContent(appState = appState, isInWindowMode = isInWindowMode, onAddStorage = onAddStorage)

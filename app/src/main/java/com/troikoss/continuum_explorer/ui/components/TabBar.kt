@@ -101,6 +101,7 @@ fun TabBar(
     onCloseTab: (FileExplorerState) -> Unit,
     onMoveTab: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
+    contentWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -149,6 +150,9 @@ fun TabBar(
     val horizontalPaddingLeft = with(density) { WindowInsets.captionBar.getLeft(density, LayoutDirection.Ltr).toDp() }
     val horizontalPaddingRight = with(density) { WindowInsets.captionBar.getRight(density, LayoutDirection.Ltr).toDp() }
 
+    val contentLeft = with(density) { contentWindowInsets.getLeft(density, LayoutDirection.Ltr).toDp() }
+    val contentRight = with(density) { contentWindowInsets.getRight(density, LayoutDirection.Ltr).toDp() }
+
     val restrictedLeft = WindowManager.restrictedLeftPadding.value
     val restrictedRight = WindowManager.restrictedRightPadding.value
 
@@ -176,16 +180,16 @@ fun TabBar(
         val currentMaxWidth = maxWidth
 
         // Unified Safety Fallback for all windowed modes (DeX & Pop-ups)
-        val safetyPaddingLeft = if (hasCaption && restrictedLeft == 0.dp && horizontalPaddingLeft == 0.dp) {
+        val safetyPaddingLeft = if (hasCaption && restrictedLeft == 0.dp && horizontalPaddingLeft == 0.dp && contentLeft == 0.dp) {
             minOf(80.dp, currentMaxWidth * 0.2f)
         } else 0.dp
 
-        val safetyPaddingRight = if (hasCaption && restrictedRight == 0.dp && horizontalPaddingRight == 0.dp) {
+        val safetyPaddingRight = if (hasCaption && restrictedRight == 0.dp && horizontalPaddingRight == 0.dp && contentRight == 0.dp) {
             minOf(220.dp, currentMaxWidth * 0.4f)
         } else 0.dp
 
-        val finalPaddingLeft = maxOf(horizontalPaddingLeft, restrictedLeft, safetyPaddingLeft)
-        val finalPaddingRight = maxOf(horizontalPaddingRight, restrictedRight, safetyPaddingRight)
+        val finalPaddingLeft = maxOf(horizontalPaddingLeft, restrictedLeft, safetyPaddingLeft, contentLeft)
+        val finalPaddingRight = maxOf(horizontalPaddingRight, restrictedRight, safetyPaddingRight, contentRight)
 
         // Prevent layout explosion in very narrow windows
         val maxTotalPadding = currentMaxWidth * 0.7f

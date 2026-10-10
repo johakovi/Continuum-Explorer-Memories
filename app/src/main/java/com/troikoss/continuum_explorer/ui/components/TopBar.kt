@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -90,7 +92,8 @@ fun TopBar(
     appState: FileExplorerState,
     hideNavButtons: Boolean = false,
     hideSearchButton: Boolean = false,
-    hideMenuButton: Boolean = false
+    hideMenuButton: Boolean = false,
+    contentWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
 ) {
 
     val context = LocalContext.current
@@ -214,7 +217,13 @@ fun TopBar(
             .height(56.dp),
         color = LocalExtendedColors.current.topBarBackground
     ) {
-        Row (modifier = Modifier.padding(8.dp), verticalAlignment = CenterVertically) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(contentWindowInsets)
+                .padding(8.dp),
+            verticalAlignment = CenterVertically
+        ) {
             if (!hideNavButtons) {
                 // NAV BUTTON BACKGROUND SURFACE - INSIDE THE TOP BAR
                 Surface(
