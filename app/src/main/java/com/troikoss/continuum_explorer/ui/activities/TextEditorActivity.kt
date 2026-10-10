@@ -60,6 +60,9 @@ import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
 import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.utils.RestrictedCache
+import com.troikoss.continuum_explorer.model.ProviderKind
+import com.troikoss.continuum_explorer.providers.StorageProviders
+import com.troikoss.continuum_explorer.utils.AppConfigurations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -98,11 +101,11 @@ class TextEditorActivity : ComponentActivity() {
         val text = textState.text
 
         val originalPath = remember { intent.getStringExtra("originalPath") }
+        val parentId = remember { intent.getStringExtra("parentId") }
+        val fileName = remember { intent.getStringExtra("fileName") ?: uri.lastPathSegment ?: "Unknown File" }
+        val providerKindStr = remember { intent.getStringExtra("PROVIDER_KIND") }
+        val connectionId = remember { intent.getStringExtra("CONNECTION_ID") }
         val tempPath = remember { intent.getStringExtra("tempPath") }
-
-        val fileName = remember(uri) {
-            uri.lastPathSegment ?: "Unknown File"
-        }
 
         // Load file content
         LaunchedEffect(uri) {
@@ -165,7 +168,16 @@ class TextEditorActivity : ComponentActivity() {
                             IconButton(onClick = {
                                 scope.launch {
                                     isSaving = true
-                                    val success = saveFile(uri, text, originalPath, tempPath)
+                                    val success = saveFile(
+                                        uri = uri,
+                                        content = text,
+                                        originalPath = originalPath,
+                                        parentId = parentId,
+                                        fileName = fileName,
+                                        providerKindStr = providerKindStr,
+                                        connectionId = connectionId,
+                                        tempPath = tempPath
+                                    )
                                     if (success) {
                                         originalText = text
                                         Toast.makeText(this@TextEditorActivity, "File saved", Toast.LENGTH_SHORT).show()
@@ -511,7 +523,16 @@ class TextEditorActivity : ComponentActivity() {
         startActivity(shareIntent)
     }
 
-    private suspend fun saveFile(uri: Uri, content: String, originalPath: String? = null, tempPath: String? = null): Boolean {
+    private suspend fun saveFile(
+        uri: Uri,
+        content: String,
+        originalPath: String? = null,
+        parentId: String? = null,
+        fileName: String? = null,
+        providerKindStr: String? = null,
+        connectionId: String? = null,
+        tempPath: String? = null
+    ): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val success = contentResolver.openOutputStream(uri, "wt")?.use { outputStream ->
@@ -521,11 +542,36 @@ class TextEditorActivity : ComponentActivity() {
                     }
                 } ?: false
 
-                if (success && originalPath != null && tempPath != null) {
-                    RestrictedCache.pushBack(this@TextEditorActivity, File(tempPath), originalPath)
-                } else {
-                    success
+                if (!success) return@withContext false
+
+                if (originalPath != null && tempPath != null && providerKindStr == null) {
+                    return@withContext RestrictedCache.pushBack(this@TextEditorActivity, File(tempPath), originalPath)
                 }
+
+                if (providerKindStr != null && originalPath != null) {
+                    val kind = try { ProviderKind.valueOf(providerKindStr) } catch (_: Exception) { null }
+                    if (kind != null) {
+                        val provider = if (kind.name.startsWith("NETWORK_") && connectionId != null) {
+                            val configs = AppConfigurations(this@TextEditorActivity)
+                            val conn = configs.networkConnections.find { it.id == connectionId }
+                            if (conn != null) StorageProviders.network(conn) else null
+                        } else {
+                            try { StorageProviders.providerFor(kind) } catch (_: Exception) { null }
+                        }
+
+                        if (provider != null) {
+                            val pId = parentId ?: provider.parentId(originalPath) ?: "/"
+                            val name = fileName ?: originalPath.substringAfterLast('/')
+                            val (_, outputStream) = provider.createAndOpenOutput(pId, name)
+                            outputStream.use { out ->
+                                out.write(content.toByteArray(Charsets.UTF_8))
+                            }
+                            return@withContext true
+                        }
+                    }
+                }
+
+                true
             } catch (e: Exception) {
                 e.printStackTrace()
                 false

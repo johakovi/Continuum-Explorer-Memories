@@ -17,6 +17,7 @@ import com.troikoss.continuum_explorer.managers.OperationType
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
+import com.troikoss.continuum_explorer.ui.activities.TextEditorActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -182,6 +183,8 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
     val isImage = mime?.startsWith("image/") == true || setOf("jpg", "jpeg", "png", "gif", "webp", "bmp").contains(extension)
     val isAudio = mime?.startsWith("audio/") == true || setOf("mp3", "wav", "ogg", "m4a", "aac", "flac").contains(extension)
     val isVideo = mime?.startsWith("video/") == true || setOf("mp4", "mkv", "webm", "avi", "mov").contains(extension)
+    val textExtensions = setOf("txt", "log", "cfg", "ini", "md", "xml", "json", "sh", "py", "js", "html", "css")
+    val isText = textExtensions.contains(extension) || mime?.startsWith("text/") == true
 
     scope.launch {
         try {
@@ -218,6 +221,43 @@ fun openRemoteFile(context: Context, scope: CoroutineScope, file: UniversalFile,
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
+                return@launch
+            }
+
+            if (isText) {
+                FileOperationsManager.start()
+                NotificationHelper.start(context)
+                withContext(Dispatchers.Main) {
+                    FileOperationsManager.update(0, 1, operationType = OperationType.COPY)
+                    FileOperationsManager.currentFileName.value = file.name
+                }
+                val cached = RemoteCache.cache(context, file) { copied, total ->
+                    if (total > 0) {
+                        FileOperationsManager.updateDetailed(
+                            processedBytes = copied, totalBytes = total,
+                            speed = 0L, remainingMillis = 0L, fileName = file.name
+                        )
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    FileOperationsManager.finish()
+                    val cachedUri = FileProvider.getUriForFile(
+                        context, context.packageName + ".provider", cached
+                    )
+                    val intent = Intent(context, TextEditorActivity::class.java).apply {
+                        setData(cachedUri)
+                        putExtra("originalPath", file.providerId)
+                        putExtra("parentId", file.parentId)
+                        putExtra("fileName", file.name)
+                        putExtra("PROVIDER_KIND", file.provider.kind.name)
+                        putExtra("CONNECTION_ID", file.provider.connectionId)
+                        putExtra("tempPath", cached.absolutePath)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(intent)
+                }
                 return@launch
             }
 
