@@ -18,15 +18,18 @@ _Note: This project is originally forked from [troikoss / Continuum Explorer](ht
 ## Screenshots
 ### Phone
 
-<img width="200" alt="Screen_Recording_20260712_215222_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/511cf7cc-eb3d-4eb6-91c1-b2262cd2a595" /> <img width="200" alt="Screenshot_20260731_183125_Continuum Explorer" src="https://github.com/user-attachments/assets/3947bba9-0501-4002-8067-47bd87a20449" /> 
+ <img width="200" alt="LibreCuts_1791808624798(1)" src="https://github.com/user-attachments/assets/b9734281-4364-43b2-9484-3210e9b2bec9" /> 
+ <img width="200" alt="Screen_Recording_20261012_154320_Continuum%20Explorer(1)" src="https://github.com/user-attachments/assets/ec2ca58d-1fc2-41f4-b32a-2df6e32cf269" /> 
+ <img width="200" alt="Screen_Recording_20260712_215222_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/511cf7cc-eb3d-4eb6-91c1-b2262cd2a595" /> 
+ <img width="200" alt="Screenshot_20260731_183125_Continuum Explorer" src="https://github.com/user-attachments/assets/3947bba9-0501-4002-8067-47bd87a20449" /> 
+
 
  ### Tablet/desktop
 
  <img width="368" alt="Screen_Recording_20260711_094754_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/3d779cc2-0390-478a-b6c3-432ca447ada0" /> 
  <img width="368" alt="Screenshot_20260731_182254_Continuum Explorer" src="https://github.com/user-attachments/assets/736193b3-ab52-4540-8368-32a29f9e21b2" />  
- <img width="368" alt="Screenshot_20260731_182314_Continuum Explorer" src="https://github.com/user-attachments/assets/d2e9f1d9-8f1d-40c0-b434-2c8829cd03a0" />
+ <img width="368" alt="Screenshot_20260731_182314_Continuum Explorer" src="https://github.com/user-attachments/assets/d2e9f1d9-8f1d-40c0-b434-2c8829cd03a0" /> 
  <img width="368" alt="Screenshot_20260731_185357_Continuum Explorer" src="https://github.com/user-attachments/assets/0b810682-bb31-447d-9455-346b6ca3735a" />
-
  <img width="368" alt="Screenshot_20260731_185033_Continuum Explorer" src="https://github.com/user-attachments/assets/fc7db263-558b-47ed-9c01-214a35f8e059" />
 
 
