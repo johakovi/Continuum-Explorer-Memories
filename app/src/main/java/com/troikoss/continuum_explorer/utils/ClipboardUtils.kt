@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
@@ -50,17 +51,22 @@ fun copyToClipboard(context: Context, files: List<UniversalFile>) {
     PendingCut.files = files
     PendingCut.isActive = false
 
-    val firstUri = getUriForUniversalFile(context, files[0]) ?: return
-    val clipData = ClipData.newUri(context.contentResolver, "File", firstUri)
+    val firstUri = getUriForUniversalFile(context, files[0]) ?: Uri.fromFile(File(files[0].providerId))
+    val clipData = ClipData.newUri(context.contentResolver, files[0].name, firstUri)
 
     for (i in 1 until files.size) {
-        val uri = getUriForUniversalFile(context, files[i])
-        if (uri != null) {
-            clipData.addItem(ClipData.Item(uri))
-        }
+        val uri = getUriForUniversalFile(context, files[i]) ?: Uri.fromFile(File(files[i].providerId))
+        clipData.addItem(ClipData.Item(uri))
     }
 
-    clipboard.setPrimaryClip(clipData)
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            clipboard.clearPrimaryClip()
+        }
+        clipboard.setPrimaryClip(clipData)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
 /**
@@ -109,24 +115,18 @@ suspend fun pasteFromClipboard(
     val pasteLog = mutableListOf<Pair<String, String>>() // For Undo: Source to Dest
     val movedPaths = mutableSetOf<String>() // Track which files were moved vs copied
 
-    if (clipData == null || clipData.itemCount == 0) {
+    val usePendingCut = PendingCut.files.isNotEmpty() && preloadedClipData == null
+    val totalCount = if (usePendingCut) PendingCut.files.size else (clipData?.itemCount ?: 0)
+
+    if (totalCount == 0) {
         withContext(Dispatchers.Main) {
             Toast.makeText(context, context.getString(R.string.msg_empty_clipboard), Toast.LENGTH_SHORT).show()
         }
         return emptyList()
     }
 
-    val totalCount = clipData.itemCount
-
     val trashDir = File(Environment.getExternalStorageDirectory(), ".Trash")
     val isPasteToTrash = currentPath?.absolutePath == trashDir.absolutePath
-
-    val firstClipUriStr = clipData.getItemAt(0).uri?.toString()
-    val firstPendingUriStr = if (PendingCut.files.isNotEmpty()) getUriForUniversalFile(context, PendingCut.files[0])?.toString() else null
-    val usePendingCut = PendingCut.files.isNotEmpty() &&
-            PendingCut.files.size == totalCount &&
-            (firstClipUriStr == null || firstPendingUriStr == null ||
-             firstClipUriStr == firstPendingUriStr || Uri.decode(firstClipUriStr) == Uri.decode(firstPendingUriStr))
 
     val isMove = usePendingCut && PendingCut.isActive
     val destSafDoc = if (currentSafUri != null) DocumentFile.fromTreeUri(context, currentSafUri) else null
@@ -161,7 +161,7 @@ suspend fun pasteFromClipboard(
         } else {
             for (i in 0 until totalCount) {
                 if (FileOperationsManager.isCancelled.value) return@withContext
-                val item = clipData.getItemAt(i)
+                val item = clipData?.getItemAt(i) ?: continue
                 val uri = item.uri ?: continue
                 context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                     val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
@@ -195,8 +195,8 @@ suspend fun pasteFromClipboard(
         for (i in 0 until totalCount) {
             if (FileOperationsManager.isCancelled.value) break
 
-            val item = clipData.getItemAt(i)
-            val sourceUri = item.uri ?: continue
+            val item = clipData?.getItemAt(i)
+            val sourceUri = item?.uri ?: continue
 
             val sourceFile = if (usePendingCut) {
                 PendingCut.files[i]

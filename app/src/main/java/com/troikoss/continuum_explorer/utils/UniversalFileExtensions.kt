@@ -6,7 +6,6 @@ import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.ProviderKind
-import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.SafProvider
@@ -62,16 +61,26 @@ fun getUriForUniversalFile(context: Context, file: UniversalFile): Uri? {
     return try {
         when {
             file.isArchiveEntry -> Uri.parse("archive://${file.absolutePath}")
-            file.provider is LocalProvider -> FileProvider.getUriForFile(
-                context,
-                context.packageName + ".provider",
-                File(file.providerId)
-            )
-            else -> Uri.parse(file.providerId)
+            file.provider is LocalProvider -> {
+                val f = File(file.providerId)
+                try {
+                    FileProvider.getUriForFile(context, context.packageName + ".provider", f)
+                } catch (_: Exception) {
+                    Uri.fromFile(f)
+                }
+            }
+            file.providerId.startsWith("content://") || file.providerId.startsWith("file://") -> {
+                Uri.parse(file.providerId)
+            }
+            else -> {
+                val p = file.providerId.ifEmpty { file.name }
+                if (p.startsWith("/")) Uri.fromFile(File(p))
+                else Uri.parse("file://$p")
+            }
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        null
+        Uri.fromFile(File(file.providerId.ifEmpty { file.name }))
     }
 }
 
