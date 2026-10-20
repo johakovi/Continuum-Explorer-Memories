@@ -13,7 +13,7 @@ import com.troikoss.continuum_explorer.managers.UndoManager
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
-import com.troikoss.continuum_explorer.utils.RestrictedCache
+import com.troikoss.continuum_explorer.providers.SafProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -57,12 +57,24 @@ suspend fun calculateSizeRecursively(context: Context, file: UniversalFile): Lon
  * Returns a name that doesn't collide with existing entries.
  * Appends " (1)", " (2)", … up to 999, then falls back to a timestamp suffix.
  */
-fun getUniqueName(name: String, exists: (String) -> Boolean): String {
+fun getUniqueName(name: String, isDirectory: Boolean = false, exists: (String) -> Boolean): String {
     if (!exists(name)) return name
 
-    val lastDot = name.lastIndexOf('.')
-    val base = if (lastDot != -1) name.substring(0, lastDot) else name
-    val ext = if (lastDot != -1) name.substring(lastDot) else ""
+    val base: String
+    val ext: String
+    if (isDirectory) {
+        base = name
+        ext = ""
+    } else {
+        val lastDot = name.lastIndexOf('.')
+        if (lastDot != -1) {
+            base = name.substring(0, lastDot)
+            ext = name.substring(lastDot)
+        } else {
+            base = name
+            ext = ""
+        }
+    }
 
     var count = 1
     var newName: String
@@ -88,6 +100,7 @@ suspend fun copyRecursively(
     destSaf: DocumentFile?,
     destProvider: StorageProvider? = null,
     destParentId: String? = null,
+    isParentMerged: Boolean = false,
     onCopyFile: suspend (UniversalFile, OutputStream) -> Unit
 ): String? {
     if (FileOperationsManager.isCancelled.value) return null
@@ -102,8 +115,14 @@ suspend fun copyRecursively(
         destProvider.findChild(destParentId, targetName) != null
     } else false
 
+    var currentMerged = isParentMerged
+
     if (alreadyExists) {
-        val result = FileOperationsManager.resolveCollision(targetName, source.isDirectory)
+        val result = if (isParentMerged) {
+            CollisionResult.MERGE
+        } else {
+            FileOperationsManager.resolveCollision(targetName, source.isDirectory)
+        }
         when (result) {
             CollisionResult.CANCEL -> {
                 FileOperationsManager.cancelSoft()
@@ -120,7 +139,7 @@ suspend fun copyRecursively(
                 }
             }
             CollisionResult.KEEP_BOTH -> {
-                targetName = getUniqueName(targetName) { name ->
+                targetName = getUniqueName(targetName, isDirectory = source.isDirectory) { name ->
                     if (destLocal != null) LocalProvider.exists(File(destLocal, name).absolutePath)
                     else if (destSaf != null) destSaf.findFile(name) != null
                     else if (destProvider != null && destParentId != null) destProvider.findChild(destParentId, name) != null
@@ -128,7 +147,9 @@ suspend fun copyRecursively(
                 }
             }
             CollisionResult.MERGE -> {
-                // No-op: fall through to recurse into existing directory
+                if (source.isDirectory) {
+                    currentMerged = true
+                }
             }
         }
     }
@@ -166,7 +187,7 @@ suspend fun copyRecursively(
                 val archiveSource: Any = if (rootId.startsWith("/")) File(rootId) else Uri.parse(rootId)
                 ZipUtils.getArchiveChildren(context, archiveSource, source.archivePath ?: "").forEach { child ->
                     if (FileOperationsManager.isCancelled.value) return@forEach
-                    copyRecursively(context, child, newDestLocal, newDestSaf, destProvider, newDestParentId, onCopyFile)
+                    copyRecursively(context, child, newDestLocal, newDestSaf, destProvider, newDestParentId, currentMerged, onCopyFile)
                 }
             }
         } else {
@@ -175,18 +196,18 @@ suspend fun copyRecursively(
             if (fileRef != null && !RestrictedCache.isRestrictedPath(source.providerId)) {
                 fileRef.listFiles()?.forEach { child ->
                     if (FileOperationsManager.isCancelled.value) return@forEach
-                    copyRecursively(context, child.toUniversal(), newDestLocal, newDestSaf, destProvider, newDestParentId, onCopyFile)
+                    copyRecursively(context, child.toUniversal(), newDestLocal, newDestSaf, destProvider, newDestParentId, currentMerged, onCopyFile)
                 }
             } else if (docRef != null) {
                 docRef.listFiles().forEach { child ->
                     if (FileOperationsManager.isCancelled.value) return@forEach
-                    copyRecursively(context, child.toUniversal(), newDestLocal, newDestSaf, destProvider, newDestParentId, onCopyFile)
+                    copyRecursively(context, child.toUniversal(), newDestLocal, newDestSaf, destProvider, newDestParentId, currentMerged, onCopyFile)
                 }
             } else {
                 try {
                     source.provider.listChildren(source.providerId).forEach { child ->
                         if (FileOperationsManager.isCancelled.value) return@forEach
-                        copyRecursively(context, child, newDestLocal, newDestSaf, destProvider, newDestParentId, onCopyFile)
+                        copyRecursively(context, child, newDestLocal, newDestSaf, destProvider, newDestParentId, currentMerged, onCopyFile)
                     }
                 } catch (_: Exception) {}
             }
@@ -206,12 +227,17 @@ suspend fun copyRecursively(
                 out
             } catch (_: Exception) { null }
         } else if (destSaf != null) {
-            val mime = source.documentFileRef?.type
-                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    source.name.substringAfterLast('.', "").lowercase()
-                )
-                ?: "application/octet-stream"
-            val newFile = destSaf.createFile(mime, targetName)
+            val existingFile = destSaf.findFile(targetName)
+            val newFile = if (existingFile != null) {
+                existingFile
+            } else {
+                val mime = source.documentFileRef?.type
+                    ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                        source.name.substringAfterLast('.', "").lowercase()
+                    )
+                    ?: "application/octet-stream"
+                destSaf.createFile(mime, targetName)
+            }
             if (newFile != null) context.contentResolver.openOutputStream(newFile.uri) else null
         } else if (destProvider != null && destParentId != null) {
             try {
@@ -309,10 +335,27 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                             if (existing.isDirectory) existing.deleteRecursively() else existing.delete()
                         }
                         CollisionResult.KEEP_BOTH -> {
-                            targetName = getUniqueName(newName) { File(fileRef.parentFile, it).exists() }
+                            targetName = getUniqueName(newName, isDirectory = file.isDirectory) { File(fileRef.parentFile, it).exists() }
                         }
                         CollisionResult.MERGE -> {
-                            // No-op: fall through to recurse into existing directory
+                            if (file.isDirectory) {
+                                val destFolder = File(fileRef.parentFile, newName)
+                                val copied = copyRecursively(
+                                    context = context ?: SafProvider.appContext(),
+                                    source = file,
+                                    destLocal = destFolder.parentFile,
+                                    destSaf = null,
+                                    isParentMerged = true,
+                                ) { src, out ->
+                                    val inStream = src.fileRef?.inputStream() ?: src.provider.openInput(src.providerId)
+                                    inStream.use { it.copyTo(out) }
+                                }
+                                if (copied != null) {
+                                    fileRef.deleteRecursively()
+                                    fileRef.parentFile?.let { p -> UndoManager.record(UndoAction.Rename(p, oldName, newName)) }
+                                    return@withContext true
+                                } else return@withContext false
+                            }
                         }
                     }
                 }
@@ -358,15 +401,38 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                         }
                         CollisionResult.KEEP_BOTH -> {
                             targetName = if (parent != null) {
-                                getUniqueName(newName) { parent.findFile(it) != null }
+                                getUniqueName(newName, isDirectory = file.isDirectory) { parent.findFile(it) != null }
                             } else {
                                 safParentId?.let { pid ->
-                                    getUniqueName(newName) { n -> file.provider.findChild(pid, n) != null }
+                                    getUniqueName(newName, isDirectory = file.isDirectory) { n -> file.provider.findChild(pid, n) != null }
                                 } ?: newName
                             }
                         }
                         CollisionResult.MERGE -> {
-                            // No-op
+                            if (file.isDirectory && context != null) {
+                                val destDoc = parent ?: DocumentFile.fromTreeUri(context, Uri.parse(safParentId))
+                                if (destDoc != null) {
+                                    val copied = copyRecursively(
+                                        context = context,
+                                        source = file,
+                                        destLocal = null,
+                                        destSaf = destDoc,
+                                        isParentMerged = true
+                                    ) { src, out ->
+                                        val inStream = context.contentResolver.openInputStream(src.documentFileRef!!.uri)
+                                        inStream?.use { it.copyTo(out) }
+                                    }
+                                    if (copied != null) {
+                                        documentFileRef.delete()
+                                        UndoManager.record(UndoAction.RenameSaf(
+                                            destDoc.uri.toString(),
+                                            oldName,
+                                            newName
+                                        ))
+                                        return@withContext true
+                                    } else return@withContext false
+                                }
+                            }
                         }
                     }
                 }
@@ -408,11 +474,31 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                     when (FileOperationsManager.resolveCollision(newName, file.isDirectory)) {
                         CollisionResult.CANCEL -> return@withContext false
                         CollisionResult.REPLACE -> { file.provider.delete(collision.providerId); newName }
-                        CollisionResult.KEEP_BOTH -> getUniqueName(newName) { n ->
+                        CollisionResult.KEEP_BOTH -> getUniqueName(newName, isDirectory = file.isDirectory) { n ->
                             @Suppress("UNNECESSARY_SAFE_CALL")
                             pId?.let { file.provider.findChild(it, n) } != null
                         }
-                        CollisionResult.MERGE -> newName
+                        CollisionResult.MERGE -> {
+                            if (file.isDirectory && pId != null) {
+                                val copied = copyRecursively(
+                                    context = context ?: SafProvider.appContext(),
+                                    source = file,
+                                    destLocal = null,
+                                    destSaf = null,
+                                    destProvider = file.provider,
+                                    destParentId = pId,
+                                    isParentMerged = true
+                                ) { src, out ->
+                                    val inStream = src.provider.openInput(src.providerId)
+                                    inStream.use { it.copyTo(out) }
+                                }
+                                if (copied != null) {
+                                    file.provider.delete(file.providerId)
+                                    return@withContext true
+                                } else return@withContext false
+                            }
+                            newName
+                        }
                     }
                 } else newName
                 file.provider.rename(file.providerId, targetName) != null

@@ -22,7 +22,6 @@ import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import com.troikoss.continuum_explorer.providers.SafProvider
 import com.troikoss.continuum_explorer.providers.ShizukuProvider
-import com.troikoss.continuum_explorer.utils.RestrictedCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -252,29 +251,32 @@ suspend fun pasteFromClipboard(
             }
 
             try {
-                // Optimization 1: Use direct Move/Copy if it's the SAME connection/provider instance
+                // Optimization 1: Use direct Move/Copy if it's the SAME connection/provider instance and target doesn't exist
                 val isSameProvider = finalDestProvider != null &&
                     (sourceFile.provider === finalDestProvider ||
                      (sourceFile.provider.kind == finalDestProvider.kind &&
                       sourceFile.provider.connectionId == finalDestProvider.connectionId))
 
                 if (isSameProvider && finalDestParentId != null) {
-                    val result = if (isMove) {
-                        finalDestProvider.move(sourceFile.providerId, finalDestParentId, sourceFile.name)
-                    } else {
-                        // Try direct copy for both files and directories if supported
-                        finalDestProvider.copy(sourceFile.providerId, finalDestParentId, sourceFile.name)
-                    }
-
-                    if (result != null) {
-                        pastedFileNames.add(sourceFile.name)
-                        pasteLog.add(sourceFile.providerId to result.providerId)
-                        if (isMove) movedPaths.add(sourceFile.providerId)
-                        if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
-                        withContext(Dispatchers.Main) {
-                            FileOperationsManager.itemsProcessed.intValue = i + 1
+                    val destChild = finalDestProvider.findChild(finalDestParentId, sourceFile.name)
+                    if (destChild == null) {
+                        val result = if (isMove) {
+                            finalDestProvider.move(sourceFile.providerId, finalDestParentId, sourceFile.name)
+                        } else {
+                            // Try direct copy for both files and directories if supported
+                            finalDestProvider.copy(sourceFile.providerId, finalDestParentId, sourceFile.name)
                         }
-                        continue
+
+                        if (result != null) {
+                            pastedFileNames.add(sourceFile.name)
+                            pasteLog.add(sourceFile.providerId to result.providerId)
+                            if (isMove) movedPaths.add(sourceFile.providerId)
+                            if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
+                            withContext(Dispatchers.Main) {
+                                FileOperationsManager.itemsProcessed.intValue = i + 1
+                            }
+                            continue
+                        }
                     }
                 }
 
@@ -287,21 +289,24 @@ suspend fun pasteFromClipboard(
                     val provider = if (currentPath != null) LocalProvider else destProvider!!
 
                     if (RestrictedCache.isRestrictedPath(sourceFile.providerId) || RestrictedCache.isRestrictedPath(destPid)) {
-                        val result = if (isMove) {
-                            provider.move(sourceFile.providerId, destPid, sourceFile.name)
-                        } else if (!sourceFile.isDirectory) {
-                            provider.copy(sourceFile.providerId, destPid, sourceFile.name)
-                        } else null
+                        val destChild = provider.findChild(destPid, sourceFile.name)
+                        if (destChild == null) {
+                            val result = if (isMove) {
+                                provider.move(sourceFile.providerId, destPid, sourceFile.name)
+                            } else if (!sourceFile.isDirectory) {
+                                provider.copy(sourceFile.providerId, destPid, sourceFile.name)
+                            } else null
 
-                        if (result != null) {
-                            pastedFileNames.add(sourceFile.name)
-                            pasteLog.add(sourceFile.providerId to result.providerId)
-                            if (isMove) movedPaths.add(sourceFile.providerId)
-                            if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
-                            withContext(Dispatchers.Main) {
-                                FileOperationsManager.itemsProcessed.intValue = i + 1
+                            if (result != null) {
+                                pastedFileNames.add(sourceFile.name)
+                                pasteLog.add(sourceFile.providerId to result.providerId)
+                                if (isMove) movedPaths.add(sourceFile.providerId)
+                                if (!sourceFile.isDirectory) globalBytesCopied += sourceFile.length
+                                withContext(Dispatchers.Main) {
+                                    FileOperationsManager.itemsProcessed.intValue = i + 1
+                                }
+                                continue
                             }
-                            continue
                         }
                     }
                 }

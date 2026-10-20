@@ -1107,8 +1107,26 @@ fun CollisionContent() {
         ) {
             TextButton(onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.CANCEL, false) }) { Text(stringResource(R.string.cancel)) }
             if (isDirectory) {
-                Button(onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.MERGE, rememberSelection) }) {
+                Button(
+                    onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.MERGE, rememberSelection) },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
                     Text(stringResource(R.string.conflict_merge))
+                }
+            } else {
+                Button(
+                    onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.REPLACE, rememberSelection) },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(stringResource(R.string.conflict_replace))
                 }
             }
             Button(
@@ -1118,14 +1136,6 @@ fun CollisionContent() {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) { Text(stringResource(R.string.conflict_keep_both)) }
-            Button(
-                onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.REPLACE, rememberSelection) },
-                modifier = Modifier.focusRequester(focusRequester),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) { Text(stringResource(R.string.conflict_replace)) }
         }
     }
 }
