@@ -125,8 +125,8 @@ suspend fun pasteFromClipboard(
     val firstPendingUriStr = if (PendingCut.files.isNotEmpty()) getUriForUniversalFile(context, PendingCut.files[0])?.toString() else null
     val usePendingCut = PendingCut.files.isNotEmpty() &&
             PendingCut.files.size == totalCount &&
-            firstClipUriStr != null && firstPendingUriStr != null &&
-            (firstClipUriStr == firstPendingUriStr || Uri.decode(firstClipUriStr) == Uri.decode(firstPendingUriStr))
+            (firstClipUriStr == null || firstPendingUriStr == null ||
+             firstClipUriStr == firstPendingUriStr || Uri.decode(firstClipUriStr) == Uri.decode(firstPendingUriStr))
 
     val isMove = usePendingCut && PendingCut.isActive
     val destSafDoc = if (currentSafUri != null) DocumentFile.fromTreeUri(context, currentSafUri) else null
@@ -210,9 +210,31 @@ suspend fun pasteFromClipboard(
                     isDir = f.isDirectory
                     fileRef = f
                 } else if (sourceUri.scheme == "content") {
-                    val mimeType = context.contentResolver.getType(sourceUri)
-                    if (mimeType == DocumentsContract.Document.MIME_TYPE_DIR) {
-                        isDir = true
+                    val localPath = safUriToFilePath(sourceUri)
+                    if (localPath != null) {
+                        val f = File(localPath)
+                        if (f.exists()) {
+                            isDir = f.isDirectory
+                            fileRef = f
+                        }
+                    }
+                    if (!isDir && fileRef == null) {
+                        try {
+                            val mimeType = context.contentResolver.getType(sourceUri)
+                            if (mimeType == DocumentsContract.Document.MIME_TYPE_DIR) {
+                                isDir = true
+                            } else {
+                                context.contentResolver.query(sourceUri, null, null, null, null)?.use { cursor ->
+                                    val mimeIndex = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                                    if (cursor.moveToFirst() && mimeIndex >= 0) {
+                                        val mType = cursor.getString(mimeIndex)
+                                        if (mType == DocumentsContract.Document.MIME_TYPE_DIR) {
+                                            isDir = true
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (_: Exception) {}
                     }
                 }
 

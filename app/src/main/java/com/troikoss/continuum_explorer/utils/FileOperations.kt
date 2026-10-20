@@ -129,13 +129,17 @@ suspend fun copyRecursively(
                 return null
             }
             CollisionResult.REPLACE -> {
-                if (destLocal != null) {
-                    val existingPath = File(destLocal, targetName).absolutePath
-                    LocalProvider.delete(existingPath)
-                } else if (destSaf != null) {
-                    destSaf.findFile(targetName)?.delete()
-                } else if (destProvider != null && destParentId != null) {
-                    destProvider.findChild(destParentId, targetName)?.let { destProvider.delete(it.providerId) }
+                if (!source.isDirectory) {
+                    if (destLocal != null) {
+                        val existingPath = File(destLocal, targetName).absolutePath
+                        LocalProvider.delete(existingPath)
+                    } else if (destSaf != null) {
+                        destSaf.findFile(targetName)?.delete()
+                    } else if (destProvider != null && destParentId != null) {
+                        destProvider.findChild(destParentId, targetName)?.let { destProvider.delete(it.providerId) }
+                    }
+                } else {
+                    currentMerged = true
                 }
             }
             CollisionResult.KEEP_BOTH -> {
@@ -332,7 +336,27 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                         CollisionResult.CANCEL -> return@withContext false
                         CollisionResult.REPLACE -> {
                             val existing = File(fileRef.parentFile, newName)
-                            if (existing.isDirectory) existing.deleteRecursively() else existing.delete()
+                            if (existing.isDirectory && file.isDirectory) {
+                                val copied = copyRecursively(
+                                    context = context ?: SafProvider.appContext(),
+                                    source = file,
+                                    destLocal = existing.parentFile,
+                                    destSaf = null,
+                                    isParentMerged = true,
+                                ) { src, out ->
+                                    val inStream = src.fileRef?.inputStream() ?: src.provider.openInput(src.providerId)
+                                    inStream.use { it.copyTo(out) }
+                                }
+                                if (copied != null) {
+                                    fileRef.deleteRecursively()
+                                    fileRef.parentFile?.let { p -> UndoManager.record(UndoAction.Rename(p, oldName, newName)) }
+                                    return@withContext true
+                                } else return@withContext false
+                            } else if (existing.isDirectory) {
+                                existing.deleteRecursively()
+                            } else {
+                                existing.delete()
+                            }
                         }
                         CollisionResult.KEEP_BOTH -> {
                             targetName = getUniqueName(newName, isDirectory = file.isDirectory) { File(fileRef.parentFile, it).exists() }
@@ -368,7 +392,7 @@ suspend fun renameFile(file: UniversalFile, newName: String, context: Context? =
                 }
 
                 if (success) {
-                    UndoManager.record(UndoAction.Rename(newFile.parentFile, oldName, targetName))
+                    newFile.parentFile?.let { p -> UndoManager.record(UndoAction.Rename(p, oldName, targetName)) }
                     true
                 } else false
             } else if (documentFileRef != null) {

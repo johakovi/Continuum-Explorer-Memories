@@ -28,6 +28,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -63,6 +66,7 @@ import com.troikoss.continuum_explorer.managers.PopupType
 import com.troikoss.continuum_explorer.utils.IconHelper
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.IconTheme
+import com.troikoss.continuum_explorer.managers.WaitResult
 import com.troikoss.continuum_explorer.utils.calculateSizeRecursively
 import com.troikoss.continuum_explorer.utils.getDeletedAt
 import com.troikoss.continuum_explorer.utils.getDeletedFrom
@@ -175,6 +179,86 @@ class PopUpActivity : ComponentActivity() {
 }
 
 @Composable
+fun AdaptiveButtonBar(
+    modifier: Modifier = Modifier,
+    spacing: Dp = 8.dp,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        content = content,
+        modifier = modifier
+    ) { measurables, constraints ->
+        if (measurables.isEmpty()) {
+            return@Layout layout(0, 0) {}
+        }
+
+        val spacingPx = spacing.roundToPx()
+        val intrinsicConstraints = Constraints()
+        val placeables = measurables.map { it.measure(intrinsicConstraints) }
+
+        val totalSpacingAll = (placeables.size - 1) * spacingPx
+        val totalWidthAll = placeables.sumOf { it.width } + totalSpacingAll
+
+        val actionPlaceables = if (placeables.size > 1) placeables.subList(1, placeables.size) else emptyList()
+        val totalSpacingAction = if (actionPlaceables.size > 1) (actionPlaceables.size - 1) * spacingPx else 0
+        val totalWidthAction = actionPlaceables.sumOf { it.width } + totalSpacingAction
+
+        val fitsAllInOneRow = constraints.hasBoundedWidth && totalWidthAll <= constraints.maxWidth
+        val fitsActionInOneRow = constraints.hasBoundedWidth && actionPlaceables.isNotEmpty() && totalWidthAction <= constraints.maxWidth
+
+        if (fitsAllInOneRow) {
+            // State 1: All buttons fit in 1 horizontal row
+            val width = constraints.maxWidth
+            val height = placeables.maxOfOrNull { it.height } ?: 0
+            layout(width, height) {
+                var currentX = width
+                placeables.reversed().forEach { placeable ->
+                    currentX -= placeable.width
+                    placeable.placeRelative(x = currentX, y = (height - placeable.height) / 2)
+                    currentX -= spacingPx
+                }
+            }
+        } else if (fitsActionInOneRow && placeables.size > 2) {
+            // State 2: In-between state — Cancel (placeables[0]) on line 1, main action buttons side-by-side on line 2
+            val cancelPlaceable = placeables[0]
+            val line1Height = cancelPlaceable.height
+            val line2Height = actionPlaceables.maxOfOrNull { it.height } ?: 0
+            val totalHeight = line1Height + spacingPx + line2Height
+            val width = constraints.maxWidth
+
+            layout(width, totalHeight) {
+                // Line 1: Cancel button right-aligned
+                cancelPlaceable.placeRelative(
+                    x = width - cancelPlaceable.width,
+                    y = (line1Height - cancelPlaceable.height) / 2
+                )
+                // Line 2: Action buttons side-by-side, right-aligned
+                var currentX = width
+                val line2Y = line1Height + spacingPx
+                actionPlaceables.reversed().forEach { placeable ->
+                    currentX -= placeable.width
+                    placeable.placeRelative(x = currentX, y = line2Y + (line2Height - placeable.height) / 2)
+                    currentX -= spacingPx
+                }
+            }
+        } else {
+            // State 3: Small screen — All buttons stacked vertically
+            val totalHeight = placeables.sumOf { it.height } + (placeables.size - 1) * spacingPx
+            val width = constraints.maxWidth
+
+            layout(width, totalHeight) {
+                var currentY = 0
+                placeables.forEach { placeable ->
+                    val x = width - placeable.width
+                    placeable.placeRelative(x = x.coerceAtLeast(0), y = currentY)
+                    currentY += placeable.height + spacingPx
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun AddToPlaylistContent(onDismiss: () -> Unit) {
     val playlists = FileOperationsManager.playlistOptions
     val song = FileOperationsManager.songToAddToPlaylist.value
@@ -262,15 +346,12 @@ fun UnresponsiveServerContent(onClose: () -> Unit) {
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-        ) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = {
-                FileOperationsManager.onWaitChoice(com.troikoss.continuum_explorer.managers.WaitResult.CANCEL)
+                FileOperationsManager.onWaitChoice(WaitResult.CANCEL)
                 onClose()
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = {
@@ -282,7 +363,7 @@ fun UnresponsiveServerContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.dialog_wait))
+                Text(stringResource(R.string.dialog_wait), maxLines = 1, softWrap = false)
             }
         }
     }
@@ -849,14 +930,13 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = {
                 FileOperationsManager.onArchiveResult(ArchiveSettings("", CompressionMethod.STORE, CompressionLevel.NORMAL, EncryptionMethod.NONE, null, false, true))
                 onClose()
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
-            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onConfirm,
                 enabled = nameState.text.isNotBlank() && (encryptionMethod == EncryptionMethod.NONE || password.isNotEmpty()),
@@ -866,7 +946,7 @@ fun ArchiveOptionsContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.archive_button))
+                Text(stringResource(R.string.archive_button), maxLines = 1, softWrap = false)
             }
         }
     }
@@ -934,14 +1014,13 @@ fun ExtractOptionsContent(onClose: () -> Unit) {
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = { 
                 FileOperationsManager.onExtractResult(ExtractSettings(false, false, true))
                 onClose() 
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
-            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = { 
                     FileOperationsManager.onExtractResult(ExtractSettings(toSeparateFolder, deleteSource))
@@ -952,7 +1031,7 @@ fun ExtractOptionsContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.extract_button))
+                Text(stringResource(R.string.extract_button), maxLines = 1, softWrap = false)
             }
         }
     }
@@ -999,14 +1078,13 @@ fun PasswordInputContent(onClose: () -> Unit) {
             keyboardActions = KeyboardActions(onDone = { onConfirm() })
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = { 
                 FileOperationsManager.onPasswordResult(null)
                 onClose() 
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
-            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.focusRequester(focusRequester),
@@ -1015,7 +1093,7 @@ fun PasswordInputContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.ok))
+                Text(stringResource(R.string.ok), maxLines = 1, softWrap = false)
             }
         }
     }
@@ -1061,9 +1139,8 @@ fun InputContent(onClose: () -> Unit) {
             keyboardActions = KeyboardActions(onDone = { onConfirm() })
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = onClose) { Text(stringResource(R.string.cancel)) }
-            Spacer(modifier = Modifier.width(8.dp))
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = onClose) { Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false) }
             Button(
                 onClick = onConfirm,
                 enabled = textState.text.isNotBlank(),
@@ -1072,7 +1149,7 @@ fun InputContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(buttonLabel)
+                Text(buttonLabel, maxLines = 1, softWrap = false)
             }
         }
     }
@@ -1100,12 +1177,10 @@ fun CollisionContent() {
             Text(text = stringResource(R.string.conflict_remember), style = MaterialTheme.typography.bodySmall)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            TextButton(onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.CANCEL, false) }) { Text(stringResource(R.string.cancel)) }
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.CANCEL, false) }) {
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
+            }
             if (isDirectory) {
                 Button(
                     onClick = { FileOperationsManager.onCollisionChoice(CollisionResult.MERGE, rememberSelection) },
@@ -1115,7 +1190,7 @@ fun CollisionContent() {
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text(stringResource(R.string.conflict_merge))
+                    Text(stringResource(R.string.conflict_merge), maxLines = 1, softWrap = false)
                 }
             } else {
                 Button(
@@ -1126,7 +1201,7 @@ fun CollisionContent() {
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text(stringResource(R.string.conflict_replace))
+                    Text(stringResource(R.string.conflict_replace), maxLines = 1, softWrap = false)
                 }
             }
             Button(
@@ -1135,7 +1210,7 @@ fun CollisionContent() {
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            ) { Text(stringResource(R.string.conflict_keep_both)) }
+            ) { Text(stringResource(R.string.conflict_keep_both), maxLines = 1, softWrap = false) }
         }
     }
 }
@@ -1160,15 +1235,12 @@ fun MoveCopyContent(onClose: () -> Unit) {
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-        ) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = {
                 FileOperationsManager.onMoveCopyChoice(MoveCopyResult.CANCEL)
                 onClose()
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = {
@@ -1179,7 +1251,7 @@ fun MoveCopyContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.menu_copy))
+                Text(stringResource(R.string.menu_copy), maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = {
@@ -1191,7 +1263,7 @@ fun MoveCopyContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.menu_move))
+                Text(stringResource(R.string.menu_move), maxLines = 1, softWrap = false)
             }
         }
     }
@@ -1213,11 +1285,7 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
         Text(text = stringResource(R.string.delete_confirm_message, itemText), style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(24.dp))
 
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
+        AdaptiveButtonBar(modifier = Modifier.fillMaxWidth()) {
             TextButton(
                 onClick = { 
                     FileOperationsManager.onDeleteChoice(DeleteResult.CANCEL)
@@ -1225,7 +1293,7 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
                 },
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
-                Text(stringResource(R.string.cancel), maxLines = 1)
+                Text(stringResource(R.string.cancel), maxLines = 1, softWrap = false)
             }
             
             Button(
@@ -1237,7 +1305,7 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.delete_recycle_bin), maxLines = 1, fontSize = 13.sp)
+                Text(stringResource(R.string.delete_recycle_bin), maxLines = 1, softWrap = false)
             }
             
             Button(
@@ -1248,7 +1316,7 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.delete_permanently), maxLines = 1, fontSize = 13.sp)
+                Text(stringResource(R.string.delete_permanently), maxLines = 1, softWrap = false)
             }
         }
     }
