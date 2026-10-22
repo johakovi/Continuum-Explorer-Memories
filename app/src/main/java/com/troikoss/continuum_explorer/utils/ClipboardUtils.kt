@@ -114,7 +114,7 @@ suspend fun pasteFromClipboard(
     val pasteLog = mutableListOf<Pair<String, String>>() // For Undo: Source to Dest
     val movedPaths = mutableSetOf<String>() // Track which files were moved vs copied
 
-    val usePendingCut = PendingCut.files.isNotEmpty() && preloadedClipData == null
+    val usePendingCut = PendingCut.files.isNotEmpty()
     val totalCount = if (usePendingCut) PendingCut.files.size else (clipData?.itemCount ?: 0)
 
     if (totalCount == 0) {
