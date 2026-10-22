@@ -71,15 +71,6 @@ _Note: This project is originally forked from [troikoss / Continuum Explorer](ht
 - Customizable tab bar background
 - Customizable UI
 
-
-## Recommended apps and sources
-
-Advanced System Monitor [Pensum](https://github.com/troikoss/Pensum) by troikoss
-
-Office app [Collabora](https://www.collaboraonline.com/collabora-office-android-ios/)
-
-List of other FOSS [apps](https://github.com/offa/android-foss)
-
 ## More languages?
 If you want contribute to adding more languages,
 then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml).
