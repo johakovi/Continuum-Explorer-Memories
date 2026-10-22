@@ -550,6 +550,8 @@
     <string name="msg_archive_remote_unsupported">暂不支持对网络位置进行压缩。</string>
     <string name="msg_remote_trash_skipped">无法将网络文件移至回收站。它们将被永久删除。</string>
     <string name="settings_about">关于</string>
+    <string name="settings_manual">用户手册</string>
+    <string name="settings_manual_desc">打开在线文档和 Wiki</string>
 
     <string name="settings_network_services">网络服务</string>
     <string name="settings_ftp_server">FTP 服务器</string>

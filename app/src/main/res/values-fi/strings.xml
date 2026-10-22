@@ -550,6 +550,8 @@
     <string name="msg_archive_remote_unsupported">Arkistointia ei vielä tueta verkkosijainneissa.</string>
     <string name="msg_remote_trash_skipped">Verkkotiedostoja ei voi siirtää roskakoriin. Ne poistetaan pysyvästi.</string>
     <string name="settings_about">Tietoja</string>
+    <string name="settings_manual">Käyttöohje</string>
+    <string name="settings_manual_desc">Avaa verkko-ohje ja wiki</string>
 
     <string name="shizuku_status">Shizuku-tila</string>
     <string name="shizuku_status_authorized">Valtuutettu</string>

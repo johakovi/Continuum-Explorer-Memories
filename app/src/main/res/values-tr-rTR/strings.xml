@@ -530,6 +530,8 @@
     <string name="msg_archive_remote_unsupported">Arşivleme ağ konumları için henüz desteklenmiyor.</string>
     <string name="msg_remote_trash_skipped">Ağ dosyaları çöp kutusuna taşınamaz.</string>
     <string name="settings_about">Hakkında</string>
+    <string name="settings_manual">Kullanım Kılavuzu</string>
+    <string name="settings_manual_desc">Çevrim içi belgeleri ve vikiyi açın</string>
 
     <string name="shizuku_status">Shizuku Durumu</string>
     <string name="shizuku_status_authorized">Yetkili</string>

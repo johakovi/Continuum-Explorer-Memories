@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
@@ -201,59 +200,17 @@ suspend fun pasteFromClipboard(
             val sourceFile = if (usePendingCut) {
                 PendingCut.files[i]
             } else {
-                val name = getFileName(context, sourceUri)
-                var isDir = false
-                var fileRef: File? = null
-
-                if (sourceUri.scheme == "file") {
-                    val f = File(sourceUri.path ?: "")
-                    isDir = f.isDirectory
-                    fileRef = f
-                } else if (sourceUri.scheme == "content") {
-                    val localPath = safUriToFilePath(sourceUri)
-                    if (localPath != null) {
-                        val f = File(localPath)
-                        if (f.exists()) {
-                            isDir = f.isDirectory
-                            fileRef = f
-                        }
-                    }
-                    if (!isDir && fileRef == null) {
-                        try {
-                            val mimeType = context.contentResolver.getType(sourceUri)
-                            if (mimeType == DocumentsContract.Document.MIME_TYPE_DIR) {
-                                isDir = true
-                            } else {
-                                context.contentResolver.query(sourceUri, null, null, null, null)?.use { cursor ->
-                                    val mimeIndex = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
-                                    if (cursor.moveToFirst() && mimeIndex >= 0) {
-                                        val mType = cursor.getString(mimeIndex)
-                                        if (mType == DocumentsContract.Document.MIME_TYPE_DIR) {
-                                            isDir = true
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (_: Exception) {}
-                    }
-                }
-
-                val docFile = DocumentFile.fromSingleUri(context, sourceUri)
-                if (!isDir && docFile != null && docFile.isDirectory) {
-                    isDir = true
-                }
-
-                if (fileRef != null) {
-                    UniversalFile(
-                        name = name,
-                        isDirectory = isDir,
-                        lastModified = fileRef.lastModified(),
-                        length = fileRef.length(),
-                        provider = LocalProvider,
-                        providerId = fileRef.absolutePath,
-                        parentId = fileRef.parentFile?.absolutePath,
-                    )
+                val resolvedPath = safUriToFilePath(sourceUri)
+                val resolvedFile = if (resolvedPath != null) File(resolvedPath) else null
+                if (resolvedFile != null && resolvedFile.exists()) {
+                    resolvedFile.toUniversal()
                 } else {
+                    val name = getFileName(context, sourceUri)
+                    var isDir = false
+                    val docFile = DocumentFile.fromSingleUri(context, sourceUri)
+                    if (docFile != null && docFile.isDirectory) {
+                        isDir = true
+                    }
                     UniversalFile(
                         name = name,
                         isDirectory = isDir,
@@ -275,9 +232,9 @@ suspend fun pasteFromClipboard(
             try {
                 // Optimization 1: Use direct Move/Copy if it's the SAME connection/provider instance and target doesn't exist
                 val isSameProvider = finalDestProvider != null &&
-                    (sourceFile.provider === finalDestProvider ||
-                     (sourceFile.provider.kind == finalDestProvider.kind &&
-                      sourceFile.provider.connectionId == finalDestProvider.connectionId))
+                        (sourceFile.provider === finalDestProvider ||
+                                (sourceFile.provider.kind == finalDestProvider.kind &&
+                                        sourceFile.provider.connectionId == finalDestProvider.connectionId))
 
                 if (isSameProvider && finalDestParentId != null) {
                     val destChild = finalDestProvider.findChild(finalDestParentId, sourceFile.name)

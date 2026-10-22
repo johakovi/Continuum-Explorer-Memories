@@ -573,6 +573,8 @@
     <string name="msg_archive_remote_unsupported">O arquivamento ainda não é suportado para locais de rede.</string>
     <string name="msg_remote_trash_skipped">Não é possível mover arquivos de rede para a lixeira. Eles serão excluídos permanentemente.</string>
     <string name="settings_about">Sobre</string>
+    <string name="settings_manual">Manual do usuário</string>
+    <string name="settings_manual_desc">Abrir a documentação online e a wiki</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistema e Bateria</string>

@@ -549,6 +549,8 @@
     <string name="msg_archive_remote_unsupported">Archivierung wird noch nicht unterstützt für Netzwerk.</string>
     <string name="msg_remote_trash_skipped">Netzwerkdateien können nicht in den Papierkorb verschoben werden.</string>
     <string name="settings_about">Über</string>
+    <string name="settings_manual">Benutzerhandbuch</string>
+    <string name="settings_manual_desc">Online-Dokumentation und Wiki öffnen</string>
 
     <string name="shizuku_status">Shizuku-Status</string>
     <string name="shizuku_status_authorized">Autorisiert</string>

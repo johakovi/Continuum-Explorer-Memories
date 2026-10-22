@@ -212,7 +212,7 @@ object SettingsManager {
     private val _ftpInactivityTimeout = mutableIntStateOf(5)
     val ftpInactivityTimeout: State<Int> = _ftpInactivityTimeout
 
-    private val _appInactivityTimeout = mutableIntStateOf(5)
+    private val _appInactivityTimeout = mutableIntStateOf(0)
     val appInactivityTimeout: State<Int> = _appInactivityTimeout
 
     private val _galleryFolders = mutableStateOf(setOf<String>())
@@ -420,7 +420,7 @@ object SettingsManager {
         _isFtpShareGamesEnabled.value = prefs.getBoolean(KEY_FTP_SHARE_GAME_SAVES, false)
         
         _ftpInactivityTimeout.intValue = prefs.getInt(KEY_FTP_INACTIVITY_TIMEOUT, 5)
-        _appInactivityTimeout.intValue = prefs.getInt(KEY_APP_INACTIVITY_TIMEOUT, 5)
+        _appInactivityTimeout.intValue = prefs.getInt(KEY_APP_INACTIVITY_TIMEOUT, 0)
 
         _galleryFolders.value = prefs.getStringSet(KEY_GALLERY_FOLDERS, emptySet()) ?: emptySet()
         _isGalleryFilterEnabled.value = prefs.getBoolean(KEY_GALLERY_FILTER_ENABLED, false)

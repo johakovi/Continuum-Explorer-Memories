@@ -573,6 +573,8 @@
     <string name="msg_archive_remote_unsupported">El archivado aún no es compatible con ubicaciones de red.</string>
     <string name="msg_remote_trash_skipped">No se pueden mover los archivos de red a la papelera. Se eliminarán permanentemente.</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_manual">Manual de usuario</string>
+    <string name="settings_manual_desc">Abrir la documentación en línea y la wiki</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistema y batería</string>

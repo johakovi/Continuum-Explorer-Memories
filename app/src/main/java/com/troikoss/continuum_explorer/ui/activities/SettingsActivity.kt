@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Done
@@ -77,6 +78,7 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val deleteBehavior = SettingsManager.deleteBehavior.value
     val touchDragBehavior = SettingsManager.touchDragBehavior.value
@@ -674,6 +676,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.clickable { showShortcutsDialog = true }
             )
 
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_manual)) },
+                supportingContent = { Text(stringResource(R.string.settings_manual_desc)) },
+                leadingContent = { Icon(Icons.Default.Book, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories/wiki")
+                }
+            )
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_about)) },

@@ -271,24 +271,42 @@ suspend fun copyRecursively(
 }
 
 /**
- * Decodes an ExternalStorageProvider document URI to an absolute file path.
+ * Decodes an ExternalStorageProvider document URI or FileProvider URI to an absolute file path.
  * Returns null if the URI cannot be decoded (e.g. non-primary volume, different provider).
  */
 fun safUriToFilePath(uri: Uri): String? {
     val docId = try {
         DocumentsContract.getDocumentId(uri)
-    } catch (_: Exception) { return null }
-    if (docId.startsWith("/")) return docId
-    val colon = docId.indexOf(':')
-    if (colon < 0) return null
-    val volume = docId.substring(0, colon)
-    val relative = docId.substring(colon + 1)
-    val root = if (volume.equals("primary", ignoreCase = true)) {
-        Environment.getExternalStorageDirectory().absolutePath
-    } else {
-        "/storage/$volume"
+    } catch (_: Exception) { null }
+
+    if (docId != null) {
+        if (docId.startsWith("/")) return docId
+        val colon = docId.indexOf(':')
+        if (colon >= 0) {
+            val volume = docId.substring(0, colon)
+            val relative = docId.substring(colon + 1)
+            val root = if (volume.equals("primary", ignoreCase = true)) {
+                Environment.getExternalStorageDirectory().absolutePath
+            } else {
+                "/storage/$volume"
+            }
+            return "$root/$relative"
+        }
     }
-    return "$root/$relative"
+
+    val path = uri.path
+    if (path != null) {
+        val relative = when {
+            path.startsWith("/external_files") -> path.removePrefix("/external_files")
+            path.startsWith("/root") -> path.removePrefix("/root")
+            else -> path
+        }
+        val f = File(Environment.getExternalStorageDirectory(), relative)
+        if (f.exists()) return f.absolutePath
+        val directFile = File(path)
+        if (directFile.exists()) return directFile.absolutePath
+    }
+    return null
 }
 
 /**
@@ -599,7 +617,7 @@ suspend fun createFile(
                 }
                 val newFile = parentDoc.createFile("text/plain", targetName)
                 if (newFile != null && content.isNotEmpty()) {
-                    context.contentResolver.openOutputStream(newFile.uri)?.use { 
+                    context.contentResolver.openOutputStream(newFile.uri)?.use {
                         it.write(content.toByteArray())
                     }
                 }

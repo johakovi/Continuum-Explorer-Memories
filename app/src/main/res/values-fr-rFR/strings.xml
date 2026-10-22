@@ -549,6 +549,8 @@
     <string name="msg_archive_remote_unsupported">L\'archivage n\'est pas encore pris en charge pour les emplacements réseau.</string>
     <string name="msg_remote_trash_skipped">Impossible de déplacer les fichiers réseau vers la corbeille. Ils seront supprimés définitivement.</string>
     <string name="settings_about">À propos</string>
+    <string name="settings_manual">Manuel d\'utilisation</string>
+    <string name="settings_manual_desc">Ouvrir la documentation en ligne et le wiki</string>
 
     <string name="shizuku_status">État de Shizuku</string>
     <string name="shizuku_status_authorized">Autorisé</string>

@@ -549,6 +549,8 @@
     <string name="msg_archive_remote_unsupported">Архивация в сети пока не поддерживается.</string>
     <string name="msg_remote_trash_skipped">Нельзя переместить сетевые файлы в корзину.</string>
     <string name="settings_about">О приложении</string>
+    <string name="settings_manual">Руководство пользователя</string>
+    <string name="settings_manual_desc">Открыть онлайн-документацию и вики</string>
 
     <string name="shizuku_status">Статус Shizuku</string>
     <string name="shizuku_status_authorized">Авторизовано</string>

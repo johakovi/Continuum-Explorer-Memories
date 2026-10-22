@@ -553,6 +553,8 @@
     <string name="msg_archive_remote_unsupported">Archiving is not yet supported for network locations.</string>
     <string name="msg_remote_trash_skipped">Can\'t move network files to trash. They will be deleted permanently.</string>
     <string name="settings_about">About</string>
+    <string name="settings_manual">User Manual</string>
+    <string name="settings_manual_desc">Open the online documentation and wiki</string>
 
     <string name="settings_network_services">Network Services</string>
     <string name="settings_ftp_server">FTP Server</string>
