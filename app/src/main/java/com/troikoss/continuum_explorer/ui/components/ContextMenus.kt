@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.ui.components
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
+import com.troikoss.continuum_explorer.utils.PendingCut
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -126,7 +127,7 @@ fun ItemContextMenu(
 
     LaunchedEffect(expanded) {
         if (expanded) {
-            hasClipboardItems = clipboard.hasPrimaryClip()
+            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
         } else {
             currentScreen = "MAIN"
         }
@@ -501,7 +502,7 @@ fun BackgroundContextMenu(
 
     LaunchedEffect(expanded) {
         if (expanded) {
-            hasClipboardItems = clipboard.hasPrimaryClip()
+            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
         }
     }
 

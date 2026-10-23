@@ -283,7 +283,7 @@ object FileOperationsManager {
         isQueueRunning = true
         managerScope.launch {
             while (operationQueue.isNotEmpty()) {
-                val op = operationQueue.first()
+                val op = operationQueue.firstOrNull() ?: break
                 start()
                 currentOperationType.value = op.type
                 try {
@@ -294,7 +294,9 @@ object FileOperationsManager {
                 // Ensure finish() was called, but only once per operation
                 if (isOperating.value) finish()
                 
-                operationQueue.removeAt(0)
+                if (operationQueue.isNotEmpty()) {
+                    operationQueue.removeAt(0)
+                }
                 completedOperationsInQueue.intValue++
                 notifyListeners()
             }

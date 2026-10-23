@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.providers
 import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.model.FileMetadata
 import com.troikoss.continuum_explorer.model.ProviderCapabilities
@@ -33,9 +34,19 @@ object SafProvider : StorageProvider {
         isRemote = false,
     )
 
-    private fun docFromId(id: String): DocumentFile? =
-        DocumentFile.fromTreeUri(appContext, Uri.parse(id))
-            ?: DocumentFile.fromSingleUri(appContext, Uri.parse(id))
+    private fun docFromId(id: String): DocumentFile? {
+        if (id.isEmpty()) return null
+        val uri = Uri.parse(id)
+        return try {
+            if (DocumentsContract.isDocumentUri(appContext, uri)) {
+                DocumentFile.fromSingleUri(appContext, uri)
+            } else {
+                DocumentFile.fromTreeUri(appContext, uri) ?: DocumentFile.fromSingleUri(appContext, uri)
+            }
+        } catch (_: Exception) {
+            DocumentFile.fromSingleUri(appContext, uri) ?: DocumentFile.fromTreeUri(appContext, uri)
+        }
+    }
 
     override fun rootId() = ""
 

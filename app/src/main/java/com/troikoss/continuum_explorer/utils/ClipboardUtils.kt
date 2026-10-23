@@ -194,12 +194,12 @@ suspend fun pasteFromClipboard(
         for (i in 0 until totalCount) {
             if (FileOperationsManager.isCancelled.value) break
 
-            val item = clipData?.getItemAt(i)
-            val sourceUri = item?.uri ?: continue
-
-            val sourceFile = if (usePendingCut) {
-                PendingCut.files[i]
+            val sourceFile: UniversalFile = if (usePendingCut) {
+                if (i < PendingCut.files.size) PendingCut.files[i] else continue
             } else {
+                val item = clipData?.getItemAt(i) ?: continue
+                val sourceUri = item.uri ?: continue
+
                 val resolvedPath = safUriToFilePath(sourceUri)
                 val resolvedFile = if (resolvedPath != null) File(resolvedPath) else null
                 if (resolvedFile != null && resolvedFile.exists()) {
@@ -305,12 +305,16 @@ suspend fun pasteFromClipboard(
                             val archiveSource: Any = if (rootId.startsWith("/")) File(rootId) else Uri.parse(rootId)
                             ZipUtils.getArchiveInputStream(context, archiveSource, src.archivePath ?: "")
                         } else null
-                    } else if (src.fileRef != null && !RestrictedCache.isRestrictedPath(src.providerId)) {
+                    } else if (src.provider is SafProvider || src.documentFileRef != null) {
+                        try {
+                            context.contentResolver.openInputStream(Uri.parse(src.providerId))
+                        } catch (_: Exception) {
+                            src.provider.openInput(src.providerId)
+                        }
+                    } else if (src.fileRef != null && src.fileRef!!.canRead() && !RestrictedCache.isRestrictedPath(src.providerId)) {
                         src.fileRef!!.inputStream()
-                    } else if (src.documentFileRef != null) {
-                        context.contentResolver.openInputStream(src.documentFileRef!!.uri)
                     } else {
-                        try { src.provider.openInput(src.providerId) } catch (_: Exception) { null }
+                        src.provider.openInput(src.providerId)
                     }
 
                     if (inputStream != null) {

@@ -251,13 +251,15 @@ suspend fun copyRecursively(
         } else null
 
         if (outputStream != null) {
+            var copySuccess = false
             try {
                 onCopyFile(source, outputStream)
+                copySuccess = true
             } catch (e: Exception) {
-                throw e
+                e.printStackTrace()
             } finally {
                 try { outputStream.close() } catch (_: Exception) {}
-                if (FileOperationsManager.isCancelled.value) {
+                if (!copySuccess || FileOperationsManager.isCancelled.value) {
                     if (destLocal != null) {
                         LocalProvider.delete(File(destLocal, targetName).absolutePath)
                     } else if (destSaf != null) {
@@ -265,6 +267,7 @@ suspend fun copyRecursively(
                     }
                 }
             }
+            if (!copySuccess) return null
         }
     }
     return targetName

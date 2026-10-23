@@ -42,6 +42,7 @@ import okio.BufferedSink
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
 import com.troikoss.continuum_explorer.managers.WaitResult
 import okhttp3.Call
+import java.net.URLDecoder
 
 class WebDavProvider(
     private val connection: NetworkConnection,
@@ -407,10 +408,11 @@ class WebDavProvider(
     fun pathOf(id: String): String = id.removePrefix("webdav://${connection.id}").ifEmpty { "/" }
 
     private fun urlOf(id: String): HttpUrl {
-        val path = pathOf(id)
+        val rawPath = pathOf(id)
+        val decodedPath = try { URLDecoder.decode(rawPath, "UTF-8") } catch (_: Exception) { rawPath }
         return baseUrl.newBuilder().apply {
-            path.split("/").filter { it.isNotEmpty() }.forEach { addPathSegment(it) }
-            if (path.endsWith("/")) addPathSegment("")
+            decodedPath.split("/").filter { it.isNotEmpty() }.forEach { addPathSegment(it) }
+            if (decodedPath.endsWith("/")) addPathSegment("")
         }.build()
     }
 

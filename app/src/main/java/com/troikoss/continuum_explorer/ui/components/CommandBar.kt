@@ -2,6 +2,8 @@ package com.troikoss.continuum_explorer.ui.components
 
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
+import com.troikoss.continuum_explorer.utils.PendingCut
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -98,8 +100,9 @@ fun CommandBar(
     val canRedo by UndoManager.canRedo
 
     val context = LocalContext.current
+    val pendingFiles = PendingCut.files
     val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
-    var hasClipboardItems by remember { mutableStateOf(clipboard.hasPrimaryClip()) }
+    var hasClipboardItems by remember { mutableStateOf(clipboard.hasPrimaryClip() || pendingFiles.isNotEmpty()) }
 
     val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.Music)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
@@ -107,9 +110,13 @@ fun CommandBar(
     val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInMusic = appState.libraryItem == LibraryItem.Music
 
+    LaunchedEffect(pendingFiles.size, clipboard.hasPrimaryClip()) {
+        hasClipboardItems = clipboard.hasPrimaryClip() || pendingFiles.isNotEmpty()
+    }
+
     DisposableEffect(clipboard) {
         val listener = ClipboardManager.OnPrimaryClipChangedListener {
-            hasClipboardItems = clipboard.hasPrimaryClip()
+            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
         }
         clipboard.addPrimaryClipChangedListener(listener)
         onDispose {
