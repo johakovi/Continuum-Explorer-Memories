@@ -441,9 +441,7 @@ private fun NavigationContent(
 ) {
     val context = LocalContext.current
     val appearance = appState.getUIAppearance()
-    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
-    val isPhonePortrait = appearance == UIAppearance.PHONE && isPortrait
+    val isPhone = appearance == UIAppearance.PHONE
 
     NavigationPane(
         modifier = modifier,
@@ -461,8 +459,8 @@ private fun NavigationContent(
         onEditNetworkClick = onEditNetwork,
         onNavigate = onCloseDrawer,
         widthProvider = {
-            // Force expanded mode in Phone Portrait to prevent minimized sidebar in the modal drawer
-            if (isPhonePortrait) 300.dp else appState.appConfigs.navPaneWidth
+            // Force expanded mode in Phone UI to prevent minimized sidebar
+            if (isPhone) 300.dp else appState.appConfigs.navPaneWidth
         },
         isInWindowMode = isInWindowMode
     )
@@ -533,8 +531,10 @@ private fun ExplorerBody(
 ) {
     val context = LocalContext.current
     val screenSize = appState.getScreenSize()
+    val appearance = appState.getUIAppearance()
+    val isPhone = appearance == UIAppearance.PHONE
     var isResizingNav by remember { mutableStateOf(false) }
-    val rawNavPaneWidth = appState.appConfigs.navPaneWidth
+    val rawNavPaneWidth = if (isPhone) 300.dp else appState.appConfigs.navPaneWidth
     val navPaneWidth by androidx.compose.animation.core.animateDpAsState(
         targetValue = rawNavPaneWidth,
         label = "NavPaneWidthAnimation",
@@ -592,40 +592,50 @@ private fun ExplorerBody(
                             widthProvider = { navPaneWidth },
                             isInWindowMode = isInWindowMode,
                             onResize = { delta ->
-                                appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
-                            },
-                            onResizeStarted = { isResizingNav = true },
-                            onResizeFinished = {
-                                isResizingNav = false
-                                val currentWidth = appState.appConfigs.navPaneWidth
-                                if (currentWidth > 80.dp && currentWidth < 160.dp) {
-                                    appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                                if (!isPhone) {
+                                    appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
                                 }
-                                appState.appConfigs.savePaneWidths()
+                            },
+                            onResizeStarted = {
+                                if (!isPhone) {
+                                    isResizingNav = true
+                                }
+                            },
+                            onResizeFinished = {
+                                if (!isPhone) {
+                                    isResizingNav = false
+                                    val currentWidth = appState.appConfigs.navPaneWidth
+                                    if (currentWidth > 80.dp && currentWidth < 160.dp) {
+                                        appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                                    }
+                                    appState.appConfigs.savePaneWidths()
+                                }
                             }
                         )
                     }
                 }
-                VerticalResizeHandle(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(16.dp) // The "empty space" resizing area
-                        .navigationBarsPadding()
-                        .padding(bottom = 8.dp),
-                    showDivider = !contentIsRounded,
-                    onResizeStarted = { isResizingNav = true },
-                    onResize = { delta ->
-                        appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
-                    },
-                    onResizeFinished = {
-                        isResizingNav = false
-                        val currentWidth = appState.appConfigs.navPaneWidth
-                        if (currentWidth > 80.dp && currentWidth < 160.dp) {
-                            appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                if (!isPhone) {
+                    VerticalResizeHandle(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(16.dp) // The "empty space" resizing area
+                            .navigationBarsPadding()
+                            .padding(bottom = 8.dp),
+                        showDivider = !contentIsRounded,
+                        onResizeStarted = { isResizingNav = true },
+                        onResize = { delta ->
+                            appState.appConfigs.navPaneWidth = (appState.appConfigs.navPaneWidth + delta).coerceIn(80.dp, 320.dp)
+                        },
+                        onResizeFinished = {
+                            isResizingNav = false
+                            val currentWidth = appState.appConfigs.navPaneWidth
+                            if (currentWidth > 80.dp && currentWidth < 160.dp) {
+                                appState.appConfigs.navPaneWidth = if (currentWidth < 125.dp) 80.dp else 220.dp
+                            }
+                            appState.appConfigs.savePaneWidths()
                         }
-                        appState.appConfigs.savePaneWidths()
-                    }
-                )
+                    )
+                }
             }
 
             // Main Content Area
