@@ -533,6 +533,9 @@
     <string name="settings_about">Hakkında</string>
     <string name="settings_manual">Kullanım Kılavuzu</string>
     <string name="settings_manual_desc">Çevrim içi belgeleri ve vikiyi açın</string>
+    <string name="settings_donate">Bağış Yap</string>
+    <string name="settings_donate_desc">Geliştiriciye bağış yaparak projenin sürdürülmesine yardımcı olun &lt;3</string>
+    <string name="settings_report_bug">Hata Bildir</string>
 
     <string name="shizuku_status">Shizuku Durumu</string>
     <string name="shizuku_status_authorized">Yetkili</string>

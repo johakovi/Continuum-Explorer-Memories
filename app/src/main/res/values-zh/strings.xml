@@ -553,6 +553,9 @@
     <string name="settings_about">关于</string>
     <string name="settings_manual">用户手册</string>
     <string name="settings_manual_desc">打开在线文档和 Wiki</string>
+    <string name="settings_donate">捐赠</string>
+    <string name="settings_donate_desc">通过向开发者捐赠来帮助维护项目 &lt;3</string>
+    <string name="settings_report_bug">报告错误</string>
 
     <string name="settings_network_services">网络服务</string>
     <string name="settings_ftp_server">FTP 服务器</string>

@@ -553,6 +553,9 @@
     <string name="settings_about">Om</string>
     <string name="settings_manual">Användarmanual</string>
     <string name="settings_manual_desc">Öppna onlinedokumentationen och wikin</string>
+    <string name="settings_donate">Donera</string>
+    <string name="settings_donate_desc">Hjälp till att underhålla projektet genom att donera till utvecklaren &lt;3</string>
+    <string name="settings_report_bug">Rapportera en bugg</string>
 
     <string name="shizuku_status">Shizuku-status</string>
     <string name="shizuku_status_authorized">Auktoriserad</string>

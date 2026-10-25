@@ -25,13 +25,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -588,6 +592,12 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.shizuku_status)) },
+                leadingContent = {
+                    Icon(
+                        imageVector = if (hasShizukuPermission) Icons.Default.LockOpen else Icons.Default.Lock,
+                        contentDescription = null
+                    )
+                },
                 supportingContent = {
                     Text(
                         when {
@@ -676,6 +686,25 @@ fun SettingsScreen(onBack: () -> Unit) {
                 leadingContent = { Icon(Icons.Default.Book, contentDescription = null) },
                 modifier = Modifier.clickable {
                     uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories/wiki")
+                }
+            )
+
+
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_report_bug)) },
+                leadingContent = { Icon(Icons.Default.BugReport, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    uriHandler.openUri("https://github.com/johakovi/Continuum-Explorer-Memories/issues/new/choose")
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_donate)) },
+                supportingContent = { Text(stringResource(R.string.settings_donate_desc)) },
+                leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    uriHandler.openUri("https://ko-fi.com/johakovi/tip")
                 }
             )
 

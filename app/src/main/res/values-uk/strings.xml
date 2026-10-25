@@ -552,6 +552,9 @@
     <string name="settings_about">Про програму</string>
     <string name="settings_manual">Посібник користувача</string>
     <string name="settings_manual_desc">Відкрити онлайн-документацію та вікі</string>
+    <string name="settings_donate">Пожертвувати</string>
+    <string name="settings_donate_desc">Допоможіть підтримати проєкт, зробивши пожертву розробнику &lt;3</string>
+    <string name="settings_report_bug">Повідомити про помилку</string>
 
     <string name="shizuku_status">Статус Shizuku</string>
     <string name="shizuku_status_authorized">Авторизовано</string>

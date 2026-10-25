@@ -552,6 +552,9 @@
     <string name="settings_about">정보</string>
     <string name="settings_manual">사용자 설명서</string>
     <string name="settings_manual_desc">온라인 설명서 및 위키 열기</string>
+    <string name="settings_donate">후원하기</string>
+    <string name="settings_donate_desc">개발자 후원을 통해 프로젝트 유지보수를 도와주세요 &lt;3</string>
+    <string name="settings_report_bug">버그 신고</string>
 
     <string name="shizuku_status">Shizuku 상태</string>
     <string name="shizuku_status_authorized">권한 부여됨</string>

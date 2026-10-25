@@ -552,6 +552,9 @@
     <string name="settings_about">Über</string>
     <string name="settings_manual">Benutzerhandbuch</string>
     <string name="settings_manual_desc">Online-Dokumentation und Wiki öffnen</string>
+    <string name="settings_donate">Spenden</string>
+    <string name="settings_donate_desc">Helfen Sie mit, das Projekt durch eine Spende an den Entwickler zu unterstützen &lt;3</string>
+    <string name="settings_report_bug">Fehler melden</string>
 
     <string name="shizuku_status">Shizuku-Status</string>
     <string name="shizuku_status_authorized">Autorisiert</string>

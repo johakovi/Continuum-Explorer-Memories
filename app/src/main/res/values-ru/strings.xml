@@ -552,6 +552,9 @@
     <string name="settings_about">О приложении</string>
     <string name="settings_manual">Руководство пользователя</string>
     <string name="settings_manual_desc">Открыть онлайн-документацию и вики</string>
+    <string name="settings_donate">Пожертвовать</string>
+    <string name="settings_donate_desc">Помогите поддержать проект, сделав пожертвование разработчику &lt;3</string>
+    <string name="settings_report_bug">Сообщить об ошибке</string>
 
     <string name="shizuku_status">Статус Shizuku</string>
     <string name="shizuku_status_authorized">Авторизовано</string>

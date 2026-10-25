@@ -576,6 +576,9 @@
     <string name="settings_about">Acerca de</string>
     <string name="settings_manual">Manual de usuario</string>
     <string name="settings_manual_desc">Abrir la documentación en línea y la wiki</string>
+    <string name="settings_donate">Donar</string>
+    <string name="settings_donate_desc">Ayuda a mantener el proyecto donando al desarrollador &lt;3</string>
+    <string name="settings_report_bug">Informar de un error</string>
 
     <!-- Inactivity Settings -->
     <string name="settings_system">Sistema y batería</string>

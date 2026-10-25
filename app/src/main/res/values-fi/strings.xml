@@ -553,6 +553,9 @@
     <string name="settings_about">Tietoja</string>
     <string name="settings_manual">Käyttöohje</string>
     <string name="settings_manual_desc">Avaa verkko-ohje ja wiki</string>
+    <string name="settings_donate">Lahjoita</string>
+    <string name="settings_donate_desc">Auta ylläpitämään projektia lahjoittamalla kehittäjälle &lt;3</string>
+    <string name="settings_report_bug">Ilmoita virheestä</string>
 
     <string name="shizuku_status">Shizuku-tila</string>
     <string name="shizuku_status_authorized">Valtuutettu</string>
