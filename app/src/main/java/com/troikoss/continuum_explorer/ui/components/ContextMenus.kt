@@ -335,6 +335,15 @@ fun ItemContextMenu(
                     trailingIcon = { CtrlShortcut("C") }
                 )
 
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_copy_to_terminal)) },
+                    onClick = {
+                        appState.copyTerminalPath()
+                        onDismiss()
+                    },
+                    leadingIcon = { Icon(Icons.Default.Terminal, null) }
+                )
+
                 if (hasClipboardItems && (!isInVirtualStorage || isInGalleryOrVideos)) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.menu_paste)) },
@@ -593,6 +602,17 @@ fun BackgroundContextMenu(
                         onClick = {
                             onDismiss()
                             openInTermux(context, appState.currentPath!!.absolutePath)
+                        }
+                    )
+                }
+
+                if (appState.currentPath != null) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_copy_to_terminal)) },
+                        leadingIcon = { Icon(Icons.Default.Terminal, null) },
+                        onClick = {
+                            appState.copyTerminalPath()
+                            onDismiss()
                         }
                     )
                 }

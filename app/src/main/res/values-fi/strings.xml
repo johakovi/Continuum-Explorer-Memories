@@ -275,6 +275,7 @@
     <string name="menu_compress">Pakkaa…</string>
     <string name="menu_cut">Leikkaa</string>
     <string name="menu_copy">Kopioi</string>
+    <string name="menu_copy_to_terminal">Kopioi terminaaliin</string>
     <string name="menu_paste">Liitä</string>
     <string name="menu_rename">Nimeä uudelleen</string>
     <string name="menu_share">Jaa</string>

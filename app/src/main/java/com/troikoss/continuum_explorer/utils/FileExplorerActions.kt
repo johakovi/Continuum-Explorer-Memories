@@ -135,6 +135,15 @@ fun FileExplorerState.copySelection() {
     copyToClipboard(context, selectionManager.selectedItems.toList())
 }
 
+fun FileExplorerState.copyTerminalPath() {
+    val items = selectionManager.selectedItems.toList()
+    if (items.isNotEmpty()) {
+        copyTerminalPathToClipboard(context, items)
+    } else if (currentPath != null) {
+        copyTerminalPathToClipboard(context, listOf(currentPath!!.absolutePath))
+    }
+}
+
 fun FileExplorerState.cutSelection() {
     cutToClipboard(context, selectionManager.selectedItems.toList())
 }

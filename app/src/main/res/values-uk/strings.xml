@@ -275,6 +275,7 @@
     <string name="menu_compress">Стиснути…</string>
     <string name="menu_cut">Вирізати</string>
     <string name="menu_copy">Копіювати</string>
+    <string name="menu_copy_to_terminal">Копіювати для термінала</string>
     <string name="menu_paste">Вставити</string>
     <string name="menu_rename">Перейменувати</string>
     <string name="menu_share">Поділитися</string>

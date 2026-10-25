@@ -76,6 +76,35 @@ fun cutToClipboard(context: Context, files: List<UniversalFile>) {
     PendingCut.isActive = true
 }
 
+/**
+ * Copies formatted file/directory paths to the system clipboard for terminal use.
+ * Format: 'path/to/something' with a space appended at the end.
+ */
+fun copyTerminalPathToClipboard(context: Context, paths: List<String>) {
+    if (paths.isEmpty()) return
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val formattedText = paths.joinToString(" ") { path ->
+        val escapedPath = path.replace("'", "'\\''")
+        "'$escapedPath'"
+    } + " "
+
+    val clipData = ClipData.newPlainText("Terminal Path", formattedText)
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            clipboard.clearPrimaryClip()
+        }
+        clipboard.setPrimaryClip(clipData)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+@JvmName("copyTerminalFilesToClipboard")
+fun copyTerminalPathToClipboard(context: Context, files: List<UniversalFile>) {
+    val paths = files.map { it.fileRef?.absolutePath ?: it.absolutePath }
+    copyTerminalPathToClipboard(context, paths)
+}
+
 private fun getFileName(context: Context, uri: Uri): String {
     var result: String? = null
     if (uri.scheme == "content") {

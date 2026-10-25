@@ -263,6 +263,7 @@
     <string name="menu_compress">Sıkıştır…</string>
     <string name="menu_cut">Kes</string>
     <string name="menu_copy">Kopyala</string>
+    <string name="menu_copy_to_terminal">Terminale kopyala</string>
     <string name="menu_paste">Yapıştır</string>
     <string name="menu_rename">Yeniden Adlandır</string>
     <string name="menu_share">Paylaş</string>

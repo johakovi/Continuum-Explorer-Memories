@@ -276,6 +276,7 @@
     <string name="menu_compress">Compactar…</string>
     <string name="menu_cut">Recortar</string>
     <string name="menu_copy">Copiar</string>
+    <string name="menu_copy_to_terminal">Copiar para o terminal</string>
     <string name="menu_paste">Colar</string>
     <string name="menu_rename">Renomear</string>
     <string name="menu_share">Compartilhar</string>

@@ -275,6 +275,7 @@
     <string name="menu_compress">압축하기…</string>
     <string name="menu_cut">잘라내기</string>
     <string name="menu_copy">복사</string>
+    <string name="menu_copy_to_terminal">터미널용 복사</string>
     <string name="menu_paste">붙여넣기</string>
     <string name="menu_rename">이름 바꾸기</string>
     <string name="menu_share">공유</string>

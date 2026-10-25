@@ -275,6 +275,7 @@
     <string name="menu_compress">Komprimieren…</string>
     <string name="menu_cut">Ausschneiden</string>
     <string name="menu_copy">Kopieren</string>
+    <string name="menu_copy_to_terminal">In Terminal kopieren</string>
     <string name="menu_paste">Einfügen</string>
     <string name="menu_rename">Umbenennen</string>
     <string name="menu_share">Teilen</string>
