@@ -267,7 +267,12 @@ private fun getHomeItemData(id: String, configs: AppConfigurations, appState: Fi
         "gallery" -> HomeItemData("gallery", stringResource(R.string.nav_gallery), Icons.Default.Image, R.drawable.ic_nav_gallery, R.drawable.ic_nav_gallery_duo, configs.isGalleryVisible, { configs.toggleGalleryVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery) }, extendedColors.galleryIcon)
         "videos" -> HomeItemData("videos", stringResource(R.string.nav_video), Icons.Default.Movie, R.drawable.ic_nav_video, R.drawable.ic_nav_video_duo, configs.isVideosVisible, { configs.toggleVideosVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Videos) }, extendedColors.videoIcon)
         "music" -> HomeItemData("music", stringResource(R.string.nav_music), Icons.Default.MusicNote, R.drawable.ic_nav_music, R.drawable.ic_nav_music_duo, configs.isMusicVisible, { configs.toggleMusicVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Music) }, extendedColors.musicIcon)
-        "downloads" -> HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads) }, extendedColors.downloadsIcon)
+        "downloads" -> HomeItemData("downloads", stringResource(R.string.nav_downloads), Icons.Default.FileDownload, R.drawable.ic_nav_downloads, R.drawable.ic_nav_downloads_duo, configs.isDownloadsVisible, { configs.toggleDownloadsVisibility() }, {
+            val internalRoot = Environment.getExternalStorageDirectory()
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (!downloadsDir.exists()) downloadsDir.mkdirs()
+            appState.navigateTo(downloadsDir, null, newRoot = internalRoot)
+        }, extendedColors.downloadsIcon)
         "documents" -> HomeItemData("documents", stringResource(R.string.nav_documents), Icons.Default.Description, R.drawable.ic_nav_documents, R.drawable.ic_nav_documents_duo, configs.isDocumentsVisible, { configs.toggleDocumentsVisibility() }, {
             if (configs.isDocumentsFolderEnabled) {
                 val internalRoot = Environment.getExternalStorageDirectory()

@@ -95,7 +95,12 @@ fun FileExplorerSQ(
                     item.absolutePath == "virtual://gallery" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Gallery)
                     item.absolutePath == "virtual://videos" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Videos)
                     item.absolutePath == "virtual://music" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Music)
-                    item.absolutePath == "virtual://downloads" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Downloads)
+                    item.absolutePath == "virtual://downloads" -> {
+                        val internalRoot = Environment.getExternalStorageDirectory()
+                        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (!downloadsDir.exists()) downloadsDir.mkdirs()
+                        newState.navigateTo(downloadsDir, null, newRoot = internalRoot, addToHistory = false)
+                    }
                     item.absolutePath == "virtual://documents" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Documents)
                     item.absolutePath == "virtual://games_manager" -> newState.navigateTo(null, null, addToHistory = false, libraryItem = LibraryItem.Games)
                     item.absolutePath == "virtual://recycle_bin" -> {
@@ -715,7 +720,11 @@ private fun navigateToSection(
         is NavSection.Gallery -> appState.navigateTo(null, null, libraryItem = LibraryItem.Gallery)
         is NavSection.Videos -> appState.navigateTo(null, null, libraryItem = LibraryItem.Videos)
         is NavSection.Music -> appState.navigateTo(null, null, libraryItem = LibraryItem.Music)
-        is NavSection.Downloads -> appState.navigateTo(null, null, libraryItem = LibraryItem.Downloads)
+        is NavSection.Downloads -> {
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (!downloadsDir.exists()) downloadsDir.mkdirs()
+            appState.navigateTo(downloadsDir, null, newRoot = Environment.getExternalStorageDirectory())
+        }
         is NavSection.Archives -> appState.navigateTo(null, null, libraryItem = LibraryItem.Archives)
         is NavSection.Apks -> appState.navigateTo(null, null, libraryItem = LibraryItem.Apks)
         is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)

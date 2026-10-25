@@ -63,6 +63,7 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.managers.IconCategory
 import com.troikoss.continuum_explorer.model.NavSection
 import com.troikoss.continuum_explorer.model.NetworkConnection
 import com.troikoss.continuum_explorer.model.NetworkProtocol

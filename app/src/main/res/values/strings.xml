@@ -377,6 +377,7 @@
     <string name="menu_video_show_all">Show All Media</string>
     <string name="menu_documents_folder">Folder</string>
     <string name="menu_documents_show_folders">Show Folders</string>
+    <string name="menu_downloads_show_folders" translatable="false">Show Folders</string>
     <string name="menu_favourite">Favourite</string>
     <string name="nav_add_storage">Add Storage</string>
     <string name="nav_internal_storage">Internal Storage</string>
