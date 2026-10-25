@@ -73,7 +73,7 @@ _Note: This project is originally forked from [troikoss / Continuum Explorer](ht
 
 ## More languages?
 If you want contribute to adding more languages,
-then use this [link (johakovi)](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml).
+then use this [link](https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml).
 
  ## More features?
 Let me know if there is something you want to this app!
