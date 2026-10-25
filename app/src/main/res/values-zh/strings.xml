@@ -580,6 +580,7 @@
     <string name="settings_ftp_inactivity_timeout">FTP 空闲超时</string>
     <string name="settings_app_inactivity_timeout">应用空闲超时</string>
     <string name="settings_timeout_minutes">%1$d 分钟</string>
+    <string name="settings_timeout_hours">%1$d 小时</string>
     <string name="settings_timeout_disabled">从不</string>
 
     <string name="settings_custom_theme">主题自定义</string>

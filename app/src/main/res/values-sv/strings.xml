@@ -581,6 +581,7 @@
     <string name="settings_ftp_inactivity_timeout">FTP Inaktivitetstimeout</string>
     <string name="settings_app_inactivity_timeout">App Inaktivitetstimeout</string>
     <string name="settings_timeout_minutes">%1$d minuter</string>
+    <string name="settings_timeout_hours">%1$d timmar</string>
     <string name="settings_timeout_disabled">Aldrig</string>
     <string name="settings_custom_theme">Temanpassning</string>
     <string name="settings_icon_style">Ikonstil</string>

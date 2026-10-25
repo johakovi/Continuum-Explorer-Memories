@@ -580,6 +580,7 @@
     <string name="settings_ftp_inactivity_timeout">Délai d\'inactivité FTP</string>
     <string name="settings_app_inactivity_timeout">Délai d\'inactivité de l\'application</string>
     <string name="settings_timeout_minutes">%1$d minutes</string>
+    <string name="settings_timeout_hours">%1$d heures</string>
     <string name="settings_timeout_disabled">Jamais</string>
     <string name="settings_custom_theme">Personnalisation du thème</string>
     <string name="settings_icon_style">Style d\'icônes</string>

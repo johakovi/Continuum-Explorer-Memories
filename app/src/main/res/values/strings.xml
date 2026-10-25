@@ -586,6 +586,7 @@
     <string name="settings_ftp_inactivity_timeout">FTP Inactivity Timeout</string>
     <string name="settings_app_inactivity_timeout">App Inactivity Timeout</string>
     <string name="settings_timeout_minutes">%1$d minutes</string>
+    <string name="settings_timeout_hours">%1$d hours</string>
     <string name="settings_timeout_disabled">Never</string>
 
     <string name="settings_custom_theme">Theme customizing</string>

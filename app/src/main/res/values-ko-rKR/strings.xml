@@ -580,6 +580,7 @@
     <string name="settings_ftp_inactivity_timeout">FTP 비활성 시간 제한</string>
     <string name="settings_app_inactivity_timeout">앱 비활성 시간 제한</string>
     <string name="settings_timeout_minutes">%1$d분</string>
+    <string name="settings_timeout_hours">%1$d시간</string>
     <string name="settings_timeout_disabled">사용 안 함</string>
     <string name="settings_custom_theme">테마 사용자 지정</string>
     <string name="settings_icon_style">아이콘 스타일</string>

@@ -569,10 +569,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_ftp_inactivity_timeout)) },
                 supportingContent = {
-                    val text = if (ftpInactivityTimeout > 0)
-                        stringResource(R.string.settings_timeout_minutes, ftpInactivityTimeout)
-                    else stringResource(R.string.settings_timeout_disabled)
-                    Text(text)
+                    Text(formatTimeoutText(ftpInactivityTimeout))
                 },
                 modifier = Modifier.clickable { showFtpTimeoutDialog = true }
             )
@@ -636,10 +633,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 headlineContent = { Text(stringResource(R.string.settings_app_inactivity_timeout)) },
                 leadingContent = { Icon(Icons.Default.HourglassEmpty, contentDescription = null) },
                 supportingContent = { 
-                    val text = if (appInactivityTimeout > 0) 
-                        stringResource(R.string.settings_timeout_minutes, appInactivityTimeout)
-                    else stringResource(R.string.settings_timeout_disabled)
-                    Text(text)
+                    Text(formatTimeoutText(appInactivityTimeout))
                 },
                 modifier = Modifier.clickable { showAppTimeoutDialog = true }
             )
@@ -1635,21 +1629,35 @@ fun SettingsScreen(onBack: () -> Unit) {
 }
 
 @Composable
+fun formatTimeoutText(minutes: Int): String {
+    return when {
+        minutes == 0 -> stringResource(R.string.settings_timeout_disabled)
+        minutes >= 60 && minutes % 60 == 0 -> {
+            if (minutes == 60) {
+                stringResource(R.string.settings_timeout_minutes, minutes)
+            } else {
+                stringResource(R.string.settings_timeout_hours, minutes / 60)
+            }
+        }
+        else -> stringResource(R.string.settings_timeout_minutes, minutes)
+    }
+}
+
+@Composable
 fun TimeoutDialog(
     title: String,
     currentValue: Int,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
-    val options = listOf(0, 1, 2, 5, 10, 30, 60)
+    val options = listOf(0, 1, 2, 5, 10, 30, 60, 120, 300)
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column {
                 options.forEach { minutes ->
-                    val label = if (minutes == 0) stringResource(R.string.settings_timeout_disabled)
-                                else stringResource(R.string.settings_timeout_minutes, minutes)
+                    val label = formatTimeoutText(minutes)
                     OptionItem(
                         label = label,
                         selected = currentValue == minutes,

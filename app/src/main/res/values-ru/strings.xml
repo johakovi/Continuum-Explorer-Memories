@@ -580,6 +580,7 @@
     <string name="settings_ftp_inactivity_timeout">Тайм-аут бездействия FTP</string>
     <string name="settings_app_inactivity_timeout">Тайм-аут бездействия приложения</string>
     <string name="settings_timeout_minutes">%1$d минут</string>
+    <string name="settings_timeout_hours">%1$d часов</string>
     <string name="settings_timeout_disabled">Никогда</string>
     <string name="settings_custom_theme">Настройка темы</string>
     <string name="settings_icon_style">Стиль иконок</string>

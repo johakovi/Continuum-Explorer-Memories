@@ -580,6 +580,7 @@
     <string name="settings_ftp_inactivity_timeout">Таймаут бездіяльності FTP</string>
     <string name="settings_app_inactivity_timeout">Таймаут бездіяльності програми</string>
     <string name="settings_timeout_minutes">%1$d хвилин</string>
+    <string name="settings_timeout_hours">%1$d годин</string>
     <string name="settings_timeout_disabled">Ніколи</string>
 
     <string name="settings_custom_theme">Налаштування теми</string>

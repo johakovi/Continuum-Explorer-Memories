@@ -561,6 +561,7 @@
     <string name="settings_ftp_inactivity_timeout">FTP İnaktivite Zaman Aşımı</string>
     <string name="settings_app_inactivity_timeout">Uygulama İnaktivite Zaman Aşımı</string>
     <string name="settings_timeout_minutes">%1$d dakika</string>
+    <string name="settings_timeout_hours">%1$d saat</string>
     <string name="settings_timeout_disabled">Asla</string>
 
     <string name="settings_custom_theme">Tema Özelleştirme</string>
