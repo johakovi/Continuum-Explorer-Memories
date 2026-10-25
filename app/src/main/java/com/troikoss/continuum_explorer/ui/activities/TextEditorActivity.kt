@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.nativeCanvas
@@ -40,6 +43,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -252,6 +256,7 @@ class TextEditorActivity : ComponentActivity() {
                     } else {
                         val horizontalScrollState = rememberScrollState()
                         val verticalScrollState = rememberScrollState()
+                        val focusRequester = remember { FocusRequester() }
                         val primaryColor = MaterialTheme.colorScheme.primary
 
                         // Latest layout result from the text field itself.
@@ -311,6 +316,14 @@ class TextEditorActivity : ComponentActivity() {
                             pos.y > contentBoxSize.height - edgeThresholdPx
                         } }
 
+                        val visibleWidthDp = with(density) { contentBoxSize.width.toDp() }
+                        val visibleHeightDp = with(density) { contentBoxSize.height.toDp() }
+                        val minEditorWidthDp = (visibleWidthDp - 58.dp).coerceAtLeast(0.dp)
+                        val minEditorHeightDp = (visibleHeightDp - 2.dp).coerceAtLeast(0.dp)
+                        val gutterHeightDp = textLayoutResult?.let { layout ->
+                            with(density) { layout.size.height.toDp() }.coerceAtLeast(minEditorHeightDp)
+                        } ?: minEditorHeightDp
+
                         Surface(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -330,7 +343,7 @@ class TextEditorActivity : ComponentActivity() {
                                 },
                             shape = RoundedCornerShape(16.dp),
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
-    tonalElevation = 2.dp
+                            tonalElevation = 2.dp
                         ) {
                             Box(modifier = Modifier.fillMaxSize()) {
                                 Row(
@@ -344,11 +357,19 @@ class TextEditorActivity : ComponentActivity() {
                                     Box(
                                         modifier = Modifier
                                             .width(48.dp)
-                                            .then(
-                                                textLayoutResult?.let { layout ->
-                                                    Modifier.height(with(density) { layout.size.height.toDp() })
-                                                } ?: Modifier.height(0.dp)
-                                            )
+                                            .height(gutterHeightDp)
+                                            .pointerInput(textLayoutResult, text) {
+                                                detectTapGestures { offset ->
+                                                    focusRequester.requestFocus()
+                                                    val layout = textLayoutResult ?: return@detectTapGestures
+                                                    if (layout.lineCount > 0) {
+                                                        val line = layout.getLineForVerticalPosition(offset.y)
+                                                            .coerceIn(0, layout.lineCount - 1)
+                                                        val charOffset = layout.getLineStart(line)
+                                                        textState = textState.copy(selection = TextRange(charOffset))
+                                                    }
+                                                }
+                                            }
                                     ) {
                                         Canvas(modifier = Modifier.fillMaxSize()) {
                                             val layout = textLayoutResult ?: return@Canvas
@@ -429,8 +450,9 @@ class TextEditorActivity : ComponentActivity() {
                                             value = textState,
                                             onValueChange = { textState = it },
                                             modifier = Modifier
-                                                .width(IntrinsicSize.Max)
-                                                .height(IntrinsicSize.Min),
+                                                .focusRequester(focusRequester)
+                                                .widthIn(min = minEditorWidthDp)
+                                                .heightIn(min = minEditorHeightDp),
                                             textStyle = editorStyle,
                                             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                                             visualTransformation = searchTransformation,
