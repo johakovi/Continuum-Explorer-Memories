@@ -14,6 +14,8 @@ _Note: This project was originally forked from [troikoss / Continuum Explorer](h
 [<img width="200" alt="badge_github" src="https://github.com/user-attachments/assets/787645c4-7de6-40f7-b76a-0c2a751811b6" />](https://github.com/johakovi/Continuum-Explorer-Memories/releases) 
 [<img width="200" alt="badge_obtainium" src="https://github.com/user-attachments/assets/bf1da4c3-50e3-42ea-b0a3-66d74128138b" />](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/johakovi/Continuum-Explorer-Memories)
 
+[<img width="200" alt="badge_orion_store" src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" />](https://rookieenough.github.io/Orion-Data/app/?id=continuum-explorer-memories)
+
 
 ## Screenshots
 ### Phone
@@ -28,10 +30,11 @@ _Note: This project was originally forked from [troikoss / Continuum Explorer](h
  ### Tablet/desktop
 
  <img width="368" alt="Screen_Recording_20260711_094754_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/3d779cc2-0390-478a-b6c3-432ca447ada0" /> 
- <img width="368" alt="Screenshot_20260731_182254_Continuum Explorer" src="https://github.com/user-attachments/assets/736193b3-ab52-4540-8368-32a29f9e21b2" />  
+ <img width="368" alt="Screenshot_20261027_234432_Continuum%20Explorer" src="https://github.com/user-attachments/assets/3075ac01-11bd-403b-8394-eb6aeff12900" />
  <img width="368" alt="Screenshot_20260731_182314_Continuum Explorer" src="https://github.com/user-attachments/assets/d2e9f1d9-8f1d-40c0-b434-2c8829cd03a0" /> 
  <img width="368" alt="Screenshot_20260731_185357_Continuum Explorer" src="https://github.com/user-attachments/assets/0b810682-bb31-447d-9455-346b6ca3735a" />
  <img width="368" alt="Screenshot_20260731_185033_Continuum Explorer" src="https://github.com/user-attachments/assets/fc7db263-558b-47ed-9c01-214a35f8e059" />
+
 
 
  ### Themes
