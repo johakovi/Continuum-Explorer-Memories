@@ -13,8 +13,9 @@ _Note: This project was originally forked from [troikoss / Continuum Explorer](h
 
 [<img width="200" alt="badge_github" src="https://github.com/user-attachments/assets/787645c4-7de6-40f7-b76a-0c2a751811b6" />](https://github.com/johakovi/Continuum-Explorer-Memories/releases) 
 [<img width="200" alt="badge_obtainium" src="https://github.com/user-attachments/assets/bf1da4c3-50e3-42ea-b0a3-66d74128138b" />](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/johakovi/Continuum-Explorer-Memories)
+[<img width="200" alt="badge_shizustore" src="https://raw.githubusercontent.com/johakovi/Continuum-Explorer-Memories/refs/heads/master/badges/get-it-on-shizustore.png" />](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/johakovi/Continuum-Explorer-Memories)
 
-[<img width="175" alt="badge_orion_store" src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" />](https://rookieenough.github.io/Orion-Data/app/?id=continuum-explorer-memories)
+[<img width="175" alt="badge_orion_store" src="https://raw.githubusercontent.com/johakovi/Continuum-Explorer-Memories/refs/heads/master/badges/orion-badge.png" />](https://shizustore.com/apps/continuum-explorer-memories)
 
 
 ## Screenshots
