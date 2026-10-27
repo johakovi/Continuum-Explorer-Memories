@@ -7,7 +7,7 @@
 Multifunctional filemanager, for working with your files or just to play your media!
 Works with tablets, desktops and phones. UI Adapts to your device screen.
 
-_Note: This project is originally forked from [troikoss / Continuum Explorer](https://github.com/troikoss/Continuum-Explorer), but now it works as standalone._
+_Note: This project was originally forked from [troikoss / Continuum Explorer](https://github.com/troikoss/Continuum-Explorer), but now it works as standalone._
 
 
 
@@ -18,10 +18,12 @@ _Note: This project is originally forked from [troikoss / Continuum Explorer](ht
 ## Screenshots
 ### Phone
 
- <img width="200" alt="LibreCuts_1791808624798(1)" src="https://github.com/user-attachments/assets/b9734281-4364-43b2-9484-3210e9b2bec9" /> 
+ <img width="200" alt="Screenshot_20261027_233912_Continuum%20Explorer" src="https://github.com/user-attachments/assets/4e53f7ef-08f4-4e5e-a2b7-2b0aa9c82395" />
  <img width="200" alt="Screen_Recording_20261012_154320_Continuum%20Explorer(1)" src="https://github.com/user-attachments/assets/ec2ca58d-1fc2-41f4-b32a-2df6e32cf269" /> 
  <img width="200" alt="Screen_Recording_20260712_215222_Continuum Explorer(1)" src="https://github.com/user-attachments/assets/511cf7cc-eb3d-4eb6-91c1-b2262cd2a595" /> 
  <img width="200" alt="Screenshot_20260731_183125_Continuum Explorer" src="https://github.com/user-attachments/assets/3947bba9-0501-4002-8067-47bd87a20449" /> 
+
+
 
 
  ### Tablet/desktop
