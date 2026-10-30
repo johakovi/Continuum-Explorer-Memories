@@ -72,6 +72,7 @@ import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.ui.activities.SettingsActivity
 import com.troikoss.continuum_explorer.model.NavLocation
 import com.troikoss.continuum_explorer.model.ScreenSize
+import com.troikoss.continuum_explorer.model.NavAnimationDirection
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.model.FileColumnType
@@ -446,7 +447,7 @@ fun TopBar(
                                 val rootItem = if (appState.libraryItem == LibraryItem.Gallery) LibraryItem.Gallery else LibraryItem.Videos
 
                                 TextButton(
-                                    onClick = { appState.navigateTo(null, null, libraryItem = rootItem) },
+                                    onClick = { appState.navigateTo(null, null, libraryItem = rootItem, navAnimation = NavAnimationDirection.BACKWARD) },
                                     contentPadding = PaddingValues(horizontal = 12.dp)
                                 ) {
                                     Text(
@@ -481,7 +482,7 @@ fun TopBar(
 
                                         TextButton(
                                             onClick = {
-                                                appState.navigateTo(targetFile, null, libraryItem = LibraryItem.Videos)
+                                                appState.navigateTo(targetFile, null, libraryItem = LibraryItem.Videos, navAnimation = NavAnimationDirection.BACKWARD)
                                                 appState.focusItemInList(leavingFile, null)
                                             },
                                             contentPadding = PaddingValues(horizontal = 12.dp),
@@ -543,17 +544,17 @@ fun TopBar(
                                                 val archivePath = archiveFile.absolutePath
                                                 if (targetPathString == archivePath) {
                                                     // Navigating to the root of the archive
-                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "")
+                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "", navAnimation = NavAnimationDirection.BACKWARD)
                                                 } else if (targetPathString.startsWith("$archivePath/")) {
                                                     // Navigating to a folder inside the archive
                                                     val innerPath = targetPathString.removePrefix("$archivePath/")
-                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "$innerPath/")
+                                                    appState.navigateTo(null, null, archiveFile = archiveFile, archivePath = "$innerPath/", navAnimation = NavAnimationDirection.BACKWARD)
                                                 } else {
                                                     // Navigating outside the archive
-                                                    appState.navigateTo(targetFile, null)
+                                                    appState.navigateTo(targetFile, null, navAnimation = NavAnimationDirection.BACKWARD)
                                                 }
                                             } else {
-                                                appState.navigateTo(targetFile, null)
+                                                appState.navigateTo(targetFile, null, navAnimation = NavAnimationDirection.BACKWARD)
                                             }
                                             appState.focusItemInList(leavingFile, null)
                                         },
@@ -592,10 +593,10 @@ fun TopBar(
                                     TextButton(
                                         onClick = {
                                             if (index == 0) {
-                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = "")
+                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = "", navAnimation = NavAnimationDirection.BACKWARD)
                                             } else {
                                                 val targetInnerPath = innerSegments.take(index).joinToString("/") + "/"
-                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = targetInnerPath)
+                                                appState.navigateTo(null, null, archiveUri = appState.currentArchiveUri, archivePath = targetInnerPath, navAnimation = NavAnimationDirection.BACKWARD)
                                             }
                                         },
                                         contentPadding = PaddingValues(horizontal = 12.dp)
@@ -633,7 +634,7 @@ fun TopBar(
                                                 repeat(appState.safStack.size - index) {
                                                     appState.safStack.removeAt(appState.safStack.lastIndex)
                                                 }
-                                                appState.navigateTo(null, targetUri)
+                                                appState.navigateTo(null, targetUri, navAnimation = NavAnimationDirection.BACKWARD)
                                                 appState.focusItemInList(null, leavingUri)
                                             }
                                         },
@@ -676,7 +677,8 @@ fun TopBar(
                                                     null, null,
                                                     networkProvider = provider,
                                                     networkId = id,
-                                                    networkConnectionId = appState.currentNetworkConnectionId
+                                                    networkConnectionId = appState.currentNetworkConnectionId,
+                                                    navAnimation = NavAnimationDirection.BACKWARD
                                                 )
                                             }
                                         },

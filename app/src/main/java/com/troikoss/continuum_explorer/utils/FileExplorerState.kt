@@ -91,6 +91,12 @@ class FileExplorerState(
     var loadedPathKey by mutableStateOf("initial")
         private set
 
+    // The library item that corresponds to the currently loaded files/view
+    var displayedLibraryItem by mutableStateOf(LibraryItem.None)
+
+    // Navigation animation direction for content window transitions
+    var navAnimationDirection by mutableStateOf(NavAnimationDirection.FADE)
+
     // Tracks if shift key is currently pressed (used for drag and drop logic)
     var isShiftPressed by mutableStateOf(false)
 
@@ -647,6 +653,7 @@ class FileExplorerState(
     fun triggerLoad(forceRefresh: Boolean = false): Job? {
         if (isSearchMode) return null
         loadingJob?.cancel()
+        isLoading = true
         val job = scope.launch {
             loadFiles(forceRefresh)
         }
@@ -887,6 +894,7 @@ class FileExplorerState(
                     pendingFocusUri = null
                 }
 
+                displayedLibraryItem = libraryItem
                 loadedPathKey = key ?: when (libraryItem) {
                     LibraryItem.Recent -> "recent"
                     LibraryItem.Home -> "home"

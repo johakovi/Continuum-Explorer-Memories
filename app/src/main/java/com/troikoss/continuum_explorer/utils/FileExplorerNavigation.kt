@@ -5,6 +5,7 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import com.troikoss.continuum_explorer.R
+import com.troikoss.continuum_explorer.model.NavAnimationDirection
 import com.troikoss.continuum_explorer.model.NavLocation
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.StorageProvider
@@ -23,9 +24,21 @@ fun FileExplorerState.navigateTo(
     networkProvider: StorageProvider? = null,
     networkId: String? = null,
     networkConnectionId: String? = null,
+    navAnimation: NavAnimationDirection? = null
 ) {
     val targetArchivePath = archivePath ?: ""
     GlobalEvents.triggerActivity()
+
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+    val isDownloadsOrDocumentsShortcut = newPath != null && (newPath.absolutePath == downloadsDir.absolutePath || newPath.absolutePath == docsDir.absolutePath)
+
+    val resolvedAnimation = navAnimation ?: when {
+        libraryItem != LibraryItem.None || this.libraryItem != LibraryItem.None || isDownloadsOrDocumentsShortcut -> NavAnimationDirection.FADE
+        addToHistory -> NavAnimationDirection.FORWARD
+        else -> NavAnimationDirection.FADE
+    }
+    navAnimationDirection = resolvedAnimation
 
     // Network navigation shortcut — skip equality check, always navigate
     if (networkProvider != null && networkId != null) {
@@ -40,6 +53,7 @@ fun FileExplorerState.navigateTo(
         currentArchiveName = null
         currentArchivePath = ""
         this.libraryItem = LibraryItem.None
+        displayedLibraryItem = LibraryItem.None
         currentNetworkProvider = networkProvider
         currentNetworkId = networkId
         currentNetworkConnectionId = networkConnectionId
@@ -87,6 +101,7 @@ fun FileExplorerState.navigateTo(
     currentArchiveName = archiveName
     currentArchivePath = targetArchivePath
     this.libraryItem = libraryItem
+    displayedLibraryItem = libraryItem
     currentNetworkProvider = null
     currentNetworkId = null
     currentNetworkConnectionId = null
@@ -112,7 +127,7 @@ fun FileExplorerState.goBack() {
             }
         }
         if (restoredProvider != null && lastLocation.networkPath != null) {
-            navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = lastLocation.networkPath, networkConnectionId = lastLocation.networkConnectionId)
+            navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = lastLocation.networkPath, networkConnectionId = lastLocation.networkConnectionId, navAnimation = NavAnimationDirection.BACKWARD)
         } else {
             navigateTo(
                 newPath = lastLocation.path,
@@ -122,7 +137,8 @@ fun FileExplorerState.goBack() {
                 archiveUri = lastLocation.archiveUri,
                 archiveName = lastLocation.archiveName,
                 archivePath = lastLocation.archivePath,
-                libraryItem = lastLocation.libraryItem
+                libraryItem = lastLocation.libraryItem,
+                navAnimation = NavAnimationDirection.BACKWARD
             )
         }
 
@@ -146,7 +162,7 @@ fun FileExplorerState.goForward() {
             }
         }
         if (restoredProvider != null && nextLocation.networkPath != null) {
-            navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = nextLocation.networkPath, networkConnectionId = nextLocation.networkConnectionId)
+            navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = nextLocation.networkPath, networkConnectionId = nextLocation.networkConnectionId, navAnimation = NavAnimationDirection.FORWARD)
         } else {
             navigateTo(
                 newPath = nextLocation.path,
@@ -156,7 +172,8 @@ fun FileExplorerState.goForward() {
                 archiveUri = nextLocation.archiveUri,
                 archiveName = nextLocation.archiveName,
                 archivePath = nextLocation.archivePath,
-                libraryItem = nextLocation.libraryItem
+                libraryItem = nextLocation.libraryItem,
+                navAnimation = NavAnimationDirection.FORWARD
             )
         }
 
@@ -243,13 +260,14 @@ fun FileExplorerState.jumpToHistory(index: Int) {
         }
     }
 
+    val historyDirection = if (index < currentIndex) NavAnimationDirection.BACKWARD else NavAnimationDirection.FORWARD
     val restoredProvider = target.networkConnectionId?.let { id ->
         appConfigs.networkConnections.find { it.id == id }?.let {
             com.troikoss.continuum_explorer.providers.StorageProviders.network(it)
         }
     }
     if (restoredProvider != null && target.networkPath != null) {
-        navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = target.networkPath, networkConnectionId = target.networkConnectionId)
+        navigateTo(null, null, addToHistory = false, networkProvider = restoredProvider, networkId = target.networkPath, networkConnectionId = target.networkConnectionId, navAnimation = historyDirection)
     } else {
         navigateTo(
             newPath = target.path,
@@ -259,7 +277,8 @@ fun FileExplorerState.jumpToHistory(index: Int) {
             archiveUri = target.archiveUri,
             archiveName = target.archiveName,
             archivePath = target.archivePath,
-            libraryItem = target.libraryItem
+            libraryItem = target.libraryItem,
+            navAnimation = historyDirection
         )
     }
 
@@ -275,7 +294,7 @@ fun FileExplorerState.goUp() {
     if (netProvider != null && netId != null) {
         val parentId = netProvider.parentId(netId)
         if (parentId != null) {
-            navigateTo(null, null, networkProvider = netProvider, networkId = parentId, networkConnectionId = currentNetworkConnectionId)
+            navigateTo(null, null, networkProvider = netProvider, networkId = parentId, networkConnectionId = currentNetworkConnectionId, navAnimation = NavAnimationDirection.BACKWARD)
         }
         return
     }
@@ -284,7 +303,7 @@ fun FileExplorerState.goUp() {
         val leavingPath = currentPath
         val parentDir = currentPath?.parentFile
         val targetPath = if (parentDir == null || parentDir.absolutePath == storageRoot.absolutePath || !parentDir.exists()) null else parentDir
-        navigateTo(newPath = targetPath, newUri = null, libraryItem = libraryItem)
+        navigateTo(newPath = targetPath, newUri = null, libraryItem = libraryItem, navAnimation = NavAnimationDirection.BACKWARD)
         if (targetPath != null) focusItemInList(leavingPath, null)
         return
     }
@@ -303,7 +322,7 @@ fun FileExplorerState.goUp() {
                 if (parentDir == null || parentDir.absolutePath == storageRoot.absolutePath || !parentDir.exists()) null else parentDir
             }
         }
-        navigateTo(newPath = targetPath, newUri = null, libraryItem = LibraryItem.Music)
+        navigateTo(newPath = targetPath, newUri = null, libraryItem = LibraryItem.Music, navAnimation = NavAnimationDirection.BACKWARD)
         if (targetPath != null) focusItemInList(leavingPath, null)
         return
     }
@@ -365,7 +384,8 @@ fun FileExplorerState.goUp() {
             archiveFile = nextArchiveFile,
             archiveUri = nextArchiveUri,
             archiveName = if (nextArchiveUri != null) currentArchiveName else null,
-            archivePath = nextArchivePath
+            archivePath = nextArchivePath,
+            navAnimation = NavAnimationDirection.BACKWARD
         )
         if (leavingUri != null && destinationUri != null && safStack.isNotEmpty()) {
             safStack.removeAt(safStack.size - 1)

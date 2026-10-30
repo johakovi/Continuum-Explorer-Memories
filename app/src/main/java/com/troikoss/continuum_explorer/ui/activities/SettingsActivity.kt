@@ -95,6 +95,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val detailsMode = SettingsManager.detailsMode.value
     val startingPage = SettingsManager.startingPage.value
     val isCommandBarVisible = SettingsManager.isCommandBarVisible.value
+    val isContentAnimationsEnabled = SettingsManager.isContentAnimationsEnabled.value
     val showHiddenFiles = SettingsManager.showHiddenFiles.value
     val iconTouchSelection = SettingsManager.iconTouchSelection.value
     val defaultViewMode = SettingsManager.defaultViewMode.value
@@ -268,6 +269,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Switch(
                         checked = isCommandBarVisible,
                         onCheckedChange = { SettingsManager.setCommandBarVisible(context, it) }
+                    )
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_content_animations)) },
+                supportingContent = { Text(stringResource(R.string.settings_content_animations_desc)) },
+                trailingContent = {
+                    Switch(
+                        checked = isContentAnimationsEnabled,
+                        onCheckedChange = { SettingsManager.setContentAnimationsEnabled(context, it) }
                     )
                 }
             )

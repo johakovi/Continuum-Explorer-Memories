@@ -87,6 +87,7 @@ object SettingsManager {
     private const val KEY_STARTING_PAGE = "starting_page"
 
     private const val KEY_COMMAND_BAR_VISIBLE = "command_bar_visible"
+    private const val KEY_CONTENT_ANIMATIONS = "content_animations"
     private const val KEY_SHOW_HIDDEN_FILES = "show_hidden_files"
     private const val KEY_ICON_TOUCH_SELECTION = "icon_touch_selection"
     private const val KEY_DEFAULT_VIEW_MODE = "default_view_mode"
@@ -177,6 +178,9 @@ object SettingsManager {
 
     private val _isCommandBarVisible = mutableStateOf(true)
     val isCommandBarVisible: State<Boolean> = _isCommandBarVisible
+
+    private val _isContentAnimationsEnabled = mutableStateOf(true)
+    val isContentAnimationsEnabled: State<Boolean> = _isContentAnimationsEnabled
 
     private val _showHiddenFiles = mutableStateOf(false)
     val showHiddenFiles: State<Boolean> = _showHiddenFiles
@@ -401,6 +405,7 @@ object SettingsManager {
         }
 
         _isCommandBarVisible.value = prefs.getBoolean(KEY_COMMAND_BAR_VISIBLE, true)
+        _isContentAnimationsEnabled.value = prefs.getBoolean(KEY_CONTENT_ANIMATIONS, true)
         _showHiddenFiles.value = prefs.getBoolean(KEY_SHOW_HIDDEN_FILES, false)
         _iconTouchSelection.value = prefs.getBoolean(KEY_ICON_TOUCH_SELECTION, true)
 
@@ -529,6 +534,13 @@ object SettingsManager {
         _isCommandBarVisible.value = visible
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_COMMAND_BAR_VISIBLE, visible).apply()
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setContentAnimationsEnabled(context: Context, enabled: Boolean) {
+        _isContentAnimationsEnabled.value = enabled
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_CONTENT_ANIMATIONS, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

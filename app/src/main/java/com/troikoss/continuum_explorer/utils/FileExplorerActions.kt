@@ -14,6 +14,7 @@ import com.troikoss.continuum_explorer.managers.UndoManager
 import com.troikoss.continuum_explorer.ui.activities.NewWindowActivity
 import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.LibraryItem
+import com.troikoss.continuum_explorer.model.NavAnimationDirection
 import com.troikoss.continuum_explorer.model.UniversalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ import java.io.File
 fun FileExplorerState.open(item: UniversalFile) {
     if (item.isDirectory) {
         if (item.provider.capabilities.isRemote) {
-            navigateTo(null, null, networkProvider = item.provider, networkId = item.providerId, networkConnectionId = currentNetworkConnectionId)
+            navigateTo(null, null, networkProvider = item.provider, networkId = item.providerId, networkConnectionId = currentNetworkConnectionId, navAnimation = NavAnimationDirection.FORWARD)
             return
         }
         if (item.isArchiveEntry) {
@@ -32,24 +33,25 @@ fun FileExplorerState.open(item: UniversalFile) {
                 newUri = null,
                 archiveFile = currentArchiveFile,
                 archiveUri = currentArchiveUri,
-                archivePath = item.archivePath
+                archivePath = item.archivePath,
+                navAnimation = NavAnimationDirection.FORWARD
             )
         } else {
             val itemFileRef = item.fileRef
             val itemDocRef = item.documentFileRef
             if (itemFileRef != null) {
                 when {
-                    libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery)
-                    libraryItem == LibraryItem.Videos -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Videos)
-                    item.providerId.startsWith("virtual://music") || item.mimeType == "album" || item.mimeType == "audio/x-mpegurl" || item.mimeType == "application/vnd.ms-wpl" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music)
+                    libraryItem == LibraryItem.Gallery -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Gallery, navAnimation = NavAnimationDirection.FORWARD)
+                    libraryItem == LibraryItem.Videos -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Videos, navAnimation = NavAnimationDirection.FORWARD)
+                    item.providerId.startsWith("virtual://music") || item.mimeType == "album" || item.mimeType == "audio/x-mpegurl" || item.mimeType == "application/vnd.ms-wpl" -> navigateTo(itemFileRef, null, libraryItem = LibraryItem.Music, navAnimation = NavAnimationDirection.FORWARD)
                     else -> {
                         safStack.clear()
-                        navigateTo(itemFileRef, null)
+                        navigateTo(itemFileRef, null, navAnimation = NavAnimationDirection.FORWARD)
                     }
                 }
             } else if (itemDocRef != null) {
                 val oldUri = currentSafUri
-                navigateTo(null, itemDocRef.uri, libraryItem = if (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) libraryItem else LibraryItem.None)
+                navigateTo(null, itemDocRef.uri, libraryItem = if (libraryItem == LibraryItem.Gallery || libraryItem == LibraryItem.Videos) libraryItem else LibraryItem.None, navAnimation = NavAnimationDirection.FORWARD)
                 oldUri?.let { safStack.add(it) }
             }
         }

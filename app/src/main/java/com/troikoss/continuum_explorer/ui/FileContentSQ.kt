@@ -81,6 +81,7 @@ import com.troikoss.continuum_explorer.model.FileColumnType
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.UniversalFile
 import com.troikoss.continuum_explorer.model.ViewMode
+import com.troikoss.continuum_explorer.ui.components.AnimatedFileContent
 import com.troikoss.continuum_explorer.ui.components.BackgroundContextMenu
 import com.troikoss.continuum_explorer.ui.components.DetailsHeader
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
@@ -369,7 +370,7 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 gridState = gridState
             )
             .contextMenuDetector(enableLongPress = true, aggressive = false) { offset ->
-                if (appState.libraryItem == LibraryItem.Home) return@contextMenuDetector
+                if (appState.displayedLibraryItem == LibraryItem.Home) return@contextMenuDetector
                 val isOverItem = itemPositions.values.any { rect -> rect.contains(offset) }
                 if (!isOverItem) {
                     menuOffset = with(density) { DpOffset(offset.x.toDp(), offset.y.toDp()) }
@@ -387,41 +388,46 @@ fun FileContentSQ(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         }
 
         val accessErr = appState.accessError
-        val isEmptyState = !appState.isLoading && appState.files.isEmpty()
+        val isEmptyState = !appState.isLoading && appState.files.isEmpty() && appState.displayedLibraryItem != LibraryItem.Home
 
-        if (accessErr != null) {
-            AccessErrorView(message = accessErr)
-        } else if (appState.libraryItem == LibraryItem.Home) {
-            HomeView(appState = appState, onAddStorage = onAddStorage)
-        } else if (isEmptyState) {
-            val emptyMessage = if (appState.isSearchMode || appState.lastSearchQuery.isNotBlank()) {
-                if (appState.lastSearchSubfolders) {
-                    stringResource(R.string.msg_search_not_found_subfolders)
+        AnimatedFileContent(
+            appState = appState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (accessErr != null) {
+                AccessErrorView(message = accessErr)
+            } else if (appState.displayedLibraryItem == LibraryItem.Home) {
+                HomeView(appState = appState, onAddStorage = onAddStorage)
+            } else if (isEmptyState) {
+                val emptyMessage = if (appState.isSearchMode || appState.lastSearchQuery.isNotBlank()) {
+                    if (appState.lastSearchSubfolders) {
+                        stringResource(R.string.msg_search_not_found_subfolders)
+                    } else {
+                        stringResource(R.string.msg_search_not_found_folder)
+                    }
                 } else {
-                    stringResource(R.string.msg_search_not_found_folder)
+                    stringResource(R.string.msg_empty_folder)
                 }
+                EmptyStateView(emptyMessage)
             } else {
-                stringResource(R.string.msg_empty_folder)
+                FileLayout(
+                    appState = appState,
+                    gridState = gridState,
+                    itemPositions = itemPositions,
+                    containerCoordinates = containerCoordinates,
+                    mousePosition = { mousePosition },
+                    focusRequester = focusRequester,
+                    dragStart = dragStart,
+                    dragEnd = dragEnd,
+                    marquee = marquee,
+                    detailsContentWidthPx = detailsContentWidthPx.value,
+                    onGridPositioned = { top, height ->
+                        gridContainerTopPx = top
+                        gridContainerHeightPx = height
+                    },
+                    isInWindowMode = isInWindowMode
+                )
             }
-            EmptyStateView(emptyMessage)
-        } else {
-            FileLayout(
-                appState = appState,
-                gridState = gridState,
-                itemPositions = itemPositions,
-                containerCoordinates = containerCoordinates,
-                mousePosition = { mousePosition },
-                focusRequester = focusRequester,
-                dragStart = dragStart,
-                dragEnd = dragEnd,
-                marquee = marquee,
-                detailsContentWidthPx = detailsContentWidthPx.value,
-                onGridPositioned = { top, height ->
-                    gridContainerTopPx = top
-                    gridContainerHeightPx = height
-                },
-                isInWindowMode = isInWindowMode
-            )
         }
 
         // Fading element overlay inside SQUARE window

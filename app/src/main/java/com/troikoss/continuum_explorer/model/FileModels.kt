@@ -60,6 +60,15 @@ enum class ScreenSize { SMALL, MEDIUM, LARGE}
  */
 enum class UIAppearance { PHONE, TABLET, WINDOWED }
 
+/**
+ * Animation direction for content window navigation transitions.
+ */
+enum class NavAnimationDirection {
+    FORWARD,   // Going inside folder (drill down)
+    BACKWARD,  // Going out of folder (go back / up)
+    FADE       // Library item transition or other
+}
+
 
 data class NavLocation(
     val path: File?,

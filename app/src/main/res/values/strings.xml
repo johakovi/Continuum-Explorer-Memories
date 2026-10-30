@@ -223,6 +223,8 @@
     <string name="settings_command_bar">Command Bar</string>
     <string name="settings_show_command_bar">Show Command Bar</string>
     <string name="settings_show_command_bar_desc">Toolbar with file operation buttons below the address bar.</string>
+    <string name="settings_content_animations">Content window animations</string>
+    <string name="settings_content_animations_desc">Animate folder navigation and library transitions.</string>
     <string name="settings_show_hidden_files">Show hidden files/folders</string>
     <string name="settings_show_hidden_files_desc">Show files and folders that start with a dot.</string>
     <string name="settings_icon_selection">Icon Selection Toggle</string>
