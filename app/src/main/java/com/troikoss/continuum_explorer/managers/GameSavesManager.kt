@@ -57,11 +57,13 @@ object GamesManager {
         GameSaveInfo("The Wreck", "Android/data/com.ThePixelHunt.TheWreck"),
         GameSaveInfo("Mindustry", "Android/data/io.anuke.mindustry/files/saves"),
         GameSaveInfo("BloonsTD (EGS)", "Android/data/com.ninjakiwi.bloonstd6epic/files"),
-        GameSaveInfo("Polytrack", "Android/data/com.kodub.polytrack"),
+        GameSaveInfo("Polytrack", "Android/data/com.kodub.p olytrack"),
         GameSaveInfo("Doki Doki Literature Club!", "Android/data/com.serenityforge.dokidokiliteratureclub"),
         GameSaveInfo("Bendy", "Android/data/com.jds.batim/files"),
         GameSaveInfo("Cytus II", "Android/data/com.rayark.cytus2/files"),
         GameSaveInfo("SpongeBob SquarePants: Battle for Bikini Bottom", "Android/data/com.hg.bfbb/files"),
+        GameSaveInfo("ARMSX2", "Android/data/com.armsx2/files"),
+        GameSaveInfo("ARMSX1", "Android/data/com.nanodata.armsx/files"),
     )
 
     fun hasAnyGame(context: Context): Boolean {

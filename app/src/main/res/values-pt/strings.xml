@@ -611,4 +611,16 @@
     <string name="settings_command_bar">Barra de Comando</string>
     <string name="settings_details_mode">Modo de Detalhes</string>
     <string name="menu_tools">Ferramentas</string>
+    <string name="settings_content_animations">Animações da janela de conteúdo</string>
+    <string name="settings_content_animations_desc">Animar navegação em pastas e transições de biblioteca.</string>
+    <string name="prop_filesystem">Sistema de arquivos:</string>
+    <string name="format_storage">Formatar armazenamento</string>
+    <string name="format_tool_title">Formatar armazenamento externo</string>
+    <string name="format_tool_volume_label">Rótulo do volume</string>
+    <string name="format_tool_warning">A formatação apagará permanentemente todos os dados neste dispositivo de armazenamento externo. Certifique-se de fazer backup dos seus arquivos antes de prosseguir.</string>
+    <string name="format_tool_confirm_button">Formatar</string>
+    <string name="format_tool_formatting">Formatando armazenamento…</string>
+    <string name="format_tool_success">Armazenamento formatado com sucesso.</string>
+    <string name="format_tool_failed">Formatação concluída/tratada. Abrindo as configurações de armazenamento do sistema se for necessário um formato completo…</string>
+    <string name="format_tool_open_system_settings">Abrir configurações de armazenamento do sistema</string>
 </resources>

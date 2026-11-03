@@ -184,6 +184,34 @@ class ShizukuFileService : IFileService.Stub() {
         }
     }
 
+    override fun formatVolume(volumePath: String, label: String): Boolean {
+        return try {
+            var volId: String? = null
+
+            val smVolumes = runShellOutput("sm list-volumes public")
+            for (line in smVolumes.lines()) {
+                val parts = line.trim().split("\\s+".toRegex())
+                if (parts.isNotEmpty() && parts[0].startsWith("public:")) {
+                    volId = parts[0]
+                    break
+                }
+            }
+
+            var success = false
+            if (!volId.isNullOrEmpty()) {
+                val process = ProcessBuilder("sh", "-c", "sm format $volId", "sh").start()
+                if (process.waitFor() == 0) {
+                    success = true
+                }
+                runShell("sm mount $volId")
+            }
+
+            success
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     private fun runShell(command: String, vararg args: String): Boolean {
         return try {
             val process = ProcessBuilder("sh", "-c", command, "sh", *args).start()

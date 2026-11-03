@@ -33,14 +33,18 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatPaint
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -398,9 +402,23 @@ fun PropertiesContent(onClose: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
+        var fileForFormat by remember { mutableStateOf<UniversalFile?>(null) }
+        var currentFsForFormat by remember { mutableStateOf("") }
+        var isExternalStorage by remember { mutableStateOf(false) }
+        var showFormatDialog by remember { mutableStateOf(false) }
+
         if (targets.size == 1) {
             val file = targets.first()
             val fileType = remember(file) { getFileType(file, context) }
+            val fsType = remember(file) { com.troikoss.continuum_explorer.utils.FileSystemUtils.getFilesystemType(file, context) }
+            val isExt = remember(file) { com.troikoss.continuum_explorer.utils.FileSystemUtils.isExternalStorage(file, context) }
+
+            LaunchedEffect(file) {
+                isExternalStorage = isExt
+                fileForFormat = file
+                currentFsForFormat = fsType
+            }
+
             val formatter = remember { SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault()) }
             val formattedDate = remember(file.lastModified) { formatter.format(file.lastModified) }
 
@@ -481,6 +499,7 @@ fun PropertiesContent(onClose: () -> Unit) {
 
             PropertyRow(stringResource(R.string.prop_name), file.name)
             PropertyRow(stringResource(R.string.prop_type), fileType)
+            PropertyRow(stringResource(R.string.prop_filesystem), fsType)
             if (file.isDirectory) {
                 remember(file) { file.fileRef?.listFiles()?.size }?.let { childCount ->
                     PropertyRow(
@@ -580,7 +599,30 @@ fun PropertiesContent(onClose: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isExternalStorage && fileForFormat != null) {
+                OutlinedButton(
+                    onClick = { showFormatDialog = true },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FormatPaint,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(stringResource(R.string.format_storage), style = MaterialTheme.typography.labelLarge)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
             Button(
                 onClick = onClose,
                 modifier = Modifier.focusRequester(focusRequester),
@@ -591,6 +633,18 @@ fun PropertiesContent(onClose: () -> Unit) {
             ) {
                 Text(stringResource(R.string.close))
             }
+        }
+
+        if (showFormatDialog && fileForFormat != null) {
+            FormatStorageDialog(
+                file = fileForFormat!!,
+                currentFs = currentFsForFormat,
+                onDismiss = { showFormatDialog = false },
+                onFormatted = {
+                    showFormatDialog = false
+                    onClose()
+                }
+            )
         }
     }
 }
@@ -1894,4 +1948,182 @@ private fun calculateSizeOnDiskRecursively(file: UniversalFile): Long {
         }
     }
     return total
+}
+
+@Composable
+fun FormatStorageDialog(
+    file: UniversalFile,
+    currentFs: String,
+    onDismiss: () -> Unit,
+    onFormatted: () -> Unit
+) {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+    val volumePath = file.fileRef?.absolutePath ?: file.absolutePath
+    var volumeLabel by remember { mutableStateOf(file.name.takeIf { it.isNotBlank() && it != "/" } ?: "STORAGE") }
+    var isFormatting by remember { mutableStateOf(false) }
+    var statusMessage by remember { mutableStateOf<String?>(null) }
+
+    Dialog(
+        onDismissRequest = { if (!isFormatting) onDismiss() }
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(min = 280.dp, max = 560.dp),
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Storage,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.format_tool_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(weight = 1f, fill = false)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = volumePath,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (currentFs.isNotBlank()) {
+                        PropertyRow(stringResource(R.string.prop_filesystem), currentFs)
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    OutlinedTextField(
+                        value = volumeLabel,
+                        onValueChange = { volumeLabel = it },
+                        label = { Text(stringResource(R.string.format_tool_volume_label)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.format_tool_warning),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+
+                    if (isFormatting) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.format_tool_formatting), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+
+                    if (statusMessage != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = statusMessage!!,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // "Open System Storage Settings" button on top
+                OutlinedButton(
+                    enabled = !isFormatting,
+                    onClick = {
+                        com.troikoss.continuum_explorer.utils.FileSystemUtils.openSystemStorageSettings(context, volumePath)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.format_tool_open_system_settings),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // "Cancel" and "Format" buttons side by side below it
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        enabled = !isFormatting,
+                        onClick = onDismiss
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        enabled = !isFormatting,
+                        onClick = {
+                            isFormatting = true
+                            statusMessage = null
+                            com.troikoss.continuum_explorer.utils.FileSystemUtils.formatStorageVolume(
+                                context = context,
+                                volumePath = volumePath,
+                                label = volumeLabel
+                            ) { success, _ ->
+                                isFormatting = false
+                                if (success) {
+                                    onFormatted()
+                                } else {
+                                    statusMessage = resources.getString(R.string.format_tool_failed)
+                                    com.troikoss.continuum_explorer.utils.FileSystemUtils.openSystemStorageSettings(context, volumePath)
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        Text(stringResource(R.string.format_tool_confirm_button), maxLines = 1)
+                    }
+                }
+            }
+        }
+    }
 }

@@ -591,4 +591,16 @@
     <string name="settings_command_bar">Komut Çubuğu</string>
     <string name="settings_details_mode">Ayrıntılar Modu</string>
     <string name="menu_tools">Araçlar</string>
+    <string name="settings_content_animations">İçerik penceresi animasyonları</string>
+    <string name="settings_content_animations_desc">Klasör gezinmesini ve kitaplık geçişlerini canlandır.</string>
+    <string name="prop_filesystem">Dosya Sistemi:</string>
+    <string name="format_storage">Depolama Alanını Biçimlendir</string>
+    <string name="format_tool_title">Harici Depolama Alanını Biçimlendir</string>
+    <string name="format_tool_volume_label">Birim Etiketi</string>
+    <string name="format_tool_warning">Biçimlendirme, bu harici depolama aygıtındaki tüm verileri kalıcı olarak silecek. Devam etmeden önce dosyalarınızın yedeğini aldığınızdan emin olun.</string>
+    <string name="format_tool_confirm_button">Biçimlendir</string>
+    <string name="format_tool_formatting">Depolama alanı biçimlendiriliyor…</string>
+    <string name="format_tool_success">Depolama alanı başarıyla biçimlendirildi.</string>
+    <string name="format_tool_failed">Biçimlendirme tamamlandı/işlendi. Tam biçimlendirme gerekliyse Sistem Depolama Ayarları açılıyor…</string>
+    <string name="format_tool_open_system_settings">Sistem Depolama Ayarlarını Aç</string>
 </resources>

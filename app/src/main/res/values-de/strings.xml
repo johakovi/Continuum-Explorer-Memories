@@ -611,4 +611,16 @@
     <string name="settings_command_bar">Befehlsleiste</string>
     <string name="settings_details_mode">Detailmodus</string>
     <string name="menu_tools">Werkzeuge</string>
+    <string name="settings_content_animations">Inhalt-Fensteranimationen</string>
+    <string name="settings_content_animations_desc">Ordnernavigation und Bibliotheksübergänge animieren.</string>
+    <string name="prop_filesystem">Dateisystem:</string>
+    <string name="format_storage">Speicher formatieren</string>
+    <string name="format_tool_title">Externen Speicher formatieren</string>
+    <string name="format_tool_volume_label">Volumenbezeichnung</string>
+    <string name="format_tool_warning">Beim Formatieren werden alle Daten auf diesem externen Speichergerät dauerhaft gelöscht. Sichern Sie Ihre Dateien vor dem Fortfahren.</string>
+    <string name="format_tool_confirm_button">Formatieren</string>
+    <string name="format_tool_formatting">Speicher wird formatiert…</string>
+    <string name="format_tool_success">Speicher erfolgreich formatiert.</string>
+    <string name="format_tool_failed">Formatierung abgeschlossen. System-Speichereinstellungen werden geöffnet…</string>
+    <string name="format_tool_open_system_settings">System-Speichereinstellungen öffnen</string>
 </resources>

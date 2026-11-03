@@ -611,4 +611,16 @@
     <string name="settings_command_bar">Komentopalkki</string>
     <string name="settings_details_mode">Yksityiskohdat-tila</string>
     <string name="menu_tools">Työkalut</string>
+    <string name="settings_content_animations">Sisältöikkunan animaatiot</string>
+    <string name="settings_content_animations_desc">Animoi kansionavigointia ja kirjastosiirtymiä.</string>
+    <string name="prop_filesystem">Tiedostojärjestelmä:</string>
+    <string name="format_storage">Alusta tallennustila</string>
+    <string name="format_tool_title">Alusta ulkoinen tallennustila</string>
+    <string name="format_tool_volume_label">Aseman nimi</string>
+    <string name="format_tool_warning">Alustus poistaa pysyvästi kaikki tiedot tältä ulkoiselta tallennuslaitteelta. Varmuuskopioi tiedostosi ennen jatkamista.</string>
+    <string name="format_tool_confirm_button">Alusta</string>
+    <string name="format_tool_formatting">Alustetaan tallennustilaa…</string>
+    <string name="format_tool_success">Tallennustila alustettu onnistuneesti.</string>
+    <string name="format_tool_failed">Alustus valmis/käsitelty. Avataan järjestelmän tallennustila-asetukset, jos täydellinen alustus on tarpeen…</string>
+    <string name="format_tool_open_system_settings">Avaa järjestelmän tallennustila-asetukset</string>
 </resources>

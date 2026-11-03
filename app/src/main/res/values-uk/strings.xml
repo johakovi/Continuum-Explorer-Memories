@@ -611,4 +611,16 @@
     <string name="settings_command_bar">Панель команд</string>
     <string name="settings_details_mode">Режим деталей</string>
     <string name="menu_tools">Інструменти</string>
+    <string name="settings_content_animations">Анімація вікон вмісту</string>
+    <string name="settings_content_animations_desc">Анімувати навігацію павками та переходи бібліотеки.</string>
+    <string name="prop_filesystem">Файлова система:</string>
+    <string name="format_storage">Форматовати сховище</string>
+    <string name="format_tool_title">Форматовати зовнішній накопичувач</string>
+    <string name="format_tool_volume_label">Мітка тому</string>
+    <string name="format_tool_warning">Форматування призведе до безповоротного видалення всіх даних на цьому зовнішньому накопичувачі. Обов\'язково створіть резервну копію файлів перед продовженням.</string>
+    <string name="format_tool_confirm_button">Форматовати</string>
+    <string name="format_tool_formatting">Форматування сховища…</string>
+    <string name="format_tool_success">Сховище успішно відформатовано.</string>
+    <string name="format_tool_failed">Форматування завершено/оброблено. Відкриття системних налаштувань сховища, якщо потрібне повне форматування…</string>
+    <string name="format_tool_open_system_settings">Відкрити системні налаштування сховища</string>
 </resources>

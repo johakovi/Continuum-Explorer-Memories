@@ -19,4 +19,5 @@ interface IFileService {
     boolean copyFile(String sourcePath, String destPath) = 11;
     boolean moveFile(String sourcePath, String destPath) = 12;
     boolean setLastModified(String path, long time) = 13;
+    boolean formatVolume(String volumePath, String label) = 14;
 }

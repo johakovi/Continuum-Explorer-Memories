@@ -611,4 +611,16 @@
     <string name="settings_command_bar">命令栏</string>
     <string name="settings_details_mode">详细信息模式</string>
     <string name="menu_tools">工具</string>
+    <string name="settings_content_animations">内容窗口动画</string>
+    <string name="settings_content_animations_desc">为文件夹导航和库转换设置动画。</string>
+    <string name="prop_filesystem">文件系统：</string>
+    <string name="format_storage">格式化存储</string>
+    <string name="format_tool_title">格式化外部存储</string>
+    <string name="format_tool_volume_label">卷标</string>
+    <string name="format_tool_warning">格式化将永久擦除此外部存储设备上的所有数据。在继续之前，请确保备份文件。</string>
+    <string name="format_tool_confirm_button">格式化</string>
+    <string name="format_tool_formatting">正在格式化存储…</string>
+    <string name="format_tool_success">存储格式化成功。</string>
+    <string name="format_tool_failed">格式化完成/已处理。如需完整格式化，正在打开系统存储设置…</string>
+    <string name="format_tool_open_system_settings">打开系统存储设置</string>
 </resources>

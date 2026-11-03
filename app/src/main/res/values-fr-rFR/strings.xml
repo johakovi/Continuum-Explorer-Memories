@@ -610,4 +610,16 @@
     <string name="settings_command_bar">Barre de commandes</string>
     <string name="settings_details_mode">Mode de détails</string>
     <string name="menu_tools">Outils</string>
+    <string name="settings_content_animations">Animations de la fenêtre de contenu</string>
+    <string name="settings_content_animations_desc">Animer la navigation dans les dossiers et les transitions de la bibliothèque.</string>
+    <string name="prop_filesystem">Système de fichiers :</string>
+    <string name="format_storage">Formater le stockage</string>
+    <string name="format_tool_title">Formater le stockage externe</string>
+    <string name="format_tool_volume_label">Nom du volume</string>
+    <string name="format_tool_warning">Le formatage effacera définitivement toutes les données de ce périphérique de stockage externe. Veillez à sauvegarder vos fichiers avant de continuer.</string>
+    <string name="format_tool_confirm_button">Formater</string>
+    <string name="format_tool_formatting">Formatage du stockage en cours…</string>
+    <string name="format_tool_success">Stockage formaté avec succès.</string>
+    <string name="format_tool_failed">Formatage terminé/traité. Ouverture des paramètres de stockage du système si un formatage complet est nécessaire…</string>
+    <string name="format_tool_open_system_settings">Ouvrir les paramètres de stockage du système</string>
 </resources>

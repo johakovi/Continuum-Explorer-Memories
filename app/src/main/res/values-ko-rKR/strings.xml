@@ -610,4 +610,16 @@
     <string name="settings_command_bar">명령 도구 모음</string>
     <string name="settings_details_mode">상세 정보 모드</string>
     <string name="menu_tools">도구</string>
+    <string name="settings_content_animations">콘텐츠 창 애니메이션</string>
+    <string name="settings_content_animations_desc">폴더 탐색 및 라이브러리 전환 애니메이션을 표시합니다.</string>
+    <string name="prop_filesystem">파일 시스템:</string>
+    <string name="format_storage">저장소 포맷</string>
+    <string name="format_tool_title">외부 저장소 포맷</string>
+    <string name="format_tool_volume_label">볼륨 레이블</string>
+    <string name="format_tool_warning">포맷하면 이 외부 저장 장치의 모든 데이터가 영구적으로 삭제됩니다. 계속하기 전에 파일을 백업하세요.</string>
+    <string name="format_tool_confirm_button">포맷</string>
+    <string name="format_tool_formatting">저장소 포맷 중…</string>
+    <string name="format_tool_success">저장소가 성공적으로 포맷되었습니다.</string>
+    <string name="format_tool_failed">포맷 완료/처리됨. 전체 포맷이 필요한 경우 시스템 저장소 설정을 엽니다…</string>
+    <string name="format_tool_open_system_settings">시스템 저장소 설정 열기</string>
 </resources>

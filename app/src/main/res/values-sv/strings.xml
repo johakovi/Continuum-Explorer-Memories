@@ -611,4 +611,16 @@
     <string name="settings_command_bar">Kommandofält</string>
     <string name="settings_details_mode">Detaljläge</string>
     <string name="menu_tools">Verktyg</string>
+    <string name="settings_content_animations">Innehållsfönsteranimationer</string>
+    <string name="settings_content_animations_desc">Animera mappnavigering och biblioteksövergångar.</string>
+    <string name="prop_filesystem">Filsystem:</string>
+    <string name="format_storage">Formatera lagring</string>
+    <string name="format_tool_title">Formatera extern lagring</string>
+    <string name="format_tool_volume_label">Volymnamn</string>
+    <string name="format_tool_warning">Formatering kommer permanent att radera all data på denna externa lagringsenhet. Se till att säkerhetskopiera dina filer innan du fortsätter.</string>
+    <string name="format_tool_confirm_button">Formatera</string>
+    <string name="format_tool_formatting">Formaterar lagring…</string>
+    <string name="format_tool_success">Lagringen har formaterats.</string>
+    <string name="format_tool_failed">Formatering klar/hanterad. Öppnar systemets lagringsinställningar om fullständig formatering krävs…</string>
+    <string name="format_tool_open_system_settings">Öppna systemets lagringsinställningar</string>
 </resources>

@@ -610,4 +610,16 @@
     <string name="settings_command_bar">Панель команд</string>
     <string name="settings_details_mode">Режим деталей</string>
     <string name="menu_tools">Инструменты</string>
+    <string name="settings_content_animations">Анимация окон контента</string>
+    <string name="settings_content_animations_desc">Анимировать навигацию по папкам и переходы в библиотеке.</string>
+    <string name="prop_filesystem">Файловая система:</string>
+    <string name="format_storage">Форматировать накопитель</string>
+    <string name="format_tool_title">Форматировать внешний накопитель</string>
+    <string name="format_tool_volume_label">Метка тома</string>
+    <string name="format_tool_warning">Форматирование приведет к безвозвратному удалению всех данных на этом внешнем накопителе. Обязательно сделайте резервную копию файлов перед продолжением.</string>
+    <string name="format_tool_confirm_button">Форматировать</string>
+    <string name="format_tool_formatting">Форматирование накопителя…</string>
+    <string name="format_tool_success">Накопитель успешно отформатирован.</string>
+    <string name="format_tool_failed">Форматирование завершено/обработано. Открытие системных настроек хранилища, если требуется полное форматирование…</string>
+    <string name="format_tool_open_system_settings">Открыть настройки хранилища системы</string>
 </resources>

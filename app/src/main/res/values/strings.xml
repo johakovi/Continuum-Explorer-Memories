@@ -44,6 +44,7 @@
     <string name="properties">Properties</string>
     <string name="prop_name">Name:</string>
     <string name="prop_type">Type:</string>
+    <string name="prop_filesystem">File System:</string>
     <string name="prop_size">Size:</string>
     <string name="prop_size_on_disk">Size on disk:</string>
     <string name="prop_location">Location:</string>
@@ -60,6 +61,17 @@
     <string name="prop_loading_metadata">Loading metadata…</string>
     <string name="prop_total_size">Total Size:</string>
     <string name="prop_bytes">bytes</string>
+
+    <!-- Format Tool -->
+    <string name="format_storage">Format Storage</string>
+    <string name="format_tool_title">Format External Storage</string>
+    <string name="format_tool_volume_label">Volume Label</string>
+    <string name="format_tool_warning">Formatting will permanently erase all data on this external storage device. Make sure to back up your files before proceeding.</string>
+    <string name="format_tool_confirm_button">Format</string>
+    <string name="format_tool_formatting">Formatting storage…</string>
+    <string name="format_tool_success">Storage formatted successfully.</string>
+    <string name="format_tool_failed">Formatting finished/handled. Opening System Storage Settings if full format is needed…</string>
+    <string name="format_tool_open_system_settings">Open System Storage Settings</string>
     <string name="details_item_count_singular">1 item</string>
     <string name="details_item_count_plural">%1$d items</string>
     <string name="details_date_modified">Date Modified: %1$s</string>
