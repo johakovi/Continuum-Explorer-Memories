@@ -404,7 +404,7 @@ fun FileExplorerSQ(
                                 SearchButton(
                                     appState = appState,
                                     searchQuery = TextFieldValue(""),
-                                    searchSubfolders = false
+                                    searchSubfolders = SettingsManager.searchSubfolders.value
                                 )
                             }
                         }

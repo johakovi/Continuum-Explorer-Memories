@@ -109,7 +109,7 @@ fun TopBar(
     var searchBarFocusedOnce by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var searchOptionsMenuExpanded by remember { mutableStateOf(false) }
-    var searchSubfolders by remember { mutableStateOf(false) }
+    var searchSubfolders by remember { mutableStateOf(SettingsManager.searchSubfolders.value) }
     var searchKindMenuExpanded by remember { mutableStateOf(false) }
 
     var addressBarFocusedOnce by remember { mutableStateOf(false) }
@@ -277,8 +277,16 @@ fun TopBar(
                                     .weight(1f)
                                     .focusRequester(focusRequester)
                                     .onFocusChanged { 
-                                        if (it.isFocused) searchBarFocusedOnce = true
-                                        if (appState.isSearchUIActive && searchBarFocusedOnce && !it.isFocused) appState.isSearchUIActive = false 
+                                        if (it.isFocused) {
+                                            searchBarFocusedOnce = true
+                                        } else if (appState.isSearchUIActive && searchBarFocusedOnce) {
+                                            coroutineScope.launch {
+                                                delay(150)
+                                                if (appState.isSearchUIActive && !searchOptionsMenuExpanded) {
+                                                    appState.isSearchUIActive = false
+                                                }
+                                            }
+                                        }
                                     }
                                     .focusProperties {
                                         down = FocusRequester.Cancel
@@ -362,7 +370,11 @@ fun TopBar(
                                             trailingIcon = {
                                                 Checkbox(checked = searchSubfolders, onCheckedChange = null)
                                             },
-                                            onClick = { searchSubfolders = !searchSubfolders }
+                                            onClick = {
+                                                val newVal = !searchSubfolders
+                                                searchSubfolders = newVal
+                                                SettingsManager.setSearchSubfolders(context, newVal)
+                                            }
                                         )
                                         HorizontalDivider()
                                         DropdownMenuItem(

@@ -141,12 +141,12 @@ class FileExplorerState(
     var isSearchUIActive by mutableStateOf(false)
     var isAddressBarActive by mutableStateOf(false)
     var lastSearchQuery by mutableStateOf("")
-    var lastSearchSubfolders by mutableStateOf(false)
+    var lastSearchSubfolders by mutableStateOf(SettingsManager.searchSubfolders.value)
 
     fun clearSearch() {
         isSearchMode = false
         lastSearchQuery = ""
-        lastSearchSubfolders = false
+        lastSearchSubfolders = SettingsManager.searchSubfolders.value
     }
 
     val activeViewMode: ViewMode

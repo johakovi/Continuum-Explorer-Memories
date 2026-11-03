@@ -64,6 +64,7 @@ object GamesManager {
         GameSaveInfo("SpongeBob SquarePants: Battle for Bikini Bottom", "Android/data/com.hg.bfbb/files"),
         GameSaveInfo("ARMSX2", "Android/data/com.armsx2/files"),
         GameSaveInfo("ARMSX1", "Android/data/com.nanodata.armsx/files"),
+        GameSaveInfo("ARMSX3", "Android/data/com.armsx3/files")
     )
 
     fun hasAnyGame(context: Context): Boolean {

@@ -98,6 +98,7 @@ object SettingsManager {
     private const val KEY_FTP_PASSWORD = "ftp_password"
     private const val KEY_GAME_SAVES_PATH = "game_saves_path"
     private const val KEY_FTP_SHARE_GAME_SAVES = "ftp_share_game_saves"
+    private const val KEY_SEARCH_SUBFOLDERS = "search_subfolders"
     private const val KEY_FTP_SERVER_MODE = "ftp_server_mode"
     private const val KEY_FTP_INACTIVITY_TIMEOUT = "ftp_inactivity_timeout"
     private const val KEY_APP_INACTIVITY_TIMEOUT = "app_inactivity_timeout"
@@ -270,6 +271,9 @@ object SettingsManager {
     private val _isNetworkExpanded = mutableStateOf(true)
     val isNetworkExpanded: State<Boolean> = _isNetworkExpanded
 
+    private val _searchSubfolders = mutableStateOf(true)
+    val searchSubfolders: State<Boolean> = _searchSubfolders
+
     private var isInitialized = false
 
     fun init(context: Context) {
@@ -417,6 +421,7 @@ object SettingsManager {
         _isStorageExpanded.value = prefs.getBoolean(KEY_NAV_STORAGE_EXPANDED, true)
         _isAddedLocationsExpanded.value = prefs.getBoolean(KEY_NAV_ADDED_LOCATIONS_EXPANDED, true)
         _isNetworkExpanded.value = prefs.getBoolean(KEY_NAV_NETWORK_EXPANDED, true)
+        _searchSubfolders.value = prefs.getBoolean(KEY_SEARCH_SUBFOLDERS, true)
 
         _isFtpServerEnabled.value = prefs.getBoolean(KEY_FTP_SERVER_ENABLED, false)
         _ftpUser.value = prefs.getString(KEY_FTP_USER, "admin") ?: "admin"
@@ -909,6 +914,12 @@ object SettingsManager {
         _isNetworkExpanded.value = expanded
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_NAV_NETWORK_EXPANDED, expanded).apply()
+    }
+
+    fun setSearchSubfolders(context: Context, enabled: Boolean) {
+        _searchSubfolders.value = enabled
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_SEARCH_SUBFOLDERS, enabled).apply()
     }
 }
 

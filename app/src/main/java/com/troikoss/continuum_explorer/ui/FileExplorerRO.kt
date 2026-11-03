@@ -411,7 +411,7 @@ fun FileExplorerRO(
                                 SearchButton(
                                     appState = appState,
                                     searchQuery = TextFieldValue(""),
-                                    searchSubfolders = false
+                                    searchSubfolders = SettingsManager.searchSubfolders.value
                                 )
                             }
                         }
