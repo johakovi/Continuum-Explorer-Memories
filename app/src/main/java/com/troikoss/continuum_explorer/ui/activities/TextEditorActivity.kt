@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import com.troikoss.continuum_explorer.ui.components.HorizontalScrollbar
 import com.troikoss.continuum_explorer.ui.components.VerticalScrollbar
@@ -258,6 +259,9 @@ class TextEditorActivity : ComponentActivity() {
                         val verticalScrollState = rememberScrollState()
                         val focusRequester = remember { FocusRequester() }
                         val primaryColor = MaterialTheme.colorScheme.primary
+                        val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+                        var fontSizeSp by remember { mutableFloatStateOf(15f) }
+                        var prevPinchDistance by remember { mutableFloatStateOf(-1f) }
 
                         // Latest layout result from the text field itself.
                         var textLayoutResult by remember {
@@ -269,13 +273,15 @@ class TextEditorActivity : ComponentActivity() {
                             text.take(offset).count { it == '\n' } + 1
                         }
 
-                        val editorStyle = TextStyle(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 15.sp,
-                            lineHeight = 22.sp,
-                            fontFamily = FontFamily.Monospace,
-                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                        )
+                        val editorStyle = remember(fontSizeSp, onSurfaceColor) {
+                            TextStyle(
+                                color = onSurfaceColor,
+                                fontSize = fontSizeSp.sp,
+                                lineHeight = (fontSizeSp * (22f / 15f)).sp,
+                                fontFamily = FontFamily.Monospace,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            )
+                        }
 
                         val searchTransformation = remember(searchQuery) {
                             VisualTransformation { input ->
@@ -318,7 +324,12 @@ class TextEditorActivity : ComponentActivity() {
 
                         val visibleWidthDp = with(density) { contentBoxSize.width.toDp() }
                         val visibleHeightDp = with(density) { contentBoxSize.height.toDp() }
-                        val minEditorWidthDp = (visibleWidthDp - 58.dp).coerceAtLeast(0.dp)
+                        val gutterWidthDp = remember(fontSizeSp, textLayoutResult?.lineCount) {
+                            val maxLine = textLayoutResult?.lineCount ?: 1
+                            val digits = maxLine.toString().length.coerceAtLeast(3)
+                            (fontSizeSp * 0.6f * digits + 20f).dp.coerceAtLeast(48.dp)
+                        }
+                        val minEditorWidthDp = (visibleWidthDp - gutterWidthDp - 10.dp).coerceAtLeast(0.dp)
                         val minEditorHeightDp = (visibleHeightDp - 2.dp).coerceAtLeast(0.dp)
                         val gutterHeightDp = textLayoutResult?.let { layout ->
                             with(density) { layout.size.height.toDp() }.coerceAtLeast(minEditorHeightDp)
@@ -332,11 +343,45 @@ class TextEditorActivity : ComponentActivity() {
                                     awaitPointerEventScope {
                                         while (true) {
                                             val event = awaitPointerEvent(PointerEventPass.Initial)
+
+                                            // 1. Hover position for scrollbars
                                             when (event.type) {
                                                 PointerEventType.Move, PointerEventType.Enter ->
                                                     contentLocalMousePos = event.changes.firstOrNull()?.position
                                                 PointerEventType.Exit -> contentLocalMousePos = null
                                                 else -> {}
+                                            }
+
+                                            // 2. Ctrl + Mouse Scroll to change text size
+                                            if (event.type == PointerEventType.Scroll && event.keyboardModifiers.isCtrlPressed) {
+                                                val change = event.changes.firstOrNull()
+                                                if (change != null) {
+                                                    val delta = change.scrollDelta.y
+                                                    if (delta != 0f) {
+                                                        val zoomFactor = if (delta < 0) 1.1f else 0.9f
+                                                        fontSizeSp = (fontSizeSp * zoomFactor).coerceIn(8f, 72f)
+                                                        event.changes.forEach { it.consume() }
+                                                    }
+                                                }
+                                            }
+
+                                            // 3. Pinch gesture (2-finger touch) to change text size
+                                            val pressed = event.changes.filter { it.pressed }
+                                            if (pressed.size >= 2) {
+                                                val p1 = pressed[0].position
+                                                val p2 = pressed[1].position
+                                                val currentDistance = (p1 - p2).getDistance()
+
+                                                if (prevPinchDistance > 0f && currentDistance > 0f) {
+                                                    val zoomFactor = currentDistance / prevPinchDistance
+                                                    if (!zoomFactor.isNaN() && !zoomFactor.isInfinite() && zoomFactor != 1f) {
+                                                        fontSizeSp = (fontSizeSp * zoomFactor).coerceIn(8f, 72f)
+                                                    }
+                                                }
+                                                prevPinchDistance = currentDistance
+                                                event.changes.forEach { it.consume() }
+                                            } else {
+                                                prevPinchDistance = -1f
                                             }
                                         }
                                     }
@@ -356,7 +401,7 @@ class TextEditorActivity : ComponentActivity() {
                                     // Line numbers gutter.
                                     Box(
                                         modifier = Modifier
-                                            .width(48.dp)
+                                            .width(gutterWidthDp)
                                             .height(gutterHeightDp)
                                             .pointerInput(textLayoutResult, text) {
                                                 detectTapGestures { offset ->
@@ -377,7 +422,7 @@ class TextEditorActivity : ComponentActivity() {
 
                                             val paint = Paint().apply {
                                                 isAntiAlias = true
-                                                textSize = with(density) { 15.sp.toPx() }
+                                                textSize = with(density) { fontSizeSp.sp.toPx() }
                                                 textAlign = Paint.Align.RIGHT
                                                 color = android.graphics.Color.GRAY
                                             }
@@ -476,7 +521,7 @@ class TextEditorActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
                                         .fillMaxWidth()
-                                        .padding(start = 62.dp, end = 16.dp, bottom = 4.dp)
+                                        .padding(start = gutterWidthDp + 14.dp, end = 16.dp, bottom = 4.dp)
                                 )
                             }
                         }

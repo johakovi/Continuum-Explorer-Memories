@@ -36,7 +36,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -109,6 +111,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     var showMenu by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
     var showSpinner by remember { mutableStateOf(false) }
+    var isPullRefreshing by remember { mutableStateOf(false) }
     var gridContainerTopPx by remember { mutableFloatStateOf(0f) }
     var gridContainerHeightPx by remember { mutableFloatStateOf(0f) }
     val headerOffsetPx = gridContainerTopPx - (containerCoordinates?.positionInRoot()?.y ?: 0f)
@@ -224,14 +227,19 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
         }
     }
 
-    // Debounced loading spinner
+    // Debounced loading spinner & pull-to-refresh reset
     LaunchedEffect(appState.isLoading) {
         if (appState.isLoading) {
             delay(400)
             showSpinner = true
         } else {
             showSpinner = false
+            isPullRefreshing = false
         }
+    }
+
+    LaunchedEffect(appState.currentPath, appState.displayedLibraryItem) {
+        isPullRefreshing = false
     }
 
     // System drag auto-scroll
@@ -298,15 +306,24 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
 
     // --- UI Layout ---
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(
-                if (contentIsRounded)
-                    Modifier.shadow(elevation = 8.dp, shape = fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
-                else
-                    Modifier.background(FileExplorerTheme.extendedColors.background)
-            )
+    @OptIn(ExperimentalMaterial3Api::class)
+    PullToRefreshBox(
+        isRefreshing = isPullRefreshing && appState.isLoading,
+        onRefresh = {
+            isPullRefreshing = true
+            appState.refresh()
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (contentIsRounded)
+                        Modifier.shadow(elevation = 8.dp, shape = fileListShape).clip(fileListShape).background(FileExplorerTheme.extendedColors.fileViewBackground)
+                    else
+                        Modifier.background(FileExplorerTheme.extendedColors.background)
+                )
             .onGloballyPositioned { containerCoordinates = it }
             .containerGestures(
                 selectionManager = selectionManager,
@@ -464,6 +481,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 onAddStorage = onAddStorage
             )
         }
+    }
     }
 }
 
