@@ -69,6 +69,7 @@ _Note: This project was originally forked from [troikoss / Continuum Explorer](h
 - Game Save Manager
 - Shizuku privilege
 - Termux privilege
+- Formatting tool (coming soon)
 
 ### Themes:
 - Custom theme packs
