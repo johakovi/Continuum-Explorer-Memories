@@ -922,49 +922,6 @@ object SettingsManager {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_SEARCH_SUBFOLDERS, enabled).apply()
     }
-
-    /*TODO(fun shouldShowWelcomeOrUpdate(context: Context): Pair<Boolean, Boolean> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastSeenVersion = prefs.getLong(KEY_LAST_SEEN_VERSION_CODE, -1L)
-        val currentVersion = try {
-            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pInfo)
-        } catch (_: Exception) {
-            0L
-        }
-
-        return when {
-            lastSeenVersion == -1L -> {
-                // First time user: show welcome with 3 pages including instructions
-                Pair(true, true)
-            }
-            currentVersion > lastSeenVersion -> {
-                // New update installed: show welcome with 2 pages (changelog, instructions omitted)
-                Pair(true, false)
-            }
-            else -> {
-                // Already seen
-                Pair(false, false)
-            }
-        }
-    }
-
-    fun markCurrentVersionSeen(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val currentVersion = try {
-            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pInfo)
-        } catch (_: Exception) {
-            0L
-        }
-        prefs.edit().putLong(KEY_LAST_SEEN_VERSION_CODE, currentVersion).apply()
-    }
-
-    fun resetWelcomeForTesting(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().remove(KEY_LAST_SEEN_VERSION_CODE).apply()
-    })
-    */
 }
 
 enum class IconCategory {

@@ -21,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -589,10 +588,6 @@ private fun ExplorerBody(
                         modifier = Modifier
                             .width(navPaneWidth)
                             .fillMaxHeight()
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = modalDrawerShape
-                            )
                             .hazeBlur(
                                 hazeState = hazeState,
                                 tintColor = sidebarBg.copy(alpha = 0.65f),
