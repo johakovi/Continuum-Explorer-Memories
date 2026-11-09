@@ -19,6 +19,7 @@ import com.troikoss.continuum_explorer.ui.FileExplorer
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.components.CrashDialog
 import com.troikoss.continuum_explorer.ui.components.CrashLogger
+//import com.troikoss.continuum_explorer.ui.components.WelcomeDialog
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.providers.StorageProviders
 import kotlinx.coroutines.Dispatchers
@@ -224,6 +225,7 @@ open class MainActivity : AppCompatActivity() {
                     initialNetworkConnectionId = initialNetworkConnectionId
                 )
                 CrashDialog()
+                //TODO(WelcomeDialog())
             }
         }
     }

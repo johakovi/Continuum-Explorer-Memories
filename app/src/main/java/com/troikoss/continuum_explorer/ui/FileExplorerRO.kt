@@ -234,7 +234,6 @@ fun FileExplorerRO(
             modifier = Modifier
             .fillMaxSize()
             .background(extendedColors.background)
-            .hazeBackground(hazeState)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
@@ -255,14 +254,17 @@ fun FileExplorerRO(
             gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
             drawerContent = {
                 val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
+                val sidebarBg = LocalExtendedColors.current.sidebarBackground
+                val modalDrawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else androidx.compose.ui.graphics.RectangleShape
                 ModalDrawerSheet(
                     modifier = (if (appearance == UIAppearance.PHONE) {
                         Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
                     } else {
                         Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
-                    }).statusBarsPadding().navigationBarsPadding(),
-                    drawerContainerColor = LocalExtendedColors.current.sidebarBackground.copy(alpha = 0.98f),
-                    drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else androidx.compose.ui.graphics.RectangleShape,
+                    }).statusBarsPadding().navigationBarsPadding()
+                        .hazeBlur(hazeState, sidebarBg.copy(alpha = 0.65f), modalDrawerShape),
+                    drawerContainerColor = Color.Transparent,
+                    drawerShape = modalDrawerShape,
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     NavigationContent(
@@ -346,8 +348,7 @@ fun FileExplorerRO(
                                     top = innerPadding.calculateTopPadding(),
                                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                                )
-                                .hazeBackground(hazeState),
+                                ),
                             appState = appState,
                             isInWindowMode = isInWindowMode,
                             onAddStorage = { safLauncher.launch(null) },
@@ -560,6 +561,7 @@ private fun ExplorerBody(
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
     val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
     val sidebarBg = LocalExtendedColors.current.sidebarBackground
+    val hazeState = LocalHazeState.current
 
     Column(modifier = modifier.fillMaxSize()) {
         val appearance = appState.getUIAppearance()
@@ -582,17 +584,23 @@ private fun ExplorerBody(
                         )
                         .zIndex(2f)
                 ) {
+                    val modalDrawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape
                     PermanentDrawerSheet(
                         modifier = Modifier
                             .width(navPaneWidth)
                             .fillMaxHeight()
                             .shadow(
                                 elevation = 8.dp,
-                                shape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape
+                                shape = modalDrawerShape
+                            )
+                            .hazeBlur(
+                                hazeState = hazeState,
+                                tintColor = sidebarBg.copy(alpha = 0.65f),
+                                shape = modalDrawerShape
                             ),
                         windowInsets = WindowInsets(0, 0, 0, 0),
-                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(24.dp) else RectangleShape,
-                        drawerContainerColor = sidebarBg.copy(alpha = 0.98f)
+                        drawerShape = modalDrawerShape,
+                        drawerContainerColor = Color.Transparent
                     ) {
                         NavigationPane(
                             appState = appState,
@@ -674,6 +682,7 @@ private fun ExplorerBody(
                         Modifier.padding(top = 2.dp)
                     }
                 )
+                .hazeBackground(hazeState)
             ) {
                 FileContent(appState = appState, isInWindowMode = isInWindowMode, onAddStorage = onAddStorage)
             }

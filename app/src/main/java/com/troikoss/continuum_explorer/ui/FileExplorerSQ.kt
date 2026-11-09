@@ -232,7 +232,6 @@ fun FileExplorerSQ(
             modifier = Modifier
             .fillMaxSize()
             .background(extendedColors.background)
-            .hazeBackground(hazeState)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
@@ -252,14 +251,16 @@ fun FileExplorerSQ(
             gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
             drawerContent = {
                 val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
+                val modalDrawerShape = RoundedCornerShape(8.dp)
                 ModalDrawerSheet(
-                    modifier = if (appearance == UIAppearance.PHONE) {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp).statusBarsPadding().navigationBarsPadding()
+                    modifier = (if (appearance == UIAppearance.PHONE) {
+                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
                     } else {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).statusBarsPadding().navigationBarsPadding()
-                    },
-                    drawerShape = RoundedCornerShape(8.dp) ,
-                    drawerContainerColor = sidebarBg.copy(alpha = 0.98f),
+                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                    }).statusBarsPadding().navigationBarsPadding()
+                        .hazeBlur(hazeState, sidebarBg.copy(alpha = 0.65f), modalDrawerShape),
+                    drawerShape = modalDrawerShape,
+                    drawerContainerColor = Color.Transparent,
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     NavigationContent(
@@ -339,8 +340,7 @@ fun FileExplorerSQ(
                                     top = innerPadding.calculateTopPadding(),
                                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                                )
-                                .hazeBackground(hazeState),
+                                ),
                             appState = appState,
                             isInWindowMode = isInWindowMode,
                             onAddStorage = { safLauncher.launch(null) },
@@ -644,6 +644,7 @@ private fun ExplorerBody(
             }
 
             // Main Content Area
+            val hazeState = LocalHazeState.current
             Box(modifier = Modifier
                 .weight(1f)
                 .then(
@@ -660,6 +661,7 @@ private fun ExplorerBody(
                         Modifier.padding(top = 2.dp)
                     }
                 )
+                .hazeBackground(hazeState)
             ) {
                 FileContent(appState = appState, isInWindowMode = isInWindowMode, onAddStorage = onAddStorage)
             }

@@ -159,22 +159,28 @@ fun TabBar(
     val isFloat = themeTop == ThemeTopMode.FLOAT
 
     val backgroundUri = SettingsManager.tabBarBackgroundUri.value
+    val hazeState = LocalHazeState.current
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(totalBarHeight)
-            .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground.copy(alpha = 0.5f)),
+            .height(totalBarHeight),
         contentAlignment = Alignment.BottomStart
     ) {
-        backgroundUri?.let { uri ->
-            AsyncImage(
-                model = uri,
-                contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop
-
-            )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground.copy(alpha = 0.5f))
+                .hazeBackground(hazeState)
+        ) {
+            backgroundUri?.let { uri ->
+                AsyncImage(
+                    model = uri,
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
 
         val currentMaxWidth = maxWidth
@@ -450,13 +456,11 @@ private fun TabItem(
                         it.clip(shape).background(backgroundColor)
                     }
                 } else {
-                    it.clip(shape)
-                        .hazeBlur(
-                            hazeState,
-                            nonActiveBgColor,
-                            shape
-                        )
-                        .background(nonActiveBgColor)
+                    it.hazeBlur(
+                        hazeState,
+                        nonActiveBgColor,
+                        shape
+                    )
                 }
             }
             .height(if (themeTop == ThemeTopMode.FLOAT) 36.dp else 32.dp)
