@@ -28,6 +28,9 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.scrollBy
+import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -43,6 +46,9 @@ import com.troikoss.continuum_explorer.model.*
 import com.troikoss.continuum_explorer.ui.components.ItemContextMenu
 import com.troikoss.continuum_explorer.utils.*
 import com.troikoss.continuum_explorer.utils.IconHelper.FileThumbnail
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.foundation.gestures.scrollBy
+import kotlinx.coroutines.launch
 import com.troikoss.continuum_explorer.utils.IconHelper.FolderPreview
 import com.troikoss.continuum_explorer.utils.IconHelper.isMimeTypePreviewable
 import com.troikoss.continuum_explorer.R
@@ -638,7 +644,17 @@ private fun FileDetailsView(
                         else -> ""
                     }
 
-                    Spacer(Modifier.width(1.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(8.dp)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        VerticalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                        )
+                    }
                     Text(
                         text = text,
                         modifier = Modifier.width(width).padding(start = 8.dp),

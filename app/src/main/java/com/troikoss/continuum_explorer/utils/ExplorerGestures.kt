@@ -15,12 +15,15 @@ import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.composed
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
@@ -876,7 +879,8 @@ fun VerticalResizeHandle(
     modifier: Modifier = Modifier,
     showDivider: Boolean = true,
     onResizeStarted: (() -> Unit)? = null,
-    onResizeFinished: (() -> Unit)? = null
+    onResizeFinished: (() -> Unit)? = null,
+    layoutWidth: Dp? = null
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -890,48 +894,41 @@ fun VerticalResizeHandle(
         )
     }
 
-    // Outer Box takes layout space provided by modifier — usually a small gap or divider.
+    val handleWidth = layoutWidth ?: 48.dp
+
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .wrapContentWidth(unbounded = true),
-        contentAlignment = Alignment.Center
-    ) {
-        if (showDivider) VerticalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .requiredWidth(48.dp) // Increased for easier grabbing as "empty space"
-                .pointerHoverIcon(resizeIcon)
-                .pointerInput(density) { // Use density as key to update if it changes
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        down.consume()
-                        currentOnResizeStarted?.invoke()
-                        
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val dragChange = event.changes.firstOrNull { it.id == down.id } ?: break
-                            if (!dragChange.pressed) {
-                                currentOnResizeFinished?.invoke()
-                                break
-                            }
-                            val deltaPx = dragChange.positionChange().x
-                            if (deltaPx != 0f) {
-                                currentOnResize(deltaPx.toDp())
-                                dragChange.consume()
-                            }
+            .width(handleWidth)
+            .pointerHoverIcon(resizeIcon)
+            .pointerInput(density) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    down.consume()
+                    currentOnResizeStarted?.invoke()
+                    
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val dragChange = event.changes.firstOrNull { it.id == down.id } ?: break
+                        if (!dragChange.pressed) {
+                            currentOnResizeFinished?.invoke()
+                            break
+                        }
+                        val deltaPx = dragChange.positionChange().x
+                        if (deltaPx != 0f) {
+                            currentOnResize(deltaPx.toDp())
+                            dragChange.consume()
                         }
                     }
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            // The "pill" is removed to satisfy the request for "empty space" resizing.
-            // The entire 48dp width is now a transparent hit-test area.
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (showDivider) {
+            VerticalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
         }
     }
 }
