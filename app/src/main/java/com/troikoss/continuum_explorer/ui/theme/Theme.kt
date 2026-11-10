@@ -559,7 +559,7 @@ fun FileExplorerTheme(
                 picturesIconDuo = if (folderTheme == IconTheme.COLOURFULDUO) ThemeGalleryDuo else ThemeGallery,
                 tabActiveBackground = colorScheme.surfaceContainerLow,
                 textColor = colorScheme.onSurface,
-                menuBackground = colorScheme.surfaceContainerLowest.copy(alpha = 0.98f),
+                menuBackground = colorScheme.surfaceContainer.copy(alpha = 0.98f),
                 fileViewBackground = colorScheme.surfaceContainer,
                 background = colorScheme.surfaceContainerLow,
                 commandPanelBackground = colorScheme.surfaceContainerLow,
