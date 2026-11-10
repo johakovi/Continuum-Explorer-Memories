@@ -42,6 +42,11 @@ import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.FileExplorerState
 import com.troikoss.continuum_explorer.utils.VerticalResizeHandle
 import com.troikoss.continuum_explorer.utils.contextMenuDetector
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.ui.unit.TextUnit
 
 /**
@@ -50,6 +55,7 @@ import androidx.compose.ui.unit.TextUnit
 @Composable
 fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
     val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
     var showColumnMenu by remember { mutableStateOf(false) }
     var columnMenuOffset by remember { mutableStateOf(DpOffset.Zero) }
     val nameColumnWidth = appState.folderConfigs.columnWidths.getOrElse(FileColumnType.NAME) { Dp.Unspecified }
@@ -59,6 +65,19 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
     Box {
         Row(
             modifier = Modifier
+                .pointerInput(scrollState) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            if (event.type == PointerEventType.Scroll) {
+                                val delta = event.changes.first().scrollDelta
+                                coroutineScope.launch {
+                                    scrollState.scrollBy(delta.y * 60f)
+                                }
+                            }
+                        }
+                    }
+                }
                 .horizontalScroll(scrollState)
                 .padding(horizontal = 8.dp, vertical = 12.dp)
                 .contextMenuDetector(enableLongPress = true, aggressive = true) { offset: Offset ->
@@ -95,7 +114,8 @@ fun DetailsHeader(appState: FileExplorerState, scrollState: ScrollState) {
                     onResizeFinished = {
                         appState.folderConfigs.saveColumnWidths(appState.getCurrentStorageKey())
                     },
-                    modifier = Modifier.height(iconSize)
+                    modifier = Modifier.height(iconSize),
+                    layoutWidth = 8.dp
                 )
 
                 SortableHeaderLabel(

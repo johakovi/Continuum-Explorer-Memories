@@ -128,7 +128,7 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
                 val nameWidth = appState.folderConfigs.columnWidths.getOrElse(FileColumnType.NAME) { 200.dp }
                 val columnsWidth = appState.folderConfigs.visibleColumns.fold(0.dp) { acc, col ->
                     val colWidth = appState.folderConfigs.columnWidths[col.type] ?: col.minWidth
-                    acc + 1.dp + colWidth
+                    acc + 8.dp + colWidth
                 }
                 (52.dp + nameWidth + columnsWidth).toPx()  // 52 = 8(pad) + 24(icon) + 12(spacer) + 8(pad)
             }
