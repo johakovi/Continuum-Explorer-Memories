@@ -11,7 +11,7 @@ import java.io.File
 /**
  * Represents a virtual/special view mode for the file list.
  */
-enum class LibraryItem { None, Home, Recent, Gallery, Videos, Music, Downloads, Documents, Archives, Apks, RecycleBin, Games, InternalStorage }
+enum class LibraryItem { None, Home, Recent, Gallery, Videos, Music, Downloads, Documents, Archives, Apks, RecycleBin, Games, InternalStorage, NetworkStorages }
 
 /**
  * Represents a navigation destination in the side pane.
@@ -29,6 +29,7 @@ sealed class NavSection {
     object Archives : NavSection()
     object Apks : NavSection()
     object Games : NavSection()
+    object NetworkStorages : NavSection()
     data class RemovableVolume(val volumeIndex: Int) : NavSection()
     data class NetworkStorage(val connectionId: String) : NavSection()
 }
@@ -164,6 +165,7 @@ data class NetworkConnection(
     val sftpPrivateKeyUri: String = "",
     val sftpPrivateKeyPassphrase: String = "",
     val sftpPrivateKey: String = "",
+    val showInSidebar: Boolean = true,
 )
 
 data class GameShortcut(val uri: Uri, val name: String? = null)

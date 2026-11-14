@@ -288,6 +288,7 @@ private fun getHomeItemData(id: String, configs: AppConfigurations, appState: Fi
         "games_manager" -> HomeItemData("games_manager", stringResource(R.string.nav_game_saves), Icons.Default.Gamepad, R.drawable.ic_nav_game, R.drawable.ic_nav_game_duo, configs.isGamesVisible, { configs.toggleGamesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.Games) }, extendedColors.gameIcon)
         "internal_storage" -> HomeItemData("internal_storage", stringResource(R.string.nav_internal_storage), Icons.Default.Storage, R.drawable.ic_storage, R.drawable.ic_storage_duo, configs.isInternalStorageVisible, { configs.toggleInternalStorageVisibility() }, { appState.navigateTo(Environment.getExternalStorageDirectory(), null) }, extendedColors.sidebarIcons)
         "trash" -> HomeItemData("trash", stringResource(R.string.nav_trash), Icons.Default.Delete, R.drawable.ic_nav_trash, R.drawable.ic_nav_trash_duo, configs.isTrashVisible, { configs.toggleTrashVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.RecycleBin) }, extendedColors.recycleBinIcon)
+        "network_storages" -> HomeItemData("network_storages", stringResource(R.string.nav_network_storages), Icons.Default.Cloud, R.drawable.ic_network_home, R.drawable.ic_network_home, configs.isNetworkStoragesVisible, { configs.toggleNetworkStoragesVisibility() }, { appState.navigateTo(null, null, libraryItem = LibraryItem.NetworkStorages) }, extendedColors.sidebarIcons)
         else -> null
     }
 }
@@ -388,7 +389,48 @@ fun HomeShortcutItem(
             Column(
                 modifier = Modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessLow))
             ) {
-                // Section-specific items (Games, Gallery, Music, etc.)
+                // Section-specific items (Network, Games, Gallery, Music, etc.)
+                if (item.id == "network_storages") {
+                    val isFtpEnabled by SettingsManager.isFtpServerEnabled
+                    val ftpMode by SettingsManager.ftpMode
+                    val context = LocalContext.current
+                    val isFtpActive = isFtpEnabled && ftpMode == SettingsManager.FtpMode.FULL_STORAGE
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.nav_add_storage)) },
+                        onClick = {
+                            onDismissMenu()
+                            onAddStorage?.invoke()
+                        },
+                        leadingIcon = { Icon(Icons.Default.Add, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.nav_add_network_storage)) },
+                        onClick = {
+                            onDismissMenu()
+                            appState.onAddNetwork?.invoke()
+                        },
+                        leadingIcon = { Icon(Icons.Default.Cloud, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            val text = if (isFtpActive) stringResource(R.string.nav_stop_ftp) else stringResource(R.string.nav_start_ftp)
+                            Text(text)
+                        },
+                        onClick = {
+                            onDismissMenu()
+                            if (isFtpActive) {
+                                SettingsManager.setFtpServerEnabled(context, false)
+                            } else {
+                                SettingsManager.setFtpServerEnabled(context, true, SettingsManager.FtpMode.FULL_STORAGE)
+                            }
+                        },
+                        leadingIcon = { Icon(if (isFtpActive) Icons.Default.WifiOff else Icons.Default.Wifi, null) }
+                    )
+                    HorizontalDivider()
+                }
                 if (item.id == "games_manager") {
                     val isFtpEnabled by SettingsManager.isFtpServerEnabled
                     val ftpMode by SettingsManager.ftpMode
@@ -648,15 +690,17 @@ fun HomeShortcutItem(
 
                 HorizontalDivider()
 
-                // Library visibility toggle
-                DropdownMenuItem(
-                    text = { Text(if (item.isVisible) stringResource(R.string.menu_remove) else stringResource(R.string.menu_add_library)) },
-                    onClick = {
-                        onDismissMenu()
-                        item.onToggle()
-                    },
-                    leadingIcon = { Icon(if (item.isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) }
-                )
+                if (item.id != "network_storages") {
+                    // Library visibility toggle
+                    DropdownMenuItem(
+                        text = { Text(if (item.isVisible) stringResource(R.string.menu_remove) else stringResource(R.string.menu_add_library)) },
+                        onClick = {
+                            onDismissMenu()
+                            item.onToggle()
+                        },
+                        leadingIcon = { Icon(if (item.isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null) }
+                    )
+                }
 
                 if (item.id == "trash") {
                     DropdownMenuItem(

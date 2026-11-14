@@ -380,6 +380,9 @@
     <string name="nav_storage_usage_label">%2$s içinde %1$s boş</string>
 
     <string name="nav_network">Ağ</string>
+    <string name="nav_network_storages">Ağ Depoları</string>
+    <string name="menu_remove_sidebar">Yan çubuktan kaldır</string>
+    <string name="menu_pin_sidebar">Yan çubuğa iğnele</string>
     <string name="nav_add_local_storage">Yerel Depolama Ekle</string>
     <string name="nav_add_network_storage">Ağ Depolama Ekle</string>
     <string name="nav_network_protocol">Protokol</string>

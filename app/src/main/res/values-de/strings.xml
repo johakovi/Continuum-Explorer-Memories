@@ -392,6 +392,9 @@
     <string name="nav_expand">Ausklappen</string>
     <string name="nav_storage_usage_label">%1$s frei von %2$s</string>
     <string name="nav_network">Netzwerk</string>
+    <string name="nav_network_storages">Netzwerkspeicher</string>
+    <string name="menu_remove_sidebar">Aus Seitenleiste entfernen</string>
+    <string name="menu_pin_sidebar">In Seitenleiste anheften</string>
     <string name="nav_add_local_storage">Lokalen Speicher hinzufügen</string>
     <string name="nav_add_network_storage">Netzwerkspeicher hinzufügen</string>
     <string name="nav_network_protocol">Protokoll</string>

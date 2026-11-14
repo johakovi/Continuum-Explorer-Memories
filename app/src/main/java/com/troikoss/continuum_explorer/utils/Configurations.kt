@@ -135,7 +135,9 @@ class FolderConfigurations(private val context: Context) {
         }
         val fallback = when {
             libraryItem == LibraryItem.Gallery -> ViewMode.GALLERY
+            libraryItem == LibraryItem.NetworkStorages -> ViewMode.GRID
             key == "virtual://music" -> ViewMode.GRID
+            key == "virtual://network_storages" -> ViewMode.GRID
             libraryItem == LibraryItem.Music -> {
                 if (key == "virtual://music/albums") ViewMode.GALLERY else ViewMode.MUSIC
             }
@@ -277,7 +279,7 @@ class AppConfigurations(private val context: Context) {
     val favoritePaths = mutableStateListOf<String>()
     val favoriteNames = mutableStateMapOf<String, String>()
     val safNames = mutableStateMapOf<String, String>()
-    val libraryOrder = mutableStateListOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash")
+    val libraryOrder = mutableStateListOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash", "network_storages")
     val networkConnections = mutableStateListOf<NetworkConnection>()
     var isRecentVisible by mutableStateOf(true)
     var isGalleryVisible by mutableStateOf(true)
@@ -290,6 +292,7 @@ class AppConfigurations(private val context: Context) {
     var isGamesVisible by mutableStateOf(false)
     var isInternalStorageVisible by mutableStateOf(false)
     var isTrashVisible by mutableStateOf(true)
+    var isNetworkStoragesVisible by mutableStateOf(true)
     var isGalleryAlbumsEnabled by mutableStateOf(false)
     var isMusicAlbumsEnabled by mutableStateOf(false)
     var isDocumentsFolderEnabled by mutableStateOf(false)
@@ -310,7 +313,7 @@ class AppConfigurations(private val context: Context) {
         loadNetworkConnections()
 
         // Ensure all library items are present in the order list
-        val required = listOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash")
+        val required = listOf("home", "gallery", "music", "recent", "downloads", "documents", "archives", "apks", "games_manager", "internal_storage", "trash", "network_storages")
         required.forEach { id ->
             if (!libraryOrder.contains(id)) {
                 if (id == "home") {
@@ -335,6 +338,9 @@ class AppConfigurations(private val context: Context) {
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else if (id == "internal_storage") {
                     val idx = libraryOrder.indexOf("games_manager")
+                    libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
+                } else if (id == "network_storages") {
+                    val idx = libraryOrder.indexOf("trash")
                     libraryOrder.add(if (idx != -1) idx + 1 else libraryOrder.size, id)
                 } else {
                     libraryOrder.add(id)
@@ -577,6 +583,11 @@ class AppConfigurations(private val context: Context) {
             val insertIndex = libraryOrder.indexOf("gallery").let { if (it != -1) it + 1 else 0 }
             libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "music")
         }
+        // Migrate: add network_storages if not present in saved order
+        if (!libraryOrder.contains("network_storages")) {
+            val insertIndex = libraryOrder.indexOf("trash").let { if (it != -1) it + 1 else libraryOrder.size }
+            libraryOrder.add(insertIndex.coerceIn(0, libraryOrder.size), "network_storages")
+        }
         isRecentVisible = prefs.getBoolean("is_recent_visible", true)
         isGalleryVisible = prefs.getBoolean("is_gallery_visible", true)
         isVideosVisible = prefs.getBoolean("is_videos_visible", false)
@@ -592,6 +603,7 @@ class AppConfigurations(private val context: Context) {
         }
         isInternalStorageVisible = prefs.getBoolean("is_internal_storage_visible", false)
         isTrashVisible = prefs.getBoolean("is_trash_visible", true)
+        isNetworkStoragesVisible = prefs.getBoolean("is_network_storages_visible", true)
         isGalleryAlbumsEnabled = prefs.getBoolean("is_gallery_albums_enabled", false)
         isMusicAlbumsEnabled = prefs.getBoolean("is_music_albums_enabled", false)
         isDocumentsFolderEnabled = prefs.getBoolean("is_documents_folder_enabled", false)
@@ -612,10 +624,17 @@ class AppConfigurations(private val context: Context) {
             putBoolean("is_games_visible", isGamesVisible)
             putBoolean("is_internal_storage_visible", isInternalStorageVisible)
             putBoolean("is_trash_visible", isTrashVisible)
+            putBoolean("is_network_storages_visible", isNetworkStoragesVisible)
             putBoolean("is_gallery_albums_enabled", isGalleryAlbumsEnabled)
             putBoolean("is_music_albums_enabled", isMusicAlbumsEnabled)
             putBoolean("is_documents_folder_enabled", isDocumentsFolderEnabled)
         }.apply()
+    }
+
+    fun toggleNetworkStoragesVisibility() {
+        isNetworkStoragesVisible = !isNetworkStoragesVisible
+        saveLibrarySettings()
+        GlobalEvents.triggerConfigUpdate()
     }
 
     fun toggleRecentVisibility() {
@@ -783,6 +802,7 @@ class AppConfigurations(private val context: Context) {
                         sftpPrivateKeyUri = obj.optString("sftpPrivateKeyUri", ""),
                         sftpPrivateKeyPassphrase = obj.optString("sftpPrivateKeyPassphrase", ""),
                         sftpPrivateKey = obj.optString("sftpPrivateKey", ""),
+                        showInSidebar = obj.optBoolean("showInSidebar", true),
                     )
                 )
             }
@@ -809,6 +829,7 @@ class AppConfigurations(private val context: Context) {
                 put("sftpPrivateKeyUri", conn.sftpPrivateKeyUri)
                 put("sftpPrivateKeyPassphrase", conn.sftpPrivateKeyPassphrase)
                 put("sftpPrivateKey", conn.sftpPrivateKey)
+                put("showInSidebar", conn.showInSidebar)
             })
         }
         try {
@@ -847,6 +868,15 @@ class AppConfigurations(private val context: Context) {
         if (index >= 0) {
             StorageProviders.evictNetwork(connection.id)
             networkConnections[index] = connection
+            saveNetworkConnections()
+            GlobalEvents.triggerConfigUpdate()
+        }
+    }
+
+    fun toggleNetworkConnectionSidebar(id: String, show: Boolean) {
+        val index = networkConnections.indexOfFirst { it.id == id }
+        if (index >= 0) {
+            networkConnections[index] = networkConnections[index].copy(showInSidebar = show)
             saveNetworkConnections()
             GlobalEvents.triggerConfigUpdate()
         }

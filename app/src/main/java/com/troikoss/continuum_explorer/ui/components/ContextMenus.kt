@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import com.troikoss.continuum_explorer.utils.PendingCut
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -133,7 +132,7 @@ fun ItemContextMenu(
         }
     }
     val selectionManager = appState.selectionManager
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.NetworkStorages)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
@@ -516,7 +515,7 @@ fun BackgroundContextMenu(
     }
 
     var currentScreen by remember { mutableStateOf("MAIN") }
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.NetworkStorages)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin

@@ -759,6 +759,13 @@ fun TopBar(
                                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.primary
                                 )
+                            } else if (appState.libraryItem == LibraryItem.NetworkStorages) {
+                                Text(
+                                    text = stringResource(R.string.nav_network_storages),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
                             } else if (appState.libraryItem == LibraryItem.Music) {
                                 Text(
                                     text = stringResource(R.string.menu_musicplayer),

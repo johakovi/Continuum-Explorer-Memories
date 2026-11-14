@@ -324,7 +324,8 @@ fun NavigationPane(
         appState.appConfigs.isArchivesVisible,
         appState.appConfigs.isApksVisible,
         appState.appConfigs.isGamesVisible,
-        appState.appConfigs.isTrashVisible
+        appState.appConfigs.isTrashVisible,
+        appState.appConfigs.isNetworkStoragesVisible
     ) {
         appState.appConfigs.libraryOrder.filter { id ->
             when (id) {
@@ -339,9 +340,14 @@ fun NavigationPane(
                 "archives" -> appState.appConfigs.isArchivesVisible
                 "apks" -> appState.appConfigs.isApksVisible
                 "games_manager" -> appState.appConfigs.isGamesVisible
+                "network_storages" -> false
                 else -> true
             }
         }
+    }
+
+    val visibleNetworkConnections = remember(appState.appConfigs.networkConnections.toList()) {
+        appState.appConfigs.networkConnections.filter { it.showInSidebar }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -893,7 +899,7 @@ fun NavigationPane(
 
 
             // Section: Network
-            if (appState.appConfigs.networkConnections.isNotEmpty()) {
+            if (visibleNetworkConnections.isNotEmpty()) {
                 if (!isMinimized) {
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
@@ -909,7 +915,7 @@ fun NavigationPane(
                 }
 
                 itemsIndexed(
-                    items = appState.appConfigs.networkConnections,
+                    items = visibleNetworkConnections,
                     key = { _, conn -> conn.id }
                 ) { _, connection ->
                     val isDragging = draggedItemId == connection.id
@@ -2017,14 +2023,30 @@ private fun NavContextMenu(
                     }
 
                     if (onRemove != null) {
+                        val isNetwork = section is NavSection.NetworkStorage
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.menu_remove)) },
+                            text = { Text(stringResource(if (isNetwork) R.string.menu_remove_sidebar else R.string.menu_remove)) },
                             onClick = {
                                 onDismissRequest()
                                 onRemove()
                             },
                             leadingIcon = { Icon(Icons.Default.Delete, null) }
                         )
+                    }
+
+                    if (section is NavSection.NetworkStorage) {
+                        val connId = section.connectionId
+                        val conn = appState.appConfigs.networkConnections.find { it.id == connId }
+                        if (conn != null) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.menu_delete)) },
+                                onClick = {
+                                    onDismissRequest()
+                                    appState.appConfigs.removeNetworkConnection(conn.id)
+                                },
+                                leadingIcon = { Icon(Icons.Default.DeleteForever, null) }
+                            )
+                        }
                     }
 
                     if (section == NavSection.RecycleBin) {

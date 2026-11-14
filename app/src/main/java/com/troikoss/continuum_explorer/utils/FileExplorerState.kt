@@ -28,6 +28,7 @@ import com.troikoss.continuum_explorer.managers.SelectionManager
 import com.troikoss.continuum_explorer.managers.SettingsManager
 import com.troikoss.continuum_explorer.managers.VideoManager
 import com.troikoss.continuum_explorer.model.*
+import com.troikoss.continuum_explorer.providers.StorageProviders
 import com.troikoss.continuum_explorer.model.StorageProvider
 import com.troikoss.continuum_explorer.providers.LocalProvider
 import kotlinx.coroutines.CoroutineScope
@@ -76,6 +77,8 @@ class FileExplorerState(
     var currentNetworkConnectionId by mutableStateOf<String?>(null)
     var networkError by mutableStateOf<String?>(null)
     var accessError by mutableStateOf<String?>(null)
+
+    var onAddNetwork: (() -> Unit)? = null
 
     // The processed and sorted list of files to display
     var files by mutableStateOf(emptyList<UniversalFile>())
@@ -259,6 +262,8 @@ class FileExplorerState(
                 context.getString(R.string.nav_apks)
             } else if (libraryItem == LibraryItem.Games) {
                 context.getString(R.string.nav_game_saves)
+            } else if (libraryItem == LibraryItem.NetworkStorages) {
+                context.getString(R.string.nav_network_storages)
             } else if (libraryItem == LibraryItem.Documents) {
                 context.getString(R.string.nav_documents)
             } else if (libraryItem == LibraryItem.Music) {
@@ -444,6 +449,15 @@ class FileExplorerState(
                 length = 0L,
                 provider = LocalProvider,
                 providerId = "virtual://games_manager"
+            )
+
+            libraryItem == LibraryItem.NetworkStorages -> UniversalFile(
+                name = context.getString(R.string.nav_network_storages),
+                isDirectory = true,
+                lastModified = 0L,
+                length = 0L,
+                provider = LocalProvider,
+                providerId = "virtual://network_storages"
             )
 
             libraryItem == LibraryItem.Archives -> UniversalFile(
@@ -762,6 +776,16 @@ class FileExplorerState(
                     LibraryItem.Archives -> com.troikoss.continuum_explorer.managers.ArchivesManager.getArchivesFiles(context)
                     LibraryItem.Apks -> com.troikoss.continuum_explorer.managers.ApksManager.getApksFiles(context)
                     LibraryItem.Games -> GamesManager.getGames(context, appConfigs)
+                    LibraryItem.NetworkStorages -> appConfigs.networkConnections.map { conn ->
+                        UniversalFile(
+                            name = conn.displayName,
+                            isDirectory = true,
+                            lastModified = 0L,
+                            length = 0L,
+                            provider = StorageProviders.network(conn),
+                            providerId = "network://${conn.id}"
+                        )
+                    }
                     LibraryItem.Home -> emptyList()
                     LibraryItem.Gallery -> when {
                         currentPath != null -> GalleryManager.getAlbumContents(context, currentPath!!.absolutePath, forceRefresh = forceRefresh, onUpdate = onIncrementalUpdate)
@@ -906,6 +930,7 @@ class FileExplorerState(
                     LibraryItem.Archives -> "archives"
                     LibraryItem.Apks -> "apks"
                     LibraryItem.Games -> "games_manager"
+                    LibraryItem.NetworkStorages -> "network_storages"
                     LibraryItem.InternalStorage -> "internal_storage"
                     LibraryItem.None -> "root"
                     LibraryItem.RecycleBin -> "trash"
@@ -1013,6 +1038,8 @@ class FileExplorerState(
             "virtual://apks"
         } else if (libraryItem == LibraryItem.Games) {
             "virtual://games_manager"
+        } else if (libraryItem == LibraryItem.NetworkStorages) {
+            "virtual://network_storages"
         } else if (libraryItem == LibraryItem.RecycleBin) {
             "virtual://recycle_bin"
         } else if (currentPath != null) {

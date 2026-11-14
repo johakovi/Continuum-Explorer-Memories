@@ -396,7 +396,8 @@ private fun FileContentView(
                     }
                 }
 
-                if (appState.getCurrentStorageKey() != "virtual://music") {
+                val isNetworkStorages = appState.libraryItem == LibraryItem.NetworkStorages || appState.getCurrentStorageKey() == "virtual://network_storages"
+                if (appState.getCurrentStorageKey() != "virtual://music" && !isNetworkStorages) {
                     Row(
                         modifier = Modifier.fillMaxWidth().offset(y = (-8).dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -505,7 +506,8 @@ private fun FileMusicView(
                     )
                 }
 
-                if (appState.getCurrentStorageKey() != "virtual://music") {
+                val isNetworkStorages = appState.libraryItem == LibraryItem.NetworkStorages || appState.getCurrentStorageKey() == "virtual://network_storages"
+                if (appState.getCurrentStorageKey() != "virtual://music" && !isNetworkStorages) {
                     Row {
                         Text(
                             text = formattedDate,
@@ -635,7 +637,8 @@ private fun FileDetailsView(
                     val uuidKey = file.fileRef?.parentFile?.name
                     val meta = uuidKey?.let { appState.recycleBinMetadata[it] }
                     val isMusic = appState.libraryItem == LibraryItem.Music || appState.getCurrentStorageKey()?.startsWith("virtual://music") == true || appState.getCurrentStorageKey()?.startsWith("virtual://playlist") == true
-                    val text = when (column.type) {
+                    val isNetworkStorages = appState.libraryItem == LibraryItem.NetworkStorages || appState.getCurrentStorageKey() == "virtual://network_storages"
+                    val text = if (isNetworkStorages) "" else when (column.type) {
                         FileColumnType.DATE -> remember(file) { appState.formatDate(file.lastModified) }
                         FileColumnType.SIZE -> if (isMusic && !file.isDirectory) "--" else if (file.isDirectory) remember(file) { file.fileRef?.listFiles()?.size?.let { n -> if (n == 1) resources.getString(R.string.details_item_count_singular) else resources.getString(R.string.details_item_count_plural, n) } ?: "--" } else remember(file) { appState.formatSize(file.length) }
                         FileColumnType.TYPE -> getFileType(file, context)
