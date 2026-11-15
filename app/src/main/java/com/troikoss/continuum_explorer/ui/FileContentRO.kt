@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,7 +39,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -307,8 +308,9 @@ fun FileContentRO(appState: FileExplorerState, isInWindowMode: Boolean = false, 
 
     // --- UI Layout ---
     @OptIn(ExperimentalMaterial3Api::class)
-    PullToRefreshBox(
+    ConditionalPullToRefreshBox(
         isRefreshing = isPullRefreshing && appState.isLoading,
+        enabled = !appState.isMouseInteraction,
         onRefresh = {
             isPullRefreshing = true
             appState.refresh()
@@ -796,5 +798,32 @@ private fun FileGrid(
                 hScrollState = hScrollState
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ConditionalPullToRefreshBox(
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    state: androidx.compose.material3.pulltorefresh.PullToRefreshState = androidx.compose.material3.pulltorefresh.rememberPullToRefreshState(),
+    contentAlignment: Alignment = Alignment.TopStart,
+    indicator: @Composable BoxScope.() -> Unit = {
+        androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator(
+            modifier = Modifier.align(Alignment.TopCenter),
+            isRefreshing = isRefreshing,
+            state = state,
+        )
+    },
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier.pullToRefresh(state = state, isRefreshing = isRefreshing, enabled = enabled, onRefresh = onRefresh),
+        contentAlignment = contentAlignment,
+    ) {
+        content()
+        indicator()
     }
 }
