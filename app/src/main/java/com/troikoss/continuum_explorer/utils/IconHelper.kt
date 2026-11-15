@@ -328,6 +328,7 @@ object IconHelper {
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
                     file.providerId == "virtual://games_manager" -> extendedColors.gameIcon
                     file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
+                    file.parentId == "virtual://network_storages" || file.providerId.startsWith("network://") -> extendedColors.sidebarIcons
                     file.parentId == "virtual://games_manager" -> {
                         val isEmulator = EMULATOR_FOLDERS.any { file.name.contains(it, ignoreCase = true) }
                         when {
@@ -399,6 +400,17 @@ object IconHelper {
                         }
                     }
                 }
+                return
+            }
+
+            val isNetworkShortcut = file.parentId == "virtual://network_storages" || file.providerId.startsWith("network://")
+            if (isNetworkShortcut) {
+                Icon(
+                    painter = rememberThemePainter(resId = R.drawable.ic_network_icon),
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize),
+                    tint = finalTint
+                )
                 return
             }
 
@@ -677,6 +689,8 @@ object IconHelper {
                 file.providerId == "virtual://documents" -> if (isDuo) R.drawable.ic_nav_documents_duo else R.drawable.ic_nav_documents
                 file.providerId == "virtual://archives" -> if (isDuo) R.drawable.ic_zip_duo else R.drawable.ic_zip
                 file.providerId == "virtual://apks" -> R.drawable.ic_android_logo
+                file.providerId == "virtual://network_storages" -> R.drawable.ic_network_home
+                file.parentId == "virtual://network_storages" || file.providerId.startsWith("network://") -> R.drawable.ic_network_icon
                 file.providerId == "virtual://games_manager" -> if (isDuo) R.drawable.ic_nav_game_duo else R.drawable.ic_nav_game
                 file.parentId == "virtual://games_manager" -> if (isDuo) R.drawable.ic_nav_game_duo else R.drawable.ic_nav_game
                 file.providerId == "virtual://recycle_bin" || (file.fileRef?.absolutePath ?: "").contains("/.Trash") -> if (isDuo) R.drawable.ic_nav_trash_duo else R.drawable.ic_nav_trash
@@ -750,6 +764,7 @@ object IconHelper {
                 lPath.contains("documents") -> R.drawable.ic_nav_documents
                 lPath.contains("archives") -> R.drawable.ic_zip
                 lPath.contains("apks") -> R.drawable.ic_android_logo
+                lPath.contains("network_storages") -> R.drawable.ic_network_home
                 lPath.contains("games_manager") -> R.drawable.ic_nav_game
                 lPath.contains("trash") || lPath.contains("recycle_bin") -> R.drawable.ic_nav_trash
                 else -> null

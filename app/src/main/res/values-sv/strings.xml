@@ -392,6 +392,9 @@
     <string name="nav_expand">Expandera</string>
     <string name="nav_storage_usage_label">%1$s ledigt av %2$s</string>
     <string name="nav_network">Nätverk</string>
+    <string name="nav_network_storages">Nätverkslagringar</string>
+    <string name="menu_remove_sidebar">Ta bort från sidofältet</string>
+    <string name="menu_pin_sidebar">Fäst i sidofältet</string>
     <string name="nav_add_local_storage">Lägg till lokal lagring</string>
     <string name="nav_add_network_storage">Lägg till nätverkslagring</string>
     <string name="nav_network_protocol">Protokoll</string>

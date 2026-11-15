@@ -392,6 +392,9 @@
     <string name="nav_expand">展开</string>
     <string name="nav_storage_usage_label">%2$s 中剩余 %1$s</string>
     <string name="nav_network">网络</string>
+    <string name="nav_network_storages">网络存储</string>
+    <string name="menu_remove_sidebar">从侧边栏移除</string>
+    <string name="menu_pin_sidebar">固定到侧边栏</string>
     <string name="nav_add_local_storage">添加本地存储</string>
     <string name="nav_add_network_storage">添加网络存储</string>
     <string name="nav_network_protocol">协议</string>

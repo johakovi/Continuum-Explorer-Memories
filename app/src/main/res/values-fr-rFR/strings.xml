@@ -393,6 +393,9 @@
     <string name="nav_expand">Développer</string>
     <string name="nav_storage_usage_label">%1$s libres sur %2$s</string>
     <string name="nav_network">Réseau</string>
+    <string name="nav_network_storages">Stockages réseau</string>
+    <string name="menu_remove_sidebar">Retirer de la barre latérale</string>
+    <string name="menu_pin_sidebar">Épingler à la barre latérale</string>
     <string name="nav_add_local_storage">Ajouter un stockage local</string>
     <string name="nav_add_network_storage">Ajouter un stockage réseau</string>
     <string name="nav_network_protocol">Protocole</string>

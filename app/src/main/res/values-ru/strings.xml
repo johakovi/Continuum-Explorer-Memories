@@ -392,6 +392,9 @@
     <string name="nav_expand">Развернуть</string>
     <string name="nav_storage_usage_label">%1$s свободно из %2$s</string>
     <string name="nav_network">Сеть</string>
+    <string name="nav_network_storages">Сетевые хранилища</string>
+    <string name="menu_remove_sidebar">Удалить из боковой панели</string>
+    <string name="menu_pin_sidebar">Закрепить на боковой панели</string>
     <string name="nav_add_local_storage">Добавить локальное хранилище</string>
     <string name="nav_add_network_storage">Добавить сетевое хранилище</string>
     <string name="nav_network_protocol">Протокол</string>

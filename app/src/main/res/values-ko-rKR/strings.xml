@@ -392,6 +392,9 @@
     <string name="nav_expand">펼치기</string>
     <string name="nav_storage_usage_label">%2$s 중 %1$s 사용 가능</string>
     <string name="nav_network">네트워크</string>
+    <string name="nav_network_storages">네트워크 저장소</string>
+    <string name="menu_remove_sidebar">사이드바에서 제거</string>
+    <string name="menu_pin_sidebar">사이드바에 고정</string>
     <string name="nav_add_local_storage">로컬 저장소 추가</string>
     <string name="nav_add_network_storage">네트워크 저장소 추가</string>
     <string name="nav_network_protocol">프로토콜</string>

@@ -410,6 +410,9 @@
     <string name="nav_expand">Expand</string>
     <string name="nav_storage_usage_label">%1$s free of %2$s</string>
     <string name="nav_network">Network</string>
+    <string name="nav_network_storages">Network Storages</string>
+    <string name="menu_remove_sidebar">Remove from sidebar</string>
+    <string name="menu_pin_sidebar">Pin to sidebar</string>
     <string name="nav_add_local_storage">Add Local Storage</string>
     <string name="nav_add_network_storage">Add Network Storage</string>
     <string name="nav_network_protocol">Protocol</string>

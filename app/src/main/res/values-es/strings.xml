@@ -393,6 +393,9 @@
     <string name="nav_expand">Expandir</string>
     <string name="nav_storage_usage_label">%1$s libres de %2$s</string>
     <string name="nav_network">Red</string>
+    <string name="nav_network_storages">Almacenamientos de red</string>
+    <string name="menu_remove_sidebar">Eliminar de la barra lateral</string>
+    <string name="menu_pin_sidebar">Fijar en la barra lateral</string>
     <string name="nav_add_local_storage">Añadir almacenamiento local</string>
     <string name="nav_add_network_storage">Añadir almacenamiento de red</string>
     <string name="nav_network_protocol">Protocolo</string>

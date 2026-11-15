@@ -500,6 +500,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         LibraryItem.Documents -> stringResource(R.string.nav_documents)
                         LibraryItem.Games -> stringResource(R.string.nav_game_saves)
                         LibraryItem.InternalStorage -> stringResource(R.string.nav_internal_storage)
+                        LibraryItem.NetworkStorages -> stringResource(R.string.nav_network_storages)
                         else -> stringResource(R.string.nav_internal_storage)
                     }
                     Text(text)
@@ -1329,7 +1330,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 LibraryItem.Downloads to R.string.nav_downloads,
                                 LibraryItem.Documents to R.string.nav_documents,
                                 LibraryItem.Games to R.string.nav_game_saves,
-                                LibraryItem.RecycleBin to R.string.nav_recycle_bin
+                                LibraryItem.RecycleBin to R.string.nav_recycle_bin,
+                                LibraryItem.NetworkStorages to R.string.nav_network_storages
                             )
                             items.forEach { (item, resId) ->
                                 OptionItem(

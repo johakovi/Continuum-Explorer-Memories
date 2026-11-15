@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import com.troikoss.continuum_explorer.utils.PendingCut
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,11 +32,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.CopyAll
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Info
@@ -133,7 +134,7 @@ fun ItemContextMenu(
         }
     }
     val selectionManager = appState.selectionManager
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.NetworkStorages)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
@@ -152,6 +153,93 @@ fun ItemContextMenu(
     ) {
         when (currentScreen) {
             "MAIN" -> {
+                if (appState.libraryItem == LibraryItem.NetworkStorages) {
+                    val item = if (onlyOneSelected) selectedItems.first() else null
+                    val connId = item?.providerId?.removePrefix("network://")
+                    val conn = if (connId != null) appState.appConfigs.networkConnections.find { it.id == connId } else null
+
+                    if (item != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_open)) },
+                            onClick = {
+                                onDismiss()
+                                appState.open(item)
+                            },
+                            leadingIcon = { Icon(IconHelper.getIconForItem(item), null) }
+                        )
+                    }
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_open_new_tab)) },
+                        onClick = {
+                            onDismiss()
+                            appState.openInNewTab(selectedItems)
+                        },
+                        leadingIcon = { Icon(Icons.Default.Tab, null) }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_open_new_window)) },
+                        onClick = {
+                            onDismiss()
+                            appState.openInNewWindow(selectedItems)
+                        },
+                        leadingIcon = { Icon(Icons.Default.Splitscreen, null) }
+                    )
+
+                    if (conn != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.nav_network_edit)) },
+                            onClick = {
+                                onDismiss()
+                                appState.onEditNetwork?.invoke(conn)
+                            },
+                            leadingIcon = { Icon(Icons.Default.Edit, null) }
+                        )
+
+                        val isPinned = conn.showInSidebar
+                        DropdownMenuItem(
+                            text = { Text(stringResource(if (isPinned) R.string.menu_remove_sidebar else R.string.menu_pin_sidebar)) },
+                            onClick = {
+                                onDismiss()
+                                appState.appConfigs.toggleNetworkConnectionSidebar(conn.id, !isPinned)
+                            },
+                            leadingIcon = { Icon(Icons.Default.PushPin, null) }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_delete)) },
+                            onClick = {
+                                onDismiss()
+                                appState.appConfigs.removeNetworkConnection(conn.id)
+                                appState.refresh()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Delete, null) }
+                        )
+                    }
+
+                    if (item != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_add_home)) },
+                            onClick = {
+                                onDismiss()
+                                appState.pinSelectionToHome()
+                            },
+                            leadingIcon = { Icon(Icons.Default.PushPin, null) }
+                        )
+                    }
+
+                    HorizontalDivider()
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_properties)) },
+                        onClick = {
+                            onDismiss()
+                            appState.showProperties(selectedItems)
+                        },
+                        leadingIcon = { Icon(Icons.Default.Info, null) }
+                    )
+                } else {
                 if (onlyOneSelected && appState.libraryItem == LibraryItem.Games) {
                     val item = selectedItems.first()
                     if (item.providerId.startsWith("content://")) {
@@ -440,6 +528,7 @@ fun ItemContextMenu(
                     },
                     leadingIcon = { Icon(Icons.Default.Info, null) }
                 )
+                }
             }
 
             "COLORS" -> {
@@ -516,7 +605,7 @@ fun BackgroundContextMenu(
     }
 
     var currentScreen by remember { mutableStateOf("MAIN") }
-    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games)
+    val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.NetworkStorages)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
     val isInGalleryOrVideos = appState.libraryItem == LibraryItem.Gallery || appState.libraryItem == LibraryItem.Videos
     val isInRecycleBin = appState.libraryItem == LibraryItem.RecycleBin
@@ -538,6 +627,18 @@ fun BackgroundContextMenu(
     ) {
         when (currentScreen) {
             "MAIN" -> {
+                if (appState.libraryItem == LibraryItem.NetworkStorages) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.nav_add_network_storage)) },
+                        leadingIcon = { Icon(Icons.Default.Cloud, null) },
+                        onClick = {
+                            onDismiss()
+                            appState.onAddNetwork?.invoke()
+                        }
+                    )
+                    HorizontalDivider()
+                }
+
                 if (appState.libraryItem == LibraryItem.Games) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.nav_add_storage)) },

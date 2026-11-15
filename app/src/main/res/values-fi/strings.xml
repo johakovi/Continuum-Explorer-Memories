@@ -392,6 +392,9 @@
     <string name="nav_expand">Laajenna</string>
     <string name="nav_storage_usage_label">%1$s vapaana / %2$s</string>
     <string name="nav_network">Verkko</string>
+    <string name="nav_network_storages">Verkkotallennustilat</string>
+    <string name="menu_remove_sidebar">Poista sivupalkista</string>
+    <string name="menu_pin_sidebar">Kiinnitä sivupalkkiin</string>
     <string name="nav_add_local_storage">Lisää paikallinen tallennustila</string>
     <string name="nav_add_network_storage">Lisää verkkotallennustila</string>
     <string name="nav_network_protocol">Protokolla</string>

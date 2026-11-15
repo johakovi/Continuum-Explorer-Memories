@@ -202,6 +202,9 @@ fun FileExplorerSQ(
         context.startActivity(Intent(context, PopUpActivity::class.java))
     }
 
+    appState.onAddNetwork = onAddNetwork
+    appState.onEditNetwork = onEditNetwork
+
     // --- Side Effects ---
     LaunchedEffect(appState, appState.currentPath, appState.currentSafUri, appState.folderConfigs.sortParams,
         appState.currentArchiveFile, appState.currentArchiveUri, appState.currentArchivePath, appState.libraryItem,
@@ -730,6 +733,7 @@ private fun navigateToSection(
         is NavSection.Archives -> appState.navigateTo(null, null, libraryItem = LibraryItem.Archives)
         is NavSection.Apks -> appState.navigateTo(null, null, libraryItem = LibraryItem.Apks)
         is NavSection.Games -> appState.navigateTo(null, null, libraryItem = LibraryItem.Games)
+        is NavSection.NetworkStorages -> appState.navigateTo(null, null, libraryItem = LibraryItem.NetworkStorages)
         is NavSection.Documents -> {
             if (appState.appConfigs.isDocumentsFolderEnabled) {
                 val docsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)

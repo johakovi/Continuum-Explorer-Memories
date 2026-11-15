@@ -392,6 +392,9 @@
     <string name="nav_expand">Розгорнути</string>
     <string name="nav_storage_usage_label">%1$s вільно з %2$s</string>
     <string name="nav_network">Мережа</string>
+    <string name="nav_network_storages">Мережеві сховища</string>
+    <string name="menu_remove_sidebar">Видалити з бічної панелі</string>
+    <string name="menu_pin_sidebar">Закріпити на бічній панелі</string>
     <string name="nav_add_local_storage">Додати локальне сховище</string>
     <string name="nav_add_network_storage">Додати мережеве сховище</string>
     <string name="nav_network_protocol">Протокол</string>
