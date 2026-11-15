@@ -2,8 +2,16 @@ package com.troikoss.continuum_explorer.ui.components
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.webkit.MimeTypeMap
+import android.widget.Toast
 import com.troikoss.continuum_explorer.utils.PendingCut
+import com.troikoss.continuum_explorer.utils.RemoteCache
+import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
+import androidx.core.content.FileProvider
+import androidx.compose.material.icons.filled.Wallpaper
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -142,6 +150,12 @@ fun ItemContextMenu(
     val onlyOneSelected = selectedItems.size == 1
     val hasDirectories = selectedItems.any { it.isDirectory }
     val hasArchive = selectedItems.any { ZipUtils.isArchive(it) }
+    val singleItem = if (onlyOneSelected) selectedItems.first() else null
+    val singleExtension = singleItem?.name?.substringAfterLast('.', "")?.lowercase() ?: ""
+    val singleMime = singleItem?.let { MimeTypeMap.getSingleton().getMimeTypeFromExtension(singleExtension) ?: it.mimeType }
+    val isSingleImage = singleItem != null && !singleItem.isDirectory && (singleMime?.startsWith("image/") == true || setOf("jpg", "jpeg", "png", "gif", "webp", "bmp").contains(singleExtension))
+    val wallpaperTitle = stringResource(R.string.menu_set_wallpaper)
+    val wallpaperFailedMsg = stringResource(R.string.msg_failed_set_wallpaper)
     val hazeState = LocalHazeState.current
 
     DropdownMenu(
@@ -481,6 +495,42 @@ fun ItemContextMenu(
                             onDismiss()
                         },
                         leadingIcon = { Icon(Icons.Default.Share, null) }
+                    )
+                }
+
+                if (isSingleImage) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.menu_set_wallpaper)) },
+                        onClick = {
+                            onDismiss()
+                            singleItem.let { file ->
+                                appState.scope.launch {
+                                    try {
+                                        val uri = withContext(Dispatchers.IO) {
+                                            if (file.provider.capabilities.isRemote) {
+                                                val cached = RemoteCache.cache(context, file)
+                                                FileProvider.getUriForFile(context, context.packageName + ".provider", cached)
+                                            } else {
+                                                getUriForUniversalFile(context, file)
+                                            }
+                                        }
+                                        if (uri != null) {
+                                            val wallpaperIntent = Intent(Intent.ACTION_ATTACH_DATA).apply {
+                                                setDataAndType(uri, "image/*")
+                                                putExtra("mimeType", "image/*")
+                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            context.startActivity(Intent.createChooser(wallpaperIntent, wallpaperTitle))
+                                        } else {
+                                            Toast.makeText(context, wallpaperFailedMsg, Toast.LENGTH_SHORT).show()
+                                        }
+                                    } catch (_: Exception) {
+                                        Toast.makeText(context, wallpaperFailedMsg, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        },
+                        leadingIcon = { Icon(Icons.Default.Wallpaper, null) }
                     )
                 }
 
