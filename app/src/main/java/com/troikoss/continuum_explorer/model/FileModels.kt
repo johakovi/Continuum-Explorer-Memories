@@ -165,7 +165,7 @@ data class NetworkConnection(
     val sftpPrivateKeyUri: String = "",
     val sftpPrivateKeyPassphrase: String = "",
     val sftpPrivateKey: String = "",
-    val showInSidebar: Boolean = true,
+    val showInSidebar: Boolean = false,
 )
 
 data class GameShortcut(val uri: Uri, val name: String? = null)

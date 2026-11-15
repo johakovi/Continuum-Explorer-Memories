@@ -328,6 +328,7 @@ object IconHelper {
                     file.providerId == "virtual://documents" -> extendedColors.documentsIcon
                     file.providerId == "virtual://games_manager" -> extendedColors.gameIcon
                     file.providerId == "virtual://recycle_bin" || file.absolutePath.contains("/.Trash") -> extendedColors.recycleBinIcon
+                    file.parentId == "virtual://network_storages" || file.providerId.startsWith("network://") -> extendedColors.sidebarIcons
                     file.parentId == "virtual://games_manager" -> {
                         val isEmulator = EMULATOR_FOLDERS.any { file.name.contains(it, ignoreCase = true) }
                         when {
@@ -399,6 +400,17 @@ object IconHelper {
                         }
                     }
                 }
+                return
+            }
+
+            val isNetworkShortcut = file.parentId == "virtual://network_storages" || file.providerId.startsWith("network://")
+            if (isNetworkShortcut) {
+                Icon(
+                    painter = rememberThemePainter(resId = R.drawable.ic_network_icon),
+                    contentDescription = null,
+                    modifier = modifier.size(iconSize),
+                    tint = finalTint
+                )
                 return
             }
 

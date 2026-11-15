@@ -1586,6 +1586,7 @@ fun NetworkConnectionContent(onClose: () -> Unit) {
             sftpPrivateKeyUri = sftpPrivateKeyUri.trim(),
             sftpPrivateKeyPassphrase = sftpPrivateKeyPassphrase,
             sftpPrivateKey = sftpPrivateKey.trim(),
+            showInSidebar = existing?.showInSidebar ?: false,
         )
         FileOperationsManager.onNetworkConnectionResult(connection)
         onClose()

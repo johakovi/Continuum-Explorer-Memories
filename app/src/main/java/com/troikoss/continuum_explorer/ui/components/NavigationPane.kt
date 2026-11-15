@@ -978,7 +978,7 @@ fun NavigationPane(
                             NavNetworkItem(
                             connection = connection,
                             onClick = { onItemSelected(NavSection.NetworkStorage(connection.id)) },
-                            onRemove = { appState.appConfigs.removeNetworkConnection(connection.id) },
+                            onRemove = { appState.appConfigs.toggleNetworkConnectionSidebar(connection.id, false) },
                             onEdit = { onEditNetworkClick(connection) },
                             onRename = { renamingNetwork = connection },
                             appState = appState,

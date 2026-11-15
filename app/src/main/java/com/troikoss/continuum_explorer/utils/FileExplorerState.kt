@@ -79,6 +79,7 @@ class FileExplorerState(
     var accessError by mutableStateOf<String?>(null)
 
     var onAddNetwork: (() -> Unit)? = null
+    var onEditNetwork: ((NetworkConnection) -> Unit)? = null
 
     // The processed and sorted list of files to display
     var files by mutableStateOf(emptyList<UniversalFile>())

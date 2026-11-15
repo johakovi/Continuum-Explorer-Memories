@@ -16,6 +16,7 @@ import com.troikoss.continuum_explorer.ui.activities.PopUpActivity
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.NavAnimationDirection
 import com.troikoss.continuum_explorer.model.UniversalFile
+import com.troikoss.continuum_explorer.providers.StorageProviders
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,6 +24,22 @@ import java.io.File
 
 fun FileExplorerState.open(item: UniversalFile) {
     if (item.isDirectory) {
+        if (item.providerId.startsWith("network://")) {
+            val connId = item.providerId.removePrefix("network://")
+            val conn = appConfigs.networkConnections.find { it.id == connId }
+            if (conn != null) {
+                val provider = StorageProviders.network(conn)
+                navigateTo(
+                    newPath = null,
+                    newUri = null,
+                    networkProvider = provider,
+                    networkId = provider.rootId(),
+                    networkConnectionId = conn.id,
+                    navAnimation = NavAnimationDirection.FORWARD
+                )
+                return
+            }
+        }
         if (item.provider.capabilities.isRemote) {
             navigateTo(null, null, networkProvider = item.provider, networkId = item.providerId, networkConnectionId = currentNetworkConnectionId, navAnimation = NavAnimationDirection.FORWARD)
             return
@@ -122,6 +139,9 @@ fun FileExplorerState.openInNewWindow(items: List<UniversalFile>) {
                         putExtra("archiveUri", itemDocRef.uri)
                         putExtra("archiveName", item.name)
                     }
+                } else if (item.providerId.startsWith("network://")) {
+                    val connId = item.providerId.removePrefix("network://")
+                    putExtra("networkConnectionId", connId)
                 } else if (itemFileRef != null) {
                     putExtra("path", itemFileRef.absolutePath)
                 } else if (itemDocRef != null) {

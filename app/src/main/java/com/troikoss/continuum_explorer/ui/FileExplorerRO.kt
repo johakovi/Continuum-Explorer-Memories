@@ -204,6 +204,7 @@ fun FileExplorerRO(
     }
 
     appState.onAddNetwork = onAddNetwork
+    appState.onEditNetwork = onEditNetwork
 
     // --- Side Effects ---
     LaunchedEffect(appState, appState.currentPath, appState.currentSafUri, appState.folderConfigs.sortParams,

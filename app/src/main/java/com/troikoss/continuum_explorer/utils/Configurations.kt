@@ -802,7 +802,7 @@ class AppConfigurations(private val context: Context) {
                         sftpPrivateKeyUri = obj.optString("sftpPrivateKeyUri", ""),
                         sftpPrivateKeyPassphrase = obj.optString("sftpPrivateKeyPassphrase", ""),
                         sftpPrivateKey = obj.optString("sftpPrivateKey", ""),
-                        showInSidebar = obj.optBoolean("showInSidebar", true),
+                        showInSidebar = obj.optBoolean("showInSidebar", false),
                     )
                 )
             }
