@@ -833,8 +833,7 @@ fun Modifier.fileDropTarget(
 
                             if (isMove) {
                                 appState.selectionManager.clear()
-                                PendingCut.files = emptyList()
-                                PendingCut.isActive = false
+                                PendingCut.clear(context)
                             } else if (isTouchDrag) {
                                 // Copy via touch — clear selection too
                                 appState.selectionManager.clear()

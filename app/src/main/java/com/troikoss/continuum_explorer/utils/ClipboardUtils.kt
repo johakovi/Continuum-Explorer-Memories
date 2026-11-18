@@ -33,9 +33,40 @@ import java.util.ArrayDeque
 object PendingCut {
     var files by mutableStateOf<List<UniversalFile>>(emptyList())
     var isActive by mutableStateOf(false)
-    fun clear() {
+    fun clear(context: Context? = null) {
         files = emptyList()
         isActive = false
+        if (context != null) {
+            try {
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    clipboard.clearPrimaryClip()
+                } else {
+                    clipboard.setPrimaryClip(ClipData.newPlainText("", ""))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+}
+
+/**
+ * Checks if there are any valid files or URIs available in PendingCut or the system clipboard.
+ */
+fun hasClipboardItems(context: Context): Boolean {
+    if (PendingCut.files.isNotEmpty()) return true
+    return try {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        if (!clipboard.hasPrimaryClip()) return false
+        val clip = clipboard.primaryClip ?: return false
+        if (clip.itemCount == 0) return false
+        for (i in 0 until clip.itemCount) {
+            if (clip.getItemAt(i).uri != null) return true
+        }
+        false
+    } catch (_: Exception) {
+        false
     }
 }
 
@@ -43,13 +74,16 @@ object PendingCut {
  * Copies selected files to the system clipboard.
  */
 fun copyToClipboard(context: Context, files: List<UniversalFile>) {
-    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    if (files.isEmpty()) return
+    if (files.isEmpty()) {
+        PendingCut.clear(context)
+        return
+    }
 
-    PendingCut.clear()
+    PendingCut.clear(context)
     PendingCut.files = files
     PendingCut.isActive = false
 
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val firstUri = getUriForUniversalFile(context, files[0]) ?: Uri.fromFile(File(files[0].providerId))
     val clipData = ClipData.newUri(context.contentResolver, files[0].name, firstUri)
 
@@ -72,6 +106,10 @@ fun copyToClipboard(context: Context, files: List<UniversalFile>) {
  * Marks files for moving (Cut). They stay on the clipboard but are flagged for deletion after paste.
  */
 fun cutToClipboard(context: Context, files: List<UniversalFile>) {
+    if (files.isEmpty()) {
+        PendingCut.clear(context)
+        return
+    }
     copyToClipboard(context, files)
     PendingCut.isActive = true
 }
@@ -413,7 +451,7 @@ suspend fun pasteFromClipboard(
                 .forEach { file ->
                     try { file.provider.delete(file.providerId) } catch (_: Exception) {}
                 }
-            PendingCut.clear()
+            PendingCut.clear(context)
         }
 
         if (pastedFileNames.isNotEmpty()) {

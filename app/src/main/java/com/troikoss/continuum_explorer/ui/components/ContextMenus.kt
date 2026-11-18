@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import android.widget.Toast
-import com.troikoss.continuum_explorer.utils.PendingCut
+import com.troikoss.continuum_explorer.utils.hasClipboardItems
 import com.troikoss.continuum_explorer.utils.RemoteCache
 import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
 import androidx.core.content.FileProvider
@@ -129,14 +129,13 @@ fun ItemContextMenu(
     appState: FileExplorerState
 ) {
     val context = LocalContext.current
-    val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     var hasClipboardItems by remember { mutableStateOf(false) }
 
     var currentScreen by remember { mutableStateOf("MAIN") }
 
     LaunchedEffect(expanded) {
         if (expanded) {
-            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
+            hasClipboardItems = hasClipboardItems(context)
         } else {
             currentScreen = "MAIN"
         }
@@ -645,12 +644,11 @@ fun BackgroundContextMenu(
     onAddStorage: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
-    val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     var hasClipboardItems by remember { mutableStateOf(false) }
 
     LaunchedEffect(expanded) {
         if (expanded) {
-            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
+            hasClipboardItems = hasClipboardItems(context)
         }
     }
 

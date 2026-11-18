@@ -34,6 +34,7 @@ fun ClipboardIndicator(
     backgroundColor: Color = LocalExtendedColors.current.sidebarBackground,
     contentColor: Color = LocalExtendedColors.current.textColor
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val clipboardFiles = PendingCut.files
     val isCut = PendingCut.isActive
     val count = clipboardFiles.size
@@ -106,7 +107,7 @@ fun ClipboardIndicator(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    IconButton(onClick = { PendingCut.clear() }) {
+                    IconButton(onClick = { PendingCut.clear(context) }) {
                         Icon(
                             Icons.Default.Clear,
                             contentDescription = "Clear",

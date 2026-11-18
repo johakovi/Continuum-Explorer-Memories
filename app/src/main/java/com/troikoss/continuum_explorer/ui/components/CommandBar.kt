@@ -4,6 +4,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.runtime.LaunchedEffect
 import com.troikoss.continuum_explorer.utils.PendingCut
+import com.troikoss.continuum_explorer.utils.hasClipboardItems
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -102,7 +103,7 @@ fun CommandBar(
     val context = LocalContext.current
     val pendingFiles = PendingCut.files
     val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
-    var hasClipboardItems by remember { mutableStateOf(clipboard.hasPrimaryClip() || pendingFiles.isNotEmpty()) }
+    var hasClipboardItems by remember { mutableStateOf(hasClipboardItems(context)) }
 
     val virtualStorage = listOf(LibraryItem.RecycleBin, LibraryItem.Gallery, LibraryItem.Videos, LibraryItem.Recent, LibraryItem.Documents, LibraryItem.Games, LibraryItem.Music, LibraryItem.NetworkStorages)
     val isInVirtualStorage = appState.libraryItem in virtualStorage
@@ -111,12 +112,12 @@ fun CommandBar(
     val isInMusic = appState.libraryItem == LibraryItem.Music
 
     LaunchedEffect(pendingFiles.size, clipboard.hasPrimaryClip()) {
-        hasClipboardItems = clipboard.hasPrimaryClip() || pendingFiles.isNotEmpty()
+        hasClipboardItems = hasClipboardItems(context)
     }
 
     DisposableEffect(clipboard) {
         val listener = ClipboardManager.OnPrimaryClipChangedListener {
-            hasClipboardItems = clipboard.hasPrimaryClip() || PendingCut.files.isNotEmpty()
+            hasClipboardItems = hasClipboardItems(context)
         }
         clipboard.addPrimaryClipChangedListener(listener)
         onDispose {
