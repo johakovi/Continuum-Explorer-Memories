@@ -701,10 +701,14 @@ private fun createDragTransferData(
         clipData.addItem(ClipData.Item(uris[i]))
     }
 
-    // Wrap it in TransferData with global permissions so other apps can read the files
+    // StrictMode prohibits file:// URIs when DRAG_FLAG_GLOBAL is present.
+    // If any URI has a file:// scheme, omit DRAG_FLAG_GLOBAL so StrictMode won't throw FileUriExposedException.
+    val hasFileUri = uris.any { it.scheme == "file" }
+    val flags = if (hasFileUri) 0 else (View.DRAG_FLAG_GLOBAL or View.DRAG_FLAG_GLOBAL_URI_READ)
+
     return DragAndDropTransferData(
         clipData = clipData,
-        flags = View.DRAG_FLAG_GLOBAL or View.DRAG_FLAG_GLOBAL_URI_READ
+        flags = flags
     )
 }
 

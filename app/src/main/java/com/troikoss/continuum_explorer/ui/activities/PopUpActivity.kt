@@ -1361,17 +1361,6 @@ fun DeleteConfirmContent(onClose: () -> Unit) {
             ) {
                 Text(stringResource(R.string.delete_recycle_bin), maxLines = 1, softWrap = false)
             }
-            
-            Button(
-                onClick = { FileOperationsManager.onDeleteChoice(DeleteResult.PERMANENT) },
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(stringResource(R.string.delete_permanently), maxLines = 1, softWrap = false)
-            }
         }
     }
 }

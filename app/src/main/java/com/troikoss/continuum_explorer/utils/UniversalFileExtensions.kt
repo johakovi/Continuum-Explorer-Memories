@@ -61,7 +61,8 @@ fun getUriForUniversalFile(context: Context, file: UniversalFile): Uri? {
     return try {
         when {
             file.isArchiveEntry -> Uri.parse("archive://${file.absolutePath}")
-            file.provider is LocalProvider -> {
+            file.providerId.startsWith("content://") -> Uri.parse(file.providerId)
+            file.provider is LocalProvider || file.provider.kind == ProviderKind.SHIZUKU || file.providerId.startsWith("/") -> {
                 val f = File(file.providerId)
                 try {
                     FileProvider.getUriForFile(context, context.packageName + ".provider", f)
@@ -69,18 +70,39 @@ fun getUriForUniversalFile(context: Context, file: UniversalFile): Uri? {
                     Uri.fromFile(f)
                 }
             }
-            file.providerId.startsWith("content://") || file.providerId.startsWith("file://") -> {
-                Uri.parse(file.providerId)
+            file.providerId.startsWith("file://") -> {
+                val path = Uri.parse(file.providerId).path
+                if (path != null && path.startsWith("/")) {
+                    val f = File(path)
+                    try {
+                        FileProvider.getUriForFile(context, context.packageName + ".provider", f)
+                    } catch (_: Exception) {
+                        Uri.parse(file.providerId)
+                    }
+                } else Uri.parse(file.providerId)
             }
             else -> {
                 val p = file.providerId.ifEmpty { file.name }
-                if (p.startsWith("/")) Uri.fromFile(File(p))
-                else Uri.parse("file://$p")
+                if (p.startsWith("/")) {
+                    val f = File(p)
+                    try {
+                        FileProvider.getUriForFile(context, context.packageName + ".provider", f)
+                    } catch (_: Exception) {
+                        Uri.fromFile(f)
+                    }
+                } else Uri.parse("file://$p")
             }
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        Uri.fromFile(File(file.providerId.ifEmpty { file.name }))
+        val p = file.providerId.ifEmpty { file.name }
+        if (p.startsWith("/")) {
+            try {
+                FileProvider.getUriForFile(context, context.packageName + ".provider", File(p))
+            } catch (_: Exception) {
+                Uri.fromFile(File(p))
+            }
+        } else Uri.fromFile(File(p))
     }
 }
 
