@@ -626,4 +626,6 @@
     <string name="format_tool_success">Almacenamiento formateado correctamente.</string>
     <string name="format_tool_failed">Formato finalizado/gestionado. Abriendo la configuración de almacenamiento del sistema si es necesario un formato completo…</string>
     <string name="format_tool_open_system_settings">Abrir configuración de almacenamiento del sistema</string>
+    <string name="clipboard_to_be_copied">Para copiar (%1$d)</string>
+    <string name="clipboard_to_be_moved">Para mover (%1$d)</string>
 </resources>

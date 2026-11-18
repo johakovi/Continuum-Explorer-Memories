@@ -190,7 +190,7 @@ object SettingsManager {
     private val _iconTouchSelection = mutableStateOf(true)
     val iconTouchSelection: State<Boolean> = _iconTouchSelection
 
-    private val _defaultViewMode = mutableStateOf(ViewMode.DETAILS)
+    private val _defaultViewMode = mutableStateOf(ViewMode.GRID)
     val defaultViewMode: State<ViewMode> = _defaultViewMode
 
 

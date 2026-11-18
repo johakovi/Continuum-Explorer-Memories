@@ -626,4 +626,6 @@
     <string name="format_tool_success">存储格式化成功。</string>
     <string name="format_tool_failed">格式化完成/已处理。如需完整格式化，正在打开系统存储设置…</string>
     <string name="format_tool_open_system_settings">打开系统存储设置</string>
+    <string name="clipboard_to_be_copied">待复制 (%1$d)</string>
+    <string name="clipboard_to_be_moved">待移动 (%1$d)</string>
 </resources>

@@ -626,4 +626,6 @@
     <string name="format_tool_success">Сховище успішно відформатовано.</string>
     <string name="format_tool_failed">Форматування завершено/оброблено. Відкриття системних налаштувань сховища, якщо потрібне повне форматування…</string>
     <string name="format_tool_open_system_settings">Відкрити системні налаштування сховища</string>
+    <string name="clipboard_to_be_copied">До копіювання (%1$d)</string>
+    <string name="clipboard_to_be_moved">До переміщення (%1$d)</string>
 </resources>

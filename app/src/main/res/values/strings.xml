@@ -629,5 +629,7 @@
     <string name="dialog_unresponsive_server_message">The server \"%1$s\" is taking a long time to respond. Would you like to keep waiting or cancel the operation?</string>
     <string name="dialog_wait">Wait</string>
     <string name="terminal_debug_title">Terminal Debug Output</string>
+    <string name="clipboard_to_be_copied">To be copied (%1$d)</string>
+    <string name="clipboard_to_be_moved">To be moved (%1$d)</string>
 </resources>
 

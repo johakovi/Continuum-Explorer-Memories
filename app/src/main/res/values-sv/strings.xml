@@ -626,4 +626,6 @@
     <string name="format_tool_success">Lagringen har formaterats.</string>
     <string name="format_tool_failed">Formatering klar/hanterad. Öppnar systemets lagringsinställningar om fullständig formatering krävs…</string>
     <string name="format_tool_open_system_settings">Öppna systemets lagringsinställningar</string>
+    <string name="clipboard_to_be_copied">Att kopiera (%1$d)</string>
+    <string name="clipboard_to_be_moved">Att flytta (%1$d)</string>
 </resources>

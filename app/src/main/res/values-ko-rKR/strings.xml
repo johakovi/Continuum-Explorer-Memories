@@ -625,4 +625,6 @@
     <string name="format_tool_success">저장소가 성공적으로 포맷되었습니다.</string>
     <string name="format_tool_failed">포맷 완료/처리됨. 전체 포맷이 필요한 경우 시스템 저장소 설정을 엽니다…</string>
     <string name="format_tool_open_system_settings">시스템 저장소 설정 열기</string>
+    <string name="clipboard_to_be_copied">복사할 항목 (%1$d)</string>
+    <string name="clipboard_to_be_moved">이동할 항목 (%1$d)</string>
 </resources>

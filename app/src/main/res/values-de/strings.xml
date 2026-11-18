@@ -626,4 +626,6 @@
     <string name="format_tool_success">Speicher erfolgreich formatiert.</string>
     <string name="format_tool_failed">Formatierung abgeschlossen. System-Speichereinstellungen werden geöffnet…</string>
     <string name="format_tool_open_system_settings">System-Speichereinstellungen öffnen</string>
+    <string name="clipboard_to_be_copied">Zu kopieren (%1$d)</string>
+    <string name="clipboard_to_be_moved">Zu verschieben (%1$d)</string>
 </resources>

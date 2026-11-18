@@ -625,4 +625,6 @@
     <string name="format_tool_success">Stockage formaté avec succès.</string>
     <string name="format_tool_failed">Formatage terminé/traité. Ouverture des paramètres de stockage du système si un formatage complet est nécessaire…</string>
     <string name="format_tool_open_system_settings">Ouvrir les paramètres de stockage du système</string>
+    <string name="clipboard_to_be_copied">À copier (%1$d)</string>
+    <string name="clipboard_to_be_moved">À déplacer (%1$d)</string>
 </resources>

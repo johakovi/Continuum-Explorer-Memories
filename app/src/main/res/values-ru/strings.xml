@@ -625,4 +625,6 @@
     <string name="format_tool_success">Накопитель успешно отформатирован.</string>
     <string name="format_tool_failed">Форматирование завершено/обработано. Открытие системных настроек хранилища, если требуется полное форматирование…</string>
     <string name="format_tool_open_system_settings">Открыть настройки хранилища системы</string>
+    <string name="clipboard_to_be_copied">К копированию (%1$d)</string>
+    <string name="clipboard_to_be_moved">К перемещению (%1$d)</string>
 </resources>

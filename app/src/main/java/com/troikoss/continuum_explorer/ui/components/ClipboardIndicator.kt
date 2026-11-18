@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.troikoss.continuum_explorer.ui.theme.LocalExtendedColors
 import com.troikoss.continuum_explorer.utils.PendingCut
+import androidx.compose.ui.res.stringResource
+import com.troikoss.continuum_explorer.R
 
 @Composable
 fun ClipboardIndicator(
@@ -103,7 +105,7 @@ fun ClipboardIndicator(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (isCut) "To be moved ($count)" else "To be copied ($count)",
+                        text = if (isCut) stringResource(R.string.clipboard_to_be_moved, count) else stringResource(R.string.clipboard_to_be_copied, count),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary
                     )

@@ -626,4 +626,6 @@
     <string name="format_tool_success">Tallennustila alustettu onnistuneesti.</string>
     <string name="format_tool_failed">Alustus valmis/käsitelty. Avataan järjestelmän tallennustila-asetukset, jos täydellinen alustus on tarpeen…</string>
     <string name="format_tool_open_system_settings">Avaa järjestelmän tallennustila-asetukset</string>
+    <string name="clipboard_to_be_copied">Kopioitavana (%1$d)</string>
+    <string name="clipboard_to_be_moved">Siirrettävänä (%1$d)</string>
 </resources>

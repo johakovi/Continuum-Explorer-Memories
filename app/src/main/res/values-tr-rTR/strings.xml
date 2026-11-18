@@ -606,4 +606,6 @@
     <string name="format_tool_success">Depolama alanı başarıyla biçimlendirildi.</string>
     <string name="format_tool_failed">Biçimlendirme tamamlandı/işlendi. Tam biçimlendirme gerekliyse Sistem Depolama Ayarları açılıyor…</string>
     <string name="format_tool_open_system_settings">Sistem Depolama Ayarlarını Aç</string>
+    <string name="clipboard_to_be_copied">Kopyalanacak (%1$d)</string>
+    <string name="clipboard_to_be_moved">Taşınacak (%1$d)</string>
 </resources>
