@@ -39,6 +39,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -128,6 +129,16 @@ import com.troikoss.continuum_explorer.utils.getSiblingFiles
 import com.troikoss.continuum_explorer.managers.CleanupManager
 import com.troikoss.continuum_explorer.utils.renameFile
 import com.troikoss.continuum_explorer.utils.toUniversal
+import android.text.format.Formatter
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
+import com.troikoss.continuum_explorer.utils.getFileType
+import com.troikoss.continuum_explorer.utils.getImageResolution
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -198,6 +209,7 @@ fun ImageViewerScreen(
 
     var showMenu by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(Offset.Zero) }
+    var showProperties by remember { mutableStateOf(false) }
 
     LaunchedEffect(initialImageUri) {
         if (initialImageUri != null) {
@@ -700,22 +712,32 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.menu_rename)) },
                         onClick = {
                             showMenu = false
-                            withImageFile(currentUri) { file ->
-                                val target = file.toUniversal()
-                                FileOperationsManager.openRename(target, context) { newName ->
+                            val targetFile = resolveToUniversalFile(currentUri)
+                            if (targetFile != null) {
+                                FileOperationsManager.openRename(targetFile, context) { newName ->
                                     FileOperationsManager.start()
-                                    FileOperationsManager.update(0, 1, operationType= OperationType.RENAME)
-                                    FileOperationsManager.currentFileName.value = target.name
+                                    FileOperationsManager.update(0, 1, operationType = OperationType.RENAME)
+                                    FileOperationsManager.currentFileName.value = targetFile.name
                                     startPopUpActivity(context)
                                     coroutineScope.launch {
-                                        val success = renameFile(target, newName)
+                                        val success = renameFile(targetFile, newName)
                                         if (success) {
-                                            val newFile = File(file.parentFile, newName)
-                                            val newUriString = Uri.fromFile(newFile).toString()
+                                            val localFile = targetFile.fileRef
+                                            val updatedTarget: Any = if (localFile != null) {
+                                                val newFile = File(localFile.parentFile, newName)
+                                                newFile.toUniversal()
+                                            } else {
+                                                targetFile.copy(
+                                                    name = newName,
+                                                    providerId = if (targetFile.providerId.contains('/')) {
+                                                        targetFile.providerId.substringBeforeLast('/') + "/" + newName
+                                                    } else newName
+                                                )
+                                            }
                                             val index = siblingImages.indexOf(currentUri)
                                             if (index != -1) {
-                                                siblingImages = siblingImages.toMutableList().apply { set(index, newUriString) }
-                                                currentUri = newUriString
+                                                siblingImages = siblingImages.toMutableList().apply { set(index, updatedTarget) }
+                                                currentUri = updatedTarget
                                             }
                                             GlobalEvents.triggerRefresh()
                                         } else {
@@ -734,24 +756,18 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.menu_delete)) },
                         onClick = {
                             showMenu = false
-                            withImageFile(currentUri) { file ->
-                                FileOperationsManager.start()
-                                startPopUpActivity(context)
-                                coroutineScope.launch {
-                                    deleteFiles(context, listOf(file.toUniversal()))
-                                    if (!file.exists()) {
-                                        val index = siblingImages.indexOf(currentUri)
-                                        val newList = siblingImages.filter { it != currentUri }
-                                        if (newList.isEmpty()) {
-                                            activity?.finish()
-                                        } else {
-                                            siblingImages = newList
-                                            currentUri = if (index < newList.size) newList[index] else newList.last()
-                                        }
-                                        GlobalEvents.triggerRefresh()
-                                    }
+                            performDeleteImage(
+                                data = currentUri,
+                                context = context,
+                                coroutineScope = coroutineScope,
+                                activity = activity,
+                                siblingImages = siblingImages,
+                                currentUri = currentUri,
+                                onUpdateState = { nextUri, newList ->
+                                    siblingImages = newList
+                                    currentUri = nextUri
                                 }
-                            }
+                            )
                         }
                     )
 
@@ -760,10 +776,7 @@ fun ImageViewerScreen(
                         leadingIcon = { Icon(Icons.Default.Info, contentDescription = stringResource(R.string.menu_properties)) },
                         onClick = {
                             showMenu = false
-                            withImageFile(currentUri) { file ->
-                                FileOperationsManager.showProperties(listOf(file.toUniversal()))
-                                startPopUpActivity(context)
-                            }
+                            showProperties = !showProperties
                         }
                     )
 
@@ -861,6 +874,19 @@ fun ImageViewerScreen(
                             }
                         }
 
+                        // Inline Properties Panel
+                        AnimatedVisibility(
+                            visible = showProperties,
+                            enter = fadeIn() + slideInVertically { it / 2 },
+                            exit = fadeOut() + slideOutVertically { it / 2 }
+                        ) {
+                            ImagePropertiesPanel(
+                                currentUri = currentUri,
+                                imageSize = imageSize,
+                                onClose = { showProperties = false }
+                            )
+                        }
+
                         // Control panel
                         val panelHazeState = LocalHazeState.current
                         Box(
@@ -877,9 +903,9 @@ fun ImageViewerScreen(
                         ) {
                             Row(
                                 modifier = Modifier
-                                    .padding(horizontal = 24.dp)
+                                    .padding(horizontal = 20.dp)
                                     .fillMaxHeight(),
-                                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = { rotation = (rotation + 90f) % 360f }) {
@@ -903,24 +929,27 @@ fun ImageViewerScreen(
                                     Icon(Icons.Default.Share, contentDescription = stringResource(R.string.menu_share), tint = Color.White)
                                 }
                                 IconButton(onClick = {
-                                    withImageFile(currentUri) { file ->
-                                        FileOperationsManager.start()
-                                        startPopUpActivity(context)
-                                        coroutineScope.launch {
-                                            deleteFiles(context, listOf(file.toUniversal()))
-                                            if (!file.exists()) {
-                                                val index = siblingImages.indexOf(currentUri)
-                                                val newList = siblingImages.filter { it != currentUri }
-                                                if (newList.isEmpty()) {
-                                                    activity?.finish()
-                                                } else {
-                                                    siblingImages = newList
-                                                    currentUri = if (index < newList.size) newList[index] else newList.last()
-                                                }
-                                                GlobalEvents.triggerRefresh()
-                                            }
+                                    showProperties = !showProperties
+                                }) {
+                                    Icon(
+                                        Icons.Default.Info,
+                                        contentDescription = stringResource(R.string.menu_properties),
+                                        tint = if (showProperties) Color(0xFF64B5F6) else Color.White
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    performDeleteImage(
+                                        data = currentUri,
+                                        context = context,
+                                        coroutineScope = coroutineScope,
+                                        activity = activity,
+                                        siblingImages = siblingImages,
+                                        currentUri = currentUri,
+                                        onUpdateState = { nextUri, newList ->
+                                            siblingImages = newList
+                                            currentUri = nextUri
                                         }
-                                    }
+                                    )
                                 }) {
                                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.menu_delete), tint = Color.White)
                                 }
@@ -951,21 +980,221 @@ fun ImageViewerScreen(
 }
 }
 
-private fun withImageFile(data: Any?, action: (File) -> Unit) {
-    if (data is UniversalFile) {
-        data.fileRef?.let { if (it.exists()) action(it) }
-        return
-    }
-    val uriString = data as? String
-    uriString?.let {
-        val uri = Uri.parse(it)
-        val path = if (uri.scheme == "file" || uri.scheme == null) uri.path ?: it else null
-        path?.let { filePath ->
-            val file = File(filePath)
-            if (file.exists()) {
-                action(file)
+@Composable
+private fun ImagePropertiesPanel(
+    currentUri: Any?,
+    imageSize: Size,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    var fileType by remember(currentUri) { mutableStateOf<String?>(null) }
+    var fileSizeString by remember(currentUri) { mutableStateOf<String?>(null) }
+    var filePathString by remember(currentUri) { mutableStateOf<String?>(null) }
+    var fileNameString by remember(currentUri) { mutableStateOf<String?>(null) }
+    var dateString by remember(currentUri) { mutableStateOf<String?>(null) }
+    var extraRes by remember(currentUri) { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(currentUri) {
+        withContext(Dispatchers.IO) {
+            when (val data = currentUri) {
+                is UniversalFile -> {
+                    fileNameString = data.name
+                    fileType = getFileType(data, context)
+                    if (data.length > 0L) {
+                        fileSizeString = formatSizeWithBytes(context, data.length)
+                    }
+                    filePathString = data.absolutePath.ifEmpty { data.providerId }
+                    if (data.lastModified > 0L) {
+                        val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault())
+                        dateString = formatter.format(Date(data.lastModified))
+                    }
+                    val res = getImageResolution(context, data)
+                    if (res.isNotEmpty() && res != "0x0" && res != "0 x 0") {
+                        extraRes = res
+                    }
+                }
+                is File -> {
+                    val universal = data.toUniversal()
+                    fileNameString = data.name
+                    fileType = getFileType(universal, context)
+                    if (data.length() > 0L) {
+                        fileSizeString = formatSizeWithBytes(context, data.length())
+                    }
+                    filePathString = data.absolutePath
+                    if (data.lastModified() > 0L) {
+                        val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault())
+                        dateString = formatter.format(Date(data.lastModified()))
+                    }
+                    val res = getImageResolution(context, universal)
+                    if (res.isNotEmpty() && res != "0x0" && res != "0 x 0") {
+                        extraRes = res
+                    }
+                }
+                is String -> {
+                    val uri = Uri.parse(data)
+                    val path = uri.path ?: data
+                    val f = File(path)
+                    if (f.exists()) {
+                        val universal = f.toUniversal()
+                        fileNameString = f.name
+                        fileType = getFileType(universal, context)
+                        if (f.length() > 0L) {
+                            fileSizeString = formatSizeWithBytes(context, f.length())
+                        }
+                        filePathString = f.absolutePath
+                        if (f.lastModified() > 0L) {
+                            val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault())
+                            dateString = formatter.format(Date(f.lastModified()))
+                        }
+                        val res = getImageResolution(context, universal)
+                        if (res.isNotEmpty() && res != "0x0" && res != "0 x 0") {
+                            extraRes = res
+                        }
+                    } else {
+                        fileNameString = uri.lastPathSegment ?: data.substringAfterLast('/')
+                        filePathString = data
+                    }
+                }
             }
         }
+    }
+
+    val displayResolution = remember(imageSize, extraRes) {
+        if (imageSize.width > 0f && imageSize.height > 0f) {
+            "${imageSize.width.toInt()} × ${imageSize.height.toInt()}"
+        } else extraRes
+    }
+
+    val panelHazeState = LocalHazeState.current
+
+    Box(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .fillMaxWidth(0.92f)
+            .hazeBlur(
+                panelHazeState,
+                Color(0xFF1E1E1E).copy(alpha = 0.85f),
+                RoundedCornerShape(16.dp)
+            )
+            .background(Color(0xFF1E1E1E).copy(alpha = 0.0f))
+            .padding(16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.properties),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                IconButton(
+                    onClick = onClose,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.close),
+                        tint = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+            }
+
+            HorizontalDivider(color = Color.White.copy(alpha = 0.15f), modifier = Modifier.padding(vertical = 2.dp))
+
+            fileNameString?.let { ImagePropertyRow(stringResource(R.string.prop_name), it) }
+            fileType?.let { ImagePropertyRow(stringResource(R.string.prop_type), it) }
+            displayResolution?.let { ImagePropertyRow(stringResource(R.string.prop_resolution), it) }
+            fileSizeString?.let { ImagePropertyRow(stringResource(R.string.prop_size), it) }
+            filePathString?.let { ImagePropertyRow(stringResource(R.string.prop_location), it) }
+            dateString?.let { ImagePropertyRow(stringResource(R.string.prop_modified), it) }
+        }
+    }
+}
+
+@Composable
+private fun ImagePropertyRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White.copy(alpha = 0.7f),
+            modifier = Modifier.width(90.dp)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+private fun formatSizeWithBytes(context: Context, sizeInBytes: Long): String {
+    val formattedSize = Formatter.formatFileSize(context, sizeInBytes)
+    val exactBytes = NumberFormat.getInstance().format(sizeInBytes)
+    return "$formattedSize ($exactBytes ${context.getString(R.string.prop_bytes)})"
+}
+
+private fun resolveToUniversalFile(data: Any?): UniversalFile? {
+    if (data is UniversalFile) return data
+    if (data is File) return data.toUniversal()
+    val uriString = data as? String ?: (data as? Uri)?.toString() ?: return null
+    val uri = Uri.parse(uriString)
+    if (uri.scheme == "file" || uri.scheme == null) {
+        val path = uri.path ?: uriString
+        val file = File(path)
+        if (file.exists()) return file.toUniversal()
+    }
+    return null
+}
+
+private fun performDeleteImage(
+    data: Any?,
+    context: Context,
+    coroutineScope: CoroutineScope,
+    activity: Activity?,
+    siblingImages: List<Any>,
+    currentUri: Any?,
+    onUpdateState: (nextUri: Any?, newSiblingImages: List<Any>) -> Unit
+) {
+    val targetFile = resolveToUniversalFile(data) ?: return
+    FileOperationsManager.start()
+    startPopUpActivity(context)
+    coroutineScope.launch {
+        deleteFiles(context, listOf(targetFile))
+        val stillExists = withContext(Dispatchers.IO) {
+            try {
+                targetFile.provider.exists(targetFile.providerId)
+            } catch (_: Exception) {
+                false
+            }
+        }
+        if (!stillExists) {
+            withContext(Dispatchers.Main) {
+                val index = siblingImages.indexOf(currentUri)
+                val newList = siblingImages.filter { it != currentUri }
+                if (newList.isEmpty()) {
+                    activity?.finish()
+                } else {
+                    val nextUri = if (index < newList.size) newList[index] else newList.last()
+                    onUpdateState(nextUri, newList)
+                }
+                GlobalEvents.triggerRefresh()
+            }
+        }
+        FileOperationsManager.finish()
     }
 }
 
