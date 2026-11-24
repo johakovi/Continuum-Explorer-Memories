@@ -5,11 +5,19 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
+import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.model.LibraryItem
 import com.troikoss.continuum_explorer.model.ViewMode
 import com.troikoss.continuum_explorer.model.SubtitleStyle
 import com.troikoss.continuum_explorer.model.SubtitleFontSize
 import com.troikoss.continuum_explorer.utils.GlobalEvents
+
+enum class AppNameOption(val stringResId: Int, val aliasClassName: String) {
+    MEMORIES_EXPLORER(R.string.app_name, "com.troikoss.continuum_explorer.ui.activities.MainActivity"),
+    CONTINUUM_EXPLORER(R.string.app_name2, "com.troikoss.continuum_explorer.ui.activities.MainActivityAlias2"),
+    FILE_EXPLORER(R.string.app_name3, "com.troikoss.continuum_explorer.ui.activities.MainActivityAlias3"),
+    MY_FILES(R.string.app_name4, "com.troikoss.continuum_explorer.ui.activities.MainActivityAlias4")
+}
 
 enum class DetailsMode {
     OFF,
@@ -79,6 +87,7 @@ object SettingsManager {
     private const val KEY_FOLDER_ICON_THEME = "folder_icon_theme"
     private const val KEY_HOME_ICON_THEME = "home_icon_theme"
     private const val KEY_CUSTOM_THEME_MODE = "custom_theme_mode"
+    private const val KEY_APP_NAME_OPTION = "app_name_option"
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
@@ -162,6 +171,9 @@ object SettingsManager {
 
     private val _customThemeMode = mutableStateOf(ThemeMode.SYSTEM)
     val customThemeMode: State<ThemeMode> = _customThemeMode
+
+    private val _appName = mutableStateOf(AppNameOption.MEMORIES_EXPLORER)
+    val appName: State<AppNameOption> = _appName
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
@@ -380,6 +392,15 @@ object SettingsManager {
         _language.value = savedLanguage
         applyLocale(savedLanguage)
 
+        val savedAppName = prefs.getString(KEY_APP_NAME_OPTION, AppNameOption.MEMORIES_EXPLORER.name)
+        val appNameOpt = try {
+            AppNameOption.valueOf(savedAppName ?: AppNameOption.MEMORIES_EXPLORER.name)
+        } catch (_: Exception) {
+            AppNameOption.MEMORIES_EXPLORER
+        }
+        _appName.value = appNameOpt
+        applyAppNameAlias(context, appNameOpt)
+
         _tabBarBackgroundUri.value = prefs.getString(KEY_TAB_BAR_BACKGROUND_URI, null)
 
         val savedDetails = prefs.getString(KEY_DETAILS_MODE, DetailsMode.OFF.name)
@@ -486,6 +507,38 @@ object SettingsManager {
         prefs.edit().putString(KEY_LANGUAGE, languageTag).apply()
         applyLocale(languageTag)
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setAppName(context: Context, option: AppNameOption) {
+        _appName.value = option
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_APP_NAME_OPTION, option.name).apply()
+        applyAppNameAlias(context, option)
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    private fun applyAppNameAlias(context: Context, option: AppNameOption) {
+        try {
+            val pm = context.packageManager
+            val packageName = context.packageName
+            AppNameOption.entries.forEach { target ->
+                val componentName = android.content.ComponentName(packageName, target.aliasClassName)
+                val newState = if (target == option) {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
+                if (pm.getComponentEnabledSetting(componentName) != newState) {
+                    pm.setComponentEnabledSetting(
+                        componentName,
+                        newState,
+                        android.content.pm.PackageManager.DONT_KILL_APP
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun applyLocale(languageTag: String) {

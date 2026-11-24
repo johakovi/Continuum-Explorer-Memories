@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">文件管理器</string>
+    <string name="app_name4">我的文件</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">新窗口</string>
@@ -189,6 +190,8 @@
     <!-- Settings -->
     <string name="settings">设置</string>
     <string name="settings_appearance">外观</string>
+    <string name="settings_app_name">应用名称</string>
+    <string name="settings_choose_app_name">选择应用名称</string>
     <string name="settings_theme">主题</string>
     <string name="settings_theme_system">系统默认</string>
     <string name="settings_theme_light">浅色模式</string>

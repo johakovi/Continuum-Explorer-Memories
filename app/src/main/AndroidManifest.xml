@@ -45,6 +45,51 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity-alias
+            android:name=".ui.activities.MainActivityAlias2"
+            android:targetActivity=".ui.activities.MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:name=".ui.activities.MainActivityAlias3"
+            android:targetActivity=".ui.activities.MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name3">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:name=".ui.activities.MainActivityAlias4"
+            android:targetActivity=".ui.activities.MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name4">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity-alias>
+
         <activity
             android:name=".ui.activities.NewWindowActivity"
             android:exported="true"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">Explorador de archivos</string>
+    <string name="app_name4">Mis archivos</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">Nueva ventana</string>
@@ -190,6 +191,8 @@
     <!-- Settings -->
     <string name="settings">Ajustes</string>
     <string name="settings_appearance">Apariencia</string>
+    <string name="settings_app_name">Nombre de la aplicación</string>
+    <string name="settings_choose_app_name">Elegir nombre de la aplicación</string>
     <string name="settings_theme">Tema</string>
     <string name="settings_theme_system">Predeterminado del sistema</string>
     <string name="settings_theme_light">Modo claro</string>

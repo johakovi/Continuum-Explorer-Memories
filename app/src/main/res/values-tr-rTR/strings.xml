@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">Dosya Gezgini</string>
+    <string name="app_name4">Dosyalarım</string>
     <string name="shortcut_new_window_short">Yeni Pencere</string>
     <string name="shortcut_new_window_long">Yeni Pencere</string>
     <string name="cancel">İptal Et</string>
@@ -178,6 +179,8 @@
 
     <string name="settings">Ayarlar</string>
     <string name="settings_appearance">Görünüm</string>
+    <string name="settings_app_name">Uygulama Adı</string>
+    <string name="settings_choose_app_name">Uygulama Adı Seçin</string>
     <string name="settings_theme">Tema</string>
     <string name="settings_theme_system">Sistem varsayılanı</string>
     <string name="settings_theme_light">Açık tema</string>

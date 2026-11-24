@@ -371,7 +371,7 @@ fun NavigationPane(
                 ) {
                     if (!isMinimized) {
                         Text(
-                            text = stringResource(R.string.app_name),
+                            text = stringResource(SettingsManager.appName.value.stringResId),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

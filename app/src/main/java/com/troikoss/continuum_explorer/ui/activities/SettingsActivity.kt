@@ -53,6 +53,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.troikoss.continuum_explorer.R
 import com.troikoss.continuum_explorer.ui.theme.FileExplorerTheme
 import com.troikoss.continuum_explorer.ui.theme.ThemeFolderColors
+import com.troikoss.continuum_explorer.managers.AppNameOption
 import com.troikoss.continuum_explorer.managers.DeleteBehavior
 import com.troikoss.continuum_explorer.managers.DetailsMode
 import com.troikoss.continuum_explorer.managers.FileOperationsManager
@@ -91,6 +92,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val themeBar = SettingsManager.themeBar.value
     val themeContent = SettingsManager.themeContent.value
     val themeTop = SettingsManager.themeTop.value
+    val appNameOption = SettingsManager.appName.value
     val language = SettingsManager.language.value
     val detailsMode = SettingsManager.detailsMode.value
     val startingPage = SettingsManager.startingPage.value
@@ -153,6 +155,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var showThemeBarDialog by remember { mutableStateOf(false) }
     var showThemeContentDialog by remember { mutableStateOf(false) }
     var showThemeTopDialog by remember { mutableStateOf(false) }
+    var showAppNameDialog by remember { mutableStateOf(false) }
     var showIconStyleDialog by remember { mutableStateOf(false) }
     var showMusicIconDialog by remember { mutableStateOf(false) }
     var showSidebarIconDialog by remember { mutableStateOf(false) }
@@ -194,6 +197,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(16.dp)
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_app_name)) },
+                supportingContent = { Text(stringResource(appNameOption.stringResId)) },
+                modifier = Modifier.clickable { showAppNameDialog = true }
             )
 
             ListItem(
@@ -1443,6 +1452,32 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showLanguageDialog = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            if (showAppNameDialog) {
+                AlertDialog(
+                    onDismissRequest = { showAppNameDialog = false },
+                    title = { Text(stringResource(R.string.settings_choose_app_name)) },
+                    text = {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            AppNameOption.entries.forEach { option ->
+                                OptionItem(
+                                    label = stringResource(option.stringResId),
+                                    selected = appNameOption == option,
+                                    onClick = {
+                                        SettingsManager.setAppName(context, option)
+                                        showAppNameDialog = false
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showAppNameDialog = false }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }

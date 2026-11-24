@@ -1,5 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name" translatable="false">Memories Explorer</string>
+    <string name="app_name2" translatable="false">Continuum Explorer</string>
+    <string name="app_name3">File Explorer</string>
+    <string name="app_name4">My Files</string>
+
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">New Window</string>
@@ -201,6 +205,8 @@
     <!-- Settings -->
     <string name="settings">Settings</string>
     <string name="settings_appearance">Appearance</string>
+    <string name="settings_app_name">App Name</string>
+    <string name="settings_choose_app_name">Choose App Name</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light mode</string>

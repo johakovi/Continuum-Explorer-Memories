@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">Tiedostoselain</string>
+    <string name="app_name4">Omat tiedostot</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">Uusi ikkuna</string>
@@ -189,6 +190,8 @@
     <!-- Settings -->
     <string name="settings">Asetukset</string>
     <string name="settings_appearance">Ulkonäkö</string>
+    <string name="settings_app_name">Sovelluksen nimi</string>
+    <string name="settings_choose_app_name">Valitse sovelluksen nimi</string>
     <string name="settings_theme">Teema</string>
     <string name="settings_themebar">Sivupalkki</string>
     <string name="settings_themebar_rounded">Pyöreä</string>

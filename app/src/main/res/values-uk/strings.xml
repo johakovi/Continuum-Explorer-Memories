@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">Провідник</string>
+    <string name="app_name4">Мої файли</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">Нове вікно</string>
@@ -189,6 +190,8 @@
     <!-- Settings -->
     <string name="settings">Налаштування</string>
     <string name="settings_appearance">Зовнішній вигляд</string>
+    <string name="settings_app_name">Назва додатка</string>
+    <string name="settings_choose_app_name">Виберіть назву додатка</string>
     <string name="settings_theme">Тема</string>
     <string name="settings_theme_system">Системна</string>
     <string name="settings_theme_light">Світла</string>

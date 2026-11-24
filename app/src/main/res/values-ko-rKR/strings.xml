@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">파일 탐색기</string>
+    <string name="app_name4">내 파일</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">새 창</string>
@@ -189,6 +190,8 @@
     <!-- Settings -->
     <string name="settings">설정</string>
     <string name="settings_appearance">테마 및 모양</string>
+    <string name="settings_app_name">앱 이름</string>
+    <string name="settings_choose_app_name">앱 이름 선택</string>
     <string name="settings_theme">테마</string>
     <string name="settings_theme_system">시스템 기본값</string>
     <string name="settings_theme_light">라이트 모드</string>

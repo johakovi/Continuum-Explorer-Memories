@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Continuum Explorer</string>
+    <string name="app_name3">Проводник</string>
+    <string name="app_name4">Мои файлы</string>
 
     <!-- Shortcuts -->
     <string name="shortcut_new_window_short">Новое окно</string>
@@ -189,6 +190,8 @@
     <!-- Settings -->
     <string name="settings">Настройки</string>
     <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_app_name">Название приложения</string>
+    <string name="settings_choose_app_name">Выберите название приложения</string>
     <string name="settings_theme">Тема</string>
     <string name="settings_theme_system">Системная</string>
     <string name="settings_theme_light">Светлая</string>
