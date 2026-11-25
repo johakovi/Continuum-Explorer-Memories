@@ -1,0 +1,32 @@
+Categories:
+  - File Manager
+  - System
+  - File Transfer
+  - Gallery
+  - Game Helper
+  - Local Media Player
+  - Multimedia
+  - Text Editor
+License: GPL-3.0-or-later
+AuthorName: johakovi
+AuthorEmail: johakovi@gmail.com
+WebSite: https://github.com/johakovi
+SourceCode: https://github.com/johakovi/Continuum-Explorer-Memories
+IssueTracker: https://github.com/johakovi/Continuum-Explorer-Memories/issues
+Translation: https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/app/src/main/res/values/strings.xml
+Changelog: https://github.com/johakovi/Continuum-Explorer-Memories/blob/master/metadata/en-US/changelogs/changelog.md
+Donate: https://ko-fi.com/johakovi/tip
+Liberapay: 
+OpenCollective: 
+Bitcoin: 
+
+AutoName: Continuum Explorer Memories
+
+RepoType: git
+Repo: https://gitlab.com/fdroid/fdroidclient.git (TÄYTYY TEHDÄ!)
+
+Builds:
+  - versionName: 'Memories M10'
+    versionCode: 50
+    commit: c626ce5f6d3e10ae15942f01ff028be310cc695a (TÄYTYY MÄÄRITTÄÄ)
+    init: rm -f build.xml (TÄYTYY MÄÄRITTÄÄ)
