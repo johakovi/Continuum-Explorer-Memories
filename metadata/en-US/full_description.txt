@@ -1,12 +1,11 @@
 
-Continuum Explorer (Memories)
+Continuum Explorer Memories
 
 Multifunctional filemanager, for working with your files or just to play your media!
 Works with tablets, desktops and phones. UI Adapts to your device screen.
 
-Note: This project is forked from troikoss / Continuum Explorer
+Note: This project was originally forked from [troikoss / Continuum Explorer](https://github.com/troikoss/Continuum-Explorer), but now it works as standalone.
 
-Key Features:
 Multimedia:
 - Video player
 - Picture viewer
@@ -24,8 +23,10 @@ File managament:
 - Game Save Manager
 - Shizuku privilege
 - Termux privilege
+- Formatting tool (coming soon)
 
 Themes:
 - Custom theme packs
 - Customizable tab bar background
 - Customizable UI
+
