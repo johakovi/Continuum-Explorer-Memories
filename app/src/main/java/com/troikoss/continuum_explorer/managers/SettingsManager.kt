@@ -19,6 +19,38 @@ enum class AppNameOption(val stringResId: Int, val aliasClassName: String) {
     MY_FILES(R.string.app_name4, "com.troikoss.continuum_explorer.ui.activities.MainActivityAlias4")
 }
 
+enum class AppIconOption(
+    val titleResId: Int,
+    val aliasClassName: String,
+    val bgDrawableResId: Int,
+    val fgDrawableResId: Int
+) {
+    ORIGINAL(
+        R.string.app_icon_original,
+        "com.troikoss.continuum_explorer.ui.activities.MainActivity",
+        R.drawable.ic_launcher_background,
+        R.drawable.ic_launcher_foreground
+    ),
+    YELLOW(
+        R.string.app_icon_yellow,
+        "com.troikoss.continuum_explorer.ui.activities.MainActivityAliasYellow",
+        R.drawable.ic_launcher_background_yellow,
+        R.drawable.ic_launcher_foreground
+    ),
+    BLACK(
+        R.string.app_icon_black,
+        "com.troikoss.continuum_explorer.ui.activities.MainActivityAliasBlack",
+        R.drawable.ic_launcher_background_black,
+        R.drawable.ic_launcher_foreground
+    ),
+    DOODLE(
+        R.string.app_icon_doodle,
+        "com.troikoss.continuum_explorer.ui.activities.MainActivityAliasDoodle",
+        R.drawable.ic_launcher_background_doodle,
+        R.drawable.ic_launcher_doodle_foreground
+    )
+}
+
 enum class DetailsMode {
     OFF,
     PANE,
@@ -88,6 +120,7 @@ object SettingsManager {
     private const val KEY_HOME_ICON_THEME = "home_icon_theme"
     private const val KEY_CUSTOM_THEME_MODE = "custom_theme_mode"
     private const val KEY_APP_NAME_OPTION = "app_name_option"
+    private const val KEY_APP_ICON_OPTION = "app_icon_option"
 
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DETAILS_MODE = "details_mode"
@@ -174,6 +207,9 @@ object SettingsManager {
 
     private val _appName = mutableStateOf(AppNameOption.MEMORIES_EXPLORER)
     val appName: State<AppNameOption> = _appName
+
+    private val _appIcon = mutableStateOf(AppIconOption.ORIGINAL)
+    val appIcon: State<AppIconOption> = _appIcon
 
     private val _language = mutableStateOf("system")
     val language: State<String> = _language
@@ -401,6 +437,15 @@ object SettingsManager {
         _appName.value = appNameOpt
         applyAppNameAlias(context, appNameOpt)
 
+        val savedAppIcon = prefs.getString(KEY_APP_ICON_OPTION, AppIconOption.ORIGINAL.name)
+        val appIconOpt = try {
+            AppIconOption.valueOf(savedAppIcon ?: AppIconOption.ORIGINAL.name)
+        } catch (_: Exception) {
+            AppIconOption.ORIGINAL
+        }
+        _appIcon.value = appIconOpt
+        applyAppIconAlias(context, appIconOpt)
+
         _tabBarBackgroundUri.value = prefs.getString(KEY_TAB_BAR_BACKGROUND_URI, null)
 
         val savedDetails = prefs.getString(KEY_DETAILS_MODE, DetailsMode.OFF.name)
@@ -515,6 +560,38 @@ object SettingsManager {
         prefs.edit().putString(KEY_APP_NAME_OPTION, option.name).apply()
         applyAppNameAlias(context, option)
         GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setAppIcon(context: Context, option: AppIconOption) {
+        _appIcon.value = option
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_APP_ICON_OPTION, option.name).apply()
+        applyAppIconAlias(context, option)
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    private fun applyAppIconAlias(context: Context, option: AppIconOption) {
+        try {
+            val pm = context.packageManager
+            val packageName = context.packageName
+            AppIconOption.entries.forEach { target ->
+                val componentName = android.content.ComponentName(packageName, target.aliasClassName)
+                val newState = if (target == option) {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
+                if (pm.getComponentEnabledSetting(componentName) != newState) {
+                    pm.setComponentEnabledSetting(
+                        componentName,
+                        newState,
+                        android.content.pm.PackageManager.DONT_KILL_APP
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun applyAppNameAlias(context: Context, option: AppNameOption) {

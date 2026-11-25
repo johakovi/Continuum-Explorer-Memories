@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Hand drawn / sketchy folder outline -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M32,45 C32,44 38,44 42,44 C45,44 47,48 50,48 C54,48 72,48 74,48 C77,48 78,50 78,53 C78,57 78,68 78,70 C78,73 76,74 72,74 C65,74 37,74 34,74 C31,74 30,72 30,68 C30,62 30,50 30,47 C30,45 31,45 32,45 Z"
+        android:strokeWidth="3.5"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Folder tab sketch line -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M31,52 C40,52 68,52 77,52"
+        android:strokeWidth="2.5"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round" />
+
+    <!-- Cute doodle star / sparkle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M66,38 L68,43 L73,43 L69,46 L71,51 L66,48 L61,51 L63,46 L59,43 L64,43 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#E67E22"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Small doodle smile / squiggle inside folder -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M48,62 Q54,67 60,62"
+        android:strokeWidth="2.5"
+        android:strokeColor="#2C3E50"
+        android:strokeLineCap="round" />
+</vector>
