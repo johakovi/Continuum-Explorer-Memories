@@ -1,5 +1,5 @@
 
-# Continuum Explorer (Memories)
+# Continuum Explorer Memories
 <img width="72" height="72" alt="ic_launcher" src="https://github.com/user-attachments/assets/4da8432b-f41d-443b-af68-88bec19c9cd7" />
 
  ### [**User manual**](https://github.com/johakovi/Continuum-Explorer-Memories/wiki)
