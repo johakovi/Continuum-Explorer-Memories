@@ -11,7 +11,7 @@ android {
         applicationId = "com.troikoss.continuum_explorer_memories"
         minSdk = 28
         targetSdk = 37
-        versionCode = 42
+        versionCode = 50
         versionName = "Memories M10" //Remember to change versionCode number in every update!
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
