@@ -66,15 +66,17 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
     val isExpanded = AudioManager.isExpanded
     val context = LocalContext.current
     val density = LocalDensity.current
+    val hazeState = LocalHazeState.current
+    val playerContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
 
     val configuration = LocalConfiguration.current
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    
+
     // Calculate max height by subtracting bottom constraints so it doesn't overflow the top
     val bottomClearance = if (configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) 84.dp else 16.dp
     val maxHeight = configuration.screenHeightDp.dp - statusBarHeight - navBarHeight - bottomClearance - 23.dp
-    
+
     var verticalDragOffset by remember { mutableStateOf(0f) }
     var horizontalDragOffset by remember { mutableStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -92,7 +94,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
 
     val animatedHeight by animateDpAsState(
         targetValue = if (isDragging) interactiveHeight else (if (isExpanded) maxHeight.coerceAtLeast(120.dp) else 120.dp),
-        animationSpec = if (isDragging) snap() else spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+        animationSpec = if (isDragging) snap() else spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow),
         label = "PillHeight"
     )
 
@@ -121,31 +123,42 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    Surface(
-                        onClick = { AudioManager.isMinimized = false },
+                    Box(
                         modifier = Modifier
                             .padding(16.dp)
-                            .size(64.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        tonalElevation = 8.dp,
-                        shadowElevation = 4.dp
+                            .size(64.dp)
+                            .hazeBackground(hazeState, zIndex = 2f)
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            if (isPlaying) {
-                                AXWaveAnimation(
-                                    modifier = Modifier.fillMaxSize(),
-                                    color = MaterialTheme.colorScheme.primary
+                        Surface(
+                            onClick = { AudioManager.isMinimized = false },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeBlur(
+                                    hazeState,
+                                    playerContainerColor.copy(alpha = 0.65f),
+                                    CircleShape
+                                ),
+                            shape = CircleShape,
+                            color = Color.Transparent,
+                            tonalElevation = 0.dp,
+                            shadowElevation = 0.dp
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                if (isPlaying) {
+                                    AXWaveAnimation(
+                                        modifier = Modifier.fillMaxSize(),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
+                                val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music else R.drawable.ic_music_music
+                                Icon(
+                                    painter = IconHelper.rememberThemePainter(resId = logoRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
+                                    contentDescription = stringResource(R.string.audio_expand_player),
+                                    modifier = Modifier.size(32.dp),
+                                    tint = if (isPlaying) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                                 )
                             }
-                            val iconTheme = SettingsManager.getEffectiveIconTheme(com.troikoss.continuum_explorer.managers.IconCategory.MUSIC)
-                            val logoRes = if (iconTheme == IconTheme.COLOURFULDUO) R.drawable.ic_music_music else R.drawable.ic_music_music
-                            Icon(
-                                painter = IconHelper.rememberThemePainter(resId = logoRes, category = com.troikoss.continuum_explorer.managers.IconCategory.MUSIC),
-                                contentDescription = stringResource(R.string.audio_expand_player),
-                                modifier = Modifier.size(32.dp),
-                                tint = if (isPlaying) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceTint
-                            )
                         }
                     }
                 }
@@ -160,25 +173,35 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                             // Fade out as it slides away
                             alpha = (1f - (animatedHorizontalOffset / size.width)).coerceIn(0f, 1f)
                         }
+                        .hazeBackground(hazeState, zIndex = 2f)
                 ) {
                     val availableWidth = maxWidth
                     val showShuffleRepeatInMain = availableWidth > 450.dp
                     val showPlaylistAdd = availableWidth > 420.dp
                     val showName = availableWidth > 380.dp
                     val horizontalPadding = if (availableWidth < 480.dp) 28.dp else 40.dp
+                    val showDrawer = animatedHeight > 124.dp
+                    val drawerShape = if (isPhone) {
+                        RoundedCornerShape(24.dp)
+                    } else {
+                        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 32.dp, bottomEnd = 32.dp)
+                    }
+                    val pillShape = drawerShape
 
                     // Drawer (Playlist) behind the pill
-                    if (animatedHeight > 120.dp) {
+                    if (showDrawer) {
                         Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            shape = if (isPhone) {
-                                RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp)
-                            } else {
-                                RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 60.dp, bottomEnd = 60.dp)
-                            },
-                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            tonalElevation = 4.dp,
-                            shadowElevation = 2.dp
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeBlur(
+                                    hazeState,
+                                    playerContainerColor.copy(alpha = 0.65f),
+                                    drawerShape
+                                ),
+                            shape = drawerShape,
+                            color = Color.Transparent,
+                            tonalElevation = 0.dp,
+                            shadowElevation = 0.dp
                         ) {
                             Column(
                                 modifier = Modifier
@@ -186,7 +209,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                     .padding(bottom = 120.dp) // Space for the pill
                                     .pointerInput(Unit) {
                                         detectDragGestures(
-                                            onDragStart = { 
+                                            onDragStart = {
                                                 isDragging = true
                                                 verticalDragOffset = 0f
                                             },
@@ -220,16 +243,16 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                         text = stringResource(R.string.playlist),
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.weight(1f)
                                     )
 
                                     var showMusicManagerMenu by remember { mutableStateOf(false) }
                                     Box {
                                         IconButton(onClick = { showMusicManagerMenu = true }) {
-                                            Icon(Icons.Default.MusicNote, contentDescription = null)
+                                            Icon(Icons.Default.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                                         }
 
-                                        val hazeState = LocalHazeState.current
                                         DropdownMenu(
                                             expanded = showMusicManagerMenu,
                                             onDismissRequest = { showMusicManagerMenu = false },
@@ -245,10 +268,10 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             DropdownMenuItem(
                                                 text = {
                                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                                        Text(stringResource(R.string.menu_music_folders))
+                                                        Text(stringResource(R.string.menu_music_folders), color = MaterialTheme.colorScheme.onSurface)
                                                         if (isFilterEnabled) {
                                                             Spacer(Modifier.weight(1f))
-                                                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                                                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                                                         }
                                                     }
                                                 },
@@ -260,20 +283,20 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                                     }
                                                     appState.isConfiguringMusicFolders = true
                                                 },
-                                                leadingIcon = { Icon(Icons.Default.Folder, null) }
+                                                leadingIcon = { Icon(Icons.Default.Folder, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                                             )
 
                                             DropdownMenuItem(
-                                                text = { Text(stringResource(R.string.menu_create_playlist)) },
+                                                text = { Text(stringResource(R.string.menu_create_playlist), color = MaterialTheme.colorScheme.onSurface) },
                                                 onClick = {
                                                     showMusicManagerMenu = false
                                                     appState.createNewPlaylist()
                                                 },
-                                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null) }
+                                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                                             )
 
                                             DropdownMenuItem(
-                                                text = { Text(stringResource(R.string.menu_sync_list)) },
+                                                text = { Text(stringResource(R.string.menu_sync_list), color = MaterialTheme.colorScheme.onSurface) },
                                                 onClick = {
                                                     showMusicManagerMenu = false
                                                     appState.scope.launch(Dispatchers.IO) {
@@ -281,7 +304,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                                         GlobalEvents.triggerRefresh()
                                                     }
                                                 },
-                                                leadingIcon = { Icon(Icons.Default.Sync, null) }
+                                                leadingIcon = { Icon(Icons.Default.Sync, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                                             )
                                         }
                                     }
@@ -291,19 +314,19 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             Icon(
                                                 imageVector = Icons.Default.Shuffle,
                                                 contentDescription = stringResource(R.string.shuffle),
-                                                tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
                                         IconButton(onClick = { AudioManager.toggleRepeat() }) {
                                             Icon(
                                                 imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
                                                 contentDescription = stringResource(R.string.repeat),
-                                                tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
                                     }
                                     IconButton(onClick = { AudioManager.isExpanded = false }) {
-                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.nav_collapse))
+                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.nav_collapse), tint = MaterialTheme.colorScheme.onSurface)
                                     }
                                 }
 
@@ -322,7 +345,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                     itemsIndexed(playlist) { index, file ->
                                         val isCurrent = index == currentIndex
                                         val isFavourite = MusicMetadataManager.isFavourite(file.providerId)
-                                        
+
                                         ListItem(
                                             headlineContent = {
                                                 Text(
@@ -391,28 +414,26 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                     }
 
                     // Pill (Controls) in front
-                    val showDrawer = animatedHeight > 120.dp
                     Surface(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
-                            .height(120.dp),
-                        shape = if (showDrawer) {
-                            if (isPhone) {
-                                RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                            } else {
-                                RoundedCornerShape(bottomStart = 60.dp, bottomEnd = 60.dp)
-                            }
-                        } else {
-                            if (isPhone) {
-                                RoundedCornerShape(24.dp)
-                            } else {
-                                RoundedCornerShape(60.dp)
-                            }
-                        },
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        tonalElevation = if (showDrawer) 4.dp else 8.dp,
-                        shadowElevation = if (showDrawer) 0.dp else 4.dp
+                            .height(120.dp)
+                            .then(
+                                if (!showDrawer) {
+                                    Modifier.hazeBlur(
+                                        hazeState,
+                                        playerContainerColor.copy(alpha = 0.65f),
+                                        pillShape
+                                    )
+                                } else {
+                                    Modifier.clip(pillShape)
+                                }
+                            ),
+                        shape = pillShape,
+                        color = Color.Transparent,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 0.dp
                     ) {
                         Column(
                             modifier = Modifier
@@ -420,7 +441,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 .pointerInput(Unit) {
                                     var lockedAxis = 0 // 0: None, 1: Vertical, 2: Horizontal
                                     detectDragGestures(
-                                        onDragStart = { 
+                                        onDragStart = {
                                             isDragging = true
                                             verticalDragOffset = 0f
                                             horizontalDragOffset = 0f
@@ -452,7 +473,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             isDragging = false
                                             val vThreshold = 100f
                                             val hThreshold = 150f
-                                            
+
                                             if (kotlin.math.abs(horizontalDragOffset) > kotlin.math.abs(verticalDragOffset) && horizontalDragOffset > hThreshold) {
                                                 AudioManager.stop()
                                             } else {
@@ -476,11 +497,11 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                         }
                                     )
                                 }
-                                .clickable { 
+                                .clickable {
                                     if (AudioManager.isExpanded) {
                                         AudioManager.isExpanded = false
                                     } else {
-                                        AudioManager.isMinimized = true 
+                                        AudioManager.isMinimized = true
                                     }
                                 }
                                 .padding(vertical = 8.dp),
@@ -513,7 +534,8 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                                     text = displayName,
                                                     style = MaterialTheme.typography.labelLarge,
                                                     maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
                                             Text(
@@ -542,7 +564,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                         Icon(
                                             if (isExpanded) Icons.AutoMirrored.Filled.QueueMusic else Icons.AutoMirrored.Filled.PlaylistPlay,
                                             contentDescription = stringResource(R.string.playlist),
-                                            tint = if (isExpanded) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                            tint = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                     if (showShuffleRepeatInMain) {
@@ -550,19 +572,23 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             Icon(
                                                 imageVector = Icons.Default.Shuffle,
                                                 contentDescription = stringResource(R.string.shuffle),
-                                                tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                tint = if (isShuffleEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                             )
                                         }
                                         IconButton(onClick = { AudioManager.toggleRepeat() }) {
                                             Icon(
                                                 imageVector = if (isRepeatEnabled) Icons.Default.RepeatOn else Icons.Default.Repeat,
                                                 contentDescription = stringResource(R.string.repeat),
-                                                tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                                tint = if (isRepeatEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                             )
                                         }
                                     }
                                     IconButton(onClick = { AudioManager.playPrevious() }) {
-                                        Icon(Icons.Default.SkipPrevious, contentDescription = stringResource(R.string.previous))
+                                        Icon(
+                                            Icons.Default.SkipPrevious,
+                                            contentDescription = stringResource(R.string.previous),
+                                            tint = MaterialTheme.colorScheme.onSurface
+                                        )
                                     }
                                     Box(contentAlignment = Alignment.Center) {
                                         if (isPlaying) {
@@ -577,7 +603,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             shape = CircleShape,
                                             colors = IconButtonDefaults.filledIconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
-                                                contentColor = MaterialTheme.colorScheme.surface
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
                                             )
                                         ) {
                                             AnimatedContent(
@@ -590,17 +616,26 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                             ) { playing ->
                                                 Icon(
                                                     imageVector = if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                                    contentDescription = if (playing) stringResource(R.string.pause) else stringResource(R.string.play)
+                                                    contentDescription = if (playing) stringResource(R.string.pause) else stringResource(R.string.play),
+                                                    tint = MaterialTheme.colorScheme.onPrimary
                                                 )
                                             }
                                         }
                                     }
                                     IconButton(onClick = { AudioManager.playNext() }) {
-                                        Icon(Icons.Default.SkipNext, contentDescription = stringResource(R.string.next))
+                                        Icon(
+                                            Icons.Default.SkipNext,
+                                            contentDescription = stringResource(R.string.next),
+                                            tint = MaterialTheme.colorScheme.onSurface
+                                        )
                                     }
                                     Spacer(Modifier.width(4.dp))
                                     IconButton(onClick = { AudioManager.stop() }) {
-                                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = stringResource(R.string.close),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
                                 }
                             }
@@ -620,7 +655,7 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 colors = SliderDefaults2.colors(
                                     thumbColor = MaterialTheme.colorScheme.primary,
                                     activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                                    inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -653,14 +688,14 @@ fun AXWaveAnimation(
     color: Color
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "AXWave")
-    
+
     val phase1 by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(tween(3000, easing = LinearEasing)),
         label = "Phase1"
     )
-    
+
     val phase2 by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -678,12 +713,12 @@ fun AXWaveAnimation(
     Canvas(modifier = modifier) {
         val width = size.width
         val height = size.height
-        
+
         fun drawWave(phase: Float, alpha: Float, ampScale: Float, freq: Float, baseOffset: Float) {
             val path = Path()
             val baseLine = height * baseOffset
             val amplitude = height * 0.2f * ampScale
-            
+
             path.moveTo(0f, baseLine)
             for (x in 0..width.toInt() step 5) {
                 val relX = x.toFloat() / width

@@ -591,14 +591,10 @@ private fun ExplorerBody(
                         modifier = Modifier
                             .width(navPaneWidth)
                             .fillMaxHeight()
-                            .hazeBlur(
-                                hazeState = hazeState,
-                                tintColor = sidebarBg.copy(alpha = 0.65f),
-                                shape = modalDrawerShape
-                            ),
+                            .hazeBackground(hazeState),
                         windowInsets = WindowInsets(0, 0, 0, 0),
                         drawerShape = modalDrawerShape,
-                        drawerContainerColor = Color.Transparent
+                        drawerContainerColor = sidebarBg.copy(alpha = 0.98f)
                     ) {
                         NavigationPane(
                             appState = appState,
@@ -707,6 +703,7 @@ private fun ExplorerBody(
                         .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier.padding(start = 8.dp))
                         .fillMaxHeight()
                         .navigationBarsPadding()
+                        .hazeBackground(hazeState)
                         .zIndex(2f),
                     isInWindowMode = isInWindowMode
                 )

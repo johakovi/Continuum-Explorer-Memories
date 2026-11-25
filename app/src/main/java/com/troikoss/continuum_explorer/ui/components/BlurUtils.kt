@@ -97,8 +97,8 @@ val LocalHazeState = compositionLocalOf { HazeState() }
 /**
  * Modifier applied to scrollable/background screen content (e.g. ExplorerBody) to capture pixels for Haze blur.
  */
-fun Modifier.hazeBackground(hazeState: HazeState): Modifier =
-    this.hazeSource(state = hazeState)
+fun Modifier.hazeBackground(hazeState: HazeState, zIndex: Float = 0f): Modifier =
+    this.hazeSource(state = hazeState, zIndex = zIndex)
 /**
  * Crash-proof Modifier applied to floating overlays, context menus, top bar, or sidebars to render the blurred backdrop.
  */

@@ -555,6 +555,7 @@ private fun ExplorerBody(
     val contentIsRounded = SettingsManager.themeContent.value == ThemeShape.ROUNDED
     val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
     val sidebarBg = LocalExtendedColors.current.topBarBackground
+    val hazeState = LocalHazeState.current
 
     Column(modifier = modifier.fillMaxSize()) {
         val appearance = appState.getUIAppearance()
@@ -578,7 +579,10 @@ private fun ExplorerBody(
                         .zIndex(2f)
                 ) {
                     PermanentDrawerSheet(
-                        modifier = Modifier.width(navPaneWidth).fillMaxHeight(),
+                        modifier = Modifier
+                            .width(navPaneWidth)
+                            .fillMaxHeight()
+                            .hazeBackground(hazeState),
                         windowInsets = WindowInsets(0, 0, 0, 0),
                         drawerShape = if (sidebarIsRounded) RoundedCornerShape(12.dp) else RectangleShape,
                         drawerContainerColor = sidebarBg.copy(alpha = 0.98f)
@@ -647,7 +651,6 @@ private fun ExplorerBody(
             }
 
             // Main Content Area
-            val hazeState = LocalHazeState.current
             Box(modifier = Modifier
                 .weight(1f)
                 .then(
@@ -690,6 +693,7 @@ private fun ExplorerBody(
                         .width(detailsPaneWidth)
                         .then(if (contentIsRounded) Modifier.padding(vertical = 8.dp).padding(end = 8.dp) else Modifier)
                         .navigationBarsPadding()
+                        .hazeBackground(hazeState)
                         .zIndex(2f),
                     isInWindowMode = isInWindowMode
                 )

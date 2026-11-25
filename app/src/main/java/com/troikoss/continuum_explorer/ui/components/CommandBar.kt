@@ -127,10 +127,12 @@ fun CommandBar(
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    val hazeState = LocalHazeState.current
 
     Surface(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .hazeBackground(hazeState),
         color = LocalExtendedColors.current.commandPanelBackground
     ) {
         Row(

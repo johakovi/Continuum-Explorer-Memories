@@ -212,10 +212,13 @@ fun TopBar(
         }
     }
 
+    val hazeState = LocalHazeState.current
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .height(56.dp)
+            .hazeBackground(hazeState),
         color = LocalExtendedColors.current.topBarBackground
     ) {
         Row (

@@ -170,8 +170,8 @@ fun TabBar(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground.copy(alpha = 0.5f))
                 .hazeBackground(hazeState)
+                .background(if (backgroundUri != null) Color.Transparent else LocalExtendedColors.current.tabBarBackground.copy(alpha = 0.5f))
         ) {
             backgroundUri?.let { uri ->
                 AsyncImage(
@@ -225,7 +225,8 @@ fun TabBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = finalPaddingLeft, end = adjustedPaddingRight)
-                .height(tabContentHeight),
+                .height(tabContentHeight)
+                .hazeBackground(hazeState, zIndex = 1f),
             verticalAlignment = if (isFloat) Alignment.CenterVertically else Alignment.Bottom
         ) {
             Row(

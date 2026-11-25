@@ -225,19 +225,22 @@ object FileExplorerTheme {
         get() = LocalExtendedColors.current
 }
 
+private val DefaultDarkColorScheme = darkColorScheme()
+private val DefaultLightColorScheme = lightColorScheme()
+
 private val VeryDarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
     onPrimary = Color.Black,
-    primaryContainer = Color(0xFF00372A),
-    onPrimaryContainer = Color(0xFF84D9D2),
+    primaryContainer = DefaultDarkColorScheme.primaryContainer,
+    onPrimaryContainer = DefaultDarkColorScheme.onPrimaryContainer,
     secondary = DarkSecondary,
     onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF1B3535),
-    onSecondaryContainer = Color(0xFFCCCCCE),
+    secondaryContainer = DefaultDarkColorScheme.secondaryContainer,
+    onSecondaryContainer = DefaultDarkColorScheme.onSecondaryContainer,
     tertiary = DarkTertiary,
     onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFF00372A),
-    onTertiaryContainer = Color(0xFF84D9D2),
+    tertiaryContainer = DefaultDarkColorScheme.tertiaryContainer,
+    onTertiaryContainer = DefaultDarkColorScheme.onTertiaryContainer,
     background = Color(0xFF000000),
     onBackground = VeryDarkText,
     surface = VeryDarkTopBar,
@@ -255,16 +258,16 @@ private val VeryDarkColorScheme = darkColorScheme(
 private val VeryLightColorScheme = lightColorScheme(
     primary = LightPrimary,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFC8E6C9),
-    onPrimaryContainer = Color(0xFF00372A),
+    primaryContainer = DefaultLightColorScheme.primaryContainer,
+    onPrimaryContainer = DefaultLightColorScheme.onPrimaryContainer,
     secondary = LightSecondary,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE0E0E0),
-    onSecondaryContainer = Color(0xFF444344),
+    secondaryContainer = DefaultLightColorScheme.secondaryContainer,
+    onSecondaryContainer = DefaultLightColorScheme.onSecondaryContainer,
     tertiary = LightTertiary,
     onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFFF1F1F1),
-    onTertiaryContainer = Color(0xFF090909),
+    tertiaryContainer = DefaultLightColorScheme.tertiaryContainer,
+    onTertiaryContainer = DefaultLightColorScheme.onTertiaryContainer,
     background = Color(0xFFF1F1F1),
     onBackground = VeryLightText,
     surface = VeryLightTopBar,
@@ -330,32 +333,55 @@ fun FileExplorerTheme(
     } else null
 
     var colorScheme = when {
-        isVeryDark -> VeryDarkColorScheme.copy(primary = dynamicScheme?.primary ?: VeryDarkColorScheme.primary)
-        isVeryLight -> VeryLightColorScheme.copy(primary = dynamicScheme?.primary ?: VeryLightColorScheme.primary)
-        darkTheme -> darkColorScheme()
-        else -> lightColorScheme()
+        isVeryDark -> VeryDarkColorScheme.copy(
+            primary = dynamicScheme?.primary ?: VeryDarkColorScheme.primary,
+            primaryContainer = dynamicScheme?.primaryContainer ?: VeryDarkColorScheme.primaryContainer,
+            onPrimaryContainer = dynamicScheme?.onPrimaryContainer ?: VeryDarkColorScheme.onPrimaryContainer,
+            secondaryContainer = dynamicScheme?.secondaryContainer ?: VeryDarkColorScheme.secondaryContainer,
+            onSecondaryContainer = dynamicScheme?.onSecondaryContainer ?: VeryDarkColorScheme.onSecondaryContainer,
+            tertiaryContainer = dynamicScheme?.tertiaryContainer ?: VeryDarkColorScheme.tertiaryContainer,
+            onTertiaryContainer = dynamicScheme?.onTertiaryContainer ?: VeryDarkColorScheme.onTertiaryContainer
+        )
+        isVeryLight -> VeryLightColorScheme.copy(
+            primary = dynamicScheme?.primary ?: VeryLightColorScheme.primary,
+            primaryContainer = dynamicScheme?.primaryContainer ?: VeryLightColorScheme.primaryContainer,
+            onPrimaryContainer = dynamicScheme?.onPrimaryContainer ?: VeryLightColorScheme.onPrimaryContainer,
+            secondaryContainer = dynamicScheme?.secondaryContainer ?: VeryLightColorScheme.secondaryContainer,
+            onSecondaryContainer = dynamicScheme?.onSecondaryContainer ?: VeryLightColorScheme.onSecondaryContainer,
+            tertiaryContainer = dynamicScheme?.tertiaryContainer ?: VeryLightColorScheme.tertiaryContainer,
+            onTertiaryContainer = dynamicScheme?.onTertiaryContainer ?: VeryLightColorScheme.onTertiaryContainer
+        )
+        darkTheme -> dynamicScheme ?: darkColorScheme()
+        else -> dynamicScheme ?: lightColorScheme()
     }
 
-    if (dynamicScheme != null && !isVeryDark && !isVeryLight) {
+    if (dynamicScheme != null) {
         colorScheme = colorScheme.copy(
             primary = dynamicScheme.primary,
             secondary = dynamicScheme.secondary,
             tertiary = dynamicScheme.tertiary,
             primaryContainer = dynamicScheme.primaryContainer,
+            onPrimaryContainer = dynamicScheme.onPrimaryContainer,
             secondaryContainer = dynamicScheme.secondaryContainer,
+            onSecondaryContainer = dynamicScheme.onSecondaryContainer,
             tertiaryContainer = dynamicScheme.tertiaryContainer,
-            surface = dynamicScheme.surface,
-            onSurface = dynamicScheme.onSurface,
-            surfaceVariant = dynamicScheme.surfaceVariant,
-            onSurfaceVariant = dynamicScheme.onSurfaceVariant,
-            surfaceContainer = dynamicScheme.surfaceContainer,
-            surfaceContainerLow = dynamicScheme.surfaceContainerLow,
-            surfaceContainerHigh = dynamicScheme.surfaceContainerHigh,
-            surfaceContainerHighest = dynamicScheme.surfaceContainerHighest,
-            surfaceContainerLowest = dynamicScheme.surfaceContainerLowest,
-            background = dynamicScheme.background,
-            onBackground = dynamicScheme.onBackground
+            onTertiaryContainer = dynamicScheme.onTertiaryContainer
         )
+        if (!isVeryDark && !isVeryLight) {
+            colorScheme = colorScheme.copy(
+                surface = dynamicScheme.surface,
+                onSurface = dynamicScheme.onSurface,
+                surfaceVariant = dynamicScheme.surfaceVariant,
+                onSurfaceVariant = dynamicScheme.onSurfaceVariant,
+                surfaceContainer = dynamicScheme.surfaceContainer,
+                surfaceContainerLow = dynamicScheme.surfaceContainerLow,
+                surfaceContainerHigh = dynamicScheme.surfaceContainerHigh,
+                surfaceContainerHighest = dynamicScheme.surfaceContainerHighest,
+                surfaceContainerLowest = dynamicScheme.surfaceContainerLowest,
+                background = dynamicScheme.background,
+                onBackground = dynamicScheme.onBackground
+            )
+        }
     }
 
     val finalColorScheme = currentPack?.let { pack ->
