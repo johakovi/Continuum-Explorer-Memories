@@ -1672,15 +1672,18 @@ private fun NavBackgroundContextMenu(
     val isFtpEnabled by SettingsManager.isFtpServerEnabled
     val ftpMode by SettingsManager.ftpMode
 
+    val shadowsEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
     val hazeState = LocalHazeState.current
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        modifier = Modifier.hazeBlur(
-            hazeState,
-            LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
-            RoundedCornerShape(16.dp)
-        ),
+        modifier = Modifier
+            .then(if (shadowsEnabled) Modifier.shadow(8.dp, RoundedCornerShape(16.dp)) else Modifier)
+            .hazeBlur(
+                hazeState,
+                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                RoundedCornerShape(16.dp)
+            ),
         shape = RoundedCornerShape(16.dp),
         containerColor = Color.Transparent
     ) {
@@ -1779,15 +1782,18 @@ private fun NavContextMenu(
     var currentScreen by remember { mutableStateOf("MAIN") }
     LaunchedEffect(expanded) { if (!expanded) currentScreen = "MAIN" }
 
+    val shadowsEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
     val hazeState = LocalHazeState.current
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        modifier = Modifier.hazeBlur(
-            hazeState,
-            LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
-            RoundedCornerShape(16.dp)
-        ),
+        modifier = Modifier
+            .then(if (shadowsEnabled) Modifier.shadow(8.dp, RoundedCornerShape(16.dp)) else Modifier)
+            .hazeBlur(
+                hazeState,
+                LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f),
+                RoundedCornerShape(16.dp)
+            ),
         shape = RoundedCornerShape(16.dp),
         containerColor = Color.Transparent
     ) {

@@ -580,13 +580,14 @@ private fun ExplorerBody(
                         )
                         .zIndex(2f)
                 ) {
+                    val shadowsEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
                     val drawerShapeVal = if (sidebarIsRounded) RoundedCornerShape(12.dp) else RectangleShape
                     PermanentDrawerSheet(
                         modifier = Modifier
                             .width(navPaneWidth)
                             .fillMaxHeight()
                             .then(
-                                if (sidebarIsRounded) {
+                                if (sidebarIsRounded && shadowsEnabled) {
                                     Modifier.shadow(elevation = 8.dp, shape = drawerShapeVal, clip = false)
                                 } else {
                                     Modifier

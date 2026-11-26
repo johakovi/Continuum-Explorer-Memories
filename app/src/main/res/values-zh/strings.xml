@@ -213,6 +213,8 @@
     <string name="settings_clear">清除</string>
     <string name="settings_colorful_bars">彩色顶部和标签栏</string>
     <string name="settings_colorful_bars_desc">为顶部栏和标签栏启用强调色。</string>
+    <string name="settings_sidebar_menu_shadow">侧边栏阴影</string>
+    <string name="settings_sidebar_menu_shadow_desc">为圆角侧边栏启用投影。</string>
     <string name="settings_icon_theme">图标主题</string>
     <string name="settings_icon_theme_colourful">彩色</string>
     <string name="settings_icon_theme_colourful_duotone">彩色双色调</string>

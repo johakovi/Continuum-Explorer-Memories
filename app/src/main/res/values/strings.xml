@@ -234,6 +234,8 @@
     <string name="settings_clear">Clear</string>
     <string name="settings_colorful_bars">Colorful top and tab bars</string>
     <string name="settings_colorful_bars_desc">Enable accent colours for the top bar and tab bar.</string>
+    <string name="settings_sidebar_menu_shadow">Sidebar shadow</string>
+    <string name="settings_sidebar_menu_shadow_desc">Enable drop shadow for the rounded sidebar.</string>
     <string name="settings_icon_theme">Icon Theme</string>
     <string name="settings_icon_theme_colourful">Colourful</string>
     <string name="settings_icon_theme_colourful_duotone">Colourful Duotone</string>

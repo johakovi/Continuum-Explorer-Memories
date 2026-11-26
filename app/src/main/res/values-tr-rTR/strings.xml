@@ -202,6 +202,8 @@
     <string name="settings_clear">Temizle</string>
     <string name="settings_colorful_bars">Renkli üst ve sekme çubukları</string>
     <string name="settings_colorful_bars_desc">Üst çubuk ve sekme çubuğu için vurgu renklerini etkinleştirin.</string>
+    <string name="settings_sidebar_menu_shadow">Kenar çubuğu gölgesi</string>
+    <string name="settings_sidebar_menu_shadow_desc">Yuvarlak kenar çubuğu için gölgeyi etkinleştir.</string>
     <string name="settings_icon_theme">Simge Teması</string>
     <string name="settings_icon_theme_colourful">Renkli</string>
     <string name="settings_icon_theme_colourful_duotone">Renkli Çift Tonlu</string>

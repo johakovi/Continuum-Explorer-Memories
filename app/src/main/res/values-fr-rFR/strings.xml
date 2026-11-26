@@ -214,6 +214,8 @@
     <string name="settings_clear">Effacer</string>
     <string name="settings_colorful_bars">Barres supérieure et d\'onglets colorées</string>
     <string name="settings_colorful_bars_desc">Activer les couleurs d\'accentuation pour la barre supérieure et la barre d\'onglets.</string>
+    <string name="settings_sidebar_menu_shadow">Ombre de la barre latérale</string>
+    <string name="settings_sidebar_menu_shadow_desc">Activer l\'ombre portée pour la barre latérale arrondie.</string>
     <string name="settings_icon_theme">Thème d\'icônes</string>
     <string name="settings_icon_theme_colourful">Coloré</string>
     <string name="settings_icon_theme_colourful_duotone">Bichromie colorée</string>

@@ -10,6 +10,7 @@ import com.troikoss.continuum_explorer.utils.hasClipboardItems
 import com.troikoss.continuum_explorer.utils.RemoteCache
 import com.troikoss.continuum_explorer.utils.getUriForUniversalFile
 import androidx.core.content.FileProvider
+import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.filled.Wallpaper
 import kotlinx.coroutines.withContext
 import androidx.compose.foundation.background
@@ -155,12 +156,15 @@ fun ItemContextMenu(
     val isSingleImage = singleItem != null && !singleItem.isDirectory && (singleMime?.startsWith("image/") == true || setOf("jpg", "jpeg", "png", "gif", "webp", "bmp").contains(singleExtension))
     val wallpaperTitle = stringResource(R.string.menu_set_wallpaper)
     val wallpaperFailedMsg = stringResource(R.string.msg_failed_set_wallpaper)
+    val shadowsEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
     val hazeState = LocalHazeState.current
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = Modifier.hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .then(if (shadowsEnabled) Modifier.shadow(8.dp, RoundedCornerShape(16.dp)) else Modifier)
+            .hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         containerColor = Color.Transparent
     ) {
@@ -664,12 +668,15 @@ fun BackgroundContextMenu(
         }
     }
 
+    val shadowsEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
     val hazeState = LocalHazeState.current
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = Modifier.hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .then(if (shadowsEnabled) Modifier.shadow(8.dp, RoundedCornerShape(16.dp)) else Modifier)
+            .hazeBlur(hazeState, LocalExtendedColors.current.menuBackground.copy(alpha = 0.65f), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         containerColor = Color.Transparent
     ) {

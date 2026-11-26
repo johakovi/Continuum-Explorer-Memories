@@ -95,6 +95,7 @@ object SettingsManager {
     private const val KEY_TAB_BAR_BACKGROUND_URI = "tab_bar_background_uri"
     private const val KEY_STARTING_PAGE = "starting_page"
 
+    private const val KEY_SIDEBAR_AND_MENU_SHADOW = "sidebar_and_menu_shadow"
     private const val KEY_COMMAND_BAR_VISIBLE = "command_bar_visible"
     private const val KEY_CONTENT_ANIMATIONS = "content_animations"
     private const val KEY_SHOW_HIDDEN_FILES = "show_hidden_files"
@@ -189,6 +190,9 @@ object SettingsManager {
 
     private val _startingPage = mutableStateOf(LibraryItem.Home)
     val startingPage: State<LibraryItem> = _startingPage
+
+    private val _isSidebarAndMenuShadowEnabled = mutableStateOf(true)
+    val isSidebarAndMenuShadowEnabled: State<Boolean> = _isSidebarAndMenuShadowEnabled
 
     private val _isCommandBarVisible = mutableStateOf(true)
     val isCommandBarVisible: State<Boolean> = _isCommandBarVisible
@@ -430,6 +434,7 @@ object SettingsManager {
             LibraryItem.Home
         }
 
+        _isSidebarAndMenuShadowEnabled.value = prefs.getBoolean(KEY_SIDEBAR_AND_MENU_SHADOW, true)
         _isCommandBarVisible.value = prefs.getBoolean(KEY_COMMAND_BAR_VISIBLE, true)
         _isContentAnimationsEnabled.value = prefs.getBoolean(KEY_CONTENT_ANIMATIONS, true)
         _showHiddenFiles.value = prefs.getBoolean(KEY_SHOW_HIDDEN_FILES, false)
@@ -588,6 +593,13 @@ object SettingsManager {
         } else {
             prefs.edit().putString(KEY_TAB_BAR_BACKGROUND_URI, uri).apply()
         }
+        GlobalEvents.triggerConfigUpdate()
+    }
+
+    fun setSidebarAndMenuShadowEnabled(context: Context, enabled: Boolean) {
+        _isSidebarAndMenuShadowEnabled.value = enabled
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_SIDEBAR_AND_MENU_SHADOW, enabled).apply()
         GlobalEvents.triggerConfigUpdate()
     }
 

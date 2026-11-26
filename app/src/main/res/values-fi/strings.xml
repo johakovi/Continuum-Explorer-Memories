@@ -213,6 +213,8 @@
     <string name="settings_theme_enhanced_system">Parannettu järjestelmä</string>
     <string name="settings_colorful_bars">Värikkäät ylä- ja välilehtipalkit</string>
     <string name="settings_colorful_bars_desc">Aktivoi aksenttivärit ylä- ja välilehtipalkeille.</string>
+    <string name="settings_sidebar_menu_shadow">Sivupalkin varjo</string>
+    <string name="settings_sidebar_menu_shadow_desc">Ota käyttöön varjo pyöristetylle sivupalkille.</string>
     <string name="settings_icon_theme">Kuvakkeiden tyyli</string>
     <string name="settings_icon_theme_colourful">Värikäs</string>
     <string name="settings_icon_theme_colourful_duotone">Värikäs duotone</string>

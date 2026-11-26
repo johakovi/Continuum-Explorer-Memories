@@ -213,6 +213,8 @@
     <string name="settings_clear">Rensa</string>
     <string name="settings_colorful_bars">Färgglada fält</string>
     <string name="settings_colorful_bars_desc">Aktivera accentfärger för toppfältet och flikfältet.</string>
+    <string name="settings_sidebar_menu_shadow">Sidofältsskugga</string>
+    <string name="settings_sidebar_menu_shadow_desc">Aktivera skugga för det rundade sidofältet.</string>
     <string name="settings_icon_theme">Ikontema</string>
     <string name="settings_icon_theme_colourful">Färgglad</string>
     <string name="settings_icon_theme_colourful_duotone">Färgglad duotone</string>

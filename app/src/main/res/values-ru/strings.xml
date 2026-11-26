@@ -213,6 +213,8 @@
     <string name="settings_clear">Очистить</string>
     <string name="settings_colorful_bars">Цветные панели</string>
     <string name="settings_colorful_bars_desc">Включить акцентные цвета для верхней панели и панели вкладок.</string>
+    <string name="settings_sidebar_menu_shadow">Тень боковой панели</string>
+    <string name="settings_sidebar_menu_shadow_desc">Включить тень для закругленной боковой панели.</string>
     <string name="settings_icon_theme">Тема значков</string>
     <string name="settings_icon_theme_colourful">Цветные</string>
     <string name="settings_icon_theme_colourful_duotone">Красочный дуотон</string>

@@ -214,6 +214,8 @@
     <string name="settings_clear">Limpar</string>
     <string name="settings_colorful_bars">Barras superior e de abas coloridas</string>
     <string name="settings_colorful_bars_desc">Ativar cores de destaque para a barra superior e a barra de abas.</string>
+    <string name="settings_sidebar_menu_shadow">Sombra da barra lateral</string>
+    <string name="settings_sidebar_menu_shadow_desc">Ativar sombra projetada para a barra lateral arredondada.</string>
     <string name="settings_icon_theme">Tema de Ícones</string>
     <string name="settings_icon_theme_colourful">Colorido</string>
     <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>

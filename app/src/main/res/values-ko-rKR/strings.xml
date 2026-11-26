@@ -213,6 +213,8 @@
     <string name="settings_clear">지우기</string>
     <string name="settings_colorful_bars">상단 및 탭 바 색상 적용</string>
     <string name="settings_colorful_bars_desc">상단 바와 탭 바에 강조 색상을 적용합니다.</string>
+    <string name="settings_sidebar_menu_shadow">사이드바 그림자</string>
+    <string name="settings_sidebar_menu_shadow_desc">둥근 사이드바에 그림자 효과를 활성화합니다.</string>
     <string name="settings_icon_theme">아이콘 테마</string>
     <string name="settings_icon_theme_colourful">컬러풀</string>
     <string name="settings_icon_theme_colourful_duotone">다채로운 듀오톤</string>

@@ -214,6 +214,8 @@
     <string name="settings_clear">Limpiar</string>
     <string name="settings_colorful_bars">Barras superior y de pestañas coloridas</string>
     <string name="settings_colorful_bars_desc">Activar colores de acento para la barra superior y la barra de pestañas.</string>
+    <string name="settings_sidebar_menu_shadow">Sombra de la barra lateral</string>
+    <string name="settings_sidebar_menu_shadow_desc">Activar sombra paralela para la barra lateral redondeada.</string>
     <string name="settings_icon_theme">Tema de iconos</string>
     <string name="settings_icon_theme_colourful">Colorido</string>
     <string name="settings_icon_theme_colourful_duotone">Duotono colorido</string>

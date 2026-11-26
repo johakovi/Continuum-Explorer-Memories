@@ -96,6 +96,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val language = SettingsManager.language.value
     val detailsMode = SettingsManager.detailsMode.value
     val startingPage = SettingsManager.startingPage.value
+    val isSidebarAndMenuShadowEnabled = SettingsManager.isSidebarAndMenuShadowEnabled.value
     val isCommandBarVisible = SettingsManager.isCommandBarVisible.value
     val isContentAnimationsEnabled = SettingsManager.isContentAnimationsEnabled.value
     val showHiddenFiles = SettingsManager.showHiddenFiles.value
@@ -269,6 +270,20 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Text(text)
                 },
                 modifier = Modifier.clickable { showDefaultViewModeDialog = true }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_sidebar_menu_shadow)) },
+                supportingContent = { Text(stringResource(R.string.settings_sidebar_menu_shadow_desc)) },
+                trailingContent = {
+                    Switch(
+                        checked = isSidebarAndMenuShadowEnabled,
+                        onCheckedChange = { SettingsManager.setSidebarAndMenuShadowEnabled(context, it) }
+                    )
+                },
+                modifier = Modifier.clickable {
+                    SettingsManager.setSidebarAndMenuShadowEnabled(context, !isSidebarAndMenuShadowEnabled)
+                }
             )
 
             ListItem(

@@ -213,6 +213,8 @@
     <string name="settings_clear">Löschen</string>
     <string name="settings_colorful_bars">Farbige Kopf- und Tab-Leisten</string>
     <string name="settings_colorful_bars_desc">Akzentfarben für die Kopfzeile und die Tab-Leiste aktivieren.</string>
+    <string name="settings_sidebar_menu_shadow">Seitenleistenschatten</string>
+    <string name="settings_sidebar_menu_shadow_desc">Schattenwurf für die abgerundete Seitenleiste aktivieren.</string>
     <string name="settings_icon_theme">Symbol-Design</string>
     <string name="settings_icon_theme_colourful">Farbenfroh</string>
     <string name="settings_icon_theme_colourful_duotone">Farbenfroher Duoton</string>

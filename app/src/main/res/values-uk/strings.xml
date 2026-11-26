@@ -213,6 +213,8 @@
     <string name="settings_clear">Очистити</string>
     <string name="settings_colorful_bars">Кольорові панелі</string>
     <string name="settings_colorful_bars_desc">Увімкнути акцентні кольори для верхньої панелі та панелі вкладок.</string>
+    <string name="settings_sidebar_menu_shadow">Тінь бічної панелі</string>
+    <string name="settings_sidebar_menu_shadow_desc">Увімкнути тінь для закругленої бічної панелі.</string>
     <string name="settings_icon_theme">Тема значків</string>
     <string name="settings_icon_theme_colourful">Кольорові</string>
     <string name="settings_icon_theme_colourful_duotone">Барвистий дуотон</string>
