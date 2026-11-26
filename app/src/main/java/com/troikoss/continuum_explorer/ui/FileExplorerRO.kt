@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.shadow
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -596,7 +595,7 @@ private fun ExplorerBody(
                             .fillMaxHeight()
                             .then(
                                 if (sidebarIsRounded && shadowsEnabled) {
-                                    Modifier.shadow(elevation = 8.dp, shape = modalDrawerShape, clip = false)
+                                    Modifier.shadow(elevation = 4.dp, shape = modalDrawerShape, clip = false)
                                 } else {
                                     Modifier
                                 }
