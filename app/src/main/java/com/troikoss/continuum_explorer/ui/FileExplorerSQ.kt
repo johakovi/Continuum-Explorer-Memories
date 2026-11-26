@@ -27,6 +27,8 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isShiftPressed
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -233,119 +235,42 @@ fun FileExplorerSQ(
     CompositionLocalProvider(LocalHazeState provides hazeState) {
         Box(
             modifier = Modifier
-            .fillMaxSize()
-            .background(extendedColors.background)
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(PointerEventPass.Initial)
-                        appState.isShiftPressed = event.keyboardModifiers.isShiftPressed
-                        val activeChange = event.changes.firstOrNull { it.pressed } ?: event.changes.firstOrNull()
-                        if (activeChange != null) {
-                            appState.isMouseInteraction = (activeChange.type == PointerType.Mouse)
+                .fillMaxSize()
+                .background(extendedColors.background)
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                            appState.isShiftPressed = event.keyboardModifiers.isShiftPressed
+                            val activeChange = event.changes.firstOrNull { it.pressed } ?: event.changes.firstOrNull()
+                            if (activeChange != null) {
+                                appState.isMouseInteraction = (activeChange.type == PointerType.Mouse)
+                            }
                         }
                     }
                 }
-            }
-            .fileDropTarget(appState)
-    ) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
-            drawerContent = {
-                val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
-                val modalDrawerShape = RoundedCornerShape(8.dp)
-                ModalDrawerSheet(
-                    modifier = (if (appearance == UIAppearance.PHONE) {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
-                    } else {
-                        Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
-                    }).statusBarsPadding().navigationBarsPadding()
-                        .hazeBlur(hazeState, sidebarBg.copy(alpha = 0.65f), modalDrawerShape),
-                    drawerShape = modalDrawerShape,
-                    drawerContainerColor = Color.Transparent,
-                    windowInsets = WindowInsets(0, 0, 0, 0)
-                ) {
-                    NavigationContent(
-                        appState = appState,
-                        onCloseDrawer = { scope.launch { drawerState.close() } },
-                        onAddStorage = { safLauncher.launch(null) },
-                        onAddSdCard = { volume ->
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
-                            }
-                        },
-                        onAddNetwork = onAddNetwork,
-                        onEditNetwork = onEditNetwork,
-                        isInWindowMode = isInWindowMode
-                    )
-                }
-            }
+                .fileDropTarget(appState)
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Scaffold(
-                    containerColor = extendedColors.background,
-                    modifier = Modifier.pointerInput(appState) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent(PointerEventPass.Initial)
-                                if (event.type == PointerEventType.Press) {
-                                    appState.requestFocus?.invoke()
-                                }
-                            }
-                        }
-                    },
-                    topBar = {
-                        val hideTopNav = appearance == UIAppearance.PHONE && isPortrait
-
-                        ExplorerTopBar(
-                            tabs = tabs,
-                            selectedTabIndex = safeIndex,
-                            onTabSelected = { selectedTabIndex = it },
-                            onAddTab = {
-                                tabs.add(createNewTabState(context, scope))
-                                selectedTabIndex = tabs.size - 1
-                            },
-                            onCloseTab = { stateToRemove ->
-                                if (tabs.size > 1) {
-                                    val idx = tabs.indexOf(stateToRemove)
-                                    if (idx != -1) {
-                                        tabs.removeAt(idx)
-                                        if (selectedTabIndex >= tabs.size) {
-                                            selectedTabIndex = (tabs.size - 1).coerceAtLeast(0)
-                                        }
-                                    }
-                                }
-                            },
-                            onMoveTab = { from, to ->
-                                val movingState = tabs.removeAt(from)
-                                tabs.add(to, movingState)
-                                if (selectedTabIndex == from) {
-                                    selectedTabIndex = to
-                                } else if (from < selectedTabIndex && to >= selectedTabIndex) {
-                                    selectedTabIndex--
-                                } else if (from > selectedTabIndex && to <= selectedTabIndex) {
-                                    selectedTabIndex++
-                                }
-                            },
-                            onMenuClick = { scope.launch { drawerState.open() } },
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                gesturesEnabled = appState.getScreenSize() == ScreenSize.SMALL,
+                drawerContent = {
+                    val sidebarIsRounded = SettingsManager.themeBar.value == ThemeShape.ROUNDED
+                    val modalDrawerShape = RoundedCornerShape(8.dp)
+                    ModalDrawerSheet(
+                        modifier = (if (appearance == UIAppearance.PHONE) {
+                            Modifier.padding(vertical = 8.dp, horizontal = 8.dp).width(300.dp)
+                        } else {
+                            Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                        }).statusBarsPadding().navigationBarsPadding()
+                            .hazeBlur(hazeState, sidebarBg.copy(alpha = 0.65f), modalDrawerShape),
+                        drawerShape = modalDrawerShape,
+                        drawerContainerColor = Color.Transparent,
+                        windowInsets = WindowInsets(0, 0, 0, 0)
+                    ) {
+                        NavigationContent(
                             appState = appState,
-                            hideNavButtons = hideTopNav,
-                            hideSearchButton = hideTopNav,
-                            hideMenuButton = hideTopNav
-                        )
-                    }
-                ) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        ExplorerBody(
-                            modifier = Modifier
-                                .padding(
-                                    top = innerPadding.calculateTopPadding(),
-                                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                                ),
-                            appState = appState,
-                            isInWindowMode = isInWindowMode,
+                            onCloseDrawer = { scope.launch { drawerState.close() } },
                             onAddStorage = { safLauncher.launch(null) },
                             onAddSdCard = { volume ->
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -353,87 +278,164 @@ fun FileExplorerSQ(
                                 }
                             },
                             onAddNetwork = onAddNetwork,
-                            onEditNetwork = onEditNetwork
+                            onEditNetwork = onEditNetwork,
+                            isInWindowMode = isInWindowMode
                         )
-
-                        if (appState.getCurrentStorageKey() == "virtual://music/playlists") {
-                            FloatingActionButton(
-                                onClick = { appState.createNewPlaylist() },
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
-                                shape = CircleShape,
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(top = innerPadding.calculateTopPadding() + 16.dp, end = 16.dp)
-                                    .zIndex(5f)
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.menu_create_playlist))
-                            }
-                        }
                     }
                 }
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Scaffold(
+                        containerColor = extendedColors.background,
+                        modifier = Modifier.pointerInput(appState) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                                    if (event.type == PointerEventType.Press) {
+                                        appState.requestFocus?.invoke()
+                                    }
+                                }
+                            }
+                        },
+                        topBar = {
+                            val hideTopNav = appearance == UIAppearance.PHONE && isPortrait
 
-                if (showBottomBar) {
-                    val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
-                        extendedColors.navigationBarColor
-                    else
-                        extendedColors.topBarBackground
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .background(
-                                Brush.verticalGradient(
-                                    0f to Color.Transparent,
-                                    0.5f to navColor,
-                                    1f to navColor
-                                )
+                            ExplorerTopBar(
+                                tabs = tabs,
+                                selectedTabIndex = safeIndex,
+                                onTabSelected = { selectedTabIndex = it },
+                                onAddTab = {
+                                    tabs.add(createNewTabState(context, scope))
+                                    selectedTabIndex = tabs.size - 1
+                                },
+                                onCloseTab = { stateToRemove ->
+                                    if (tabs.size > 1) {
+                                        val idx = tabs.indexOf(stateToRemove)
+                                        if (idx != -1) {
+                                            tabs.removeAt(idx)
+                                            if (selectedTabIndex >= tabs.size) {
+                                                selectedTabIndex = (tabs.size - 1).coerceAtLeast(0)
+                                            }
+                                        }
+                                    }
+                                },
+                                onMoveTab = { from, to ->
+                                    val movingState = tabs.removeAt(from)
+                                    tabs.add(to, movingState)
+                                    if (selectedTabIndex == from) {
+                                        selectedTabIndex = to
+                                    } else if (from < selectedTabIndex && to >= selectedTabIndex) {
+                                        selectedTabIndex--
+                                    } else if (from > selectedTabIndex && to <= selectedTabIndex) {
+                                        selectedTabIndex++
+                                    }
+                                },
+                                onMenuClick = { scope.launch { drawerState.open() } },
+                                appState = appState,
+                                hideNavButtons = hideTopNav,
+                                hideSearchButton = hideTopNav,
+                                hideMenuButton = hideTopNav
                             )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .navigationBarsPadding()
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            CompositionLocalProvider(LocalContentColor provides extendedColors.sidebarIcons) {
-                                NavigationControls(
-                                    appState = appState,
-                                    onMenuClick = { scope.launch { drawerState.open() } }
-                                )
-                                SearchButton(
-                                    appState = appState,
-                                    searchQuery = TextFieldValue(""),
-                                    searchSubfolders = SettingsManager.searchSubfolders.value
-                                )
+                        }
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            ExplorerBody(
+                                modifier = Modifier
+                                    .padding(
+                                        top = innerPadding.calculateTopPadding(),
+                                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                                    ),
+                                appState = appState,
+                                isInWindowMode = isInWindowMode,
+                                onAddStorage = { safLauncher.launch(null) },
+                                onAddSdCard = { volume ->
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        sdCardLauncher.launch(volume.createOpenDocumentTreeIntent())
+                                    }
+                                },
+                                onAddNetwork = onAddNetwork,
+                                onEditNetwork = onEditNetwork
+                            )
+
+                            if (appState.getCurrentStorageKey() == "virtual://music/playlists") {
+                                FloatingActionButton(
+                                    onClick = { appState.createNewPlaylist() },
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                                    shape = CircleShape,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(top = innerPadding.calculateTopPadding() + 16.dp, end = 16.dp)
+                                        .zIndex(5f)
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.menu_create_playlist))
+                                }
                             }
                         }
                     }
+
+                    if (showBottomBar) {
+                        val navColor = if (extendedColors.navigationBarColor != Color.Transparent)
+                            extendedColors.navigationBarColor
+                        else
+                            extendedColors.topBarBackground
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                                .background(
+                                    Brush.verticalGradient(
+                                        0f to Color.Transparent,
+                                        0.5f to navColor,
+                                        1f to navColor
+                                    )
+                                )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .padding(8.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                CompositionLocalProvider(LocalContentColor provides extendedColors.sidebarIcons) {
+                                    NavigationControls(
+                                        appState = appState,
+                                        onMenuClick = { scope.launch { drawerState.open() } }
+                                    )
+                                    SearchButton(
+                                        appState = appState,
+                                        searchQuery = TextFieldValue(""),
+                                        searchSubfolders = SettingsManager.searchSubfolders.value
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    AudioPlayerBar(
+                        appState = appState,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .padding(bottom = if (showBottomBar) 84.dp else 16.dp)
+                    )
+
+                    ClipboardIndicator(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .navigationBarsPadding()
+                            .padding(bottom = if (showBottomBar) 140.dp else 80.dp),
+                        backgroundColor = LocalExtendedColors.current.sidebarBackground,
+                        contentColor = LocalExtendedColors.current.textColor
+                    )
                 }
-
-                AudioPlayerBar(
-                    appState = appState,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .navigationBarsPadding()
-                        .padding(bottom = if (showBottomBar) 84.dp else 16.dp)
-                )
-
-                ClipboardIndicator(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .navigationBarsPadding()
-                        .padding(bottom = if (showBottomBar) 140.dp else 80.dp),
-                    backgroundColor = LocalExtendedColors.current.sidebarBackground,
-                    contentColor = LocalExtendedColors.current.textColor
-                )
             }
         }
     }
-}
 }
 
 @Composable
@@ -578,13 +580,21 @@ private fun ExplorerBody(
                         )
                         .zIndex(2f)
                 ) {
+                    val drawerShapeVal = if (sidebarIsRounded) RoundedCornerShape(12.dp) else RectangleShape
                     PermanentDrawerSheet(
                         modifier = Modifier
                             .width(navPaneWidth)
                             .fillMaxHeight()
+                            .then(
+                                if (sidebarIsRounded) {
+                                    Modifier.shadow(elevation = 8.dp, shape = drawerShapeVal, clip = false)
+                                } else {
+                                    Modifier
+                                }
+                            )
                             .hazeBackground(hazeState),
                         windowInsets = WindowInsets(0, 0, 0, 0),
-                        drawerShape = if (sidebarIsRounded) RoundedCornerShape(12.dp) else RectangleShape,
+                        drawerShape = drawerShapeVal,
                         drawerContainerColor = sidebarBg.copy(alpha = 0.98f)
                     ) {
                         NavigationPane(

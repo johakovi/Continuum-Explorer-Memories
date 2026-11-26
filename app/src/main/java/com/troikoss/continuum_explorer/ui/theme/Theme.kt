@@ -394,10 +394,10 @@ fun FileExplorerTheme(
             val sidebarIconColor = if (sidebarTheme == IconTheme.MATERIAL) colorScheme.primary else VeryDarkIcons
             val folderIconColor = if (folderTheme == IconTheme.MATERIAL) colorScheme.primary else VeryDarkIcons
             ExtendedColors(
-                sidebarBackground = VeryDarkSidebar,
+                sidebarBackground = colorScheme.surfaceContainerHigh,
                 topBarBackground = VeryDarkTopBar,
                 navButtonBackground = Color(0xFF000000),
-                searchBoxBackground = Color(0xFF1A1A1A),
+                searchBoxBackground = colorScheme.surfaceContainerHigh,
                 tabBarBackground = Color(0xFF2D2D2F),
                 selectionBackground = DarkPrimarySelection,
                 sidebarIcons = sidebarIconColor,
@@ -463,10 +463,10 @@ fun FileExplorerTheme(
             val sidebarIconColor = if (sidebarTheme == IconTheme.MATERIAL) colorScheme.primary else VeryLightIcons
             val folderIconColor = if (folderTheme == IconTheme.MATERIAL) colorScheme.primary else VeryLightIcons
             ExtendedColors(
-                sidebarBackground = VeryLightSidebar,
+                sidebarBackground = colorScheme.surfaceContainerHigh,
                 topBarBackground = VeryLightTopBar,
                 navButtonBackground = VeryLightTopBar,
-                searchBoxBackground = Color(0xFFE3E3E3),
+                searchBoxBackground = colorScheme.surfaceContainerHigh,
                 tabBarBackground = Color(0xFFfcfcfe),
                 selectionBackground = LightPrimarySelection,
                 sidebarIcons = sidebarIconColor,
@@ -530,10 +530,10 @@ fun FileExplorerTheme(
         }
         else -> {
             ExtendedColors(
-                sidebarBackground = colorScheme.surfaceContainer,
+                sidebarBackground = colorScheme.surfaceContainerHigh,
                 topBarBackground = colorScheme.surfaceContainerLow,
-                navButtonBackground = colorScheme.surfaceContainerLow,
-                searchBoxBackground = colorScheme.surfaceContainer,
+                navButtonBackground = colorScheme. surfaceContainerLow,
+                searchBoxBackground = colorScheme.surfaceContainerHighest,
                 tabBarBackground = colorScheme.surfaceContainerLowest,
                 selectionBackground = colorScheme.primaryContainer,
                 sidebarIcons = colorScheme.onSurface,
@@ -608,7 +608,7 @@ fun FileExplorerTheme(
         if (context is ComponentActivity) {
             val statusColor = finalExtendedColors.statusBarColor.toArgb()
             val navColor = finalExtendedColors.navigationBarColor.toArgb()
-            
+
             context.enableEdgeToEdge(
                 statusBarStyle = if (darkTheme) {
                     SystemBarStyle.dark(statusColor)
@@ -621,7 +621,7 @@ fun FileExplorerTheme(
                     SystemBarStyle.light(navColor, navColor)
                 }
             )
-            
+
             androidx.core.view.WindowCompat.setDecorFitsSystemWindows(context.window, false)
 
             if (Build.VERSION.SDK_INT >= 35) {

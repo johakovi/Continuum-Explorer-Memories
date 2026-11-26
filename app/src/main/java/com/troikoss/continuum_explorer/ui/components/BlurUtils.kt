@@ -1,6 +1,8 @@
 package com.troikoss.continuum_explorer.ui.components
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
@@ -105,7 +107,8 @@ fun Modifier.hazeBackground(hazeState: HazeState, zIndex: Float = 0f): Modifier 
 fun Modifier.hazeBlur(
     hazeState: HazeState,
     tintColor: Color = Color.Unspecified,
-    shape: Shape = RoundedCornerShape(16.dp)
+    shape: Shape = RoundedCornerShape(16.dp),
+    border: BorderStroke? = null
 ): Modifier {
     val effectiveColor = if (tintColor != Color.Unspecified) tintColor else Color(0xFF1C1C1C).copy(alpha = 0.65f)
     val style = HazeStyle(
@@ -114,7 +117,10 @@ fun Modifier.hazeBlur(
         backgroundColor = effectiveColor
     )
 
-    return this.clip(shape).hazeEffect(state = hazeState, style = style)
+    return this
+        .clip(shape)
+        .hazeEffect(state = hazeState, style = style)
+        .then(if (border != null) Modifier.border(border, shape) else Modifier)
 }
 
 /**

@@ -3,6 +3,7 @@ package com.troikoss.continuum_explorer.ui.components
 import androidx.annotation.OptIn
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -136,7 +137,8 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 .hazeBlur(
                                     hazeState,
                                     playerContainerColor.copy(alpha = 0.65f),
-                                    CircleShape
+                                    CircleShape,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
                                 ),
                             shape = CircleShape,
                             color = Color.Transparent,
@@ -196,7 +198,8 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                 .hazeBlur(
                                     hazeState,
                                     playerContainerColor.copy(alpha = 0.65f),
-                                    drawerShape
+                                    drawerShape,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
                                 ),
                             shape = drawerShape,
                             color = Color.Transparent,
@@ -424,7 +427,8 @@ fun AudioPlayerBar(appState: FileExplorerState, modifier: Modifier = Modifier) {
                                     Modifier.hazeBlur(
                                         hazeState,
                                         playerContainerColor.copy(alpha = 0.65f),
-                                        pillShape
+                                        pillShape,
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
                                     )
                                 } else {
                                     Modifier.clip(pillShape)
